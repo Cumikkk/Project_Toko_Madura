@@ -1,6 +1,5 @@
 com_error.log
 com_access.log
-assets/vendor/
 assets/uploads/
 file_upload.php
 test_email.php
