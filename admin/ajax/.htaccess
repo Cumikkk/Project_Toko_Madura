@@ -1,0 +1,28 @@
+Options +FollowSymlinks 
+Options +MultiViews
+Options +SymLinksifOwnerMatch
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+	RewriteCond %{REQUEST_FILENAME} -f [OR]
+	RewriteCond %{REQUEST_FILENAME} -l
+	RewriteRule ^ - [L]
+    
+    #Akses ke /ajax/auth/
+    RewriteRule ^auth/([^./]+)/([^./]+)/([^./]+)/?$ appAuth.php?a=$1&b=$2&c=$3 [L,QSA]
+    RewriteRule ^auth/([^./]+)/([^./]+)/?$ appAuth.php?a=$1&b=$2 [L,QSA]
+    RewriteRule ^auth/([^./]+)/?$ appAuth.php?a=$1 [L,QSA]
+
+    #Akses ke /ajax/post/
+    RewriteRule ^post/([^./]+)/([^./]+)/([^./]+)/([^./]+)/?$ appPost.php?a=$1&b=$2&c=$3&d=$4 [L,QSA]
+	RewriteRule ^post/([^./]+)/([^./]+)/([^./]+)/?$ appPost.php?a=$1&b=$2&c=$3 [L,QSA]
+	RewriteRule ^post/([^./]+)/([^./]+)/?$ appPost.php?a=$1&b=$2 [L,QSA]
+	RewriteRule ^post/([^./]+)/?$ appPost.php?a=$1 [L,QSA]
+
+    #Akses ke /ajax/datatable/
+    RewriteRule ^datatable/([^./]+)/([^./]+)/([^./]+)/?$ appDatatable.php?url=$1&a=$2b=$3 [L,QSA]
+    RewriteRule ^datatable/([^./]+)/([^./]+)/?$ appDatatable.php?url=$1&a=$2 [L,QSA]
+	RewriteRule ^datatable/([^./]+)/?$ appDatatable.php?url=$1 [L,QSA]
+</IfModule>

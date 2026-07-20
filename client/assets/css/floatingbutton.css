@@ -1,0 +1,127 @@
+
+
+.floatbtn_scope_floatbtn{
+    /* Variabel khusus komponen */
+    --fab-size_floatbtn: 56px;
+    --fab-offset_floatbtn: 22px; /* jarak dari pinggir layar */
+    --fab-bg_floatbtn: #2563eb; /* biru */
+    --fab-bg-hover_floatbtn: #1d4ed8; /* biru lebih gelap */
+    --fab-color_floatbtn: #ffffff;
+    --fab-shadow_floatbtn: 0 10px 20px rgba(37,99,235,.35);
+    --ring_floatbtn: 3px solid rgba(37,99,235,.4);
+    --z-fab_floatbtn: 999999;
+}
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn{
+    position: fixed !important; 
+    z-index: 999999 !important;
+    left: calc(var(--fab-offset_floatbtn) + env(safe-area-inset-left)) !important;
+    bottom: calc(var(--fab-offset_floatbtn) + env(safe-area-inset-bottom)) !important;
+    width: var(--fab-size_floatbtn); 
+    height: var(--fab-size_floatbtn);
+    display: grid !important; 
+    place-items: center;
+    border-radius: 9999px; 
+    text-decoration: none;
+    color: var(--fab-color_floatbtn);
+    background: #22c55e !important; /* hijau WhatsApp */
+    box-shadow: 0 10px 20px rgba(34,197,94,.35) !important;
+    transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+    -webkit-tap-highlight-color: transparent;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn:hover{ background:#16a34a; transform: translateY(-1px); }
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn:active{ transform: translateY(0); box-shadow: 0 6px 14px rgba(34,197,94,.3); }
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn:focus-visible{ outline: var(--ring_floatbtn); outline-offset: 3px; }
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn svg{ width: 26px; height: 26px; display:block; }
+
+
+/* Badge kecil untuk teks opsional */
+.floatbtn_scope_floatbtn .label_floatbtn{
+    position: absolute; left: calc(100% + 10px); white-space: nowrap;
+    background:#0f172a; color:#e2e8f0; padding: 6px 10px; border-radius: 10px;
+    font-size: 12px; box-shadow: 0 6px 20px rgba(2,6,23,.25); pointer-events: none; opacity: 0; transform: translateY(4px);
+    transition: opacity .2s ease, transform .2s ease;
+}
+.floatbtn_scope_floatbtn .floating-whatsapp_floatbtn:hover .label_floatbtn{ opacity: 1; transform: translateY(0); }
+
+
+/* ---------- VARIAN #2: Speed Dial (Multi Aksi) ---------- */
+.floatbtn_scope_floatbtn .fab_floatbtn{ position: fixed; z-index: var(--z-fab_floatbtn);
+    right: calc(var(--fab-offset_floatbtn) + env(safe-area-inset-right));
+    bottom: calc(var(--fab-offset_floatbtn) + 72px + env(safe-area-inset-bottom)); /* agak di atas tombol WA agar tidak tabrakan */
+}
+.floatbtn_scope_floatbtn .fab__main_floatbtn{
+    width: var(--fab-size_floatbtn); height: var(--fab-size_floatbtn);
+    border: 0; border-radius: 9999px; cursor: pointer; display: grid; place-items: center;
+    background: var(--fab-bg_floatbtn); color: var(--fab-color_floatbtn);
+    box-shadow: var(--fab-shadow_floatbtn);
+    transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.floatbtn_scope_floatbtn .fab__main_floatbtn:hover{ background: var(--fab-bg-hover_floatbtn); transform: translateY(-1px); }
+.floatbtn_scope_floatbtn .fab__main_floatbtn:active{ transform: translateY(0); box-shadow: 0 6px 14px rgba(37,99,235,.3); }
+.floatbtn_scope_floatbtn .fab__main_floatbtn:focus-visible{ outline: var(--ring_floatbtn); outline-offset: 4px; }
+.floatbtn_scope_floatbtn .fab__icon_floatbtn{ width:24px; height:24px; transition: transform .2s ease; }
+
+
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__icon_floatbtn{ transform: rotate(45deg); }
+
+
+.floatbtn_scope_floatbtn .fab__list_floatbtn{ list-style: none; margin: 0; padding: 0; position: absolute; bottom: calc(var(--fab-size_floatbtn) + 10px); right: 0; }
+.floatbtn_scope_floatbtn .fab__item_floatbtn{ display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.floatbtn_scope_floatbtn .fab__label_floatbtn{
+    background: #0f172a; color: #e2e8f0; padding: 8px 10px; border-radius: 10px; font-size: 12px;
+    box-shadow: 0 6px 20px rgba(2,6,23,.25); opacity: 0; transform: translateY(6px); transition: opacity .2s ease, transform .2s ease;
+    pointer-events: none;
+}
+
+
+.floatbtn_scope_floatbtn .fab__btn_floatbtn{
+    width: 44px; height: 44px; border-radius: 9999px; display: grid; place-items: center; text-decoration: none;
+    color: var(--fab-color_floatbtn); background:#334155; transition: transform .15s ease, background-color .15s ease;
+    box-shadow: 0 8px 20px rgba(51,65,85,.3);
+}
+.floatbtn_scope_floatbtn .fab__btn_floatbtn:hover{ background:#1f2937; transform: translateY(-1px); }
+.floatbtn_scope_floatbtn .fab__btn_floatbtn:active{ transform: translateY(0); }
+.floatbtn_scope_floatbtn .fab__btn_floatbtn svg{ width:20px; height:20px; }
+
+
+/* state tertutup */
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="false"] .fab__item_floatbtn{ opacity: 0; filter: blur(2px); transform: translateY(8px); pointer-events: none; }
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="false"] .fab__btn_floatbtn{ transition-delay: 0s; }
+
+
+/* state terbuka */
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__item_floatbtn{ opacity: 1; filter: none; transform: translateY(0); pointer-events: auto; }
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__label_floatbtn{ opacity: 1; transform: translateY(0); }
+
+
+/* animasi stagger */
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__item_floatbtn:nth-child(1){ transition: all .15s ease .02s; }
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__item_floatbtn:nth-child(2){ transition: all .15s ease .06s; }
+.floatbtn_scope_floatbtn .fab_floatbtn[aria-expanded="true"] .fab__item_floatbtn:nth-child(3){ transition: all .15s ease .10s; }
+
+
+@media (prefers-reduced-motion: reduce){
+.floatbtn_scope_floatbtn .fab__item_floatbtn,
+.floatbtn_scope_floatbtn .fab__label_floatbtn,
+.floatbtn_scope_floatbtn .fab__icon_floatbtn{ transition: none !important; }
+}
+
+/* Pastikan tombol WhatsApp terlihat di semua ukuran layar */
+@media (min-width: 768px) {
+    .floatbtn_scope_floatbtn .floating-whatsapp_floatbtn {
+        display: grid !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .floatbtn_scope_floatbtn .floating-whatsapp_floatbtn {
+        display: grid !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}

@@ -1,0 +1,36 @@
+.positive {
+    color: var(--bs-green) !important;
+}
+
+.negative {
+    color: var(--bs-danger) !important;
+}
+
+.panel.header-color {
+    border-top: 4px solid #F0C434;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.5rem;  
+    font-weight: 600;
+    margin: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.data-table {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.data-table th, .data-table td {
+    text-align: start !important;
+    vertical-align: middle;
+}

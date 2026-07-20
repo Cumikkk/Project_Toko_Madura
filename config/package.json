@@ -1,0 +1,26 @@
+{
+  "name": "rrfx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevTeam-AllMediaIndo/rrfx.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DevTeam-AllMediaIndo/rrfx/issues"
+  },
+  "homepage": "https://github.com/DevTeam-AllMediaIndo/rrfx#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.5.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.3.0"
+  }
+}
