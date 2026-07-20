@@ -1,19 +1,20 @@
 # App info
-APP_NAME=
+APP_NAME="Toko Madura"
 APP_DEV_PASS=
-APP_MODE=
-APP_EMAILER=#mailgun/smtp
+APP_MODE=development
+APP_EMAILER=smtp
 
-CLIENT_URL=
-ADMIN_URL=
-API_URL=
+# URL Konfigurasi Lokal - Dinonaktifkan agar otomatis menggunakan deteksi dinamis SystemInfo::app()
+# CLIENT_URL="http://localhost/Project-Toko Madura/client"
+# ADMIN_URL="http://localhost/Project-Toko Madura/admin"
+# API_URL="http://localhost/Project-Toko Madura/api"
 
 # Database
-DB_HOST=
-DB_USER=
+DB_HOST=127.0.0.1
+DB_USER=root
 DB_PASS=
-DB_NAME=
-DB_PORT=
+DB_NAME=toko_madura
+DB_PORT=3306
 DB_METALIVE=
 DB_METADEMO=
 
@@ -24,32 +25,3 @@ EMAIL_USER=
 EMAIL_PASSWORD=
 EMAIL_PORT=
 EMAIL_SECURE=
-
-# Email MailGun Credential
-MAILGUN_DOMAIN=
-MAILGUN_APIKEY=
-MAILGUN_EMAIL=
-MAILGUN_NAME=
-
-# AWS
-AWS_REGION=
-AWS_BUCKET=
-AWS_FOLDER=
-AWS_KEY=
-AWS_SECRET=
-
-# Metatrader
-SERVER_NAME_DEMO=
-SERVER_NAME_LIVE=
-MANAGER_TOKEN_DEMO=
-MANAGER_TOKEN_LIVE=
-MANAGER_ENDPOINT=
-TERMINAL_ENDPOINT=
-
-# Telegram Bot
-TELEGRAM_BOT=
-
-# Github Auto Pull
-GITHUB_REPO="DevTeam-AllMediaIndo/rrfx"
-GITHUB_USER_PULL=
-GITHUB_WEBHOOK_SECRET=
