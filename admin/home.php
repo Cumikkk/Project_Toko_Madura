@@ -198,32 +198,56 @@ $filePermission = $adminPermissionCore->hasPermission($getAuthrorizedPermissions
 
 		<script type="text/javascript">
             $(document).ready(function() {
-                $('.nav-item').removeClass('active show')
-                let currentModule = window.location.pathname
+                $('.nav-item').removeClass('active show');
+                $('.nav-sub-item').removeClass('active');
+                $('.nav-sub-link').removeClass('active');
+                
+                let currentPath = window.location.pathname;
+                let adminUrlPath = new URL('<?= SystemInfo::app("ADMIN_URL") ?>', window.location.origin).pathname;
+                let relativePath = currentPath.substring(adminUrlPath.length);
+                let segments = relativePath.split('/').filter(Boolean);
+                let primaryModule = segments[0] ? segments[0].toLowerCase() : '';
+                let secondaryModule = segments[1] ? segments[1].toLowerCase() : '';
+                
                 $.each($('.menu-nav .nav-link'), (i, el) => {
-                    let target = $(el)
-                    if(target.hasClass('with-sub')) {
-                        /** Handle Dropdown */
-                        subTarget = target.parent().find('.nav-sub-link').map((el, val) => {
-                            if($(val).attr('href') == currentModule) {
-                                return val;
-                            }
-                        })
-
-                        if(subTarget?.attr('href') == currentModule) {
-                            if(!subTarget.hasClass('active')) subTarget.addClass('active');
-                            if(!subTarget.parent().hasClass('active')) subTarget.parent().addClass('active');
-                            if(!subTarget.parent().parent().hasClass('open')) subTarget.parent().parent().addClass('open');
-                            if(!subTarget.parent().parent().parent().hasClass('active show')) subTarget.parent().parent().parent().addClass('active show');
-                        }
+                    let target = $(el);
+                    let href = target.attr('href');
+                    if (!href) return;
                     
-                    }else {
-                        /** Handle Single */
-                        if(target?.attr('href') == currentModule) {
-                            target.parent().addClass('active')
+                    let hrefPath = new URL(href, window.location.origin).pathname;
+                    let relativeHref = hrefPath.substring(adminUrlPath.length);
+                    let hrefSegments = relativeHref.split('/').filter(Boolean);
+                    let hrefPrimary = hrefSegments[0] ? hrefSegments[0].toLowerCase() : '';
+                    let hrefSecondary = hrefSegments[1] ? hrefSegments[1].toLowerCase() : '';
+                    
+                    if (target.hasClass('with-sub')) {
+                        let hasActiveSub = false;
+                        target.parent().find('.nav-sub-link').each((subIdx, subEl) => {
+                            let subHref = $(subEl).attr('href');
+                            if (subHref) {
+                                let subHrefPath = new URL(subHref, window.location.origin).pathname;
+                                let subRelativeHref = subHrefPath.substring(adminUrlPath.length);
+                                let subHrefSegments = subRelativeHref.split('/').filter(Boolean);
+                                let subHrefPrimary = subHrefSegments[0] ? subHrefSegments[0].toLowerCase() : '';
+                                let subHrefSecondary = subHrefSegments[1] ? subHrefSegments[1].toLowerCase() : '';
+                                
+                                if (subHrefPrimary === primaryModule && subHrefSecondary === secondaryModule) {
+                                    $(subEl).addClass('active');
+                                    $(subEl).parent().addClass('active');
+                                    hasActiveSub = true;
+                                }
+                            }
+                        });
+                        
+                        if (hasActiveSub) {
+                            target.parent().addClass('active show');
+                        }
+                    } else {
+                        if (hrefPrimary === primaryModule) {
+                            target.parent().addClass('active');
                         }
                     }
-                })
+                });
 
 				$('.amount-formatter').on('keyup', function(evt) {
 					$(evt.currentTarget).val( formatter( $(evt.currentTarget).val() ) )
