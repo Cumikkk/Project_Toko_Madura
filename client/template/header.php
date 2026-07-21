@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\FileUpload;
+use Config\Core\SystemInfo;
 ?>
 <!-- preloader start -->
 <div class="preloader d-none">
