@@ -1,132 +1,123 @@
-# 📋 Panduan Alur Perintah Git
+# 📋 Panduan Alur Kerja Git (Step-by-Step Terurut)
 
-Berikut adalah urutan perintah Git yang rapi dan siap digunakan untuk alur kerja harian maupun kolaborasi bersama tim Anda:
+Panduan ini disusun secara berurutan mulai dari awal pembuatan branch, memasukkan perintah sehari-hari, hingga cara berkolaborasi dengan tim.
 
 ---
 
-## 🌿 A. Alur Kerja Harian di Branch Sendiri (`Cumikkk`)
+## 🚀 1. Langkah Awal Pembuatan Branch (Hanya Sekali di Awal)
+Sebelum mulai mengotak-atik kode, buatlah branch khusus agar pekerjaan Anda terpisah dari branch `main` (utama).
 
-Jalankan urutan 5 langkah ini setiap kali Anda ingin bekerja dan menyimpan hasil kerja Anda ke branch `Cumikkk`:
+*   **Untuk Anda (membuat branch `Cumikkk`):**
+    ```bash
+    git checkout -b Cumikkk
+    ```
+*   **Untuk Teman Anda (membuat branch sendiri, misal `branch-andi`):**
+    ```bash
+    git checkout -b branch-andi
+    ```
+    *(Tanda `-b` artinya membuat branch baru dan langsung berpindah ke sana).*
 
-1. **Cek Posisi Branch** (Pastikan tertulis `* Cumikkk` di terminal)
+---
+
+## 💻 2. Langkah-Langkah Memasukkan Perintah (Alur Kerja Harian)
+Jalankan langkah-langkah di bawah ini secara berurutan setiap kali Anda selesai menulis kode dan ingin menyimpannya ke GitHub:
+
+### **Langkah A: Cek Branch Aktif**
+Pastikan Anda berada di branch Anda sendiri, bukan di branch `main`:
+```bash
+git branch
+```
+*(Yang aktif harus memiliki tanda bintang `*` di sebelah namanya, contoh: `* Cumikkk`).*
+
+### **Langkah B: Cek File yang Berubah**
+Ketik ini untuk melihat file apa saja yang baru Anda edit:
+```bash
+git status
+```
+
+### **Langkah C: Tandai File yang Diedit**
+Ketik ini untuk menandai semua file siap disimpan:
+```bash
+git add .
+```
+
+### **Langkah D: Simpan di Komputer Lokal**
+Kunci perubahan tersebut di lokal komputer Anda dengan pesan deskripsi singkat:
+```bash
+git commit -m "Tulis pesan mengenai apa yang Anda ubah"
+```
+*(Contoh: `git commit -m "Update login master"`).*
+
+### **Langkah E: Kirim Perubahan ke GitHub**
+*   **Jika Baru Pertama Kali Push Branch Ini:**
+    ```bash
+    git push -u origin [nama-branch-anda]
+    ```
+    *(Contoh: `git push -u origin Cumikkk`)*
+*   **Untuk Push Rutin Berikutnya:**
+    ```bash
+    git push origin [nama-branch-anda]
+    ```
+    *(Contoh: `git push origin Cumikkk`)*
+
+---
+
+## 🤝 3. Langkah Menyatukan Kode ke Branch Utama (`main`)
+Lakukan langkah ini jika salah satu fitur di branch uji coba (misal `Cumikkk`) sudah selesai dites dan ingin digabungkan secara resmi ke branch `main`.
+
+1. **Pindah ke branch `main`**:
    ```bash
-   git branch
+   git checkout main
    ```
-   *(Jika Anda berada di branch `main`, ketik `git checkout Cumikkk` dahulu)*
-
-2. **Tarik Pembaruan Online Terbaru** (Untuk sinkronisasi dengan GitHub)
+2. **Tarik pembaruan online terbaru di branch `main`**:
    ```bash
    git pull
    ```
-
-3. **Tandai Semua Perubahan File**
+3. **Gabungkan (Merge) branch uji coba Anda ke `main`**:
    ```bash
-   git add .
+   git merge Cumikkk
    ```
-
-4. **Kunci Perubahan di Lokal**
+4. **Kirim hasil penggabungan ke GitHub**:
    ```bash
-   git commit -m "Deskripsi singkat hasil kerja Anda"
-   ```
-
-5. **Kirim Perubahan ke GitHub**
-   ```bash
-   git push origin Cumikkk
+   git push origin main
    ```
 
 ---
 
-## 👥 B. Alur Kerja Kolaborasi Bersama Teman (Kerja Bareng)
+## 🔄 4. Langkah Sinkronisasi Ulang (Mengambil Kode Baru dari Teman)
+Setelah salah satu dari Anda memperbarui branch `main` (Langkah 3), pihak yang lain harus memperbarui branch kerjanya masing-masing agar mendapatkan fitur terbaru tersebut.
 
-Bagian ini menjelaskan bagaimana Anda (`Cumikkk`) dan teman Anda (misalnya branch `branch-andi`) bekerja bersama tanpa mengganggu branch utama (`main`).
-
-```mermaid
-graph TD
-    A[Anda di branch Cumikkk] -->|Selesai Fitur & Commit| B[Pindah ke main]
-    B -->|Pull & Merge Cumikkk| C[Push main ke GitHub]
-    C -->|Beri Tahu Teman| D[Teman di branch-andi]
-    D -->|Pindah ke main & Pull| E[Kembali ke branch-andi]
-    E -->|Merge main| F[Kode Anda berdua tersambung aman]
-```
-
-### 1. Perintah yang Dilakukan oleh TEMAN Anda:
-Teman Anda membuat branch kerjanya sendiri untuk mulai menulis fiturnya:
-```bash
-# Membuat & pindah ke branch baru milik teman
-git checkout -b branch-andi
-
-# Setelah selesai coding, tandai & commit perubahan
-git add .
-git commit -m "Deskripsi hasil kerja teman"
-
-# Upload branch teman ke GitHub (Push Pertama)
-git push -u origin branch-andi
-```
-
-### 2. Perintah untuk Menyatukan Hasil Kerja Anda ke Branch Utama (`main`):
-Jika fitur Anda di branch `Cumikkk` sudah selesai dan ingin dibagikan ke teman Anda, lakukan ini:
-```bash
-# 1. Pindah ke branch main
-git checkout main
-
-# 2. Ambil update terbaru dari GitHub main
-git pull
-
-# 3. Gabungkan kode Cumikkk ke dalam main
-git merge Cumikkk
-
-# 4. Push hasil penggabungan ke GitHub main
-git push origin main
-```
-
-### 3. Perintah agar Teman Anda Bisa Mengambil Pembaruan dari `main`:
-Teman Anda ingin memasukkan fitur baru buatan Anda tadi ke branch kerjanya (`branch-andi`):
-```bash
-# 1. Teman pindah ke branch main lokalnya
-git checkout main
-
-# 2. Teman menarik kode terbaru dari GitHub main
-git pull
-
-# 3. Teman kembali ke branch kerjanya
-git checkout branch-andi
-
-# 4. Teman menggabungkan kode main terbaru ke branch kerjanya
-git merge main
-```
-
----
-
-## 🔄 C. Cara Mengambil Pembaruan dari Branch Teman
-Jika Anda ingin melihat atau mengambil kode yang dikerjakan teman Anda di branch-nya (`branch-andi`) secara langsung:
-
-1. **Ambil informasi branch baru dari GitHub**:
+**Contoh: Teman Anda ingin mengambil fitur baru buatan Anda dari `main`:**
+1. **Teman Anda pindah ke branch `main` lokalnya**:
    ```bash
-   git fetch origin
+   git checkout main
    ```
-
-2. **Pindah ke branch teman Anda untuk melihat kodenya**:
+2. **Teman Anda menarik kode baru dari GitHub**:
+   ```bash
+   git pull
+   ```
+3. **Teman Anda kembali ke branch kerjanya**:
    ```bash
    git checkout branch-andi
    ```
+4. **Teman Anda menggabungkan kode `main` terbaru ke branch-nya**:
+   ```bash
+   git merge main
+   ```
+   *(Sekarang kode di branch teman Anda sudah lengkap berisi hasil kerja Anda berdua).*
 
 ---
 
-## ⏪ D. Pembatalan Perubahan (Jika Ada Salah Edit)
-
-* **Membatalkan editan file yang BELUM di-`git add`:**
-  ```bash
-  git restore nama_file.php
-  ```
-* **Membatalkan file yang terlanjur di-`git add` (keluar dari antrean):**
-  ```bash
-  git restore --staged nama_file.php
-  ```
-* **Membatalkan commit terakhir di lokal (File editan Anda tetap aman):**
-  ```bash
-  git reset --soft HEAD~1
-  ```
-* **Membatalkan commit terakhir & MENGHAPUS semua editan file secara total:**
-  ```bash
-  git reset --hard HEAD~1
-  ```
+## ⏪ 5. Langkah Pembatalan Perubahan (Jika Terjadi Kesalahan)
+*   **Membatalkan editan file yang BELUM di-`git add`:**
+    ```bash
+    git restore nama_file.php
+    ```
+*   **Membatalkan file yang terlanjur di-`git add`:**
+    ```bash
+    git restore --staged nama_file.php
+    ```
+*   **Membatalkan commit terakhir di lokal (File editan Anda tetap aman):**
+    ```bash
+    git reset --soft HEAD~1
+    ```
