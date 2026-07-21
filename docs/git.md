@@ -121,3 +121,29 @@ Setelah salah satu dari Anda memperbarui branch `main` (Langkah 3), pihak yang l
     ```bash
     git reset --soft HEAD~1
     ```
+
+---
+
+## 💡 6. Tips Tambahan & FAQ (PENTING)
+
+### ❓ Kenapa saat mengetik `git branch` hanya muncul branch `main`?
+*   **Penyebab**: Perintah `git branch` hanya menampilkan branch yang **sudah pernah diaktifkan secara lokal** di komputer Anda. Karena Anda baru melakukan kloning repositori, branch lain (seperti `Cumikkk`) masih tersimpan di server GitHub dan belum diunduh ke komputer Anda.
+*   **Solusi**:
+    1. Untuk melihat **semua** branch (baik lokal maupun di server GitHub), ketik:
+       ```bash
+       git branch -a
+       ```
+       *(Branch online/remote biasanya berwarna merah).*
+    2. Untuk mengambil dan berpindah ke branch dari GitHub (misalnya branch `Cumikkk`), jalankan:
+       ```bash
+       git fetch origin
+       git checkout Cumikkk
+       ```
+
+### ❓ Apa bedanya `git fetch origin` dengan `git pull`?
+*   **`git fetch origin` (Mengintip/Mengambil Info)**:
+    *   Hanya mengambil **informasi daftar perubahan terbaru** dari GitHub (seperti daftar branch baru yang dibuat teman Anda, atau adanya commit baru) tanpa merusak atau mengubah kode file yang sedang Anda buka di VS Code.
+    *   **Kapan digunakan?** Ketika teman Anda baru saja membuat branch baru di GitHub dan Anda ingin berpindah ke branch tersebut, atau saat Anda ingin mengecek update terbaru tanpa ingin langsung menimpa kode lokal Anda.
+*   **`git pull` (Mengunduh & Menggabungkan)**:
+    *   Mengunduh data terbaru sekaligus **langsung menggabungkan (merge) ke file kode Anda saat ini** di VS Code.
+    *   **Kapan digunakan?** Ketika Anda ingin menyelaraskan isi file codingan Anda dengan versi terbaru di GitHub.
