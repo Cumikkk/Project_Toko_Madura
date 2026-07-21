@@ -77,6 +77,6 @@ JsonResponse([
     'success'   => true,
     'message'   => "Update admin successfully",
     'data'      => [
-        'redirect' => "/admin/view"
+        'redirect' => \Config\Core\SystemInfo::app('ADMIN_URL') . "/admin/view"
     ]
 ]);

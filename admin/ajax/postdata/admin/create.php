@@ -72,8 +72,8 @@ if(!$insert) {
 
 JsonResponse([
     'success'   => true,
-    'message'   => "Berhasil membuat admin baru",
+    'message'   => "create admin successfully",
     'data'      => [
-        'redirect' => "/admin/view"
+        'redirect' => \Config\Core\SystemInfo::app('ADMIN_URL') . "/admin/view"
     ]
 ]);
