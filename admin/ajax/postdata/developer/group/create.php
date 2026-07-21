@@ -50,7 +50,7 @@ $insert = Database::insert("admin_module_group", [
     'group' => $data['group_name'],
     'type' => $data['group_type'],
     'icon' => $data['group_icon'],
-    'min_level' => 0
+    'min_level' => 1
 ]);
 
 if(!$insert) {

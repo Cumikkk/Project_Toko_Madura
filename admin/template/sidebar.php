@@ -1,6 +1,7 @@
 <?php
     use Config\Core\SystemInfo;
     $login_page = $page;
+    $page_sub = $_GET['b'] ?? '';
 ?>
 <div class="sticky">
     <div class="main-menu main-sidebar main-sidebar-sticky side-menu">
@@ -20,7 +21,7 @@
                             <?php foreach($group['modules'] as $module) : ?>
                                 <?php foreach($module['permission'] as $permission) : ?>
                                     <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
-                                        <li class="nav-item <?= ($module['module'] == $login_page)? "active" : ""; ?>">
+                                        <li class="nav-item <?= (strcasecmp($module['module'], $login_page) == 0)? "active" : ""; ?>">
                                             <a class="nav-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>">
                                                 <span class="shape1"></span>
                                                 <span class="shape2"></span>
@@ -29,11 +30,24 @@
                                             </a>
                                         </li>
                                     <?php endif; ?>
-                                <?php endforeach; ?>
+                                 <?php endforeach; ?>
                             <?php endforeach; ?>
 
                         <?php elseif($group['type'] == "dropdown") : ?>
-                            <li class="nav-item">
+                            <?php
+                            $isGroupActive = false;
+                            if (strcasecmp($group['group'], $login_page) == 0) {
+                                $isGroupActive = true;
+                            } else {
+                                foreach ($group['modules'] as $mod) {
+                                    if (strcasecmp($mod['module'], $login_page) == 0) {
+                                        $isGroupActive = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            ?>
+                            <li class="nav-item <?= $isGroupActive ? "active show" : ""; ?>">
                                 <a class="nav-link with-sub" href="javascript:void(0);">
                                     <span class="shape1"></span>
                                     <span class="shape2"></span>
@@ -45,7 +59,9 @@
                                     <?php foreach($group['modules'] as $module) : ?>
                                         <?php foreach($module['permission'] as $permission) : ?>
                                             <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
-                                                <li class="nav-sub-item"><a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= $module['alias'] ?></a></li>
+                                                <li class="nav-sub-item <?= (strcasecmp($module['module'], $login_page) == 0 || strcasecmp($module['module'], $page_sub) == 0)? "active" : ""; ?>">
+                                                    <a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= $module['alias'] ?></a>
+                                                </li>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php endforeach; ?>
