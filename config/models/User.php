@@ -54,7 +54,7 @@ class User extends UserAuth {
                 'MBR_USER' => $rawUser['username'],
                 'MBR_STS' => -1, 
                 'MBR_LOCKED' => 0,
-                'MBR_THEME' => '1',
+                'MBR_THEME' => $_SESSION['MBR_THEME'] ?? '1',
                 'MBR_AVATAR' => '',
                 'role' => $rawUser['role'],
                 'userid' => md5(md5($rawUser['id_users']))

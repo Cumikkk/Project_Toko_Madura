@@ -259,12 +259,8 @@
             })
             $.post(window.CLIENT_URL + "/ajax/post/dashboard/theme", {theme: 1}, function(resp) {
                 if (resp.success) {
-
-                    if (darkMode === "enabled") {
-                        enableDarkMode();
-                        $('#darkTheme').addClass('active');
-                    }
-
+                    enableDarkMode();
+                    $('#darkTheme').addClass('active');
                     location.reload();
                 }
             }, 'json')
@@ -295,12 +291,8 @@
             })
             $.post(window.CLIENT_URL + "/ajax/post/dashboard/theme", {theme: 0}, function(resp) {
                 if (resp.success) {
-        
-                    if (lightMode === "enabled") {
-                        enableLightMode();
-                        $('#lightTheme').addClass('active');
-                    }
-
+                    enableLightMode();
+                    $('#lightTheme').addClass('active');
                     location.reload();
                 }
             }, 'json')
