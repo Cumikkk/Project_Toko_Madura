@@ -55,6 +55,7 @@ class User extends UserAuth {
                 'MBR_STS' => -1, 
                 'MBR_LOCKED' => 0,
                 'MBR_THEME' => '1',
+                'MBR_AVATAR' => '',
                 'role' => $rawUser['role'],
                 'userid' => md5(md5($rawUser['id_users']))
             ];
@@ -76,7 +77,7 @@ class User extends UserAuth {
 
      public static function avatar(string $filename): string {
         if(empty($filename) || $filename == "-") {
-            return "/assets/images/admin.png";
+            return SystemInfo::app('CLIENT_URL') . "/assets/images/admin.png";
         }
 
         return FileUpload::awsFile($filename);
