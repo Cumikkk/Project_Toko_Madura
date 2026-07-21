@@ -1,19 +1,20 @@
 # 📋 Panduan Alur Perintah Git
 
-Berikut adalah urutan perintah Git yang rapi dan siap digunakan untuk alur kerja Anda:
+Berikut adalah urutan perintah Git yang rapi dan siap digunakan untuk alur kerja harian maupun kolaborasi bersama tim Anda:
 
 ---
 
-## 🌿 A. Alur Kerja di Branch `Cumikkk` (Eksperimen/Uji Coba)
+## 🌿 A. Alur Kerja Harian di Branch Sendiri (`Cumikkk`)
 
-Jalankan urutan ini untuk menyimpan pekerjaan Anda ke branch `Cumikkk`:
+Jalankan urutan 5 langkah ini setiap kali Anda ingin bekerja dan menyimpan hasil kerja Anda ke branch `Cumikkk`:
 
 1. **Cek Posisi Branch** (Pastikan tertulis `* Cumikkk` di terminal)
    ```bash
    git branch
    ```
+   *(Jika Anda berada di branch `main`, ketik `git checkout Cumikkk` dahulu)*
 
-2. **Tarik Pembaruan Terbaru** (Dari server online)
+2. **Tarik Pembaruan Online Terbaru** (Untuk sinkronisasi dengan GitHub)
    ```bash
    git pull
    ```
@@ -25,7 +26,7 @@ Jalankan urutan ini untuk menyimpan pekerjaan Anda ke branch `Cumikkk`:
 
 4. **Kunci Perubahan di Lokal**
    ```bash
-   git commit -m "Update Cumikkk."
+   git commit -m "Deskripsi singkat hasil kerja Anda"
    ```
 
 5. **Kirim Perubahan ke GitHub**
@@ -35,77 +36,97 @@ Jalankan urutan ini untuk menyimpan pekerjaan Anda ke branch `Cumikkk`:
 
 ---
 
-## 🔄 B. Cara Berpindah dan Menggabungkan ke Branch `main` (Utama)
+## 👥 B. Alur Kerja Kolaborasi Bersama Teman (Kerja Bareng)
 
-Jalankan urutan ini jika Anda sudah siap menyatukan kode uji coba dari branch `Cumikkk` ke branch utama `main`:
+Bagian ini menjelaskan bagaimana Anda (`Cumikkk`) dan teman Anda (misalnya branch `branch-andi`) bekerja bersama tanpa mengganggu branch utama (`main`).
 
-1. **Pindah ke Branch `main`**
-   ```bash
-   git checkout main
-   ```
-
-2. **Gabungkan Perubahan dari `Cumikkk` ke `main`**
-   ```bash
-   git merge Cumikkk
-   ```
-
-3. **Tarik Pembaruan Online Terbaru**
-   ```bash
-   git pull
-   ```
-
-4. **Kirim Hasil Gabungan ke GitHub**
-   ```bash
-   git push origin main
-   ```
-
----
-
-## 👥 C. Cara agar Teman Punya Branch Sendiri (Kolaborasi)
-
-Jika teman Anda ingin mulai bekerja di branch-nya sendiri tanpa mengganggu branch `main` atau `Cumikkk`, berikut adalah langkah-langkah yang harus dilakukan oleh **teman Anda**:
-
-### Langkah 1: Kloning Repositori (Jika belum punya kodenya)
-Teman Anda harus mengkloning repositori ini ke komputer lokalnya:
-```bash
-git clone https://github.com/Cumikkk/Project_Toko_Madura.git
-cd Project_Toko_Madura
+```mermaid
+graph TD
+    A[Anda di branch Cumikkk] -->|Selesai Fitur & Commit| B[Pindah ke main]
+    B -->|Pull & Merge Cumikkk| C[Push main ke GitHub]
+    C -->|Beri Tahu Teman| D[Teman di branch-andi]
+    D -->|Pindah ke main & Pull| E[Kembali ke branch-andi]
+    E -->|Merge main| F[Kode Anda berdua tersambung aman]
 ```
 
-### Langkah 2: Buat Branch Baru Khusus untuk Dirinya
-Teman Anda membuat branch baru dengan nama bebas (misalnya `branch-andi`):
+### 1. Perintah yang Dilakukan oleh TEMAN Anda:
+Teman Anda membuat branch kerjanya sendiri untuk mulai menulis fiturnya:
 ```bash
+# Membuat & pindah ke branch baru milik teman
 git checkout -b branch-andi
-```
-*(Perintah ini akan membuat branch baru lokal dan langsung berpindah ke branch tersebut).*
 
-### Langkah 3: Lakukan Coding dan Simpan Perubahan
-Setelah selesai menulis kode:
-```bash
-# 1. Tandai file yang berubah
+# Setelah selesai coding, tandai & commit perubahan
 git add .
-
-# 2. Kunci perubahan di lokal
 git commit -m "Deskripsi hasil kerja teman"
-```
 
-### Langkah 4: Push Pertama Kali ke GitHub
-Teman Anda harus mengunggah branch barunya ke GitHub agar Anda bisa melihat kodenya:
-```bash
+# Upload branch teman ke GitHub (Push Pertama)
 git push -u origin branch-andi
 ```
-*(Setelah push pertama ini sukses, untuk push berikutnya teman Anda cukup mengetik `git push` atau `git push origin branch-andi`).*
+
+### 2. Perintah untuk Menyatukan Hasil Kerja Anda ke Branch Utama (`main`):
+Jika fitur Anda di branch `Cumikkk` sudah selesai dan ingin dibagikan ke teman Anda, lakukan ini:
+```bash
+# 1. Pindah ke branch main
+git checkout main
+
+# 2. Ambil update terbaru dari GitHub main
+git pull
+
+# 3. Gabungkan kode Cumikkk ke dalam main
+git merge Cumikkk
+
+# 4. Push hasil penggabungan ke GitHub main
+git push origin main
+```
+
+### 3. Perintah agar Teman Anda Bisa Mengambil Pembaruan dari `main`:
+Teman Anda ingin memasukkan fitur baru buatan Anda tadi ke branch kerjanya (`branch-andi`):
+```bash
+# 1. Teman pindah ke branch main lokalnya
+git checkout main
+
+# 2. Teman menarik kode terbaru dari GitHub main
+git pull
+
+# 3. Teman kembali ke branch kerjanya
+git checkout branch-andi
+
+# 4. Teman menggabungkan kode main terbaru ke branch kerjanya
+git merge main
+```
 
 ---
 
-## 🔄 D. Cara Mengambil Pembaruan dari Branch Teman
-Jika Anda ingin melihat atau mengambil kode yang sudah dikerjakan teman Anda di branch-nya (`branch-andi`):
+## 🔄 C. Cara Mengambil Pembaruan dari Branch Teman
+Jika Anda ingin melihat atau mengambil kode yang dikerjakan teman Anda di branch-nya (`branch-andi`) secara langsung:
 
 1. **Ambil informasi branch baru dari GitHub**:
    ```bash
    git fetch origin
    ```
+
 2. **Pindah ke branch teman Anda untuk melihat kodenya**:
    ```bash
    git checkout branch-andi
    ```
+
+---
+
+## ⏪ D. Pembatalan Perubahan (Jika Ada Salah Edit)
+
+* **Membatalkan editan file yang BELUM di-`git add`:**
+  ```bash
+  git restore nama_file.php
+  ```
+* **Membatalkan file yang terlanjur di-`git add` (keluar dari antrean):**
+  ```bash
+  git restore --staged nama_file.php
+  ```
+* **Membatalkan commit terakhir di lokal (File editan Anda tetap aman):**
+  ```bash
+  git reset --soft HEAD~1
+  ```
+* **Membatalkan commit terakhir & MENGHAPUS semua editan file secara total:**
+  ```bash
+  git reset --hard HEAD~1
+  ```
