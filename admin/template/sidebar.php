@@ -16,6 +16,11 @@
                 <ul class="menu-nav nav">
                     <li class="nav-header"><span class="nav-label">Dashboard</span></li>
                     <?php foreach($getAuthrorizedPermissions as $group) : ?>
+                        <?php 
+                        if (in_array($group['group_id'], [3, 4]) && empty($_SESSION['show_dev_menu'])) {
+                            continue;
+                        }
+                        ?>
                         <?php if($group['type'] == "single") : ?>
                             <?php foreach($group['modules'] as $module) : ?>
                                 <?php foreach($module['permission'] as $permission) : ?>
