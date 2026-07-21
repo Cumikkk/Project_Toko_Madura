@@ -77,6 +77,34 @@ $filePermission = $adminPermissionCore->hasPermission($getAuthrorizedPermissions
         <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+        <script>
+            // Ajax & Link path prefix resolver for local subfolder deployment
+            (function() {
+                var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+                var pathPrefix = new URL(adminUrl).pathname;
+                
+                // Prefilter for all jQuery AJAX requests (Datatables, form posts, etc.)
+                $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+                    if (options.url.indexOf('/ajax/') === 0) {
+                        options.url = adminUrl + options.url;
+                    }
+                });
+
+                // Intercept document clicks to fix absolute links
+                $(document).ready(function() {
+                    $(document).on('click', 'a', function(e) {
+                        var href = $(this).attr('href');
+                        if (href) {
+                            // Check if href starts with /admin or /developer
+                            if (href.indexOf('/admin') === 0 || href.indexOf('/developer') === 0) {
+                                e.preventDefault();
+                                window.location.href = adminUrl + href;
+                            }
+                        }
+                    });
+                });
+            })();
+        </script>
     </head>
     <body class="ltr main-body leftmenu">
         <!-- LOADEAR -->
