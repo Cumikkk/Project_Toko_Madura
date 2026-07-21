@@ -83,6 +83,7 @@ class AdminAuth {
                 'ADM_EMAIL' => $rawUser['email'],
                 'ADM_LEVEL' => 1, // master level
                 'ADM_STS' => 1,
+                'ADMROLE_NAME' => ucfirst($rawUser['role']),
                 'role' => $rawUser['role']
             ];
             

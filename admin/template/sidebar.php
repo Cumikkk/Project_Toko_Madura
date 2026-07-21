@@ -1,4 +1,5 @@
 <?php
+    use Config\Core\SystemInfo;
     $login_page = $page;
 ?>
 <div class="sticky">
@@ -6,10 +7,8 @@
         <div class="main-sidebar-header main-container-1 active">
             <div class="sidemenu-logo">
                 <a class="main-logo" href="#">
-                    <img src="/assets/img/logo-black4.png" class="header-brand-img desktop-logo" alt="logo">
-                    <img src="/assets/img/favicon/favicon.ico" class="header-brand-img icon-logo" alt="logo">
-                    <!-- <img src="/assets/img/brand/logo.png" class="header-brand-img desktop-logo theme-logo" alt="logo">
-                    <img src="/assets/img/brand/logo.png" class="header-brand-img icon-logo theme-logo" alt="logo"> -->
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-black4.png" class="header-brand-img desktop-logo" alt="logo">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/favicon.ico" class="header-brand-img icon-logo" alt="logo">
                 </a>
             </div>
             <div class="main-sidebar-body main-body-1">
@@ -22,7 +21,7 @@
                                 <?php foreach($module['permission'] as $permission) : ?>
                                     <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
                                         <li class="nav-item <?= ($module['module'] == $login_page)? "active" : ""; ?>">
-                                            <a class="nav-link" href="<?= $permission['link'] ?>">
+                                            <a class="nav-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>">
                                                 <span class="shape1"></span>
                                                 <span class="shape2"></span>
                                                 <i class="<?= $group['icon'] ?>"></i>
@@ -46,7 +45,7 @@
                                     <?php foreach($group['modules'] as $module) : ?>
                                         <?php foreach($module['permission'] as $permission) : ?>
                                             <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
-                                                <li class="nav-sub-item"><a class="nav-sub-link" href="<?= $permission['link'] ?>"><?= $module['alias'] ?></a></li>
+                                                <li class="nav-sub-item"><a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= $module['alias'] ?></a></li>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php endforeach; ?>
