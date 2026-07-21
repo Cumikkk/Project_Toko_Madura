@@ -3,6 +3,7 @@
     <?php
     use App\Library\Sales\SalesMain;
     use App\Models\Helper;
+    use Config\Core\SystemInfo;
 
     switch($pageFile) {
         case "verif": 
@@ -86,7 +87,7 @@
 </div>
 
 <script type="module">
-    import CallbackRegistry from '/assets/js/callback-registry.js';
+    import CallbackRegistry from '<?= SystemInfo::app('CLIENT_URL') ?>/assets/js/callback-registry.js';
     let dynamicModalDefault = document.getElementById('dynamicModalDefault')
     $(document).ready(function() {
         if(dynamicModalDefault) {
