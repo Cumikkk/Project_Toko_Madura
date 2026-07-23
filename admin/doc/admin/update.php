@@ -8,7 +8,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "update")) {
     die("<script>location.href = '{$redirectUrl}'; </script>");
 }
 
-$adminId = Helper::form_input($_GET['c'] ?? 0);
+$adminId = Helper::form_input(!empty($_GET['c']) ? $_GET['c'] : ($_GET['b'] ?? 0));
 $admin = Admin::findById($adminId);
 if(!$admin) {
     $redirectUrl = \Config\Core\SystemInfo::app('ADMIN_URL') . '/admin/view';

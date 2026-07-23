@@ -207,16 +207,14 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
             } else {
                 $queryA = $_GET['a'] ?? '';
                 $queryB = $_GET['b'] ?? '';
-                $queryC = $_GET['c'] ?? '';
-
-                if(!empty($queryA)) {
-                    $requestUri = '/' . $queryA;
-                    if(!empty($queryB)) {
-                        $requestUri .= '/' . $queryB;
+                $uriParts = [];
+                foreach (['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as $pKey) {
+                    if (!empty($_GET[$pKey])) {
+                        $uriParts[] = $_GET[$pKey];
                     }
-                    if(!empty($queryC)) {
-                        $requestUri .= '/' . $queryC;
-                    }
+                }
+                if (!empty($uriParts)) {
+                    $requestUri = '/' . implode('/', $uriParts);
                 } else {
                     $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
                     $adminUrlRaw = \Config\Core\SystemInfo::app('ADMIN_URL') ?? '';
@@ -254,9 +252,9 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                         }
 
                         $pattern1 = preg_quote($perm['pattern'], "#");
-                        $pattern2 = str_replace("/\*", "(?:/.*)?", $pattern1);
-                        $pattern2 = str_replace("\*", ".*", $pattern2);
-                        $regex = "#^" . $pattern2 . "$#";
+                        $pattern2 = str_replace("\*", ".*", $pattern1);
+                        $regexPattern = str_replace("\/.*", "(?:/.*)?", $pattern2);
+                        $regex = "#^" . $regexPattern . "$#";
 
                         if(preg_match($regex, $requestUri)) {
                             $perm['min_level'] = $module['id'];

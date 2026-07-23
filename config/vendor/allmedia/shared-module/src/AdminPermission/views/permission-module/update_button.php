@@ -9,8 +9,7 @@
                             let actionArea = td.find('.action');
                             if(actionArea && !actionArea.find('.btn-edit').length) {
                                 let id = actionArea.data('id');
-                                let adminUrl = '<?= \Config\Core\SystemInfo::app("ADMIN_URL") ?>';
-                                actionArea.append(`<a href="${adminUrl}/developer/module/update?d=${id}" class="btn btn-success btn-sm text-white btn-edit me-1"><i class="fas fa-edit"></i></a>`)
+                                actionArea.append(`<a href="/developer/module/update/${id}" class="btn btn-success btn-sm text-white btn-edit me-1"><i class="fas fa-edit"></i></a>`)
                             }
                         }
                     })

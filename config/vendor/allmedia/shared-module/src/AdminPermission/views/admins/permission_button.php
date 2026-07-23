@@ -9,8 +9,7 @@
                             let actionArea = td.find('.action');
                             if(actionArea && !actionArea.find('.btn-permission').length) {
                                 let id = actionArea.data('id');
-                                let adminUrl = '<?= \Config\Core\SystemInfo::app("ADMIN_URL") ?>';
-                                actionArea.append(`<a href="${adminUrl}/admin/permission?c=${id}" class="btn btn-primary btn-sm text-white btn-permission"><i class="fas fa-gear"></i></a>`)
+                                actionArea.append(`<a href="/admin/permission/${id}" class="btn btn-primary btn-sm text-white btn-permission"><i class="fas fa-gear"></i></a>`)
                             }
                         }
                     })
