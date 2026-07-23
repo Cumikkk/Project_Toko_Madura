@@ -70,9 +70,46 @@ if(!$insert) {
     ]);
 }
 
+$newAdminId = $db->insert_id;
+$add_level = intval($data['add-level'] ?? 2);
+
+// Auto-assign permissions based on level
+$permSql = "SELECT id, module_id FROM admin_permissions";
+$sqlPerms = $db->query($permSql);
+if($sqlPerms && $sqlPerms->num_rows > 0) {
+    while($pRow = $sqlPerms->fetch_assoc()) {
+        $pId = $pRow['id'];
+        $modId = $pRow['module_id'];
+        
+        $shouldGrant = false;
+        if ($add_level == 1) {
+            // Programmer: FULL
+            $shouldGrant = true;
+        } elseif ($add_level == 2) {
+            // Master: Dashboard, Investor, Pengaturan, Admin (module_id 1..4)
+            if (in_array($modId, [1, 2, 3, 4])) {
+                $shouldGrant = true;
+            }
+        } elseif ($add_level == 3) {
+            // Admin Staf: Dashboard, Investor, Pengaturan (module_id 1..3)
+            if (in_array($modId, [1, 2, 3])) {
+                $shouldGrant = true;
+            }
+        }
+
+        if ($shouldGrant) {
+            Database::insert("admin_authorize", [
+                'admin_id' => $newAdminId,
+                'permission_id' => $pId,
+                'status' => -1
+            ]);
+        }
+    }
+}
+
 JsonResponse([
     'success'   => true,
-    'message'   => "create admin successfully",
+    'message'   => "Berhasil menambahkan admin baru",
     'data'      => [
         'redirect' => \Config\Core\SystemInfo::app('ADMIN_URL') . "/admin/view"
     ]

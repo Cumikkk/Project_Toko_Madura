@@ -56,7 +56,7 @@ try {
                                                 <td>
                                                     <div class="form-group mb-3">
                                                         <label class="mb-0">
-                                                            <input type="checkbox" name="input[]" value="<?= $perm['permission_id'] ?>" class="custom-switch-input" <?= ($perm['status'])? "checked" : "" ?> />
+                                                            <input type="checkbox" name="input[]" value="<?= $perm['permission_id'] ?>" class="custom-switch-input" <?= ($perm['status'] == -1 || $perm['status'] == 1)? "checked" : "" ?> />
                                                             <span class="custom-switch-indicator border-dark custom-switch-indicator-md"></span>
                                                         </label>
                                                     </div>

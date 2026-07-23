@@ -51,23 +51,11 @@ if(!$admin) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="country" class="form-label">Country</label>
-                                <select name="country" id="country" class="form-control">
-                                    <option value="" disabled selected>Select</option>
-                                    <?php foreach(Country::countries() as $country) : ?>
-                                        <option value="<?= $country['COUNTRY_NAME'] ?>" <?= ($country['ID_COUNTRY'] == $admin['ADM_COUNTRY'])? "selected" : ""; ?>><?= $country['COUNTRY_NAME'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="level" class="form-label">Level</label>
+                                <label for="level" class="form-label">Role / Level</label>
                                 <select name="level" id="level" class="form-control">
-                                    <option value="" disabled selected>Select</option>
-                                    <?php foreach(Admin::adminRoles() as $role) : ?>
-                                        <option value="<?= $role['ID_ADMROLE'] ?>" <?= ($role['ID_ADMROLE'] == $admin['ADM_LEVEL'])? "selected" : ""; ?>><?= $role['ADMROLE_NAME'] ?></option>
-                                    <?php endforeach; ?>
+                                    <option value="1" <?= ($admin['ADM_LEVEL'] == 1)? "selected" : ""; ?>>Programmer (Super Master)</option>
+                                    <option value="2" <?= ($admin['ADM_LEVEL'] == 2)? "selected" : ""; ?>>Master (Owner)</option>
+                                    <option value="3" <?= ($admin['ADM_LEVEL'] == 3)? "selected" : ""; ?>>Admin Staf</option>
                                 </select>
                             </div>
                         </div>
