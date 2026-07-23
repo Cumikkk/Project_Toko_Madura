@@ -26,9 +26,14 @@ $investors = $db->query("
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card">
-            <div class="card-header">
-                <h6 class="main-content-label mb-1">List Investor Toko Madura</h6>
-                <p class="text-muted card-sub-title">Daftar semua investor beserta persentase pembagian hasil mereka.</p>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="main-content-label mb-1">List Investor Toko Madura</h6>
+                    <p class="text-muted card-sub-title mb-0">Daftar semua investor beserta persentase pembagian hasil mereka.</p>
+                </div>
+                <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
+                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Investor</a>
+                <?php endif; ?>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

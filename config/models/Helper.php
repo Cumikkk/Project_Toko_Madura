@@ -55,7 +55,7 @@ class Helper {
     }
 
     public static function get_user_agent(): string {
-        return @$_SERVER['HTTP_USER_AGENT'] ?? "unknown";
+        return $_SERVER['HTTP_USER_AGENT'] ?? "CLI/Unknown";
     }
 
     public static function getFloatingRate(string $from, string $to) {

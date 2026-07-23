@@ -65,7 +65,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="add-password" class="form-label fw-bold">Password</label>
-                                <input type="password" class="form-control" id="add-password" name="add-password" placeholder="Masukkan password admin baru (contoh: 123)" required>
+                                <input type="password" class="form-control" id="add-password" name="add-password" placeholder="Masukkan password" required>
                             </div>
                         </div>
                         <div class="col-md-12 mt-4 d-flex justify-content-end gap-2">
