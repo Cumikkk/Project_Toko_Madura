@@ -92,7 +92,7 @@ if(!$admin) {
                             <div class="form-group">
                                 <label for="new-password" class="form-control-label">Password Baru</label>
                                 <div class="input-group">
-                                    <input type="text" name="new-password" class="form-control" placeholder="Masukkan password baru (contoh: 123)" value="<?= Helper::generatePassword(); ?>" required>
+                                    <input type="password" name="new-password" class="form-control" placeholder="Masukkan password baru (opsional)" value="" required>
                                     <button type="submit" class="input-group-text bg-primary" data-original-text="Update">Update</button>
                                 </div>
                             </div>
