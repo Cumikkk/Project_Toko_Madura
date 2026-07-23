@@ -81,6 +81,8 @@ class AdminAuth {
                 'ADM_NAME' => $rawUser['nama_lengkap'],
                 'ADM_USER' => $rawUser['username'],
                 'ADM_EMAIL' => $rawUser['email'],
+                'ADM_PHONE' => $rawUser['no_hp'],
+                'ADM_PASS'  => $rawUser['password'],
                 'ADM_LEVEL' => 1, // master level
                 'ADM_STS' => 1,
                 'ADMROLE_NAME' => ucfirst($rawUser['role']),
