@@ -54,10 +54,15 @@ if($check_password !== TRUE) {
     ]);
 }
 
+$add_email = !empty($data['add-email']) ? $data['add-email'] : null;
+$add_phone = !empty($data['add-phone']) ? $data['add-phone'] : null;
+
 // Insert into users table
 $insert = Database::insert("users", [
     'nama_lengkap' => $add_fullname,
     'username'     => $add_username,
+    'email'        => $add_email,
+    'no_hp'        => $add_phone,
     'password'     => password_hash($add_password, PASSWORD_BCRYPT),
     'role'         => 'master'
 ]);

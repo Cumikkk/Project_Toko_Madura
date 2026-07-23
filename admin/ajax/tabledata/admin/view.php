@@ -20,6 +20,30 @@ $dt->hide('ADM_PASS');
 $dt->hide('ADM_LEVEL');
 $dt->hide('COUNTRY_NAME');
 
+$dt->edit('ADMROLE_NAME', function($data) {
+    global $db;
+    $id = intval($data['ID_ADM']);
+    $sqlPerms = $db->query("
+        SELECT ap.module_id 
+        FROM admin_authorize aa 
+        JOIN admin_permissions ap ON (ap.id = aa.permission_id) 
+        WHERE aa.admin_id = {$id} AND (aa.status = -1 OR aa.status = 1)
+    ");
+    $modIds = [];
+    if ($sqlPerms && $sqlPerms->num_rows > 0) {
+        while ($pRow = $sqlPerms->fetch_assoc()) {
+            $modIds[] = intval($pRow['module_id']);
+        }
+    }
+    if (in_array(5, $modIds) || in_array(6, $modIds)) {
+        return "<span class='badge bg-danger'>Programmer</span>";
+    } elseif (in_array(4, $modIds)) {
+        return "<span class='badge bg-primary'>Master (Owner)</span>";
+    } else {
+        return "<span class='badge bg-info'>Admin Staf</span>";
+    }
+});
+
 $dt->edit('ADM_STS', function($data) {
     return "<span class='badge bg-success'>Active</span>";
 });

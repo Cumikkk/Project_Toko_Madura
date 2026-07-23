@@ -43,13 +43,13 @@ if(!$admin) {
                                 <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" value="<?= $admin['ADM_NAME'] ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="<?= $admin['ADM_USER'] ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="level" class="form-label">Role / Level</label>
                                 <select name="level" id="level" class="form-control">
@@ -57,6 +57,18 @@ if(!$admin) {
                                     <option value="2" <?= ($admin['ADM_LEVEL'] == 2)? "selected" : ""; ?>>Master (Owner)</option>
                                     <option value="3" <?= ($admin['ADM_LEVEL'] == 3)? "selected" : ""; ?>>Admin Staf</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email (Opsional)</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email admin" value="<?= htmlspecialchars($admin['ADM_EMAIL'] ?? '') ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="no_hp" class="form-label">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="No HP admin" value="<?= htmlspecialchars($admin['ADM_PHONE'] ?? '') ?>">
                             </div>
                         </div>
                         <div class="col-md-12 mt-4 text-end">

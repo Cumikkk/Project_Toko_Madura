@@ -254,7 +254,8 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                         }
 
                         $pattern1 = preg_quote($perm['pattern'], "#");
-                        $pattern2 = str_replace("\*", ".*", $pattern1);
+                        $pattern2 = str_replace("/\*", "(?:/.*)?", $pattern1);
+                        $pattern2 = str_replace("\*", ".*", $pattern2);
                         $regex = "#^" . $pattern2 . "$#";
 
                         if(preg_match($regex, $requestUri)) {

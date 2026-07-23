@@ -43,10 +43,23 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                             <div class="form-group">
                                 <label for="add-level" class="form-label fw-bold">Role / Level</label>
                                 <select name="add-level" id="add-level" class="form-control" required>
+                                    <option value="" disabled selected>-- Pilih Role / Level --</option>
                                     <option value="1">Programmer (Super Master)</option>
-                                    <option value="2" selected>Master (Owner)</option>
+                                    <option value="2">Master (Owner)</option>
                                     <option value="3">Admin Staf</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="add-email" class="form-label fw-bold">Email (Opsional)</label>
+                                <input type="email" class="form-control" id="add-email" name="add-email" placeholder="Contoh: admin@tokomadura.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="add-phone" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="add-phone" name="add-phone" placeholder="Contoh: 08123456789">
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">

@@ -57,10 +57,16 @@ if($sql_check_username->num_rows != 0) {
     ]);
 }
 
+$email = !empty($data['email']) ? $data['email'] : null;
+$phone = !empty($data['no_hp']) ? $data['no_hp'] : null;
+$level = intval($data['level'] ?? 2);
+
 // Update users table
 $update = Database::update("users", [
     'nama_lengkap' => $fullname,
-    'username'     => $username
+    'username'     => $username,
+    'email'        => $email,
+    'no_hp'        => $phone
 ], ['id_users' => $admin_id]);
 
 if(!$update) {
@@ -70,6 +76,38 @@ if(!$update) {
         'message'   => "Gagal memperbarui admin",
         'data'      => []
     ]);
+}
+
+// Re-assign permissions according to selected level
+// Level 1 = Programmer (FULL 1..20)
+// Level 2 = Master (1..4)
+// Level 3 = Admin Staf (1..3)
+$db->query("DELETE FROM admin_authorize WHERE admin_id = {$admin_id}");
+$sqlPerms = $db->query("SELECT id, module_id FROM admin_permissions");
+if ($sqlPerms && $sqlPerms->num_rows > 0) {
+    while ($pRow = $sqlPerms->fetch_assoc()) {
+        $pId = $pRow['id'];
+        $modId = $pRow['module_id'];
+        $shouldGrant = false;
+        if ($level == 1) {
+            $shouldGrant = true;
+        } elseif ($level == 2) {
+            if (in_array($modId, [1, 2, 3, 4])) {
+                $shouldGrant = true;
+            }
+        } elseif ($level == 3) {
+            if (in_array($modId, [1, 2, 3])) {
+                $shouldGrant = true;
+            }
+        }
+        if ($shouldGrant) {
+            Database::insert("admin_authorize", [
+                'admin_id' => $admin_id,
+                'permission_id' => $pId,
+                'status' => -1
+            ]);
+        }
+    }
 }
 
 JsonResponse([
