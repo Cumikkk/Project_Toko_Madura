@@ -20,7 +20,7 @@
                         <?php if($group['type'] == "single") : ?>
                             <?php foreach($group['modules'] as $module) : ?>
                                 <?php foreach($module['permission'] as $permission) : ?>
-                                    <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
+                                    <?php if(strcasecmp($permission['code'], "view") == 0 && ($module['visible'] == -1 || $module['visible'] == 1) && ($permission['status'] == -1 || $permission['status'] == 1)) : ?>
                                         <li class="nav-item <?= (strcasecmp($module['module'], $login_page) == 0)? "active" : ""; ?>">
                                             <a class="nav-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>">
                                                 <span class="shape1"></span>
@@ -58,7 +58,7 @@
                                 <ul class="nav-sub">
                                     <?php foreach($group['modules'] as $module) : ?>
                                         <?php foreach($module['permission'] as $permission) : ?>
-                                            <?php if($permission['code'] == "view" && $module['visible'] == -1 && $permission['status']) : ?>
+                                            <?php if(strcasecmp($permission['code'], "view") == 0 && ($module['visible'] == -1 || $module['visible'] == 1) && ($permission['status'] == -1 || $permission['status'] == 1)) : ?>
                                                 <li class="nav-sub-item <?= (strcasecmp($module['module'], $login_page) == 0 || strcasecmp($module['module'], $page_sub) == 0)? "active" : ""; ?>">
                                                     <a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= $module['alias'] ?></a>
                                                 </li>
