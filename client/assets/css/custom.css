@@ -104,3 +104,750 @@ body.dark-theme .header .main-logo .logo-big img.dark-theme,
 body.dark-theme .mobile-logo img.dark-theme {
     display: block;
 }
+
+/* ==========================================================================
+   TOKO MADURA - PERFECT MAROON SIDEBAR OVERRIDES & RESPONSIVE FIXES
+   ========================================================================== */
+
+/* 1. Global Sidebar Container Fixes */
+.main-sidebar,
+.main-sidebar.tm-maroon-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    width: 260px !important;
+    padding-top: 0 !important;
+    background: #7A1215 !important;
+    background-image: linear-gradient(180deg, #7D0A0A 0%, #4D0709 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.25) !important;
+    z-index: 1050 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease !important;
+}
+
+/* Header Navbar Exact Height & Clean Alignment */
+.header {
+    height: 70px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1040 !important;
+}
+
+/* Add comfortable spacing to the hamburger toggle button from sidebar */
+.header .nav-close-btn {
+    margin-left: 24px !important;
+    padding-left: 4px !important;
+}
+
+.header .nav-close-btn button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    transition: background 0.2s ease !important;
+}
+
+.header .nav-close-btn button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Hide duplicate header main-logo on desktop since Brand Header is inside Sidebar */
+@media (min-width: 992px) {
+    .header .main-logo {
+        display: none !important;
+    }
+}
+
+/* Kill default template pseudo elements that cause double background / red strip */
+.main-sidebar::after,
+.main-sidebar::before,
+.main-sidebar.tm-maroon-sidebar::after,
+.main-sidebar.tm-maroon-sidebar::before {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* 2. Brand Header in Sidebar - Perfectly Aligned at 70px Height */
+.tm-maroon-sidebar .sidebar-brand {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: transparent !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-border-box !important;
+}
+
+.tm-maroon-sidebar .brand-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-decoration: none !important;
+}
+
+.tm-maroon-sidebar .brand-icon {
+    width: 38px !important;
+    height: 38px !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(6px) !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 19px !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.tm-maroon-sidebar .brand-text-container {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.tm-maroon-sidebar .brand-title {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    color: #FFFFFF !important;
+    line-height: 1.1 !important;
+    text-transform: uppercase !important;
+}
+
+.tm-maroon-sidebar .brand-subtitle {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    text-transform: uppercase !important;
+}
+
+/* Hide Close (X) button on Desktop Screens */
+@media (min-width: 992px) {
+    .tm-maroon-sidebar .sidebar-close-btn {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .tm-maroon-sidebar .sidebar-close-btn {
+        display: flex !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: none !important;
+        color: #FFFFFF !important;
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 16px !important;
+        cursor: pointer !important;
+    }
+}
+
+/* 3. User Badge Card */
+.tm-maroon-sidebar .sidebar-user-card {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    margin: 6px 14px 14px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-info {
+    overflow: hidden !important;
+    flex: 1 !important;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-name {
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    margin-bottom: 2px !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-role-badge {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    padding: 2px 8px !important;
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #FFFFFF !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/* 4. Main Menu Wrapper */
+.tm-maroon-sidebar .main-menu {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    background: transparent !important;
+}
+
+.tm-maroon-sidebar .sidebar-menu {
+    padding: 0 14px 20px 14px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    background: transparent !important;
+}
+
+/* KILLS DARK NAVY BOXES & BORDERS FROM THEME ON SIDEBAR-ITEM */
+.tm-maroon-sidebar .sidebar-item,
+.dark-theme .tm-maroon-sidebar .sidebar-item,
+.light-theme .tm-maroon-sidebar .sidebar-item {
+    background: transparent !important;
+    border: none !important;
+    margin-bottom: 6px !important;
+    padding: 0 !important;
+    list-style: none !important;
+    box-shadow: none !important;
+}
+
+/* 5. Section Header Titles */
+.tm-maroon-sidebar .sidebar-section-title,
+.dark-theme .tm-maroon-sidebar .sidebar-section-title,
+.light-theme .tm-maroon-sidebar .sidebar-section-title {
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-weight: 700 !important;
+    padding: 18px 14px 8px 14px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    list-style: none !important;
+}
+
+/* 6. Sidebar Links */
+.tm-maroon-sidebar .sidebar-link,
+.dark-theme .tm-maroon-sidebar .sidebar-link,
+.light-theme .tm-maroon-sidebar .sidebar-link {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500 !important;
+    font-size: 14.5px !important;
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    gap: 14px !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.tm-maroon-sidebar .sidebar-link .nav-icon,
+.dark-theme .tm-maroon-sidebar .sidebar-link .nav-icon {
+    font-size: 18px !important;
+    width: 24px !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: color 0.25s ease !important;
+}
+
+.tm-maroon-sidebar .sidebar-link .sidebar-txt {
+    color: inherit !important;
+}
+
+/* 7. Active State Pill (Crisp White Pill Matching Design Screenshot) */
+.tm-maroon-sidebar .sidebar-link.active,
+.tm-maroon-sidebar .sidebar-item.active > .sidebar-link,
+.dark-theme .tm-maroon-sidebar .sidebar-link.active,
+.light-theme .tm-maroon-sidebar .sidebar-link.active {
+    background: #FFFFFF !important;
+    color: #7D0A0A !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22) !important;
+    transform: translateX(3px) !important;
+    border: none !important;
+}
+
+.tm-maroon-sidebar .sidebar-link.active .nav-icon,
+.tm-maroon-sidebar .sidebar-item.active > .sidebar-link .nav-icon,
+.dark-theme .tm-maroon-sidebar .sidebar-link.active .nav-icon {
+    color: #7D0A0A !important;
+}
+
+.tm-maroon-sidebar .sidebar-link.active .sidebar-txt,
+.dark-theme .tm-maroon-sidebar .sidebar-link.active .sidebar-txt {
+    color: #7D0A0A !important;
+}
+
+/* 8. Hover State */
+.tm-maroon-sidebar .sidebar-link:hover:not(.active),
+.dark-theme .tm-maroon-sidebar .sidebar-link:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
+    transform: translateX(3px) !important;
+}
+
+.tm-maroon-sidebar .sidebar-link:hover:not(.active) .nav-icon,
+.dark-theme .tm-maroon-sidebar .sidebar-link:hover:not(.active) .nav-icon {
+    color: #FFFFFF !important;
+}
+
+/* 9. Logout Button Special Styling */
+.tm-maroon-sidebar .sidebar-link.sidebar-logout-btn:hover {
+    background: rgba(220, 53, 69, 0.25) !important;
+    color: #ff8080 !important;
+}
+
+.tm-maroon-sidebar .sidebar-link.sidebar-logout-btn:hover .nav-icon {
+    color: #ff8080 !important;
+}
+
+/* 10. Overlay Backdrop on Mobile */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1045;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 11. Layout Dimensions & Responsive Alignment */
+@media (min-width: 992px) {
+    body.body-padding,
+    body.body-padding.light-theme,
+    body.body-padding.dark-theme {
+        padding-left: 260px !important;
+    }
+    
+    .header {
+        left: 260px !important;
+        width: calc(100% - 260px) !important;
+    }
+
+    /* Collapsed Sidebar on Desktop */
+    .main-sidebar.tm-maroon-sidebar.collapsed {
+        width: 80px !important;
+    }
+
+    body.body-padding.expanded {
+        padding-left: 80px !important;
+    }
+
+    .header.expanded {
+        left: 80px !important;
+        width: calc(100% - 80px) !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-txt,
+    .main-sidebar.tm-maroon-sidebar.collapsed .brand-text-container,
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-user-card,
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-section-title {
+        display: none !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-link {
+        justify-content: center !important;
+        padding: 14px 0 !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-brand {
+        justify-content: center !important;
+        padding: 16px 0 !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    body.body-padding,
+    body.body-padding.light-theme,
+    body.body-padding.dark-theme {
+        padding-left: 0 !important;
+    }
+
+    .header {
+        left: 0 !important;
+        width: 100% !important;
+    }
+
+    .mobile-logo {
+        max-width: none !important;
+        width: auto !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 auto !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar {
+        transform: translateX(-100%) !important;
+        width: 270px !important;
+        z-index: 1060 !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.mobile-open,
+    .main-sidebar.tm-maroon-sidebar.sidebar-open,
+    .main-sidebar.tm-maroon-sidebar.sidebar-mini,
+    .main-sidebar.tm-maroon-sidebar.active {
+        transform: translateX(0) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.5) !important;
+    }
+}
+
+
+:root {
+    --tm-maroon-main: #7A1215;
+    --tm-maroon-dark: #4E080A;
+    --tm-maroon-gradient: linear-gradient(180deg, #7A1215 0%, #4D0709 100%);
+    --tm-active-pill-bg: #FFFFFF;
+    --tm-active-pill-text: #7A1215;
+    --tm-inactive-text: rgba(255, 255, 255, 0.85);
+    --tm-hover-bg: rgba(255, 255, 255, 0.15);
+    --tm-border-light: rgba(255, 255, 255, 0.12);
+}
+
+/* Sidebar Root Container */
+.main-sidebar.tm-maroon-sidebar {
+    background: var(--tm-maroon-gradient) !important;
+    width: 260px !important;
+    border-right: 1px solid var(--tm-border-light) !important;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.18) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease !important;
+    z-index: 1050 !important;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Sidebar Brand Header (Matches Screenshot) */
+.tm-maroon-sidebar .sidebar-brand {
+    padding: 22px 20px 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--tm-border-light);
+    margin-bottom: 10px;
+}
+
+.tm-maroon-sidebar .brand-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+}
+
+.tm-maroon-sidebar .brand-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.tm-maroon-sidebar .brand-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tm-maroon-sidebar .brand-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #FFFFFF;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.tm-maroon-sidebar .brand-subtitle {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+}
+
+.tm-maroon-sidebar .sidebar-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.tm-maroon-sidebar .sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* User Profile Badge in Sidebar */
+.tm-maroon-sidebar .sidebar-user-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin: 0 14px 14px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-info {
+    overflow: hidden;
+    flex: 1;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.tm-maroon-sidebar .sidebar-user-card .user-role-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Sidebar Menu Items */
+.tm-maroon-sidebar .main-menu {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tm-maroon-sidebar .sidebar-menu {
+    padding: 0 14px 20px 14px !important;
+    list-style: none !important;
+    margin: 0 !important;
+}
+
+.tm-maroon-sidebar .sidebar-item {
+    margin-bottom: 6px;
+    list-style: none !important;
+}
+
+.tm-maroon-sidebar .sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    color: var(--tm-inactive-text) !important;
+    font-weight: 500;
+    font-size: 14.5px;
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    gap: 14px;
+}
+
+.tm-maroon-sidebar .sidebar-link .nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tm-inactive-text);
+    transition: color 0.25s ease;
+}
+
+/* Active State Pill - Matches Reference Image White Pill */
+.tm-maroon-sidebar .sidebar-link.active,
+.tm-maroon-sidebar .sidebar-item.active > .sidebar-link {
+    background: var(--tm-active-pill-bg) !important;
+    color: var(--tm-active-pill-text) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+    transform: translateX(4px);
+}
+
+.tm-maroon-sidebar .sidebar-link.active .nav-icon,
+.tm-maroon-sidebar .sidebar-item.active > .sidebar-link .nav-icon {
+    color: var(--tm-active-pill-text) !important;
+}
+
+/* Hover State */
+.tm-maroon-sidebar .sidebar-link:hover:not(.active) {
+    background: var(--tm-hover-bg) !important;
+    color: #FFFFFF !important;
+    transform: translateX(4px);
+}
+
+.tm-maroon-sidebar .sidebar-link:hover:not(.active) .nav-icon {
+    color: #FFFFFF !important;
+}
+
+/* Sidebar Logout Button Hover */
+.tm-maroon-sidebar .sidebar-link.sidebar-logout-btn:hover {
+    background: rgba(220, 53, 69, 0.25) !important;
+    color: #ff8080 !important;
+}
+
+.tm-maroon-sidebar .sidebar-link.sidebar-logout-btn:hover .nav-icon {
+    color: #ff8080 !important;
+}
+
+/* Section Header Titles */
+.tm-maroon-sidebar .sidebar-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 700;
+    padding: 18px 16px 8px 16px;
+    list-style: none !important;
+}
+
+/* Overlay Backdrop on Mobile */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1045;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Desktop Layout Adjustments */
+@media (min-width: 992px) {
+    body.body-padding {
+        padding-left: 260px !important;
+    }
+    
+    .header {
+        left: 260px !important;
+        width: calc(100% - 260px) !important;
+    }
+
+    /* Collapsed Sidebar on Desktop */
+    .main-sidebar.tm-maroon-sidebar.collapsed {
+        width: 80px !important;
+    }
+
+    body.body-padding.expanded {
+        padding-left: 80px !important;
+    }
+
+    .header.expanded {
+        left: 80px !important;
+        width: calc(100% - 80px) !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-txt,
+    .main-sidebar.tm-maroon-sidebar.collapsed .brand-text-container,
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-user-card,
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-section-title {
+        display: none !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-link {
+        justify-content: center !important;
+        padding: 14px 0 !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-brand {
+        justify-content: center !important;
+        padding: 16px 0 !important;
+    }
+}
+
+/* Mobile Layout Adjustments */
+@media (max-width: 991.98px) {
+    body.body-padding {
+        padding-left: 0 !important;
+    }
+
+    .header {
+        left: 0 !important;
+        width: 100% !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar {
+        transform: translateX(-100%);
+        width: 270px !important;
+    }
+
+    .main-sidebar.tm-maroon-sidebar.mobile-open {
+        transform: translateX(0) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.5) !important;
+    }
+}

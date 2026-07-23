@@ -16,33 +16,35 @@ use Config\Core\SystemInfo;
 <!-- header start -->
 <div class="header">
     <div class="row g-0 align-items-center">
-        <div class="col-xxl-6 col-xl-5 col-4 d-flex align-items-center gap-20">
+        <div class="col-3 col-sm-3 col-lg-5 d-flex align-items-center">
             <div class="main-logo d-lg-block d-none">
                 <div class="logo-big">
-                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard">
-                        <img src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/logo-full-first-state-futures.svg" class="w-100 light-theme" alt="Logo">
-                        <img src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/logo-full-first-state-futures-light.svg" class="w-100 dark-theme" alt="Logo">
-                    </a>
-                </div>
-                <div class="logo-small">
-                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard">
-                        <img src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.ico" alt="Logo">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-flex align-items-center gap-2 text-decoration-none">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm fw-bold" style="background: #7D0A0A; color: #ffffff;">
+                            <i class="fa-sharp fa-solid fa-shop fs-5"></i>
+                        </div>
+                        <span class="fw-extrabold fs-5 text-uppercase tracking-wide" style="color: var(--bs-body-color, #ffffff); font-weight: 800; letter-spacing: 0.5px;">TOKO MADURA</span>
                     </a>
                 </div>
             </div>
-            <div class="nav-close-btn">
-                <button id="navClose"><i class="fa-light fa-bars-sort"></i></button>
+            <div class="nav-close-btn ms-2 ms-lg-3">
+                <button id="navClose" type="button" aria-label="Toggle Sidebar"><i class="fa-light fa-bars-sort"></i></button>
             </div>
         </div>
-        <div class="col-4 d-lg-none">
-            <div class="mobile-logo">
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard">
-                    <img src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/logo-full-first-state-futures.svg" class="w-100 light-theme" alt="Logo">
-                    <img src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/logo-full-first-state-futures-light.svg" class="w-100 dark-theme" alt="Logo">
+        <div class="col-6 col-sm-6 d-lg-none">
+            <div class="mobile-logo text-center">
+                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm fw-bold" style="background: #7D0A0A; color: #ffffff;">
+                        <i class="fa-sharp fa-solid fa-shop fs-6"></i>
+                    </div>
+                    <div class="d-flex flex-column text-start">
+                        <span class="fw-extrabold text-uppercase" style="color: #ffffff; font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase" style="color: rgba(255, 255, 255, 0.65); font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;"><?= strtoupper($user['role'] ?? 'investor'); ?> PANEL</span>
+                    </div>
                 </a>
             </div>
         </div>
-        <div class="col-xxl-6 col-xl-7 col-lg-8 col-4">
+        <div class="col-3 col-sm-3 col-lg-7">
             <div class="header-right-btns d-flex justify-content-end align-items-center">
                 <div class="header-collapse-group">
                     <div class="header-right-btns d-flex justify-content-end align-items-center p-0">

@@ -50,6 +50,50 @@ $(document).ready(function() {
     $(document).on('input', '.input-number', function() {
         $(this).val($(this).val().replace(/[^0-9]/g, ''));
     });
+
+    // Handle Responsive Sidebar Toggle (Mobile Drawer & Desktop Collapse)
+    let sidebarDebounceTimer = 0;
+
+    function toggleMobileSidebar(e) {
+        const now = Date.now();
+        if (now - sidebarDebounceTimer < 300) {
+            return;
+        }
+        sidebarDebounceTimer = now;
+
+        if ($(window).width() < 992) {
+            $('#mainSidebar').toggleClass('mobile-open sidebar-mini active');
+            $('#sidebarOverlay').toggleClass('show');
+        } else {
+            $('#mainSidebar').toggleClass('collapsed');
+            $('body').toggleClass('expanded');
+            $('.header').toggleClass('expanded');
+        }
+    }
+
+    function closeMobileSidebar() {
+        $('#mainSidebar').removeClass('mobile-open sidebar-mini active sidebar-open');
+        $('#sidebarOverlay').removeClass('show');
+    }
+
+    $(document).on('click', '#navClose, .nav-close-btn button, .nav-close-btn', function(e) {
+        if ($(window).width() < 992) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileSidebar(e);
+        }
+    });
+
+    $(document).on('click', '#mobileSidebarClose, #sidebarOverlay', function(e) {
+        e.preventDefault();
+        closeMobileSidebar();
+    });
+
+    $(document).on('click', '.tm-maroon-sidebar .sidebar-link', function() {
+        if ($(window).width() < 992) {
+            closeMobileSidebar();
+        }
+    });
 })
 
 function formatter(angka, prefix = null){

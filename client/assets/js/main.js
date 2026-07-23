@@ -861,8 +861,8 @@
                 }
             });
             $(document).on('click', function (e) {
-                if ($(e.target).is('.main-sidebar *') === false) {
-                    $('.main-sidebar').removeClass('sidebar-mini');
+                if ($(e.target).is('.main-sidebar, .main-sidebar *, #navClose, #navClose *, .nav-close-btn, .nav-close-btn *') === false) {
+                    $('.main-sidebar').removeClass('sidebar-mini mobile-open');
                     if ($(window).width() < 1200) {
                         if ($('.main-sidebar').hasClass('two-column-menu')) {
                             $('.main-sidebar').addClass('sub-menu-collapsed');
