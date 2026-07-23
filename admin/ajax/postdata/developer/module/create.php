@@ -108,6 +108,16 @@ foreach($permissions as $perm) {
             'data'      => []
         ]);
     }
+
+    $permId = $db->insert_id;
+    $adminIdsToAuthorize = array_unique([$user['ADM_ID'], 1]);
+    foreach ($adminIdsToAuthorize as $aid) {
+        Database::insert("admin_authorize", [
+            'admin_id' => $aid,
+            'permission_id' => $permId,
+            'status' => -1
+        ]);
+    }
 }
 
 $db->commit();

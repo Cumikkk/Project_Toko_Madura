@@ -15,11 +15,13 @@ try {
 
     JsonResponse([
         'success' => true,
+        'message' => 'Pengaturan berhasil diperbarui',
         'alert' => ['title' => 'Sukses', 'text' => 'Pengaturan berhasil diperbarui', 'icon' => 'success']
     ]);
 } catch (Exception $e) {
     JsonResponse([
         'success' => false,
+        'message' => $e->getMessage(),
         'alert' => ['title' => 'Error', 'text' => $e->getMessage(), 'icon' => 'error']
     ]);
 }
