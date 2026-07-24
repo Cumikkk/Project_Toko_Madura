@@ -62,12 +62,9 @@ $investors = $db->query("
                                         <td><?= htmlspecialchars($row['alamat_investor'] ?? '-') ?></td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center">
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <button type="button" class="btn btn-info btn-sm text-white me-1" title="Detail Investor" onclick="alert('Investor: <?= htmlspecialchars($row['nama_lengkap']) ?>\nUsername: <?= htmlspecialchars($row['username']) ?>\nAlamat: <?= htmlspecialchars($row['alamat_investor'] ?? '-') ?>\nBagi Hasil: <?= $row['persen_bagian_investor'] ?>%')"><i class="fas fa-eye"></i> Detail</button>
-                                                <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
-                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create?id=<?= $row['id_investor'] ?>" class="btn btn-warning btn-sm me-1" title="Edit Investor"><i class="fas fa-edit"></i> Edit</a>
-                                                <?php endif; ?>
-                                            </div>
+                                            <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
+                                                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create?id=<?= $row['id_investor'] ?>" class="btn btn-warning btn-sm me-1" title="Edit Investor"><i class="fas fa-edit"></i> Edit Investor</a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
