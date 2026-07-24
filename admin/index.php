@@ -33,9 +33,9 @@ if(empty($authPage)) {
         <meta name="theme-color" content="#ffffff">
 
 		<!-- ICONS CSS -->
-		<link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/css/all.min.css">
-		<link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/css/sharp-solid.min.css">
-		<link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/css/sharp-regular.min.css">
+		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/all.min.css">
+		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/sharp-solid.min.css">
+		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/sharp-regular.min.css">
 		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/icons.css" rel="stylesheet">
 		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/font-awesome/font-awesome.min.css" rel="stylesheet">
 		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/plugin.css" rel="stylesheet">

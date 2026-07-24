@@ -9,7 +9,11 @@
             <div class="sidemenu-logo" style="overflow: hidden; height: 64px; max-height: 64px; padding: 0 15px; display: flex; align-items: center; justify-content: flex-start; background: #0f141f;">
                 <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" style="display: flex; align-items: center; gap: 10px; text-decoration: none; width: 100%; height: 100%;">
                     <div class="d-flex align-items-center justify-content-center shadow-sm" style="background: #7D0A0A; color: #ffffff; min-width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 18px;">
-                        <i class="fa-sharp fa-solid fa-shop"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 100 100" fill="none">
+                            <polygon points="50,16 16,42 84,42" fill="#ffffff"/>
+                            <rect x="22" y="42" width="56" height="44" rx="2" fill="#ffffff"/>
+                            <rect x="40" y="56" width="20" height="30" rx="2" fill="#7D0A0A"/>
+                        </svg>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-extrabold text-uppercase text-white" style="font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
