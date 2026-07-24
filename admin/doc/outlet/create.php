@@ -7,12 +7,20 @@ $idOutlet = intval($_GET['id'] ?? ($_GET['c'] ?? 0));
 $isEdit = ($idOutlet > 0);
 
 $outletData = null;
+$kasirData  = null;
+
 if ($isEdit) {
-    $resOut = $db->query("SELECT * FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+    $resOut = $db->query("
+        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp
+        FROM outlet o
+        LEFT JOIN users u ON (u.id_users = o.id_users)
+        WHERE o.id_outlet = {$idOutlet} LIMIT 1
+    ");
     if ($resOut && $resOut->num_rows > 0) {
         $outletData = $resOut->fetch_assoc();
+        $kasirData  = $outletData; // same row, has kasir_ prefixed fields
     } else {
-        $isEdit = false;
+        $isEdit   = false;
         $idOutlet = 0;
     }
 }
@@ -23,9 +31,6 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
     die("<script>location.href = '{$redirectUrl}'; </script>");
 }
 
-// Fetch list of Kasir/Pengelola Users (role = 'outlet')
-$kasirList = $db->query("SELECT id_users, nama_lengkap, username FROM users WHERE role = 'outlet' ORDER BY nama_lengkap ASC");
-
 // Fetch list of Investors
 $investorList = $db->query("
     SELECT i.id_investor, u.nama_lengkap, i.persen_bagian_investor
@@ -33,6 +38,16 @@ $investorList = $db->query("
     JOIN users u ON (u.id_users = i.id_users)
     ORDER BY u.nama_lengkap ASC
 ");
+
+// Auto-generate kode_outlet
+if (empty($outletData['kode_outlet'])) {
+    $lastKode = $db->query("SELECT kode_outlet FROM outlet ORDER BY id_outlet DESC LIMIT 1");
+    $lastRow  = $lastKode ? $lastKode->fetch_assoc() : null;
+    $lastNum  = $lastRow ? intval(substr($lastRow['kode_outlet'], 3)) : 0;
+    $nextKode = 'TM-' . sprintf('%03d', $lastNum + 1);
+} else {
+    $nextKode = $outletData['kode_outlet'];
+}
 ?>
 
 <div class="page-header">
@@ -47,52 +62,35 @@ $investorList = $db->query("
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto mb-3">
-        <div class="card custom-card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><?= $isEdit ? "Form Edit Cabang Outlet" : "Form Registrasi Toko Madura Baru"; ?></h5>
-            </div>
-            <div class="card-body">
-                <form action="" method="post" id="form-create-outlet">
-                    <?php if ($isEdit) : ?>
-                        <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
-                    <?php endif; ?>
+    <div class="col-md-9 mx-auto mb-3">
+        <form action="" method="post" id="form-create-outlet">
+            <?php if ($isEdit) : ?>
+                <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
+                <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
+            <?php endif; ?>
+
+            <!-- SECTION 1: Data Toko -->
+            <div class="card custom-card overflow-hidden mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fa fa-building me-2 text-primary"></i>Data Toko / Cabang</h5>
+                </div>
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="form-group">
-                                <label for="kode_outlet" class="form-label fw-bold">Kode Outlet / Cabang</label>
-                                <?php
-                                    if (empty($outletData['kode_outlet'])) {
-                                        $lastKode = $db->query("SELECT kode_outlet FROM outlet ORDER BY id_outlet DESC LIMIT 1");
-                                        $lastRow  = $lastKode ? $lastKode->fetch_assoc() : null;
-                                        $lastNum  = $lastRow ? intval(substr($lastRow['kode_outlet'], 3)) : 0;
-                                        $nextKode = 'TM-' . sprintf('%03d', $lastNum + 1);
-                                    } else {
-                                        $nextKode = $outletData['kode_outlet'];
-                                    }
-                                ?>
-                                <input type="text" class="form-control" id="kode_outlet" name="kode_outlet" placeholder="Contoh: TM-001" value="<?= htmlspecialchars($nextKode); ?>" required>
+                                <label for="kode_outlet" class="form-label fw-bold">Kode Outlet</label>
+                                <input type="text" class="form-control" id="kode_outlet" name="kode_outlet"
+                                    placeholder="Contoh: TM-001"
+                                    value="<?= htmlspecialchars($nextKode); ?>" required>
+                                <small class="text-muted">Generate otomatis, bisa diubah manual.</small>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-8 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko / Cabang</label>
-                                <input type="text" class="form-control" id="nama_outlet" name="nama_outlet" placeholder="Contoh: Toko Madura Cabang Waru" value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="id_users" class="form-label fw-bold">Pengelola (Kasir Toko)</label>
-                                <select class="form-control" id="id_users" name="id_users" required>
-                                    <option value="" disabled <?= empty($outletData['id_users']) ? 'selected' : ''; ?>>-- Pilih Kasir Pengelola --</option>
-                                    <?php if ($kasirList && $kasirList->num_rows > 0) : ?>
-                                        <?php while ($k = $kasirList->fetch_assoc()) : ?>
-                                            <option value="<?= $k['id_users']; ?>" <?= (($outletData['id_users'] ?? 0) == $k['id_users']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($k['nama_lengkap']); ?> (<?= htmlspecialchars($k['username']); ?>)
-                                            </option>
-                                        <?php endwhile; ?>
-                                    <?php endif; ?>
-                                </select>
+                                <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
+                                    placeholder="Contoh: Toko Madura Cabang Waru"
+                                    value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -110,20 +108,73 @@ $investorList = $db->query("
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Toko</label>
-                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3" placeholder="Masukkan alamat lokasi toko cabang" required><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
+                                <input type="text" class="form-control" id="alamat_outlet" name="alamat_outlet"
+                                    placeholder="Masukkan alamat lokasi toko cabang"
+                                    value="<?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?>">
                             </div>
                         </div>
-                        <div class="col-md-12 mt-4 d-flex justify-content-end gap-2">
-                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary">Batal</a>
-                            <button type="submit" class="btn btn-primary" data-original-text="Submit"><?= $isEdit ? "Simpan Perubahan" : "Simpan Toko Cabang"; ?></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Data Akun Kasir -->
+            <div class="card custom-card overflow-hidden mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="ti-user me-2 text-success"></i>Akun Kasir Pengelola</h5>
+                    <?php if ($isEdit) : ?>
+                        <p class="text-muted card-sub-title mb-0 mt-1">Kosongkan field password jika tidak ingin mengubah password kasir.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_nama" class="form-label fw-bold">Nama Lengkap Kasir</label>
+                                <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
+                                    placeholder="Contoh: Budi Santoso"
+                                    value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP Kasir</label>
+                                <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
+                                    placeholder="Contoh: 08123456789"
+                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_username" class="form-label fw-bold">Username Login Kasir</label>
+                                <input type="text" class="form-control" id="kasir_username" name="kasir_username"
+                                    placeholder="Contoh: kasir_waru"
+                                    value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_password" class="form-label fw-bold">
+                                    Password Kasir <?= $isEdit ? '<span class="text-muted fw-normal">(opsional)</span>' : ''; ?>
+                                </label>
+                                <input type="password" class="form-control" id="kasir_password" name="kasir_password"
+                                    placeholder="<?= $isEdit ? 'Kosongkan jika tidak ingin mengubah' : 'Buat password untuk kasir ini'; ?>"
+                                    <?= $isEdit ? '' : 'required'; ?>>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary">Batal</a>
+                <button type="submit" class="btn btn-primary" data-original-text="Submit">
+                    <?= $isEdit ? "Simpan Perubahan" : "Simpan Toko & Kasir"; ?>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -131,9 +182,9 @@ $investorList = $db->query("
     $(document).ready(function() {
         $('#form-create-outlet').on('submit', function(el) {
             el.preventDefault();
-            let button = $(this).find('button[type="submit"]'), 
-                data = $(this).serialize();
-                
+            let button = $(this).find('button[type="submit"]'),
+                data   = $(this).serialize();
+
             button.addClass('loading').prop('disabled', true);
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/create", data, (resp) => {
                 button.removeClass('loading').prop('disabled', false);
@@ -156,19 +207,10 @@ $investorList = $db->query("
                 }
             }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
-                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
-                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr && xhr.responseText) {
-                    try {
-                        let res = JSON.parse(xhr.responseText);
-                        if (res.message) errorMsg = res.message;
-                    } catch(e) {}
-                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Perhatian!',
-                    text: errorMsg
+                    text: 'Gagal terhubung ke server. Silakan coba lagi.'
                 });
             });
         });
