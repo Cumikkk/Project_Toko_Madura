@@ -61,7 +61,17 @@ $investorList = $db->query("
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kode_outlet" class="form-label fw-bold">Kode Outlet / Cabang</label>
-                                <input type="text" class="form-control" id="kode_outlet" name="kode_outlet" placeholder="Contoh: TM-001" value="<?= htmlspecialchars($outletData['kode_outlet'] ?? ('TM-' . sprintf('%03d', rand(1, 999)))); ?>" required>
+                                <?php
+                                    if (empty($outletData['kode_outlet'])) {
+                                        $lastKode = $db->query("SELECT kode_outlet FROM outlet ORDER BY id_outlet DESC LIMIT 1");
+                                        $lastRow  = $lastKode ? $lastKode->fetch_assoc() : null;
+                                        $lastNum  = $lastRow ? intval(substr($lastRow['kode_outlet'], 3)) : 0;
+                                        $nextKode = 'TM-' . sprintf('%03d', $lastNum + 1);
+                                    } else {
+                                        $nextKode = $outletData['kode_outlet'];
+                                    }
+                                ?>
+                                <input type="text" class="form-control" id="kode_outlet" name="kode_outlet" placeholder="Contoh: TM-001" value="<?= htmlspecialchars($nextKode); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">

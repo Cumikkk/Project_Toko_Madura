@@ -88,7 +88,6 @@ $outlets = $db->query("
                                         <td><?= htmlspecialchars($row['alamat_outlet'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
-                                                <button type="button" class="btn btn-info btn-sm text-white" title="Detail Toko" onclick="alert('Kode: <?= htmlspecialchars($row['kode_outlet']) ?>\nToko: <?= htmlspecialchars($row['nama_outlet']) ?>\nPengelola: <?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?>\nNo. HP: <?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?>\nInvestor: <?= htmlspecialchars($row['nama_investor'] ?? 'Belum ada') ?>\nAlamat: <?= htmlspecialchars($row['alamat_outlet'] ?? '-') ?>')"><i class="fas fa-eye"></i></button>
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
                                                 <?php endif; ?>

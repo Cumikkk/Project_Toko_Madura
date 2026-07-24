@@ -93,7 +93,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="0.01" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor" placeholder="Contoh: 60.00" value="<?= htmlspecialchars($investorData['persen_bagian_investor'] ?? '60.00'); ?>" required>
+                                    <input type="number" step="0.01" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor" placeholder="Contoh: 50.00" value="<?= htmlspecialchars($investorData['persen_bagian_investor'] ?? '50.00'); ?>" required>
                                     <span class="input-group-text">%</span>
                                 </div>
                                 <small class="text-muted">Persentase porsi keuntungan bersih yang menjadi hak investor ini.</small>
