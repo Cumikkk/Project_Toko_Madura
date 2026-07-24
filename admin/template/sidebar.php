@@ -6,14 +6,14 @@
 <div class="sticky">
     <div class="main-menu main-sidebar main-sidebar-sticky side-menu">
         <div class="main-sidebar-header main-container-1 active">
-            <div class="sidemenu-logo" style="overflow: hidden; height: 64px; max-height: 64px; padding: 0 15px; display: flex; align-items: center; justify-content: flex-start; background: #0f141f;">
-                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" style="display: flex; align-items: center; gap: 12px; text-decoration: none; width: 100%; height: 100%;">
-                    <div class="brand-icon" style="width: 38px; height: 38px; background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(6px); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 19px; color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);">
+            <div class="sidemenu-logo">
+                <a class="brand-link" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
+                    <div class="brand-icon">
                         <i class="fa-sharp fa-solid fa-shop"></i>
                     </div>
-                    <div class="brand-text-container" style="display: flex; flex-direction: column;">
-                        <span class="brand-title" style="color: #FFFFFF; font-weight: 800; font-size: 15px; letter-spacing: 0.8px; line-height: 1.1;">TOKO MADURA</span>
-                        <span class="brand-subtitle" style="color: rgba(255, 255, 255, 0.75); font-weight: 700; font-size: 9px; letter-spacing: 1.2px;">ADMIN PANEL</span>
+                    <div class="brand-text-container">
+                        <span class="brand-title">TOKO MADURA</span>
+                        <span class="brand-subtitle">ADMIN PANEL</span>
                     </div>
                 </a>
             </div>
