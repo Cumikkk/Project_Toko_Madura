@@ -23,22 +23,13 @@ try {
         ]);
     }
 
-    if(empty($_SERVER['HTTP_REFERER'])) {
-        JsonResponse([
-            'code'      => 403,
-            'success'   => false,
-            'message'   => "Invalid Request",
-            'data'      => []
-        ]);
-    }
-
     /** Authentication */
     $user = Admin::authentication();
     if(empty($user)) {
         JsonResponse([
-            'code'      => 403,
+            'code'      => 401,
             'success'   => false,
-            'message'   => "Invalid User",
+            'message'   => "Sesi login Anda telah berakhir. Silakan login kembali.",
             'data'      => []
         ]);
     }

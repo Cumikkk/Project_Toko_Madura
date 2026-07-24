@@ -133,16 +133,25 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Gagal!',
+                        title: 'Perhatian!',
                         text: resp.message || 'Gagal menyimpan data investor.'
                     });
                 }
-            }, 'json').fail(function() {
+            }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
+                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                } else if (xhr && xhr.responseText) {
+                    try {
+                        let res = JSON.parse(xhr.responseText);
+                        if (res.message) errorMsg = res.message;
+                    } catch(e) {}
+                }
                 Swal.fire({
                     icon: 'error',
-                    title: 'Kesalahan System',
-                    text: 'Gagal terhubung ke server. Silakan coba lagi.'
+                    title: 'Perhatian!',
+                    text: errorMsg
                 });
             });
         });

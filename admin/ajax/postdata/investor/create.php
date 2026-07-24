@@ -23,7 +23,8 @@ $password     = $data['password'] ?? '';
 $email        = !empty($data['email']) ? $data['email'] : null;
 $no_hp        = !empty($data['no_hp']) ? $data['no_hp'] : null;
 $alamat       = !empty($data['alamat_investor']) ? $data['alamat_investor'] : null;
-$persen       = floatval($data['persen_bagian_investor'] ?? 60.0);
+$persenRaw = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
+$persen    = floatval($persenRaw);
 
 if (empty($nama_lengkap) || empty($username)) {
     JsonResponse([
