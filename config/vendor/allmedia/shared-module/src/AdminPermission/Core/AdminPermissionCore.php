@@ -34,6 +34,7 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                 JOIN (
                     SELECT 
                         amg.id as group_id,
+                        amg.`order` as group_order,
                         amg.`group`,
                         amg.icon,
                         amg.min_level,
@@ -46,7 +47,7 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                     JOIN admin_module_group amg ON (amg.id = am.group_id)
                 ) as module ON (module.module_id = ap.module_id)
                 WHERE aa.admin_id = {$adminid}
-                ORDER BY module.group_id ASC, ap.module_id ASC
+                ORDER BY module.group_order ASC, module.group_id ASC, ap.module_id ASC
             ");
 
             $result = [];
