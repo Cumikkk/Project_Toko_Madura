@@ -89,9 +89,45 @@ $(document).ready(function() {
         closeMobileSidebar();
     });
 
-    $(document).on('click', '.tm-maroon-sidebar .sidebar-link', function() {
+    $(document).on('click', '.tm-maroon-sidebar .sidebar-link:not(.sidebar-logout-btn)', function() {
         if ($(window).width() < 992) {
             closeMobileSidebar();
+        }
+    });
+
+    // =========================================================================
+    // GLOBAL LOGOUT CONFIRMATION MODAL
+    // =========================================================================
+    $(document).on('click', 'a[href*="/logout"], a[href$="logout"], .sidebar-logout-btn, #logout', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const logoutUrl = $(this).attr('href') || '/logout';
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin logout dari sistem?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#7D0A0A',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Logout',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-danger rounded-pill px-4',
+                    cancelButton: 'btn btn-secondary rounded-pill px-4 me-2'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = logoutUrl;
+                }
+            });
+        } else {
+            if (confirm('Apakah Anda yakin ingin logout dari sistem?')) {
+                window.location.href = logoutUrl;
+            }
         }
     });
 })
@@ -99,15 +135,15 @@ $(document).ready(function() {
 function formatter(angka, prefix = null){
     var number_string = angka.replace(/[^\.\d]/g, '').toString(),
     split   		= number_string.split('.'),
-    sisa     		= split[0].length % 3,
-    rupiah     		= split[0].substr(0, sisa),
-    ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
-    // tambahkan titik jika yang di input sudah menjadi angka ribuan
+    sisa 			= split[0].length % 3,
+    rupiah 			= split[0].substr(0, sisa),
+    ribuan 			= split[0].substr(sisa).match(/\d{3}/gi);
+
     if(ribuan){
         separator = sisa ? ',' : '';
         rupiah += separator + ribuan.join(',');
     }
 
     rupiah = split[1] != undefined ? rupiah + '.' + split[1] : rupiah;
-    return prefix == undefined ? rupiah : (rupiah ? prefix + rupiah : '');
+    return prefix == undefined ? rupiah : (rupiah ? 'Rp ' + rupiah : '');
 }

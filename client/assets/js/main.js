@@ -815,8 +815,19 @@
             }
         });
         $(".sidebar-link").each(function () {
+            var currentUrl = window.location.href;
             var pageUrl = window.location.href.split(/[?#]/)[0];
-            if (this.href == pageUrl) {
+            var linkUrl = this.href;
+            
+            var isMatch = false;
+            if (window.location.search) {
+                isMatch = (linkUrl === currentUrl);
+            } else {
+                isMatch = (linkUrl.split(/[?#]/)[0] === pageUrl && !linkUrl.includes('?'));
+            }
+            
+            if (isMatch) {
+                $(".sidebar-link").removeClass("active");
                 $(this).addClass("active");
                 if (!$('.main-sidebar').hasClass('horizontal-menu')) {
                     $(this).parents(".sidebar-item").addClass("open");

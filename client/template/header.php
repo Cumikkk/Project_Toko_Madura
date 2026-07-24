@@ -38,8 +38,8 @@ use Config\Core\SystemInfo;
                         <i class="fa-sharp fa-solid fa-shop fs-6"></i>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-extrabold text-uppercase" style="color: #ffffff; font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
-                        <span class="fw-bold text-uppercase" style="color: rgba(255, 255, 255, 0.65); font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;"><?= strtoupper($user['role'] ?? 'investor'); ?> PANEL</span>
+                        <span class="fw-extrabold text-uppercase text-body-emphasis" style="font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase text-body-secondary" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;"><?= strtoupper($user['role'] ?? 'investor'); ?> PANEL</span>
                     </div>
                 </a>
             </div>

@@ -1,7 +1,7 @@
 <?php
 use Config\Core\SystemInfo;
 
-$role = $user['role'] ?? '';
+$role = strtolower($user['role'] ?? '');
 $currentPage = $_GET['a'] ?? 'dashboard';
 ?>
 
@@ -55,7 +55,7 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                 <!-- INVESTOR SPECIFIC MENU -->
                 <li class="sidebar-section-title">Menu Investor</li>
                 
-                <!-- 1. Mendaftarkan akun outlet & melihat daftar outlet miliknya + rincian omzet -->
+                <!-- 1. Data Outlet -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/outlet" class="sidebar-link <?= ($currentPage == 'outlet') ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-store"></i></span> 
@@ -63,7 +63,7 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                     </a>
                 </li>
 
-                <!-- 2. Akumulasi potongan dari semua outlet & kalkulasi otomatis bagi hasil (Hak Investor vs Hak Outlet) -->
+                <!-- 2. Bagi Hasil -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/bagi-hasil" class="sidebar-link <?= ($currentPage == 'bagi-hasil') ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-hand-holding-dollar"></i></span> 
@@ -71,7 +71,7 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                     </a>
                 </li>
 
-                <!-- 3. Laporan Omzet & Potongan -->
+                <!-- 3. Laporan -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/laporan" class="sidebar-link <?= ($currentPage == 'laporan') ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-file-invoice-dollar"></i></span> 
@@ -83,7 +83,7 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                 <!-- OUTLET SPECIFIC MENU -->
                 <li class="sidebar-section-title">Menu Outlet</li>
 
-                <!-- 1. Menginput total omzet penjualan toko (harian, mingguan, bulanan) -->
+                <!-- 1. Input Omzet Harian -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="sidebar-link <?= ($currentPage == 'omzet' && empty($_GET['tab'])) ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-money-bill-trend-up"></i></span> 
@@ -91,11 +91,27 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                     </a>
                 </li>
 
-                <!-- 2. Riwayat data omzet & hitungan potongan otomatis berdasarkan persentase global -->
+                <!-- 2. Riwayat Potongan -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="sidebar-link <?= ($currentPage == 'omzet' && ($_GET['tab'] ?? '') == 'riwayat') || $currentPage == 'riwayat-omzet' ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-clock-rotate-left"></i></span> 
                         <span class="sidebar-txt">Riwayat Potongan</span>
+                    </a>
+                </li>
+
+                <!-- 3. Bagi Hasil -->
+                <li class="sidebar-item">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/bagi-hasil" class="sidebar-link <?= ($currentPage == 'bagi-hasil') ? 'active' : ''; ?>">
+                        <span class="nav-icon"><i class="fa-light fa-hand-holding-dollar"></i></span> 
+                        <span class="sidebar-txt">Bagi Hasil</span>
+                    </a>
+                </li>
+
+                <!-- 4. Laporan Omzet -->
+                <li class="sidebar-item">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/laporan" class="sidebar-link <?= ($currentPage == 'laporan') ? 'active' : ''; ?>">
+                        <span class="nav-icon"><i class="fa-light fa-file-invoice-dollar"></i></span> 
+                        <span class="sidebar-txt">Laporan</span>
                     </a>
                 </li>
 
