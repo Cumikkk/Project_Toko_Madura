@@ -69,6 +69,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                             <div class="form-group">
                                 <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
                                 <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password'; ?>" <?= $isEdit ? "" : "required"; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.</small>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">

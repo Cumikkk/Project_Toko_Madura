@@ -44,6 +44,18 @@ if (!$isEdit && empty($password)) {
     ]);
 }
 
+if (!empty($password)) {
+    $check_password = Helper::validation_password($password);
+    if ($check_password !== true) {
+        JsonResponse([
+            'code'      => 200,
+            'success'   => false,
+            'message'   => $check_password,
+            'data'      => []
+        ]);
+    }
+}
+
 if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
     JsonResponse([
         'code'      => 200,

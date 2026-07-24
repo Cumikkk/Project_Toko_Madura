@@ -51,6 +51,19 @@ if (!$isEdit && empty($kasir_password)) {
     exit;
 }
 
+if (!empty($kasir_password)) {
+    $check_password = Helper::validation_password($kasir_password);
+    if ($check_password !== true) {
+        JsonResponse([
+            'code'    => 200,
+            'success' => false,
+            'message' => $check_password,
+            'data'    => []
+        ]);
+        exit;
+    }
+}
+
 // Escape strings
 $kodeSafe    = $db->real_escape_string($kode_outlet);
 $namaSafe    = $db->real_escape_string($nama_outlet);

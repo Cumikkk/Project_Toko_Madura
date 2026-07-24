@@ -163,6 +163,7 @@ if (empty($outletData['kode_outlet'])) {
                                 <input type="password" class="form-control" id="kasir_password" name="kasir_password"
                                     placeholder="<?= $isEdit ? 'Kosongkan jika tidak ubah' : 'Buat password kasir'; ?>"
                                     <?= $isEdit ? '' : 'required'; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.</small>
                             </div>
                         </div>
                     </div>
