@@ -6,15 +6,10 @@
 <div class="sticky">
     <div class="main-menu main-sidebar main-sidebar-sticky side-menu">
         <div class="main-sidebar-header main-container-1 active">
-            <div class="sidemenu-logo">
-                <a class="brand-link" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
-                    <div class="brand-icon">
-                        <i class="fa-sharp fa-solid fa-shop"></i>
-                    </div>
-                    <div class="brand-text-container">
-                        <span class="brand-title">TOKO MADURA</span>
-                        <span class="brand-subtitle">ADMIN PANEL</span>
-                    </div>
+            <div class="sidemenu-logo" style="overflow: hidden; height: 64px; max-height: 64px; padding: 0 15px; display: flex; align-items: center; justify-content: flex-start; background: #0f141f;">
+                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" style="display: flex; align-items: center; justify-content: flex-start; width: 100%; height: 100%;">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/toko_madura_white_text_dark_bg.jpg" class="header-brand-img desktop-logo" style="max-height: 46px; height: 46px; width: auto; max-width: 100%; object-fit: contain; object-position: left center;" alt="Toko Madura Logo">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/toko_madura_white_text_dark_bg.jpg" class="header-brand-img icon-logo" style="max-height: 36px; height: 36px; width: auto; object-fit: contain;" alt="Toko Madura Icon">
                 </a>
             </div>
             <div class="main-sidebar-body main-body-1">

@@ -4,28 +4,16 @@
         <div class="main-header-left">
             <a class="main-header-menu-icon" href="javascript:void(0);" id="mainSidebarToggle"><span></span></a>
             <div class="hor-logo">
-                <a class="main-logo d-flex align-items-center gap-2 text-decoration-none" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
-                    <div class="d-flex align-items-center justify-content-center shadow-sm" style="background: #7D0A0A; color: #ffffff; width: 36px; height: 36px; border-radius: 10px; font-size: 18px;">
-                        <i class="fa-sharp fa-solid fa-shop"></i>
-                    </div>
-                    <div class="d-flex flex-column text-start">
-                        <span class="fw-extrabold text-uppercase" style="font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: 0.5px; color: #1c273c;">TOKO MADURA</span>
-                        <span class="fw-bold text-uppercase text-muted" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;">ADMIN PANEL</span>
-                    </div>
+                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo.png" width="75%" class="header-brand-img desktop-logo" alt="logo">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo-light.png" width="75%" class="header-brand-img desktop-logo-dark" alt="logo">
                 </a>
             </div>
         </div>
         <div class="main-header-center">
             <div class="responsive-logo">
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" class="d-inline-flex align-items-center gap-2 text-decoration-none">
-                    <div class="d-flex align-items-center justify-content-center shadow-sm" style="background: #7D0A0A; color: #ffffff; width: 30px; height: 30px; border-radius: 8px; font-size: 15px;">
-                        <i class="fa-sharp fa-solid fa-shop"></i>
-                    </div>
-                    <div class="d-flex flex-column text-start">
-                        <span class="fw-extrabold text-uppercase" style="font-weight: 800; font-size: 12px; line-height: 1.1; letter-spacing: 0.5px; color: #1c273c;">TOKO MADURA</span>
-                        <span class="fw-bold text-uppercase text-muted" style="font-weight: 700; font-size: 8px; letter-spacing: 0.8px;">ADMIN PANEL</span>
-                    </div>
-                </a>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx3.png" class="mobile-logo" alt="logo"></a>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx-white1.png" class="mobile-logo-dark" alt="logo"></a>
             </div>
         </div>
         <div class="main-header-right">

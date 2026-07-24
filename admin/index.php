@@ -25,20 +25,11 @@ if(empty($authPage)) {
         <title><?= ucwords($authPage) ?> - <?= CompanyProfile::$name ?></title>
 
         <!-- FAVICON -->
-        <link rel="icon" type="image/svg+xml" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/favicon.svg">
-        <link rel="shortcut icon" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/favicon.svg">
+        <link rel="icon" type="image/png" sizes="16x16" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/favicon.ico">
         <link rel="manifest" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/manifest.json">
         <meta name="msapplication-TileColor" content="#ffffff">
         <meta name="msapplication-TileImage" content="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/ms-icon-144x144.png">
         <meta name="theme-color" content="#ffffff">
-
-		<!-- ICONS CSS -->
-		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/icons.css" rel="stylesheet">
-		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/font-awesome/font-awesome.min.css" rel="stylesheet">
-		<link href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/web-fonts/plugin.css" rel="stylesheet">
-		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/all.min.css">
-		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/sharp-solid.min.css">
-		<link rel="stylesheet" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/vendor/css/sharp-regular.min.css">
 
 		<!-- BOOTSTRAP CSS -->
 		<link  id="style" href="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
