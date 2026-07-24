@@ -1,6 +1,12 @@
 <?php 
 use App\Models\Helper;
 use App\Models\Admin;
+use Config\Core\SystemInfo;
+
+if (($user['ADM_LEVEL'] ?? 1) != 1) {
+    $redirectUrl = SystemInfo::app('ADMIN_URL') . '/admin/view';
+    die("<script>location.href = '{$redirectUrl}'; </script>");
+}
 
 try {
     $idAdmin = Helper::form_input(!empty($_GET['c']) ? $_GET['c'] : ($_GET['b'] ?? "me"));

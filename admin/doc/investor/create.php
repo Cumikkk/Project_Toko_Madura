@@ -92,7 +92,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                 data = $(this).serialize();
                 
             button.addClass('loading');
-            $.post("/ajax/post/investor/create", data, (resp) => {
+            $.post("<?= \Config\Core\SystemInfo::app('ADMIN_URL') ?>/ajax/post/investor/create", data, (resp) => {
                 button.removeClass('loading');
                 Swal.fire(resp.alert).then(() => {
                     if(resp.success) {

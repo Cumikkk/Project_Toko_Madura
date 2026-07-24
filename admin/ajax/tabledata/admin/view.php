@@ -1,4 +1,20 @@
 <?php
+use App\Models\Admin;
+
+$loggedInUser = Admin::authentication();
+$loggedInLevel = intval($loggedInUser['ADM_LEVEL'] ?? 1);
+
+$whereClause = "WHERE role = 'master'";
+if ($loggedInLevel == 2) {
+    // Master Owner: Only show Admin Staff (exclude users with permissions for module_id 4, 5, 6)
+    $whereClause .= " AND id_users NOT IN (
+        SELECT DISTINCT aa.admin_id 
+        FROM admin_authorize aa 
+        JOIN admin_permissions ap ON (ap.id = aa.permission_id) 
+        WHERE ap.module_id IN (4, 5, 6) AND (aa.status = -1 OR aa.status = 1)
+    )";
+}
+
 $dt->query("
     SELECT
         NOW() as ADM_TIMESTAMP,
@@ -12,7 +28,7 @@ $dt->query("
         id_users as ADM_ID,
         'Indonesia' as COUNTRY_NAME
     FROM users
-    WHERE role = 'master'
+    {$whereClause}
 ");
 
 $dt->hide('ID_ADM');

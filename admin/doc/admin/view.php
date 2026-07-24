@@ -9,11 +9,12 @@
 </div>
 
 <?php 
+$isMasterOwner = (($user['ADM_LEVEL'] ?? 1) == 2);
 Allmedia\Shared\AdminPermission\SharedViews::render("admins/view", [
     'isAllowToCreate' => $adminPermissionCore->isHavePermission($moduleId, "create"),
     'isAllowToUpdate' => $adminPermissionCore->isHavePermission($moduleId, "update"),
     'isAllowToDelete' => $adminPermissionCore->isHavePermission($moduleId, "delete"),
-    'isAllowToUpdatePermission' => $adminPermissionCore->isHavePermission($moduleId, "update.permission"),
+    'isAllowToUpdatePermission' => $isMasterOwner ? false : $adminPermissionCore->isHavePermission($moduleId, "update.permission"),
 ]); 
 ?>
 

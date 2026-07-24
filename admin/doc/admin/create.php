@@ -43,10 +43,14 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                             <div class="form-group">
                                 <label for="add-level" class="form-label fw-bold">Role / Level</label>
                                 <select name="add-level" id="add-level" class="form-control" required>
-                                    <option value="" disabled selected>-- Pilih Role / Level --</option>
-                                    <option value="1">Programmer (Super Master)</option>
-                                    <option value="2">Master (Owner)</option>
-                                    <option value="3">Admin Staf</option>
+                                    <?php if (($user['ADM_LEVEL'] ?? 1) == 1) : ?>
+                                        <option value="" disabled selected>-- Pilih Role / Level --</option>
+                                        <option value="1">Programmer (Super Master)</option>
+                                        <option value="2">Master (Owner)</option>
+                                        <option value="3">Admin Staf</option>
+                                    <?php else : ?>
+                                        <option value="3" selected>Admin Staf</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>
