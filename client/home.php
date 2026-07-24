@@ -51,7 +51,8 @@ Logger::client_log([
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title><?= "{$pageTitle} - " . CompanyProfile::$name; ?></title>
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.svg">
+    <link rel="shortcut icon" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.svg">
     <link rel="manifest" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/ms-icon-144x144.png">

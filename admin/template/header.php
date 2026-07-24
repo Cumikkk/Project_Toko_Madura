@@ -4,16 +4,36 @@
         <div class="main-header-left">
             <a class="main-header-menu-icon" href="javascript:void(0);" id="mainSidebarToggle"><span></span></a>
             <div class="hor-logo">
-                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
-                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo.png" width="75%" class="header-brand-img desktop-logo" alt="logo">
-                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo-light.png" width="75%" class="header-brand-img desktop-logo-dark" alt="logo">
+                <a class="main-logo d-flex align-items-center gap-2 text-decoration-none" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm" style="background: #7D0A0A; color: #ffffff; min-width: 32px; height: 32px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 100 100" fill="none">
+                            <polygon points="50,16 16,42 84,42" fill="#ffffff"/>
+                            <rect x="22" y="42" width="56" height="44" rx="2" fill="#ffffff"/>
+                            <rect x="40" y="56" width="20" height="30" rx="2" fill="#7D0A0A"/>
+                        </svg>
+                    </div>
+                    <div class="d-flex flex-column text-start">
+                        <span class="fw-extrabold text-uppercase" style="font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: 0.5px; color: #1c273c;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase text-muted" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;">ADMIN PANEL</span>
+                    </div>
                 </a>
             </div>
         </div>
         <div class="main-header-center">
             <div class="responsive-logo">
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx3.png" class="mobile-logo" alt="logo"></a>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx-white1.png" class="mobile-logo-dark" alt="logo"></a>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm" style="background: #7D0A0A; color: #ffffff; min-width: 28px; height: 28px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 100 100" fill="none">
+                            <polygon points="50,16 16,42 84,42" fill="#ffffff"/>
+                            <rect x="22" y="42" width="56" height="44" rx="2" fill="#ffffff"/>
+                            <rect x="40" y="56" width="20" height="30" rx="2" fill="#7D0A0A"/>
+                        </svg>
+                    </div>
+                    <div class="d-flex flex-column text-start">
+                        <span class="fw-extrabold text-uppercase" style="font-weight: 800; font-size: 12px; line-height: 1.1; letter-spacing: 0.5px; color: #1c273c;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase text-muted" style="font-weight: 700; font-size: 8px; letter-spacing: 0.8px;">ADMIN PANEL</span>
+                    </div>
+                </a>
             </div>
         </div>
         <div class="main-header-right">

@@ -20,7 +20,8 @@ if(empty($authPage)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= ucwords($authPage) ?> | <?= CompanyProfile::$name ?></title>
     <meta name="description" content="<?= CompanyProfile::$name ?>"/>
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.svg">
+    <link rel="shortcut icon" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/favicon.svg">
     <link rel="manifest" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="<?= SystemInfo::app('CLIENT_URL') ?>/assets/images/favicon/ms-icon-144x144.png">
