@@ -61,22 +61,22 @@ if (empty($outletData['kode_outlet'])) {
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-9 mx-auto mb-3">
-        <form action="" method="post" id="form-create-outlet">
-            <?php if ($isEdit) : ?>
-                <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
-                <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
-            <?php endif; ?>
+<form action="" method="post" id="form-create-outlet">
+    <?php if ($isEdit) : ?>
+        <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
+        <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
+    <?php endif; ?>
 
-            <!-- SECTION 1: Data Toko -->
-            <div class="card custom-card overflow-hidden mb-3">
+    <div class="row">
+        <!-- LEFT COLUMN: Data Toko / Cabang -->
+        <div class="col-md-6 mb-3">
+            <div class="card custom-card overflow-hidden h-100 mb-0">
                 <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="fa fa-building me-2 text-primary"></i>Data Toko / Cabang</h5>
+                    <h5 class="card-title mb-0">Data Toko / Cabang</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kode_outlet" class="form-label fw-bold">Kode Outlet</label>
                                 <input type="text" class="form-control" id="kode_outlet" name="kode_outlet"
@@ -85,7 +85,7 @@ if (empty($outletData['kode_outlet'])) {
                                 <small class="text-muted">Generate otomatis, bisa diubah manual.</small>
                             </div>
                         </div>
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko / Cabang</label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
@@ -93,7 +93,7 @@ if (empty($outletData['kode_outlet'])) {
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="id_investor" class="form-label fw-bold">Investor Pemodal</label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
@@ -108,24 +108,25 @@ if (empty($outletData['kode_outlet'])) {
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Toko</label>
-                                <input type="text" class="form-control" id="alamat_outlet" name="alamat_outlet"
-                                    placeholder="Masukkan alamat lokasi toko cabang"
-                                    value="<?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?>">
+                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
+                                    placeholder="Masukkan alamat lokasi toko cabang"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- SECTION 2: Data Akun Kasir -->
-            <div class="card custom-card overflow-hidden mb-3">
+        <!-- RIGHT COLUMN: Data Akun Kasir Pengelola -->
+        <div class="col-md-6 mb-3">
+            <div class="card custom-card overflow-hidden h-100 mb-0">
                 <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="ti-user me-2 text-success"></i>Akun Kasir Pengelola</h5>
+                    <h5 class="card-title mb-0">Akun Kasir Pengelola</h5>
                     <?php if ($isEdit) : ?>
-                        <p class="text-muted card-sub-title mb-0 mt-1">Kosongkan field password jika tidak ingin mengubah password kasir.</p>
+                        <p class="text-muted card-sub-title mb-0 mt-1">Kosongkan password jika tidak ingin mengubah.</p>
                     <?php endif; ?>
                 </div>
                 <div class="card-body">
@@ -160,23 +161,23 @@ if (empty($outletData['kode_outlet'])) {
                                     Password Kasir <?= $isEdit ? '<span class="text-muted fw-normal">(opsional)</span>' : ''; ?>
                                 </label>
                                 <input type="password" class="form-control" id="kasir_password" name="kasir_password"
-                                    placeholder="<?= $isEdit ? 'Kosongkan jika tidak ingin mengubah' : 'Buat password untuk kasir ini'; ?>"
+                                    placeholder="<?= $isEdit ? 'Kosongkan jika tidak ubah' : 'Buat password kasir'; ?>"
                                     <?= $isEdit ? '' : 'required'; ?>>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary">Batal</a>
-                <button type="submit" class="btn btn-primary" data-original-text="Submit">
-                    <?= $isEdit ? "Simpan Perubahan" : "Simpan Toko & Kasir"; ?>
-                </button>
-            </div>
-        </form>
+        <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
+            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-primary" data-original-text="Submit">
+                <?= $isEdit ? "Simpan Perubahan" : "Simpan Toko & Kasir"; ?>
+            </button>
+        </div>
     </div>
-</div>
+</form>
 
 <script type="text/javascript">
     $(document).ready(function() {
