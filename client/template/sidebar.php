@@ -13,9 +13,6 @@ $currentPage = $_GET['a'] ?? 'dashboard';
     <!-- Brand / Logo Header (Matching Design Reference) -->
     <div class="sidebar-brand">
         <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="brand-link">
-            <div class="brand-icon">
-                <i class="fa-sharp fa-solid fa-shop"></i>
-            </div>
             <div class="brand-text-container">
                 <span class="brand-title">TOKO MADURA</span>
                 <span class="brand-subtitle"><?= strtoupper($role) ?> PANEL</span>
