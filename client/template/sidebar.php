@@ -88,11 +88,11 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                     </a>
                 </li>
 
-                <!-- 2. Riwayat Potongan -->
+                <!-- 2. Riwayat & Potongan -->
                 <li class="sidebar-item">
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="sidebar-link <?= ($currentPage == 'omzet' && ($_GET['tab'] ?? '') == 'riwayat') || $currentPage == 'riwayat-omzet' ? 'active' : ''; ?>">
                         <span class="nav-icon"><i class="fa-light fa-clock-rotate-left"></i></span> 
-                        <span class="sidebar-txt">Riwayat Potongan</span>
+                        <span class="sidebar-txt">Riwayat & Potongan</span>
                     </a>
                 </li>
 

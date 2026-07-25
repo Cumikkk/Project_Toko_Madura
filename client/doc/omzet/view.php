@@ -259,7 +259,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link <?= ($activeTab === 'riwayat') ? 'active' : ''; ?>" id="btnTabRiwayat" data-bs-toggle="pill" data-bs-target="#paneRiwayatOmzet" type="button" role="tab">
-                                <i class="fa-light fa-clock-rotate-left me-2"></i>Riwayat & Rekap
+                                <i class="fa-light fa-clock-rotate-left me-2"></i>Riwayat & Potongan
                             </button>
                         </li>
                     </ul>
@@ -348,7 +348,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                 <div class="card border border-body-subtle shadow-sm mb-4" style="border-radius: 16px;">
                     <div class="card-header bg-transparent border-0 pt-4 px-3 px-md-4 pb-0 d-flex flex-wrap align-items-center justify-content-between gap-3">
                         <div>
-                            <h5 class="fw-bold mb-1 fs-5 text-body-emphasis"><i class="fa-solid fa-receipt me-2 text-danger"></i>Riwayat Omzet Periode <?= htmlspecialchars($periodeLabelStr); ?></h5>
+                            <h5 class="fw-bold mb-1 fs-5 text-body-emphasis"><i class="fa-solid fa-receipt me-2 text-danger"></i>Riwayat Omzet & Potongan Periode <?= htmlspecialchars($periodeLabelStr); ?></h5>
                             <p class="text-body-secondary small mb-0">Daftar penginputan omzet harian toko Anda • <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2 py-1"><i class="fa-solid fa-calendar-check me-1"></i>Total Hari Input: <?= $totalHariInput; ?> Hari</span></p>
                         </div>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -501,7 +501,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                 </div>
                             </div>
 
-                            <!-- 3. Total Hak Bersih Outlet Sebulan (sebelum di potong) -->
+                            <!-- 3. Total Hak Bersih Outlet SSebulan (sebelum di potong) -->
                             <div class="col-12 col-md-4">
                                 <div class="rekap-item-box rekap-box-bersih h-100 d-flex align-items-center justify-content-between shadow-sm">
                                     <div>
