@@ -25,8 +25,8 @@ foreach(['admin_id', 'new-password'] as $req) {
 
 $admin_id = intval($data['admin_id']);
 
-// Check if admin user exists in users
-$check = $db->query("SELECT id_users FROM users WHERE id_users = {$admin_id} AND role = 'master' LIMIT 1");
+// Check if admin user exists in users (all admin roles)
+$check = $db->query("SELECT id_users FROM users WHERE id_users = {$admin_id} AND role IN ('programmer', 'master', 'admin_staf') LIMIT 1");
 if($check->num_rows != 1) {
     JsonResponse([
         'code'      => 200,

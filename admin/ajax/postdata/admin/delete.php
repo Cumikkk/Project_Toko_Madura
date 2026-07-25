@@ -14,8 +14,8 @@ if(!$permission) {
 
 $adminId = intval(Helper::form_input($_POST['id'] ?? 0));
 
-// Check if admin user exists in users
-$check = $db->query("SELECT id_users, username FROM users WHERE id_users = {$adminId} AND role = 'master' LIMIT 1");
+// Check if admin user exists in users (all admin roles)
+$check = $db->query("SELECT id_users, username FROM users WHERE id_users = {$adminId} AND role IN ('programmer', 'master', 'admin_staf') LIMIT 1");
 if($check->num_rows != 1) {
     JsonResponse([
         'code'      => 200,
