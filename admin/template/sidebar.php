@@ -7,9 +7,14 @@
     <div class="main-menu main-sidebar main-sidebar-sticky side-menu">
         <div class="main-sidebar-header main-container-1 active">
             <div class="sidemenu-logo" style="overflow: hidden; height: 64px; max-height: 64px; padding: 0 15px; display: flex; align-items: center; justify-content: flex-start; background: #0f141f;">
-                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" style="display: flex; align-items: center; justify-content: flex-start; width: 100%; height: 100%;">
-                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/toko_madura_white_text_dark_bg.jpg" class="header-brand-img desktop-logo" style="max-height: 46px; height: 46px; width: auto; max-width: 100%; object-fit: contain; object-position: left center;" alt="Toko Madura Logo">
-                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/toko_madura_white_text_dark_bg.jpg" class="header-brand-img icon-logo" style="max-height: 36px; height: 36px; width: auto; object-fit: contain;" alt="Toko Madura Icon">
+                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" style="display: flex; align-items: center; gap: 10px; text-decoration: none; width: 100%; height: 100%;">
+                    <div class="d-flex align-items-center justify-content-center shadow-sm" style="background: #7D0A0A; color: #ffffff; min-width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 18px;">
+                        <i class="fa-sharp fa-solid fa-shop"></i>
+                    </div>
+                    <div class="d-flex flex-column text-start">
+                        <span class="fw-extrabold text-uppercase text-white" style="font-weight: 800; font-size: 14px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase text-muted" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;">ADMIN PANEL</span>
+                    </div>
                 </a>
             </div>
             <div class="main-sidebar-body main-body-1">
