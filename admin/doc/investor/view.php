@@ -16,8 +16,8 @@ if ($loggedInLevel == 1) {
 } elseif ($loggedInLevel == 2) {
     $whereClause = "WHERE i.id_master = {$loggedInId}";
 } else {
-    // Admin Staff (Level 3): Filter by Master Owner ID (2)
-    $whereClause = "WHERE i.id_master = 2";
+    // Admin Staff (Level 3): Filter by Master Owner IDs dynamically
+    $whereClause = "WHERE i.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
 }
 
 // Fetch investors list with Master Owner name

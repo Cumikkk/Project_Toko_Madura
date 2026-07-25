@@ -16,7 +16,7 @@ if ($loggedInLevel == 1) {
 } elseif ($loggedInLevel == 2) {
     $whereClause = "WHERE inv.id_master = {$loggedInId}";
 } else {
-    $whereClause = "WHERE inv.id_master = 2";
+    $whereClause = "WHERE inv.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
 }
 
 // Fetch outlets list with investor and user details
