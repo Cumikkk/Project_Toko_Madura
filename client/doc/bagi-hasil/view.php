@@ -45,9 +45,15 @@ if ($resSet && $resSet->num_rows > 0) {
     $potonganGlobal = (float)$resSet->fetch_assoc()['nilai'];
 }
 
-// Separate Month & Year Filter
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : (int)date('n');
+// Separate Month & Year Filter (Default: 0 = Semua Bulan)
+$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
 $selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
+
+// Determine last day of selected month/year to check if deduction is active
+$checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
+$checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
+$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $checkBulan, $checkTahun);
+$lastDayDateStr = sprintf('%04d-%02d-%02d', $checkTahun, $checkBulan, $daysInMonth);
 
 $availableYears = [];
 $rows = [];
@@ -55,6 +61,7 @@ $totOmzet = 0;
 $totPotongan10 = 0;
 $totHakInvestor = 0;
 $totHakOutlet = 0;
+$hasAnyLastDayDone = false;
 
 // Fetch distinct years available in database
 $whereYearSql = ($role === 'investor') ? "o.id_investor = {$investorId}" : "o.id_outlet = {$targetOutletId}";
@@ -97,17 +104,38 @@ $resBagiHasil = $db->query($sqlBagiHasil);
 if ($resBagiHasil) {
     while ($row = $resBagiHasil->fetch_assoc()) {
         $omzet = (float)$row['total_omzet'];
+        $idOutletRow = (int)$row['id_outlet'];
         
-        // Potongan 10% dari total omzet outlet sebulan
-        $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
-        
-        // Bagi Hasil: 50% Investor : 50% Outlet dari potongan 10%
-        $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-        $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-        
+        if ($selectedBulan > 0) {
+            // Specific Month Selected -> Cek apakah data omzet tanggal terakhir bulan tersebut sudah diinput untuk outlet ini
+            $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
+            $isLastDayDone = ($chkLast && $chkLast->num_rows > 0);
+
+            if ($isLastDayDone) {
+                $hasAnyLastDayDone = true;
+                $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
+                $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
+                $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+            } else {
+                $potongan10 = 0.00;
+                $hakInvestor = 0.00;
+                $hakOutlet = 0.00;
+            }
+        } else {
+            // "Semua Bulan" Selected -> Mengakumulasi total potongan DB seluruh bulan yang sudah tutup
+            $potongan10 = (float)$row['total_potongan_db'];
+            $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
+            $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+            $isLastDayDone = ($potongan10 > 0 || $omzet > 0);
+            if ($potongan10 > 0) {
+                $hasAnyLastDayDone = true;
+            }
+        }
+
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
         $totalBersihOutlet = $omzet - $hakInvestor;
 
+        $row['is_last_day_done'] = $isLastDayDone;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
@@ -122,7 +150,7 @@ if ($resBagiHasil) {
     }
 }
 
-$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : '') . ($selectedTahun > 0 ? $selectedTahun : '');
+$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : 'Semua Bulan ') . ($selectedTahun > 0 ? $selectedTahun : '');
 if ($selectedBulan === 0 && $selectedTahun === 0) {
     $periodeLabelStr = 'Semua Periode';
 }
@@ -188,7 +216,7 @@ $countOutlet = count($rows);
     background-color: var(--bs-body-bg, #ffffff);
     border: 1px solid var(--bs-border-color, #dee2e6);
     border-radius: 50rem;
-    padding: 4px 14px;
+    padding: 6px 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .filter-pill-container select {
@@ -196,9 +224,9 @@ $countOutlet = count($rows);
     background: transparent !important;
     font-weight: 700 !important;
     color: var(--bs-body-color) !important;
-    font-size: 13px;
-    padding-left: 4px;
-    padding-right: 24px;
+    font-size: 12px;
+    padding-left: 2px;
+    padding-right: 18px;
     cursor: pointer;
     box-shadow: none !important;
 }
@@ -211,6 +239,10 @@ $countOutlet = count($rows);
         width: 42px;
         height: 42px;
         font-size: 16px;
+    }
+    .filter-pill-container select {
+        font-size: 13px;
+        padding-right: 22px;
     }
 }
 
@@ -229,42 +261,54 @@ $countOutlet = count($rows);
 </style>
 
 <div class="main-content-inner py-3 py-md-4">
-    <!-- Header Title & Filters (Fully Mobile-Precise & Indented) -->
-    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 mb-md-4 gap-2 gap-md-3">
-        <!-- Title Group with Icon & Indented Subtitle -->
-        <div class="d-flex align-items-start gap-2 gap-md-3 pe-md-2">
-            <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-danger-subtle text-danger p-2 flex-shrink-0 mt-1" style="width: 38px; height: 38px;">
-                <i class="fa-solid fa-vault fs-5"></i>
-            </div>
-            <div>
-                <h3 class="fw-extrabold text-body-emphasis mb-1 fs-5 fs-md-4" style="letter-spacing: -0.3px; line-height: 1.25;">
-                    Laporan Bagi Hasil <?= ($role === 'investor') ? 'Investor' : 'Toko'; ?>
-                </h3>
-                <p class="text-body-secondary small mb-0" style="line-height: 1.35; font-size: 12px;">Rekapitulasi komisi investor dan hak outlet per periode</p>
-            </div>
-        </div>
+    <!-- Header Title & Action Bar Card (Sleek & Balanced) -->
+    <div class="card border border-body-subtle shadow-sm mb-3 mb-md-4" style="border-radius: 16px;">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3">
+                <!-- Title Group with Icon & Subtitle -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-4 bg-danger-subtle text-danger p-2 p-md-3 flex-shrink-0" style="width: 46px; height: 46px;">
+                        <i class="fa-solid fa-vault fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-extrabold text-body-emphasis mb-1 fs-5 fs-md-4" style="letter-spacing: -0.3px;">
+                            Laporan Bagi Hasil <?= ($role === 'investor') ? 'Investor' : 'Toko'; ?>
+                        </h3>
+                        <p class="text-body-secondary small mb-0">Rekapitulasi komisi investor dan hak outlet per periode</p>
+                    </div>
+                </div>
 
-        <!-- Sleek Pill Filter Bar -->
-        <div class="filter-pill-container d-inline-flex align-items-center gap-2 mt-2 mt-md-0">
-            <span class="text-body-secondary small fw-semibold text-nowrap"><i class="fa-light fa-filter me-1 text-danger"></i>Filter:</span>
-            <div class="d-inline-flex align-items-center gap-1">
-                <select id="filterBulanBagiHasil" title="Pilih Bulan">
-                    <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                    <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                        <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>>
-                            <?= $mName; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <span class="text-body-secondary opacity-50">/</span>
-                <select id="filterTahunBagiHasil" title="Pilih Tahun">
-                    <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                    <?php foreach ($availableYears as $yVal) : ?>
-                        <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>>
-                            <?= $yVal; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <!-- Controls: Filter & Export PDF -->
+                <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-lg-auto justify-content-start justify-content-lg-end">
+                    <!-- Sleek Pill Filter Bar -->
+                    <div class="filter-pill-container d-flex align-items-center justify-content-between gap-2 flex-grow-1 flex-lg-grow-0">
+                        <span class="text-body-secondary small fw-semibold text-nowrap"><i class="fa-light fa-filter me-1 text-danger"></i>Filter:</span>
+                        <div class="d-flex align-items-center gap-1">
+                            <select id="filterBulanBagiHasil" title="Pilih Bulan" class="form-select-sm border-0 bg-transparent fw-bold text-body shadow-none px-1">
+                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
+                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>>
+                                        <?= $mName; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span class="text-body-secondary opacity-50">/</span>
+                            <select id="filterTahunBagiHasil" title="Pilih Tahun" class="form-select-sm border-0 bg-transparent fw-bold text-body shadow-none px-1">
+                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
+                                <?php foreach ($availableYears as $yVal) : ?>
+                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>>
+                                        <?= $yVal; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Cetak PDF Bagi Hasil -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold text-nowrap flex-grow-1 flex-lg-grow-0 text-center">
+                        <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF Bagi Hasil
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -277,9 +321,7 @@ $countOutlet = count($rows);
                     <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-chart-pie me-1"></i> <?= strtoupper($role); ?> DASHBOARD
                     </span>
-                    <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill" style="font-size: 11px;">
-                        <i class="fa-solid fa-store me-1"></i> <?= $countOutlet; ?> Outlet
-                    </span>
+                   
                 </div>
                 <h2 class="fw-bold text-white mb-1 fs-3 fs-md-2">Bagi Hasil Periode <?= htmlspecialchars($periodeLabelStr); ?></h2>
                 <p class="text-white-50 small mb-0">Total akumulasi komisi investor dan hak bersih outlet</p>
@@ -287,7 +329,20 @@ $countOutlet = count($rows);
             <div class="col-lg-5 col-12 text-lg-end">
                 <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-10 text-center text-lg-end">
                     <div class="text-white-50 small fw-semibold">Total Hak Bagi Hasil Investor</div>
-                    <div class="fs-2 fw-extrabold text-warning">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></div>
+                    <div class="fs-2 fw-extrabold text-warning">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?>
+                        <?php else : ?>
+                            -
+                        <?php endif; ?>
+                    </div>
+                    <div class="text-white-50 small">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            
+                        <?php else : ?>
+                            <i class="fa-light fa-clock me-1 text-warning"></i>Menunggu tanggal akhir bulan (Tgl <?= $daysInMonth; ?>)
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,23 +361,31 @@ $countOutlet = count($rows);
                 </div>
                 <div>
                     <div class="fs-6 fs-md-4 fw-extrabold text-primary mb-1">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></div>
-                    <small class="text-body-secondary micro-text d-block">Total seluruh outlet</small>
+                    <small class="text-body-secondary micro-text d-block">Total akumulasi omzet kotor</small>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Potongan Global 10% -->
+        <!-- 2. Potongan 10% -->
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-potongan h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-danger text-uppercase card-stat-title-full">Potongan Global (10%)</span>
+                    <span class="text-danger text-uppercase card-stat-title-full">Potongan (10%)</span>
                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-percent"></i>
                     </div>
                 </div>
                 <div>
-                    <div class="fs-6 fs-md-4 fw-extrabold text-danger mb-1">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></div>
-                    <small class="text-body-secondary micro-text d-block">Total potongan komisi</small>
+                    <div class="fs-6 fs-md-4 fw-extrabold text-danger mb-1">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            Rp <?= number_format($totPotongan10, 0, ',', '.'); ?>
+                        <?php else : ?>
+                            -
+                        <?php endif; ?>
+                    </div>
+                    <small class="text-body-secondary micro-text d-block">
+                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Total potongan komisi' : 'Berlaku di tgl ' . $daysInMonth; ?>
+                    </small>
                 </div>
             </div>
         </div>
@@ -337,8 +400,16 @@ $countOutlet = count($rows);
                     </div>
                 </div>
                 <div>
-                    <div class="fs-6 fs-md-4 fw-extrabold text-success mb-1">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></div>
-                    <small class="text-success micro-text d-block"><i class="fa-solid fa-arrow-trend-up me-1"></i>Hak bersih investor</small>
+                    <div class="fs-6 fs-md-4 fw-extrabold text-success mb-1">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?>
+                        <?php else : ?>
+                            -
+                        <?php endif; ?>
+                    </div>
+                    <small class="text-success micro-text d-block">
+                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? '<i class="fa-solid fa-arrow-trend-up me-1"></i>Hak bersih investor' : 'Dihitung tgl akhir bulan'; ?>
+                    </small>
                 </div>
             </div>
         </div>
@@ -353,8 +424,16 @@ $countOutlet = count($rows);
                     </div>
                 </div>
                 <div>
-                    <div class="fs-6 fs-md-4 fw-extrabold text-warning mb-1">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></div>
-                    <small class="text-body-secondary micro-text d-block">Bagian milik outlet</small>
+                    <div class="fs-6 fs-md-4 fw-extrabold text-warning mb-1">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?>
+                        <?php else : ?>
+                            -
+                        <?php endif; ?>
+                    </div>
+                    <small class="text-body-secondary micro-text d-block">
+                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Bagian milik outlet' : 'Dihitung tgl akhir bulan'; ?>
+                    </small>
                 </div>
             </div>
         </div>
@@ -365,7 +444,7 @@ $countOutlet = count($rows);
         <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
             <div>
                 <h5 class="fw-bold text-body-emphasis mb-0 fs-6">
-                    <i class="text-danger"></i>Rincian Pembagian Hak Per Outlet (<?= htmlspecialchars($periodeLabelStr); ?>)
+                    <i class="fa-solid fa-list-check me-2 text-danger"></i>Rincian Pembagian Hak Per Outlet (<?= htmlspecialchars($periodeLabelStr); ?>)
                 </h5>
                 <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan 10%, serta hak investor & outlet</p>
             </div>
@@ -400,9 +479,27 @@ $countOutlet = count($rows);
                                         <small class="text-body-secondary font-monospace"><?= htmlspecialchars($r['kode_outlet']); ?></small>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-end fw-bold text-danger">Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-end fw-extrabold text-success fs-6">Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-end fw-extrabold text-warning fs-6">Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></td>
+                                    <td class="py-3 px-3 text-end fw-bold text-danger">
+                                        <?php if ($r['is_last_day_done']) : ?>
+                                            Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?>
+                                        <?php else : ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-3 px-3 text-end fw-extrabold text-success fs-6">
+                                        <?php if ($r['is_last_day_done']) : ?>
+                                            Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?>
+                                        <?php else : ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-3 px-3 text-end fw-extrabold text-warning fs-6">
+                                        <?php if ($r['is_last_day_done']) : ?>
+                                            Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?>
+                                        <?php else : ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -423,9 +520,15 @@ $countOutlet = count($rows);
                             <tr>
                                 <td colspan="2" class="py-3 ps-3 text-end text-body-emphasis text-uppercase">TOTAL KESELURUHAN:</td>
                                 <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
-                                <td class="py-3 px-3 text-end text-danger fs-6">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
-                                <td class="py-3 px-3 text-end text-success fs-5">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
-                                <td class="py-3 px-3 text-end text-warning fs-5">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></td>
+                                <td class="py-3 px-3 text-end text-danger fs-6">
+                                    <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
+                                </td>
+                                <td class="py-3 px-3 text-end text-success fs-5">
+                                    <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakInvestor, 0, ',', '.') : '-'; ?>
+                                </td>
+                                <td class="py-3 px-3 text-end text-warning fs-5">
+                                    <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
+                                </td>
                                 <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
                             </tr>
                         </tfoot>

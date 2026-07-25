@@ -225,9 +225,9 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
         <div class="row mb-3 mb-md-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm" style="border-radius: 16px; background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%); color: #fff;">
-                    <div class="card-body p-3 p-md-5">
-                        <div class="row align-items-center g-3">
-                            <div class="col-lg-8 col-md-7">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
                                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                                     <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                                         <i class="fa-solid fa-store me-1"></i> Outlet Panel
@@ -239,13 +239,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                     <span class="mx-1">•</span> 
                                     <i class="fa-light fa-user me-1"></i>Investor: <strong><?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></strong>
                                 </p>
-                            </div>
-                            <div class="col-lg-4 col-md-5 text-md-end text-start">
-                                <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-10 text-center text-md-end">
-                                    <div class="text-white-50 small fw-semibold">Monitoring: <strong class="text-white"><?= htmlspecialchars($periodeLabelStr); ?></strong></div>
-                                    <div class="fs-4 fw-bold text-warning">Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></div>
-                                    <div class="text-white-50 small">Total Akumulasi Omzet Kotor</div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -298,51 +291,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
             </div>
         </div>
 
-        <!-- Summary Metrics Cards (Theme-Adaptive Text Colors) -->
-        <div class="row g-2 g-md-3 mb-4">
-            <div class="col-6 col-xl-4">
-                <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 d-flex align-items-center gap-2 gap-md-3">
-                        <div class="rounded-3 p-2 p-md-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
-                            <i class="fa-light fa-calendar-check fs-5 fs-md-4"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="text-body-secondary small fw-semibold">Total Hari Input</div>
-                            <div class="fs-5 fs-md-4 fw-bold text-body-emphasis mb-0"><?= number_format($totalHariInput, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Hari</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-xl-4">
-                <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 d-flex align-items-center gap-2 gap-md-3">
-                        <div class="rounded-3 p-2 p-md-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: linear-gradient(135deg, #198754 0%, #0d5132 100%);">
-                            <i class="fa-light fa-money-bill-trend-up fs-5 fs-md-4"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="text-body-secondary small fw-semibold">Total Omzet (<?= htmlspecialchars($periodeLabelStr); ?>)</div>
-                            <div class="fs-6 fs-md-5 fw-bold text-success mb-0">Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-xl-4">
-                <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 d-flex align-items-center gap-2 gap-md-3">
-                        <div class="rounded-3 p-2 p-md-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%);">
-                            <i class="fa-light fa-wallet fs-5 fs-md-4 text-dark"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <div class="text-body-secondary small fw-semibold">Total Bersih Toko</div>
-                            <div class="fs-6 fs-md-5 fw-bold text-body-emphasis mb-0">Rp <?= number_format($totalBersihOutlet, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Tab Panes -->
         <div class="tab-content" id="omzetTabContent">
             
@@ -350,9 +298,9 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
             <!-- TAB 1: FORM INPUT OMZET HARIAN -->
             <!-- ========================================================================= -->
             <div class="tab-pane fade <?= ($activeTab !== 'riwayat') ? 'show active' : ''; ?>" id="paneInputOmzet" role="tabpanel">
-                <div class="row g-3 g-md-4">
+                <div class="row justify-content-center">
                     <!-- Form Input Column -->
-                    <div class="col-lg-7 col-xl-8">
+                    <div class="col-12 col-lg-9 col-xl-8">
                         <div class="card border border-body-subtle shadow-sm" style="border-radius: 16px;">
                             <div class="card-header bg-transparent border-0 pt-4 px-3 px-md-4 pb-0">
                                 <h5 class="fw-bold mb-1 fs-5 text-body-emphasis"><i class="fa-solid fa-file-circle-plus me-2 text-danger"></i>Form Input Omzet Harian Toko</h5>
@@ -390,29 +338,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Live Calculator Preview Card -->
-                    <div class="col-lg-5 col-xl-4">
-                        <div class="card border border-body-subtle shadow-sm bg-body-tertiary" style="border-radius: 16px;">
-                            <div class="card-header bg-transparent border-0 pt-4 px-3 px-md-4 pb-0">
-                                <h6 class="fw-bold mb-1 text-body-emphasis"><i class="fa-light fa-calculator me-2 text-danger"></i>Ringkasan Input Harian</h6>
-                                <p class="text-body-secondary small mb-0">Rincian nominal omzet harian Anda.</p>
-                            </div>
-                            <div class="card-body p-3 p-md-4">
-                                <div class="p-3 bg-body rounded-3 border border-body-subtle mb-0">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-body-secondary small">Input Omzet Hari Ini</span>
-                                        <span class="fw-bold text-body-emphasis fs-6" id="calc_omzet_val">Rp 0</span>
-                                    </div>
-                                    <hr class="my-2 opacity-25">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                       
-                                        <span class="fw-bold text-primary small">Diakumulasi per Bulan</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -423,12 +348,16 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                 <div class="card border border-body-subtle shadow-sm mb-4" style="border-radius: 16px;">
                     <div class="card-header bg-transparent border-0 pt-4 px-3 px-md-4 pb-0 d-flex flex-wrap align-items-center justify-content-between gap-3">
                         <div>
-                            <h5 class="fw-bold mb-1 fs-5 text-body-emphasis"><i class="text-danger"></i>Riwayat Omzet Periode <?= htmlspecialchars($periodeLabelStr); ?></h5>
-                            <p class="text-body-secondary small mb-0">Daftar penginputan omzet harian toko Anda</p>
+                            <h5 class="fw-bold mb-1 fs-5 text-body-emphasis"><i class="fa-solid fa-receipt me-2 text-danger"></i>Riwayat Omzet Periode <?= htmlspecialchars($periodeLabelStr); ?></h5>
+                            <p class="text-body-secondary small mb-0">Daftar penginputan omzet harian toko Anda • <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2 py-1"><i class="fa-solid fa-calendar-check me-1"></i>Total Hari Input: <?= $totalHariInput; ?> Hari</span></p>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <!-- Tombol Cetak PDF Laporan -->
+                            <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/omzet/export_pdf.php?bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm fw-bold">
+                                <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF Laporan
+                            </a>
                             <!-- Tombol Hapus Terpilih / Bulk Delete Button -->
-                            <button type="button" id="btnDeleteSelected" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-none">
+                            <button type="button" id="btnDeleteSelected" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm d-none">
                                 <i class="fa-solid fa-trash-can me-1"></i> Hapus Terpilih (<span id="selectedCount">0</span>)
                             </button>
                         </div>
@@ -514,16 +443,21 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                 <!-- ========================================================================= -->
                 <?php if (!empty($laporanList)) : ?>
                     <div class="rekap-card-grand p-3 p-md-4 mb-4">
-                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 border-body-subtle">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3 border-body-subtle flex-wrap gap-2">
                             <div>
                                 <h6 class="fw-bold text-body-emphasis mb-0 fs-6">
-                                    <i class="text-danger"></i>Rekapitulasi Omzet & Bagi Hasil (<?= htmlspecialchars($periodeLabelStr); ?>)
+                                    <i class="fa-solid fa-calculator me-2 text-danger"></i>Rekapitulasi Omzet & Bagi Hasil (<?= htmlspecialchars($periodeLabelStr); ?>)
                                 </h6>
                                 <p class="text-body-secondary small mb-0">Ringkasan total akumulasi omzet, potongan global, dan pendapatan bersih outlet</p>
                             </div>
-                            <span class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-2">
-                                <i class="fa-light fa-calculator me-1"></i> Rekap Final
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-3 py-2">
+                                    <i class="fa-solid fa-calendar-check me-1"></i> Total Hari Input: <?= $totalHariInput; ?> Hari
+                                </span>
+                                <span class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-2">
+                                    <i class="fa-light fa-calculator me-1"></i> Rekap Final
+                                </span>
+                            </div>
                         </div>
 
                         <div class="row g-3">
@@ -541,11 +475,11 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                 </div>
                             </div>
 
-                            <!-- 2. Potongan Global 10% Sebulan -->
+                            <!-- 2. Potongan 10% Sebulan -->
                             <div class="col-12 col-md-4">
                                 <div class="rekap-item-box rekap-box-potongan h-100 d-flex align-items-center justify-content-between">
                                     <div>
-                                        <div class="text-danger small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Potongan Global (10%)</div>
+                                        <div class="text-danger small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Potongan (10%)</div>
                                         <div class="fs-4 fw-extrabold text-danger mt-1">
                                             <?php if ($isLastDayDone) : ?>
                                                 - Rp <?= number_format($totalPotonganBulanan, 0, ',', '.'); ?>
@@ -567,13 +501,13 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                 </div>
                             </div>
 
-                            <!-- 3. Total Hak Bersih Outlet Sebulan (90%) -->
+                            <!-- 3. Total Hak Bersih Outlet Sebulan (sebelum di potong) -->
                             <div class="col-12 col-md-4">
                                 <div class="rekap-item-box rekap-box-bersih h-100 d-flex align-items-center justify-content-between shadow-sm">
                                     <div>
-                                        <div class="text-warning small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Hak Bersih Outlet (90%)</div>
+                                        <div class="text-warning small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Hak Bersih Outlet (sebelum bagi hasil)</div>
                                         <div class="fs-4 fw-extrabold text-warning mt-1">Rp <?= number_format($totalBersihOutlet, 0, ',', '.'); ?></div>
-                                        <div class="text-white-50 small mt-1"><i class="fa-light fa-wallet me-1 text-warning"></i>Siap dibagikan / disetor</div>
+                                        
                                     </div>
                                     <div class="rounded-circle bg-warning text-dark p-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
                                         <i class="fa-solid fa-wallet fs-4"></i>

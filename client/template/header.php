@@ -33,10 +33,7 @@ use Config\Core\SystemInfo;
         </div>
         <div class="col-6 col-sm-6 d-lg-none">
             <div class="mobile-logo text-center">
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-inline-flex align-items-center gap-2 text-decoration-none">
-                    <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm fw-bold" style="background: #7D0A0A; color: #ffffff;">
-                        <i class="fa-sharp fa-solid fa-shop fs-6"></i>
-                    </div>
+                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-inline-flex align-items-center text-decoration-none">
                     <div class="d-flex flex-column text-start">
                         <span class="fw-extrabold text-uppercase text-body-emphasis" style="font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
                         <span class="fw-bold text-uppercase text-body-secondary" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;"><?= strtoupper($user['role'] ?? 'investor'); ?> PANEL</span>
