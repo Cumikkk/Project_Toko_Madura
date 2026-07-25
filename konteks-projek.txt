@@ -4,8 +4,9 @@ Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan
 
 1. Tugas Master
 - Mendaftarkan akun untuk setiap investor.
+- Melihat daftar investor ia daftarkan saja
 - Mengatur persentase potongan global. Pengaturan ini dibuat dinamis karena nilai persentase belum bersifat tetap.
-- Memantau berjalannya sistem secara garis besar. Setiap Master dapat melihat daftar investor di bawah naungannya, akumulasi total omzet per investor, dan total perputaran uang dari potongan tersebut.
+- Memantau berjalannya sistem secara garis besar. Setiap Master dapat melihat daftar investor di bawah naungannya.
 
 2. Tugas Investor
 - Mendaftarkan akun untuk setiap outlet yang berada di bawah kepemilikannya.
