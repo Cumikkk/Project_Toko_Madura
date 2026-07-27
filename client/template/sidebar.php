@@ -112,6 +112,26 @@ $currentPage = $_GET['a'] ?? 'dashboard';
                     </a>
                 </li>
 
+            <?php elseif ($role === 'master') : ?>
+                <!-- MASTER OWNER SPECIFIC MENU -->
+                <li class="sidebar-section-title">Menu Master Owner</li>
+
+                <!-- 1. Data Investor (Fokus Non-Keuangan) -->
+                <li class="sidebar-item">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="sidebar-link <?= ($currentPage == 'investor') ? 'active' : ''; ?>">
+                        <span class="nav-icon"><i class="fa-light fa-users"></i></span> 
+                        <span class="sidebar-txt">Data Investor</span>
+                    </a>
+                </li>
+
+                <!-- 2. Keuntungan Master -->
+                <li class="sidebar-item">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/keuntungan-master" class="sidebar-link <?= ($currentPage == 'keuntungan-master') ? 'active' : ''; ?>">
+                        <span class="nav-icon"><i class="fa-light fa-chart-line-up"></i></span> 
+                        <span class="sidebar-txt">Keuntungan Master</span>
+                    </a>
+                </li>
+
             <?php endif; ?>
 
             <!-- GENERAL SYSTEM MENU -->

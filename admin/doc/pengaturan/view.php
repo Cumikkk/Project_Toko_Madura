@@ -29,11 +29,19 @@ $settings = $db->query("SELECT * FROM pengaturan_sistem");
                 <form id="form-settings">
                     <?php if ($settings && $settings->num_rows > 0) : ?>
                         <?php while ($row = $settings->fetch_assoc()) : ?>
+                            <?php 
+                                $isCurrency = strpos($row['nama_pengaturan'], 'biaya') !== false;
+                            ?>
                             <div class="form-group mb-3">
                                 <label class="fw-bold mb-1"><?= ucwords(str_replace('_', ' ', $row['nama_pengaturan'])) ?></label>
                                 <div class="input-group">
-                                    <input type="number" step="0.01" class="form-control" name="settings[<?= $row['nama_pengaturan'] ?>]" value="<?= $row['nilai'] ?>" required />
-                                    <span class="input-group-text">%</span>
+                                    <?php if ($isCurrency) : ?>
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" step="1" class="form-control" name="settings[<?= $row['nama_pengaturan'] ?>]" value="<?= number_format($row['nilai'], 0, '', '') ?>" required />
+                                    <?php else : ?>
+                                        <input type="number" step="0.01" class="form-control" name="settings[<?= $row['nama_pengaturan'] ?>]" value="<?= $row['nilai'] ?>" required />
+                                        <span class="input-group-text">%</span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endwhile; ?>

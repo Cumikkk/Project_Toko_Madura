@@ -23,7 +23,7 @@ foreach($required as $req) {
 
 /** Check email or username */
 $emailOrUser = $data['email'];
-$sqlCheckUser = $db->query("SELECT * FROM users WHERE (LOWER(email) = LOWER('{$emailOrUser}') OR LOWER(username) = LOWER('{$emailOrUser}')) AND role IN ('investor', 'outlet') LIMIT 1");
+$sqlCheckUser = $db->query("SELECT * FROM users WHERE (LOWER(email) = LOWER('{$emailOrUser}') OR LOWER(username) = LOWER('{$emailOrUser}')) AND role IN ('master', 'investor', 'outlet') LIMIT 1");
 
 if($sqlCheckUser->num_rows != 1) {
     JsonResponse([

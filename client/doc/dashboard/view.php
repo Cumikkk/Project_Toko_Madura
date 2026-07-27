@@ -8,8 +8,171 @@ $db = Database::connect();
 $role = strtolower($user['role'] ?? 'investor');
 $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
-if ($role === 'investor') {
-    // 1. Fetch Investor Metrics
+if ($role === 'master') {
+    // -------------------------------------------------------------
+    // DASHBOARD MASTER OWNER (NON-KEUANGAN + 2 CARD + LIMIT TABLES)
+    // -------------------------------------------------------------
+    $countInvestor = $db->query("SELECT COUNT(*) as total FROM investor WHERE id_master = {$userId} OR id_master IS NULL")->fetch_assoc()['total'] ?? 0;
+    $countOutlet   = $db->query("
+        SELECT COUNT(*) as total FROM outlet o 
+        JOIN investor i ON i.id_investor = o.id_investor 
+        WHERE i.id_master = {$userId} OR i.id_master IS NULL
+    ")->fetch_assoc()['total'] ?? 0;
+
+    // Fetch Investors (Limit 5)
+    $listInvestors = $db->query("
+        SELECT u.nama_lengkap, u.no_hp, i.alamat_investor, i.tanggal_bergabung, COUNT(o.id_outlet) as total_outlet
+        FROM investor i
+        JOIN users u ON u.id_users = i.id_users
+        LEFT JOIN outlet o ON o.id_investor = i.id_investor
+        WHERE i.id_master = {$userId} OR i.id_master IS NULL
+        GROUP BY i.id_investor
+        ORDER BY i.id_investor DESC LIMIT 5
+    ");
+
+    // Fetch Outlets (Limit 5)
+    $listOutlets = $db->query("
+        SELECT o.kode_outlet, o.nama_outlet, o.kecamatan, o.alamat_outlet, o.tanggal_bergabung, u_inv.nama_lengkap as nama_investor
+        FROM outlet o
+        JOIN investor i ON i.id_investor = o.id_investor
+        JOIN users u_inv ON u_inv.id_users = i.id_users
+        WHERE i.id_master = {$userId} OR i.id_master IS NULL
+        ORDER BY o.id_outlet DESC LIMIT 5
+    ");
+?>
+<div class="row row-sm mb-4">
+    <div class="col-12">
+        <div class="card custom-card bg-primary text-white shadow-sm border-0">
+            <div class="card-body p-4">
+                <h3 class="fw-bold mb-1">Selamat Datang, <?= htmlspecialchars($user['MBR_NAME'] ?? 'Master Owner') ?>!</h3>
+                <p class="mb-0 opacity-75 fs-14">Portal Pemantauan Master Owner Toko Madura (Non-Keuangan & Manajemen Partner)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2 CARD INDIKATOR UTAMA MASTER OWNER -->
+<div class="row row-sm mb-4">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card custom-card border-0 shadow-sm" style="border-left: 5px solid #0d6efd !important;">
+            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <span class="text-muted fw-bold text-uppercase fs-12">Total Investor Saya</span>
+                    <h2 class="fw-bold text-primary mb-0 mt-1"><?= $countInvestor ?></h2>
+                    <small class="text-muted">Investor Pemodal Terdaftar</small>
+                </div>
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
+                    <i class="fa-light fa-users fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card custom-card border-0 shadow-sm" style="border-left: 5px solid #198754 !important;">
+            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <span class="text-muted fw-bold text-uppercase fs-12">Total Outlet Cabang</span>
+                    <h2 class="fw-bold text-success mb-0 mt-1"><?= $countOutlet ?></h2>
+                    <small class="text-muted">Cabang Outlet Terdaftar</small>
+                </div>
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
+                    <i class="fa-light fa-store fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABEL RINGKASAN INVESTOR & OUTLET (WITH LIMIT & PAGINATION VIEW) -->
+<div class="row row-sm">
+    <!-- TABLE INVESTOR -->
+    <div class="col-lg-6 mb-4">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="main-content-label mb-0 text-primary"><i class="fa-light fa-users me-2"></i>Ringkasan Investor Pemodal</h6>
+                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Investor</th>
+                                <th>Lokasi Alamat</th>
+                                <th class="text-center">Jumlah Outlet</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($listInvestors && $listInvestors->num_rows > 0) : ?>
+                                <?php $no = 1; while ($inv = $listInvestors->fetch_assoc()) : ?>
+                                    <tr>
+                                        <td><?= $no++ ?></td>
+                                        <td>
+                                            <strong class="text-dark"><?= htmlspecialchars($inv['nama_lengkap']) ?></strong>
+                                            <br><small class="text-muted"><i class="fa-light fa-phone me-1"></i><?= htmlspecialchars($inv['no_hp']) ?></small>
+                                        </td>
+                                        <td><?= htmlspecialchars($inv['alamat_investor'] ?? '-') ?></td>
+                                        <td class="text-center"><span class="badge bg-primary rounded-pill"><?= $inv['total_outlet'] ?> Outlet</span></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else : ?>
+                                <tr><td colspan="4" class="text-center py-3 text-muted">Belum ada investor.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE OUTLET -->
+    <div class="col-lg-6 mb-4">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="main-content-label mb-0 text-success"><i class="fa-light fa-store me-2"></i>Ringkasan Cabang Outlet</h6>
+                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="btn btn-outline-success btn-sm">Lihat Semua</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Outlet</th>
+                                <th>Lokasi (Kecamatan)</th>
+                                <th>Pemilik (Investor)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($listOutlets && $listOutlets->num_rows > 0) : ?>
+                                <?php $no = 1; while ($out = $listOutlets->fetch_assoc()) : ?>
+                                    <tr>
+                                        <td><?= $no++ ?></td>
+                                        <td>
+                                            <strong class="text-dark"><?= htmlspecialchars($out['nama_outlet']) ?></strong>
+                                            <br><small class="text-muted"><?= htmlspecialchars($out['kode_outlet']) ?></small>
+                                        </td>
+                                        <td><?= htmlspecialchars($out['kecamatan'] ?? $out['alamat_outlet'] ?? '-') ?></td>
+                                        <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($out['nama_investor']) ?></span></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else : ?>
+                                <tr><td colspan="4" class="text-center py-3 text-muted">Belum ada outlet.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+} else if ($role === 'investor') {
+    // -------------------------------------------------------------
+    // DASHBOARD INVESTOR
+    // -------------------------------------------------------------
     $resInv = $db->query("SELECT id_investor, persen_bagian_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
     $investorId = 0;
     $persenInvestor = 50.00;
@@ -32,7 +195,6 @@ if ($role === 'investor') {
     $omzetBersih = $totalOmzet - $totalPotongan;
     $hakInvestor = $omzetBersih * ($persenInvestor / 100.0);
 
-    // Recent 5 Omzet Reports
     $resRecent = $db->query("
         SELECT o.nama_outlet, o.kode_outlet, lo.periode_laporan, lo.omzet, lo.nominal_potongan, lo.waktu_input
         FROM laporan_omzet lo
@@ -40,8 +202,49 @@ if ($role === 'investor') {
         WHERE o.id_investor = {$investorId}
         ORDER BY lo.waktu_input DESC LIMIT 5
     ");
+?>
+<div class="row row-sm mb-4">
+    <div class="col-12">
+        <div class="card custom-card bg-primary text-white shadow-sm border-0">
+            <div class="card-body p-4">
+                <h3 class="fw-bold mb-1">Selamat Datang, <?= htmlspecialchars($user['MBR_NAME'] ?? 'Investor') ?>!</h3>
+                <p class="mb-0 opacity-75 fs-14">Portal Pemantauan Kinerja & Bagi Hasil Cabang Toko Madura</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row row-sm mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <span class="text-muted fw-bold text-uppercase fs-12">Total Cabang Outlet</span>
+                <h2 class="fw-bold text-primary mb-0 mt-1"><?= $resOutletCount ?> Outlet</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <span class="text-muted fw-bold text-uppercase fs-12">Akumulasi Omzet Kotor</span>
+                <h2 class="fw-bold text-dark mb-0 mt-1">Rp <?= number_format($totalOmzet, 0, ',', '.') ?></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <span class="text-muted fw-bold text-uppercase fs-12">Estimasi Hak Investor (<?= $persenInvestor ?>%)</span>
+                <h2 class="fw-bold text-success mb-0 mt-1">Rp <?= number_format($hakInvestor, 0, ',', '.') ?></h2>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
 } else {
-    // 2. Fetch Outlet Metrics
+    // -------------------------------------------------------------
+    // DASHBOARD OUTLET (KASIR)
+    // -------------------------------------------------------------
     $resOut = $db->query("SELECT id_outlet, kode_outlet, nama_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1")->fetch_assoc();
     $outletId = (int)($resOut['id_outlet'] ?? 0);
 
@@ -52,191 +255,34 @@ if ($role === 'investor') {
 
     $totalLaporan = (int)($resOutletOmzet['total_laporan'] ?? 0);
     $totalOmzet = (float)($resOutletOmzet['total_omzet'] ?? 0);
-    $totalPotongan = (float)($resOutletOmzet['total_potongan'] ?? 0);
-
-    // Recent 5 Omzet Reports
-    $resRecent = $db->query("
-        SELECT periode_laporan, omzet, presentase_potongan, nominal_potongan, waktu_input
-        FROM laporan_omzet WHERE id_outlet = {$outletId}
-        ORDER BY waktu_input DESC LIMIT 5
-    ");
-}
 ?>
-
-<div class="main-content-inner py-4">
-    <!-- Welcome Header Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm" style="border-radius: 16px; background: linear-gradient(135deg, #7D0A0A 0%, #3D0708 100%); color: #fff;">
-                <div class="card-body p-4 p-md-5">
-                    <div class="row align-items-center g-3">
-                        <div class="col-lg-8 col-md-7">
-                            <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                                <i class="fa-solid fa-shop me-1"></i> Toko Madura Client Portal
-                            </span>
-                            <h2 class="fw-bold mb-2 text-white">Selamat Datang, <?= htmlspecialchars($user['MBR_NAME'] ?? 'Pengguna'); ?>!</h2>
-                            <p class="text-white-50 fs-6 mb-0">Anda masuk sebagai <strong><?= strtoupper($role); ?></strong>. Pantau rekapitulasi omzet, bagi hasil, dan performa toko secara real-time.</p>
-                        </div>
-                        <div class="col-lg-4 col-md-5 text-md-end text-start">
-                            <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-inline-block text-start text-md-end">
-                                <span class="text-white-50 small d-block">Status Akun Login</span>
-                                <span class="fw-bold text-warning fs-6"><i class="fa-solid fa-circle-check text-success me-1"></i> Terverifikasi Aktif</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary Metrics Cards -->
-    <div class="row g-3 mb-4">
-        <?php if ($role === 'investor') : ?>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #7D0A0A 0%, #580608 100%);">
-                            <i class="fa-light fa-store fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Total Outlet Milik Anda</div>
-                            <div class="fs-4 fw-bold text-dark"><?= number_format($resOutletCount, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-muted">Cabang</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
-                            <i class="fa-light fa-money-bill-trend-up fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Total Omzet Keseluruhan</div>
-                            <div class="fs-5 fw-bold text-primary">Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">
-                            <i class="fa-light fa-hand-holding-dollar fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Komisi Platform</div>
-                            <div class="fs-5 fw-bold text-danger">Rp <?= number_format($totalPotongan, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
-                            <i class="fa-light fa-vault fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Hak Investor (<?= number_format($persenInvestor, 0); ?>%)</div>
-                            <div class="fs-5 fw-bold text-success">Rp <?= number_format($hakInvestor, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php else : ?>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #7D0A0A 0%, #580608 100%);">
-                            <i class="fa-light fa-file-invoice fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Total Laporan Inputed</div>
-                            <div class="fs-4 fw-bold text-dark"><?= number_format($totalLaporan, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-muted">Laporan</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
-                            <i class="fa-light fa-money-bill-trend-up fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Total Omzet Laporkan</div>
-                            <div class="fs-4 fw-bold text-success">Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-                    <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">
-                            <i class="fa-light fa-percent fs-4"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-semibold">Total Potongan Komisi</div>
-                            <div class="fs-4 fw-bold text-danger">Rp <?= number_format($totalPotongan, 0, ',', '.'); ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Recent Laporan Omzet Table -->
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white py-3 px-4 d-flex align-items-center justify-content-between border-bottom">
-            <h5 class="fw-bold text-dark mb-0 fs-6">5 Laporan Omzet Terbaru</h5>
-            <?php if ($role === 'investor') : ?>
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/outlet" class="btn btn-sm btn-outline-danger rounded-pill fw-bold">Lihat Semua Outlet</a>
-            <?php else : ?>
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="btn btn-sm btn-outline-danger rounded-pill fw-bold">+ Input Omzet Baru</a>
-            <?php endif; ?>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-secondary border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 text-center fw-bold text-dark">No</th>
-                            <?php if ($role === 'investor') : ?>
-                                <th class="py-3 px-3 fw-bold text-dark">Outlet Toko</th>
-                            <?php endif; ?>
-                            <th class="py-3 px-3 fw-bold text-dark">Periode Laporan</th>
-                            <th class="py-3 px-3 text-end fw-bold text-dark">Omzet (Rp)</th>
-                            <th class="py-3 px-3 text-end fw-bold text-danger">Potongan Komisi</th>
-                            <th class="py-3 px-4 text-center fw-bold text-dark">Waktu Input</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-0">
-                        <?php if ($resRecent && $resRecent->num_rows > 0) : ?>
-                            <?php $no = 1; while ($r = $resRecent->fetch_assoc()) : ?>
-                                <tr>
-                                    <td class="py-3 px-4 text-center text-muted font-monospace"><?= $no++; ?></td>
-                                    <?php if ($role === 'investor') : ?>
-                                        <td class="py-3 px-3">
-                                            <div class="fw-bold text-dark"><?= htmlspecialchars($r['nama_outlet']); ?></div>
-                                            <small class="text-muted font-monospace"><?= htmlspecialchars($r['kode_outlet']); ?></small>
-                                        </td>
-                                    <?php endif; ?>
-                                    <td class="py-3 px-3 fw-semibold text-dark"><?= date('d M Y', strtotime($r['periode_laporan'])); ?></td>
-                                    <td class="py-3 px-3 text-end fw-bold text-success">Rp <?= number_format($r['omzet'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-end fw-semibold text-danger">Rp <?= number_format($r['nominal_potongan'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-4 text-center text-muted small"><?= date('d/m/Y H:i', strtotime($r['waktu_input'])); ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else : ?>
-                            <tr>
-                                <td colspan="<?= ($role === 'investor') ? '6' : '5'; ?>" class="text-center text-muted py-4">Belum ada laporan omzet yang dimasukkan.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+<div class="row row-sm mb-4">
+    <div class="col-12">
+        <div class="card custom-card bg-success text-white shadow-sm border-0">
+            <div class="card-body p-4">
+                <h3 class="fw-bold mb-1">Selamat Datang, <?= htmlspecialchars($resOut['nama_outlet'] ?? 'Outlet') ?>!</h3>
+                <p class="mb-0 opacity-75 fs-14">Portal Input & Pelaporan Omzet Toko Madura</p>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row row-sm mb-4">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <span class="text-muted fw-bold text-uppercase fs-12">Total Laporan Inisiasi</span>
+                <h2 class="fw-bold text-primary mb-0 mt-1"><?= $totalLaporan ?> Laporan</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card custom-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <span class="text-muted fw-bold text-uppercase fs-12">Total Omzet Terinput</span>
+                <h2 class="fw-bold text-success mb-0 mt-1">Rp <?= number_format($totalOmzet, 0, ',', '.') ?></h2>
+            </div>
+        </div>
+    </div>
+</div>
+<?php } ?>

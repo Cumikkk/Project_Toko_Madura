@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-27 15:49:49
+-- Generated: 2026-07-27 15:55:09
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -170,7 +170,7 @@ CREATE TABLE `admin_module` (
   UNIQUE KEY `unique_module_name` (`module`) USING BTREE,
   KEY `fk_group_id` (`group_id`) USING BTREE,
   CONSTRAINT `admin_module_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `admin_module_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_module`
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('1', '1', '1', 'Dashboard', '-1', '-1', '2026-07-23 12:19:52', NULL);
@@ -182,6 +182,7 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('7', '4', '5', 'Outlet', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('8', '5', '6', 'Omzet', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('9', '6', '7', 'Bagi Hasil', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
+INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('16', '2', '5', 'request-outlet', '-1', '-1', '2026-07-27 15:53:00', NULL);
 
 -- --------------------------------------------------------
 -- Table structure for `admin_permissions`
@@ -198,7 +199,7 @@ CREATE TABLE `admin_permissions` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `fk_module_id_on_permission` (`module_id`) USING BTREE,
   CONSTRAINT `fk_module_id_on_permission` FOREIGN KEY (`module_id`) REFERENCES `admin_module` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_permissions`
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('1', '1', 'view', 'View Dashboard', '/dashboard', '2026-07-23 12:19:52', NULL);
@@ -228,6 +229,7 @@ INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `crea
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('41', '7', 'update', 'Update Outlet', '/outlet/update/*', '2026-07-24 10:34:29', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('42', '7', 'delete', 'Delete Outlet', '/outlet/delete', '2026-07-24 10:34:29', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('43', '8', 'verify', 'Verify Omzet Nota', '/omzet/verify', '2026-07-24 10:34:29', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('48', '16', 'view', 'View Request Outlet List', '/request-outlet/view', '2026-07-27 15:53:00', NULL);
 
 -- --------------------------------------------------------
 -- Table structure for `admin_authorize`
@@ -273,6 +275,7 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '41', '-1', '2026-07-24 13:46:50', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '42', '-1', '2026-07-24 13:46:50', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '43', '-1', '2026-07-24 13:46:50', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '48', '-1', '2026-07-27 15:53:00', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '1', '-1', '2026-07-25 08:24:35', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '2', '-1', '2026-07-25 08:24:35', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '3', '-1', '2026-07-25 08:24:35', NULL);
@@ -285,6 +288,7 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '10', '-1', '2026-07-25 08:24:35', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '11', '-1', '2026-07-25 08:24:35', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '12', '-1', '2026-07-25 08:24:35', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '48', '-1', '2026-07-27 15:53:00', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '1', '-1', '2026-07-25 08:48:44', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '2', '-1', '2026-07-25 08:48:44', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '3', '-1', '2026-07-25 08:48:44', NULL);
@@ -292,4 +296,5 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '5', '-1', '2026-07-25 08:48:44', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '6', '-1', '2026-07-25 08:48:44', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '7', '-1', '2026-07-25 08:48:44', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('52', '48', '-1', '2026-07-27 15:53:00', NULL);
 

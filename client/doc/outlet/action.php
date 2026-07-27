@@ -62,6 +62,31 @@ try {
         }
         $kodeOutlet = 'OUT' . sprintf('%03d', $maxId + 1);
 
+        // Fetch subscription fee from system config
+        $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
+        $nominalBiaya = 50000.00;
+        if ($resFee && $resFee->num_rows > 0) {
+            $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
+        }
+
+        $kecamatan = trim($db->real_escape_string($_POST['kecamatan'] ?? ''));
+
+        // Handle Upload Bukti Pembayaran if uploaded
+        $buktiPath = '';
+        if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../uploads/bukti_pembayaran/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileExt = strtolower(pathinfo($_FILES['bukti_pembayaran']['name'], PATHINFO_EXTENSION));
+            $newFileName = 'bukti_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
+            $targetFilePath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
+                $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
+            }
+        }
+
         // Hash Password & Insert User Account
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $escapedHash = $db->real_escape_string($hashedPassword);
@@ -72,15 +97,16 @@ try {
         }
         $newUserId = $db->insert_id;
 
-        // Insert Outlet Record
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}')";
+        // Insert Outlet Record with status 'pending'
+        $escapedBukti = $db->real_escape_string($buktiPath);
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
 
         JsonResponse([
             'success' => true,
-            'message' => 'Outlet "' . htmlspecialchars($namaOutlet) . '" (' . $kodeOutlet . ') berhasil didaftarkan!'
+            'message' => 'Request pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" (' . $kodeOutlet . ') berhasil dikirim! Menunggu verifikasi pembayaran oleh Admin.'
         ]);
     }
 
