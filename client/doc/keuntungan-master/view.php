@@ -17,7 +17,6 @@ $periodeFilter = "{$selectedTahun}-" . str_pad($selectedBulan, 2, '0', STR_PAD_L
 $sqlKeuntungan = "
     SELECT 
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         o.kecamatan,
         u_inv.nama_lengkap as nama_investor,
@@ -83,7 +82,7 @@ $totalHakMaster = 0;
                 <thead class="bg-light text-center">
                     <tr>
                         <th style="width: 5%;">No</th>
-                        <th>Kode & Nama Outlet</th>
+                        <th>Nama Outlet</th>
                         <th>Investor Pemodal</th>
                         <th class="text-end">Omzet Kotor</th>
                         <th class="text-end">Potongan (10%)</th>
@@ -111,7 +110,6 @@ $totalHakMaster = 0;
                                 <td class="text-center"><?= $no++ ?></td>
                                 <td>
                                     <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                    <br><small class="text-muted"><?= htmlspecialchars($row['kode_outlet']) ?></small>
                                 </td>
                                 <td><?= htmlspecialchars($row['nama_investor']) ?></td>
                                 <td class="text-end fw-bold">Rp <?= number_format($omzet, 0, ',', '.') ?></td>

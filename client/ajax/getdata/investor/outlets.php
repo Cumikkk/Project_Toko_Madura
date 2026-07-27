@@ -16,7 +16,6 @@ if ($idInvestor <= 0) {
 $sql = "
     SELECT 
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         o.alamat_outlet,
         o.kecamatan,

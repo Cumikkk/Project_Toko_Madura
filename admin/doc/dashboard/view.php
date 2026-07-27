@@ -23,7 +23,7 @@ $hakOutlet    = $omzetBersih * 0.50;
 
 // Top 5 Outlet berdasarkan Omzet
 $topOutlets = $db->query("
-    SELECT o.nama_outlet, o.kode_outlet, SUM(l.omzet) as total_omzet
+    SELECT o.nama_outlet, SUM(l.omzet) as total_omzet
     FROM laporan_omzet l
     JOIN outlet o ON l.id_outlet = o.id_outlet
     GROUP BY l.id_outlet
@@ -33,7 +33,7 @@ $topOutlets = $db->query("
 
 // 5 Transaksi Omzet Terbaru
 $recentOmzet = $db->query("
-    SELECT l.*, o.nama_outlet, o.kode_outlet
+    SELECT l.*, o.nama_outlet
     FROM laporan_omzet l
     JOIN outlet o ON l.id_outlet = o.id_outlet
     ORDER BY l.waktu_input DESC

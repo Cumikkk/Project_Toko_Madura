@@ -140,7 +140,7 @@ $(document).ready(function() {
                     html += `
                         <tr>
                             <td class="text-center">${idx + 1}</td>
-                            <td><strong class="text-primary">${item.nama_outlet}</strong> <small class="text-muted">(${item.kode_outlet})</small></td>
+                            <td><strong class="text-primary">${item.nama_outlet}</strong></td>
                             <td>${item.kecamatan || item.alamat_outlet || '-'}</td>
                             <td><span class="badge bg-light text-dark border">${namaInv}</span></td>
                             <td class="text-center">${item.tanggal_bergabung || '-'}</td>

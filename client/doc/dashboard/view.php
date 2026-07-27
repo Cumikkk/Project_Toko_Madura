@@ -32,7 +32,7 @@ if ($role === 'master') {
 
     // Fetch Outlets (Limit 5)
     $listOutlets = $db->query("
-        SELECT o.kode_outlet, o.nama_outlet, o.kecamatan, o.alamat_outlet, o.tanggal_bergabung, u_inv.nama_lengkap as nama_investor
+        SELECT o.nama_outlet, o.kecamatan, o.alamat_outlet, o.tanggal_bergabung, u_inv.nama_lengkap as nama_investor
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
         JOIN users u_inv ON u_inv.id_users = i.id_users
@@ -151,7 +151,6 @@ if ($role === 'master') {
                                         <td><?= $no++ ?></td>
                                         <td>
                                             <strong class="text-dark"><?= htmlspecialchars($out['nama_outlet']) ?></strong>
-                                            <br><small class="text-muted"><?= htmlspecialchars($out['kode_outlet']) ?></small>
                                         </td>
                                         <td><?= htmlspecialchars($out['kecamatan'] ?? $out['alamat_outlet'] ?? '-') ?></td>
                                         <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($out['nama_investor']) ?></span></td>

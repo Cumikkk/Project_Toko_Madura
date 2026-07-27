@@ -96,7 +96,6 @@ $requests = $db->query($sqlRequests);
                         <thead>
                             <tr class="text-center">
                                 <th style="width: 5%;">No</th>
-                                <th>Kode</th>
                                 <th>Nama Outlet</th>
                                 <th>Kecamatan / Lokasi</th>
                                 <th>Investor Pemodal</th>
@@ -112,7 +111,6 @@ $requests = $db->query($sqlRequests);
                                 <?php $no = 1; while ($row = $requests->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($row['kode_outlet']) ?></span></td>
                                         <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                         <td><?= htmlspecialchars($row['kecamatan'] ?? $row['alamat_outlet'] ?? '-') ?></td>
                                         <td>

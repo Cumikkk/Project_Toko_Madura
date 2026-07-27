@@ -54,14 +54,6 @@ try {
             JsonResponse(['success' => false, 'message' => 'Username "' . htmlspecialchars($username) . '" sudah digunakan. Silakan gunakan username lain.']);
         }
 
-        // Auto-generate Kode Outlet (OUT001, OUT002, ...)
-        $resCode = $db->query("SELECT MAX(id_outlet) as max_id FROM outlet");
-        $maxId = 0;
-        if ($resCode && $rowCode = $resCode->fetch_assoc()) {
-            $maxId = (int)$rowCode['max_id'];
-        }
-        $kodeOutlet = 'OUT' . sprintf('%03d', $maxId + 1);
-
         // Fetch subscription fee from system config
         $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
         $nominalBiaya = 50000.00;
@@ -99,14 +91,14 @@ try {
 
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
 
         JsonResponse([
             'success' => true,
-            'message' => 'Request pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" (' . $kodeOutlet . ') berhasil dikirim! Menunggu verifikasi pembayaran oleh Admin.'
+            'message' => 'Request pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" berhasil dikirim! Menunggu verifikasi pembayaran oleh Admin.'
         ]);
     }
 
