@@ -17,7 +17,7 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.kode_outlet, o.nama_outlet, o.alamat_outlet, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, o.alamat_outlet, u.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN investor i ON o.id_investor = i.id_investor
     LEFT JOIN users u ON i.id_users = u.id_users
@@ -221,10 +221,6 @@ ob_start();
                     <tr>
                         <td class="meta-label">Nama Outlet</td>
                         <td class="meta-value">: <?= htmlspecialchars($outlet['nama_outlet']); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Kode Outlet</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['kode_outlet']); ?></td>
                     </tr>
                     <tr>
                         <td class="meta-label">Alamat Outlet</td>

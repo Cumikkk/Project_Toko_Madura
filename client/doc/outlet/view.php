@@ -53,7 +53,6 @@ $whereOmzetSql = !empty($whereOmzet) ? " AND " . implode(" AND ", $whereOmzet) :
 $sqlOutlets = "
     SELECT 
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         o.alamat_outlet,
         o.id_users,
@@ -212,7 +211,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3" style="width: 50px;">No</th>
-                                    <th>Kode Outlet</th>
                                     <th>Nama Outlet</th>
                                     <th>Username Akun</th>
                                     <th>Alamat Outlet</th>
@@ -226,11 +224,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                     <?php foreach ($outlets as $index => $row) : ?>
                                         <tr>
                                             <td class="ps-3 fw-bold text-body-secondary"><?= $index + 1; ?></td>
-                                            <td>
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-3 fw-bold" style="font-size: 12px;">
-                                                    <i class="fa-light fa-tag me-1"></i><?= htmlspecialchars($row['kode_outlet']); ?>
-                                                </span>
-                                            </td>
                                             <td>
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($row['nama_outlet']); ?></div>
                                             </td>
@@ -410,7 +403,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             <i class="fa-solid fa-store fs-2"></i>
                         </div>
                         <h4 class="fw-bold mb-1 text-body-emphasis" id="det_nama_outlet">-</h4>
-                        <span class="badge bg-danger px-3 py-1 rounded-pill" id="det_kode_outlet">Kode: -</span>
                     </div>
 
                     <div class="list-group list-group-flush rounded-3 border border-body-subtle mb-3">
@@ -572,7 +564,6 @@ $(document).ready(function() {
                 $('#detailOutletLoading').addClass('d-none');
                 if (res.success) {
                     $('#det_nama_outlet').text(res.data.nama_outlet);
-                    $('#det_kode_outlet').text('Kode: ' + res.data.kode_outlet);
                     $('#det_username').text('@' + res.data.username);
                     $('#det_alamat').text(res.data.alamat_outlet || '-');
                     $('#det_total_omzet').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.data.total_omzet));

@@ -30,21 +30,14 @@ class Admin extends AdminAuth {
                 $db = Database::connect();
             }
 
-            $sqlCheck = $db->query("SELECT * FROM users WHERE id_users = {$idAdm} AND role IN ('programmer', 'master', 'admin_staf') LIMIT 1");
+            $sqlCheck = $db->query("SELECT * FROM users WHERE id_users = {$idAdm} AND role IN ('programmer', 'master') LIMIT 1");
             if($sqlCheck->num_rows != 1) {
                 return [];
             }
             $rawUser = $sqlCheck->fetch_assoc();
             $role = $rawUser['role'];
 
-            $level = 3;
-            if ($role === 'programmer') {
-                $level = 1;
-            } elseif ($role === 'master') {
-                $level = 2;
-            } else {
-                $level = 3;
-            }
+            $level = ($role === 'programmer') ? 1 : 2;
 
             return [
                 'ID_ADM' => $rawUser['id_users'],
@@ -56,7 +49,7 @@ class Admin extends AdminAuth {
                 'ADM_PASS'  => $rawUser['password'],
                 'ADM_LEVEL' => $level,
                 'ADM_STS' => 1,
-                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : (($level == 2) ? 'Master Owner' : 'Admin Staf'),
+                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : 'Master Owner',
                 'role' => $role,
                 'ADM_COUNTRY' => 7
             ];

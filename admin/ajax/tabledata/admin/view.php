@@ -4,13 +4,7 @@ use App\Models\Admin;
 $loggedInUser = Admin::authentication();
 $loggedInLevel = intval($loggedInUser['ADM_LEVEL'] ?? 1);
 
-if ($loggedInLevel == 1) {
-    // Programmer (Super Master): See all admins (programmer, master, admin_staf)
-    $whereClause = "WHERE role IN ('programmer', 'master', 'admin_staf')";
-} else {
-    // Master Owner: Only show Admin Staff (role = 'admin_staf')
-    $whereClause = "WHERE role = 'admin_staf'";
-}
+$whereClause = "WHERE role IN ('programmer', 'master')";
 
 $dt->query("
     SELECT
@@ -37,10 +31,8 @@ $dt->edit('ADMROLE_NAME', function($data) {
     $r = strtolower($data['ADMROLE_NAME'] ?? '');
     if ($r === 'programmer') {
         return "<span class='badge bg-danger'>Programmer</span>";
-    } elseif ($r === 'master') {
-        return "<span class='badge bg-primary'>Master (Owner)</span>";
     } else {
-        return "<span class='badge bg-info'>Admin Staf</span>";
+        return "<span class='badge bg-primary'>Master (Owner)</span>";
     }
 });
 

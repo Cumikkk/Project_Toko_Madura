@@ -88,7 +88,6 @@ if ($selectedTahun > 0) {
 $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
@@ -458,7 +457,7 @@ $countOutlet = count($rows);
                     <thead class="table-group-divider bg-body-secondary">
                         <tr class="text-uppercase small text-body-secondary">
                             <th class="py-3 ps-3 text-center fw-bold" style="width: 40px;">No</th>
-                            <th class="py-3 px-3 fw-bold">Kode & Nama Outlet</th>
+                            <th class="py-3 px-3 fw-bold">Nama Outlet</th>
                             <th class="py-3 px-3 text-end fw-bold">Total Omzet (100%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-danger">Potongan (10%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-success">Hak Investor (50%)</th>
@@ -476,7 +475,6 @@ $countOutlet = count($rows);
                                             <i class="fa-solid fa-store text-danger me-1"></i>
                                             <?= htmlspecialchars($r['nama_outlet']); ?>
                                         </div>
-                                        <small class="text-body-secondary font-monospace"><?= htmlspecialchars($r['kode_outlet']); ?></small>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                                     <td class="py-3 px-3 text-end fw-bold text-danger">

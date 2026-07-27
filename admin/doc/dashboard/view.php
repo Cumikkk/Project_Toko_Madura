@@ -112,7 +112,6 @@ $recentOmzet = $db->query("
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td>
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                            <br><small class="text-muted"><?= htmlspecialchars($row['kode_outlet']) ?></small>
                                         </td>
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>

@@ -46,7 +46,7 @@ if ($role === 'investor') {
     if ($selectedTahun > 0) $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
     $whereSql = implode(" AND ", $whereConditions);
 
-    $sql = "SELECT l.*, o.nama_outlet, o.kode_outlet FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereSql} ORDER BY l.periode_laporan DESC, l.id_laporan DESC";
+    $sql = "SELECT l.*, o.nama_outlet FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereSql} ORDER BY l.periode_laporan DESC, l.id_laporan DESC";
     $res = $db->query($sql);
     if ($res) {
         while ($r = $res->fetch_assoc()) {
@@ -57,7 +57,7 @@ if ($role === 'investor') {
     }
 } else {
     // Outlet role
-    $resOut = $db->query("SELECT id_outlet, nama_outlet, kode_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT id_outlet, nama_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1");
     $outlet = ($resOut && $resOut->num_rows > 0) ? $resOut->fetch_assoc() : null;
     $outletId = $outlet ? (int)$outlet['id_outlet'] : 0;
 
@@ -82,7 +82,6 @@ if ($role === 'investor') {
         while ($r = $res->fetch_assoc()) {
             if ($outlet) {
                 $r['nama_outlet'] = $outlet['nama_outlet'];
-                $r['kode_outlet'] = $outlet['kode_outlet'];
             }
             $laporanList[] = $r;
             $totalOmzet += (float)$r['omzet'];
@@ -221,7 +220,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                     </td>
                                     <td class="py-3 px-3">
                                         <div class="fw-semibold text-body-emphasis"><?= htmlspecialchars($r['nama_outlet'] ?? 'Outlet'); ?></div>
-                                        <small class="text-body-secondary font-monospace"><?= htmlspecialchars($r['kode_outlet'] ?? '-'); ?></small>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($omz, 0, ',', '.'); ?></td>
                                     <td class="py-3 px-3 text-end fw-bold text-danger">Rp <?= number_format($pot, 0, ',', '.'); ?></td>

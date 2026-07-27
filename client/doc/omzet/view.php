@@ -235,8 +235,6 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                 </div>
                                 <h2 class="fw-bold mb-1 text-white fs-3 fs-md-2"><?= htmlspecialchars($outlet['nama_outlet']); ?></h2>
                                 <p class="text-white-50 small mb-0">
-                                    <i class="fa-light fa-tag me-1"></i>Kode: <strong><?= htmlspecialchars($outlet['kode_outlet']); ?></strong> 
-                                    <span class="mx-1">•</span> 
                                     <i class="fa-light fa-user me-1"></i>Investor: <strong><?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></strong>
                                 </p>
                             </div>

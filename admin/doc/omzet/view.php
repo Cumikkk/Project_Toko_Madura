@@ -6,7 +6,7 @@ $db = Database::connect();
 
 // Fetch omzet reports - semua data tanpa filter (programmer lihat semua)
 $laporanOmzet = $db->query("
-    SELECT lo.*, o.nama_outlet, o.kode_outlet, o.alamat_outlet,
+    SELECT lo.*, o.nama_outlet, o.alamat_outlet,
            u.nama_lengkap as pengelola,
            inv_user.nama_lengkap as nama_investor
     FROM laporan_omzet lo
@@ -44,7 +44,6 @@ $laporanOmzet = $db->query("
                             <tr class="text-center">
                                 <th style="width: 5%;">No</th>
                                 <th>Periode Laporan</th>
-                                <th>Kode Outlet</th>
                                 <th>Nama Outlet</th>
                                 <th>Pengelola (Kasir)</th>
                                 <th>Investor Pemodal</th>
@@ -60,7 +59,6 @@ $laporanOmzet = $db->query("
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td><strong><?= date('d M Y', strtotime($row['periode_laporan'])) ?></strong></td>
-                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($row['kode_outlet']) ?></span></td>
                                         <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                         <td><?= htmlspecialchars($row['pengelola'] ?? '-') ?></td>
                                         <td>

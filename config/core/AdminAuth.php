@@ -64,7 +64,7 @@ class AdminAuth {
 
             $sqlCheck = $db->query("
                 SELECT * FROM users 
-                WHERE id_users = {$userId} AND role IN ('programmer', 'master', 'admin_staf')
+                WHERE id_users = {$userId} AND role IN ('programmer', 'master')
                 LIMIT 1
             ");
 
@@ -74,7 +74,7 @@ class AdminAuth {
 
             $rawUser = $sqlCheck->fetch_assoc(); 
             $role = $rawUser['role'];
-            $level = ($role === 'programmer') ? 1 : (($role === 'master') ? 2 : 3);
+            $level = ($role === 'programmer') ? 1 : 2;
 
             // Map keys for backward compatibility with RRFX template admin
             $user = [
@@ -87,7 +87,7 @@ class AdminAuth {
                 'ADM_PASS'  => $rawUser['password'],
                 'ADM_LEVEL' => $level,
                 'ADM_STS' => 1,
-                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : (($level == 2) ? 'Master Owner' : 'Admin Staf'),
+                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : 'Master Owner',
                 'role' => $role
             ];
             

@@ -77,7 +77,6 @@ if ($selectedTahun > 0) {
 $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
@@ -113,19 +112,14 @@ if ($resBagiHasil) {
             $potongan10 = (float)$row['total_potongan_db'];
             $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
             $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-            $isLastDayDone = ($potongan10 > 0 || $omzet > 0);
-            if ($potongan10 > 0) {
-                $hasAnyLastDayDone = true;
-            }
+            $isLastDayDone = true;
         }
 
-        $totalBersihOutlet = $omzet - $hakInvestor;
-
-        $row['is_last_day_done'] = $isLastDayDone;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
-        $row['total_bersih_outlet'] = $totalBersihOutlet;
+        $row['total_bersih_outlet'] = $omzet - $potongan10;
+        $row['is_last_day_done'] = $isLastDayDone;
 
         $totOmzet += $omzet;
         $totPotongan10 += $potongan10;
@@ -358,7 +352,7 @@ ob_start();
         <thead>
             <tr>
                 <th class="text-center" style="width: 30px;">No</th>
-                <th style="width: 140px;">Kode & Nama Outlet</th>
+                <th style="width: 140px;">Nama Outlet</th>
                 <th class="text-end">Total Omzet (100%)</th>
                 <th class="text-end">Potongan (10%)</th>
                 <th class="text-end">Hak Investor (50%)</th>
@@ -372,8 +366,7 @@ ob_start();
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
                         <td>
-                            <strong><?= htmlspecialchars($r['nama_outlet']); ?></strong><br>
-                            <span style="font-size: 8.5px; color: #64748b; font-family: monospace;"><?= htmlspecialchars($r['kode_outlet']); ?></span>
+                            <strong><?= htmlspecialchars($r['nama_outlet']); ?></strong>
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                         <td class="text-end text-danger fw-bold">

@@ -195,7 +195,7 @@ if ($role === 'master') {
     $hakInvestor = $omzetBersih * ($persenInvestor / 100.0);
 
     $resRecent = $db->query("
-        SELECT o.nama_outlet, o.kode_outlet, lo.periode_laporan, lo.omzet, lo.nominal_potongan, lo.waktu_input
+        SELECT o.nama_outlet, lo.periode_laporan, lo.omzet, lo.nominal_potongan, lo.waktu_input
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
         WHERE o.id_investor = {$investorId}
@@ -244,7 +244,7 @@ if ($role === 'master') {
     // -------------------------------------------------------------
     // DASHBOARD OUTLET (KASIR)
     // -------------------------------------------------------------
-    $resOut = $db->query("SELECT id_outlet, kode_outlet, nama_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1")->fetch_assoc();
+    $resOut = $db->query("SELECT id_outlet, nama_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1")->fetch_assoc();
     $outletId = (int)($resOut['id_outlet'] ?? 0);
 
     $resOutletOmzet = $db->query("

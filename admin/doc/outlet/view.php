@@ -60,7 +60,6 @@ $outlets = $db->query("
                         <thead>
                             <tr class="text-center">
                                 <th style="width: 5%;">No</th>
-                                <th>Kode Outlet</th>
                                 <th>Nama Toko / Cabang</th>
                                 <th>Pengelola (Kasir)</th>
                                 <th>No. HP</th>
@@ -74,7 +73,6 @@ $outlets = $db->query("
                                 <?php $no = 1; while ($row = $outlets->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($row['kode_outlet']) ?></span></td>
                                         <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                         <td><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
                                         <td><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>

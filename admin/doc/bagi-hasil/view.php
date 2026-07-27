@@ -49,7 +49,6 @@ $whereSql = !empty($whereConditions) ? "AND " . implode(" AND ", $whereCondition
 $sqlBagiHasil = "
     SELECT
         o.id_outlet,
-        o.kode_outlet,
         o.nama_outlet,
         u_kasir.nama_lengkap as pengelola,
         u_inv.nama_lengkap as nama_investor,
@@ -61,7 +60,7 @@ $sqlBagiHasil = "
     LEFT JOIN investor inv ON inv.id_investor = o.id_investor
     LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
     LEFT JOIN laporan_omzet l ON l.id_outlet = o.id_outlet {$whereSql}
-    GROUP BY o.id_outlet, o.kode_outlet, o.nama_outlet, u_kasir.nama_lengkap,
+    GROUP BY o.id_outlet, o.nama_outlet, u_kasir.nama_lengkap,
              u_inv.nama_lengkap, inv.persen_bagian_investor
     ORDER BY u_inv.nama_lengkap ASC, o.nama_outlet ASC
 ";
@@ -207,7 +206,6 @@ $periodeLabel = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '-') . ' ' 
                         <thead>
                             <tr class="text-center">
                                 <th style="width: 5%;">No</th>
-                                <th>Kode Outlet</th>
                                 <th>Nama Outlet</th>
                                 <th>Pengelola (Kasir)</th>
                                 <th>Investor Pemodal</th>
@@ -223,7 +221,6 @@ $periodeLabel = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '-') . ' ' 
                                 <?php $no = 1; foreach ($rows as $row) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($row['kode_outlet']) ?></span></td>
                                         <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                         <td><?= htmlspecialchars($row['pengelola'] ?? '-') ?></td>
                                         <td>

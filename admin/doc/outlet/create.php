@@ -39,15 +39,6 @@ $investorList = $db->query("
     ORDER BY u.nama_lengkap ASC
 ");
 
-// Auto-generate kode_outlet
-if (empty($outletData['kode_outlet'])) {
-    $lastKode = $db->query("SELECT kode_outlet FROM outlet ORDER BY id_outlet DESC LIMIT 1");
-    $lastRow  = $lastKode ? $lastKode->fetch_assoc() : null;
-    $lastNum  = $lastRow ? intval(substr($lastRow['kode_outlet'], 3)) : 0;
-    $nextKode = 'TM-' . sprintf('%03d', $lastNum + 1);
-} else {
-    $nextKode = $outletData['kode_outlet'];
-}
 ?>
 
 <div class="page-header">
@@ -76,16 +67,7 @@ if (empty($outletData['kode_outlet'])) {
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kode_outlet" class="form-label fw-bold">Kode Outlet</label>
-                                <input type="text" class="form-control" id="kode_outlet" name="kode_outlet"
-                                    placeholder="Contoh: TM-001"
-                                    value="<?= htmlspecialchars($nextKode); ?>" required>
-                                <small class="text-muted">Generate otomatis, bisa diubah manual.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko / Cabang</label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
