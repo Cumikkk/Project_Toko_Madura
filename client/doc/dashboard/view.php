@@ -152,7 +152,7 @@ if ($role === 'master') {
                                         <td>
                                             <strong class="text-dark"><?= htmlspecialchars($out['nama_outlet']) ?></strong>
                                         </td>
-                                        <td><?= htmlspecialchars($out['kecamatan'] ?? $out['alamat_outlet'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($out['kecamatan'] ?: '-') ?></td>
                                         <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($out['nama_investor']) ?></span></td>
                                     </tr>
                                 <?php endwhile; ?>

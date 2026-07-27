@@ -134,15 +134,17 @@ $currentPage = $_GET['a'] ?? 'dashboard';
 
             <?php endif; ?>
 
-            <!-- GENERAL SYSTEM MENU -->
-            <li class="sidebar-section-title">Pengaturan</li>
-            
-            <li class="sidebar-item">
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information" class="sidebar-link <?= ($currentPage == 'personal-information' || $currentPage == 'profile') ? 'active' : ''; ?>">
-                    <span class="nav-icon"><i class="fa-light fa-gear"></i></span> 
-                    <span class="sidebar-txt">Pengaturan</span>
-                </a>
-            </li>
+            <?php if ($role !== 'master') : ?>
+                <!-- GENERAL SYSTEM MENU -->
+                <li class="sidebar-section-title">Pengaturan</li>
+                
+                <li class="sidebar-item">
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information" class="sidebar-link <?= ($currentPage == 'personal-information' || $currentPage == 'profile') ? 'active' : ''; ?>">
+                        <span class="nav-icon"><i class="fa-light fa-gear"></i></span> 
+                        <span class="sidebar-txt">Pengaturan</span>
+                    </a>
+                </li>
+            <?php endif; ?>
 
             <li class="sidebar-item mt-3">
                 <a href="<?= SystemInfo::app('CLIENT_URL') ?>/logout" class="sidebar-link sidebar-logout-btn">

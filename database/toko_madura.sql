@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-27 16:40:55
+-- Generated: 2026-07-27 17:04:14
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -148,7 +148,7 @@ INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_l
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '3', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '4', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '5', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '6', 'Pengaturan', 'single', 'fa fa-cog sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '6', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
 
 -- --------------------------------------------------------
 -- Table structure for `admin_module`

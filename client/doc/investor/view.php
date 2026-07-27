@@ -137,11 +137,20 @@ $(document).ready(function() {
             if (resp.success && resp.data.length > 0) {
                 let html = '';
                 $.each(resp.data, function(idx, item) {
+                    let locStr = '';
+                    if (item.kecamatan) {
+                        locStr += `<strong class="text-dark d-block">Kec. ${item.kecamatan}</strong>`;
+                    }
+                    if (item.alamat_outlet) {
+                        locStr += `<small class="text-muted">${item.alamat_outlet}</small>`;
+                    }
+                    if (!locStr) locStr = '-';
+
                     html += `
                         <tr>
                             <td class="text-center">${idx + 1}</td>
                             <td><strong class="text-primary">${item.nama_outlet}</strong></td>
-                            <td>${item.kecamatan || item.alamat_outlet || '-'}</td>
+                            <td>${locStr}</td>
                             <td><span class="badge bg-light text-dark border">${namaInv}</span></td>
                             <td class="text-center">${item.tanggal_bergabung || '-'}</td>
                         </tr>
