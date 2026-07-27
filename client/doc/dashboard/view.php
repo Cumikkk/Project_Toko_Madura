@@ -99,7 +99,7 @@ if ($role === 'master') {
                             <tr>
                                 <th>No</th>
                                 <th>Nama Investor</th>
-                                <th>Lokasi Alamat</th>
+                                <th>Alamat Investor</th>
                                 <th class="text-center">Jumlah Outlet</th>
                             </tr>
                         </thead>
@@ -140,19 +140,23 @@ if ($role === 'master') {
                             <tr>
                                 <th>No</th>
                                 <th>Nama Outlet</th>
-                                <th>Lokasi (Kecamatan)</th>
+                                <th>Lokasi</th>
                                 <th>Pemilik (Investor)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ($listOutlets && $listOutlets->num_rows > 0) : ?>
                                 <?php $no = 1; while ($out = $listOutlets->fetch_assoc()) : ?>
+                                    <?php 
+                                        $locParts = array_filter([trim($out['kecamatan'] ?? ''), trim($out['alamat_outlet'] ?? '')]);
+                                        $locText = !empty($locParts) ? implode(' - ', $locParts) : '-';
+                                    ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td>
                                             <strong class="text-dark"><?= htmlspecialchars($out['nama_outlet']) ?></strong>
                                         </td>
-                                        <td><?= htmlspecialchars($out['kecamatan'] ?: '-') ?></td>
+                                        <td><?= htmlspecialchars($locText) ?></td>
                                         <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($out['nama_investor']) ?></span></td>
                                     </tr>
                                 <?php endwhile; ?>

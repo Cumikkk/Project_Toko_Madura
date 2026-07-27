@@ -45,7 +45,7 @@ $investors = $db->query($sqlInv);
                         <th style="width: 5%;">No</th>
                         <th>Nama Lengkap</th>
                         <th>No. HP</th>
-                        <th>Lokasi Investor</th>
+                        <th>Alamat Investor</th>
                         <th class="text-center">Jumlah Outlet</th>
                         <th class="text-center">Tanggal Bergabung</th>
                         <th class="text-center" style="width: 15%;">Aksi</th>
@@ -98,7 +98,7 @@ $investors = $db->query($sqlInv);
                             <tr>
                                 <th>No</th>
                                 <th>Nama Outlet</th>
-                                <th>Lokasi (Kecamatan)</th>
+                                <th>Lokasi</th>
                                 <th>Nama Investor (Pemilik)</th>
                                 <th>Tanggal Bergabung</th>
                             </tr>
@@ -137,20 +137,16 @@ $(document).ready(function() {
             if (resp.success && resp.data.length > 0) {
                 let html = '';
                 $.each(resp.data, function(idx, item) {
-                    let locStr = '';
-                    if (item.kecamatan) {
-                        locStr += `<strong class="text-dark d-block">Kec. ${item.kecamatan}</strong>`;
-                    }
-                    if (item.alamat_outlet) {
-                        locStr += `<small class="text-muted">${item.alamat_outlet}</small>`;
-                    }
-                    if (!locStr) locStr = '-';
+                    let locParts = [];
+                    if (item.kecamatan) locParts.push('Kec. ' + item.kecamatan);
+                    if (item.alamat_outlet) locParts.push(item.alamat_outlet);
+                    let locText = locParts.length > 0 ? locParts.join(' - ') : '-';
 
                     html += `
                         <tr>
                             <td class="text-center">${idx + 1}</td>
                             <td><strong class="text-primary">${item.nama_outlet}</strong></td>
-                            <td>${locStr}</td>
+                            <td>${locText}</td>
                             <td><span class="badge bg-light text-dark border">${namaInv}</span></td>
                             <td class="text-center">${item.tanggal_bergabung || '-'}</td>
                         </tr>
