@@ -1,6 +1,6 @@
 -- ========================================================
--- EXPORT DATABASE TOKO MADURA (LATEST XAMPP LIVE DB)
--- Generated: 2026-07-25 11:17:05
+-- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
+-- Generated: 2026-07-27 15:49:49
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -37,6 +37,8 @@ CREATE TABLE `investor` (
   `id_master` int(10) unsigned NOT NULL,
   `alamat_investor` text DEFAULT NULL,
   `persen_bagian_investor` decimal(5,2) NOT NULL DEFAULT 50.00,
+  `persen_bagian_master` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `tanggal_bergabung` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id_investor`),
   UNIQUE KEY `id_users` (`id_users`),
   KEY `id_master` (`id_master`),
@@ -45,7 +47,7 @@ CREATE TABLE `investor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `investor`
-INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `alamat_investor`, `persen_bagian_investor`) VALUES ('14', '48', '47', 'sidodadi', '50.00');
+INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', 'sidodadi', '50.00', '0.00', '2026-07-27 15:49:35');
 
 -- --------------------------------------------------------
 -- Table structure for `outlet`
@@ -58,6 +60,12 @@ CREATE TABLE `outlet` (
   `kode_outlet` varchar(20) NOT NULL,
   `nama_outlet` varchar(100) NOT NULL,
   `alamat_outlet` text DEFAULT NULL,
+  `kecamatan` varchar(100) DEFAULT NULL,
+  `status` enum('pending','active','reject') NOT NULL DEFAULT 'active',
+  `nominal_biaya` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `bukti_pembayaran` varchar(255) DEFAULT NULL,
+  `alasan_penolakan` text DEFAULT NULL,
+  `tanggal_bergabung` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id_outlet`),
   UNIQUE KEY `id_users` (`id_users`),
   UNIQUE KEY `kode_outlet` (`kode_outlet`),
@@ -67,7 +75,7 @@ CREATE TABLE `outlet` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `outlet`
-INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `kode_outlet`, `nama_outlet`, `alamat_outlet`) VALUES ('10', '49', '14', 'TM-001', 'Toko Madura Merdeka', 'sidodadi');
+INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `kode_outlet`, `nama_outlet`, `alamat_outlet`, `kecamatan`, `status`, `nominal_biaya`, `bukti_pembayaran`, `alasan_penolakan`, `tanggal_bergabung`) VALUES ('10', '49', '14', 'TM-001', 'Toko Madura Merdeka', 'sidodadi', NULL, 'active', '0.00', NULL, NULL, '2026-07-27 15:49:36');
 
 -- --------------------------------------------------------
 -- Table structure for `laporan_omzet`
@@ -115,10 +123,11 @@ CREATE TABLE `pengaturan_sistem` (
   `nilai` decimal(5,2) NOT NULL,
   PRIMARY KEY (`id_pengaturan`),
   UNIQUE KEY `nama_pengaturan` (`nama_pengaturan`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `pengaturan_sistem`
 INSERT INTO `pengaturan_sistem` (`id_pengaturan`, `nama_pengaturan`, `nilai`) VALUES ('1', 'potongan_global', '10.00');
+INSERT INTO `pengaturan_sistem` (`id_pengaturan`, `nama_pengaturan`, `nilai`) VALUES ('2', 'biaya_langganan_outlet', '999.99');
 
 -- --------------------------------------------------------
 -- Table structure for `admin_module_group`
