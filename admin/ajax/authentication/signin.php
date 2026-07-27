@@ -29,7 +29,7 @@ if(empty($data['password'])) {
 $username = $data['username'];
 $password = $data['password'];
 
-$sqlGet = $db->query("SELECT * FROM users WHERE LOWER(username) = LOWER('{$username}') AND role IN ('programmer', 'master', 'admin_staf') LIMIT 1");
+$sqlGet = $db->query("SELECT * FROM users WHERE LOWER(username) = LOWER('{$username}') AND role IN ('programmer', 'master') LIMIT 1");
 $admin = $sqlGet->fetch_assoc();
 
 if($sqlGet->num_rows != 1) {
