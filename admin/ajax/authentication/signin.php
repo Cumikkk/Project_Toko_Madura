@@ -60,11 +60,13 @@ $_SESSION['user_id'] = $admin['id_users'];
 
 Admin::setSessionData(['token' => $token]);
 
+$redirectUrl = (strtolower($admin['role'] ?? '') === 'master') ? SystemInfo::app('CLIENT_URL') . '/dashboard' : 'dashboard';
+
 JsonResponse([
     'code'      => 200,
     'success'   => true,
     'message'   => "Login berhasil",
     'data'      => [
-        'redirect'  => 'dashboard'
+        'redirect'  => $redirectUrl
     ]
 ]);

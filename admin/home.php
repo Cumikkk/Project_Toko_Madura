@@ -20,6 +20,11 @@ if(empty($user)) {
     die("<script>alert('Invalid Session, please re-login'); location.href = '/';</script>");
 }
 
+/** Redirect Master Owner to Client Portal */
+if (strtolower($user['role'] ?? '') === 'master') {
+    die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/dashboard';</script>");
+}
+
 /** update token expired */
 try {
     $userid = md5(md5($user['ADM_ID']));
