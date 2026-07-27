@@ -55,12 +55,19 @@
             $.post("ajax/auth/signin", data, function(resp) {
                 button.removeClass('loading');
                 if(!resp.success) {
-                    Swal.fire(resp.alert);
+                    Swal.fire(resp.alert || { icon: 'error', title: 'Login Gagal', text: resp.message || 'Akun atau password salah' });
                     return false;
                 }
 
                 location.href = resp.data.redirect;
-            }, 'json')
+            }, 'json').fail(function(xhr) {
+                button.removeClass('loading');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: 'Gagal terhubung ke server. Silakan coba lagi.'
+                });
+            });
         })
     })
 </script>

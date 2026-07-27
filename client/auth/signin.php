@@ -87,17 +87,24 @@ if($isLoggedIn) {
 		$.post("ajax/auth/signin", formData, function(resp) {
 			button.removeClass('loading');
 			if(!resp.success) {
-				Swal.fire(resp.alert);
+				Swal.fire(resp.alert || { icon: 'error', title: 'Login Gagal', text: resp.message || 'Username/Email atau Password salah' });
 				return false;
 			}
 
-			if(!resp.data.redirect) {
-				Swal.fire(resp.alert);
+			if(!resp.data || !resp.data.redirect) {
+				Swal.fire(resp.alert || { icon: 'error', title: 'Login Gagal', text: resp.message || 'Username/Email atau Password salah' });
 				return false;
 			}
 			
 			location.href = resp.data.redirect;
-		}, 'json');
+		}, 'json').fail(function(xhr) {
+			button.removeClass('loading');
+			Swal.fire({
+				icon: 'error',
+				title: 'Terjadi Kesalahan',
+				text: 'Gagal terhubung ke server. Silakan coba lagi.'
+			});
+		});
 	});
 	localStorage.clear();
 </script>

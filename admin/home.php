@@ -21,9 +21,13 @@ if(empty($user)) {
 }
 
 /** update token expired */
-$userid = md5(md5($user['ADM_ID']));
-$newExpired = date("Y-m-d H:i:s", strtotime("+1 hour"));
-Database::update("tb_admin", ['ADM_TOKEN_EXPIRED' => $newExpired], ['ADM_ID' => $user['ADM_ID']]);
+try {
+    $userid = md5(md5($user['ADM_ID']));
+    $newExpired = date("Y-m-d H:i:s", strtotime("+1 hour"));
+    Database::update("tb_admin", ['ADM_TOKEN_EXPIRED' => $newExpired], ['ADM_ID' => $user['ADM_ID']]);
+} catch (\Throwable $e) {
+    // Ignore legacy table update if tb_admin table is not present
+}
 
 /** Permission */
 $adminPermissionCore = AdminPermissionFactory::adminPermissionCore();
