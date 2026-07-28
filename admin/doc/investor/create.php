@@ -42,9 +42,9 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto mb-3">
+    <div class="col-md-10 mx-auto mb-3">
         <div class="card custom-card">
-            <div class="card-header">
+            <div class="card-header border-bottom">
                 <h5 class="card-title mb-0"><?= $isEdit ? "Form Edit Data Investor" : "Form Registrasi Investor"; ?></h5>
             </div>
             <div class="card-body">
@@ -53,12 +53,19 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                         <input type="hidden" name="id_investor" value="<?= $idInvestor; ?>">
                     <?php endif; ?>
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Investor</label>
                                 <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($investorData['nama_lengkap'] ?? ''); ?>" required>
                             </div>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
+
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="username" class="form-label fw-bold">Username</label>
@@ -72,25 +79,14 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-12 mb-3">
+
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
                             </div>
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor</label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
                                 <div class="input-group">
@@ -100,7 +96,14 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                                 <small class="text-muted">Persentase porsi keuntungan bersih yang menjadi hak investor ini.</small>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-4 d-flex justify-content-end gap-2">
+
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor</label>
+                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
                             <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/view" class="btn btn-secondary">Batal</a>
                             <button type="submit" class="btn btn-primary" data-original-text="Submit"><?= $isEdit ? "Simpan Perubahan" : "Simpan Investor"; ?></button>
                         </div>
