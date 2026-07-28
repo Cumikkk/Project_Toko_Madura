@@ -93,18 +93,18 @@ $recentRequests = $db->query("
 </div>
 
 <!-- Row Summary Tables -->
-<div class="row row-sm">
+<div class="row row-sm d-flex align-items-stretch">
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
-    <div class="col-lg-6 mb-4">
-        <div class="card custom-card overflow-hidden">
+    <div class="col-lg-6 mb-4 d-flex">
+        <div class="card custom-card overflow-hidden w-100 d-flex flex-column mb-0">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="card-title">Outlet dengan Omzet Tertinggi</h5>
                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
+            <div class="card-body d-flex flex-column flex-grow-1">
+                <div class="table-responsive flex-grow-1">
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
                         <thead>
                             <tr class="text-center">
@@ -151,16 +151,16 @@ $recentRequests = $db->query("
     </div>
 
     <!-- REQUEST OUTLET TERBARU -->
-    <div class="col-lg-6 mb-4">
-        <div class="card custom-card overflow-hidden">
+    <div class="col-lg-6 mb-4 d-flex">
+        <div class="card custom-card overflow-hidden w-100 d-flex flex-column mb-0">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="card-title">Request Outlet Terbaru</h5>
                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view?tab=pending" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
+            <div class="card-body d-flex flex-column flex-grow-1">
+                <div class="table-responsive flex-grow-1">
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
                         <thead>
                             <tr class="text-center">
