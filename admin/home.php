@@ -103,9 +103,8 @@ $filePermission = $adminPermissionCore->hasPermission($getAuthrorizedPermissions
                 $(document).ready(function() {
                     $(document).on('click', 'a', function(e) {
                         var href = $(this).attr('href');
-                        if (href) {
-                            // Check if href starts with /admin or /developer
-                            if (href.indexOf('/admin') === 0 || href.indexOf('/developer') === 0) {
+                        if (href && href.indexOf('/') === 0 && href.indexOf('//') !== 0 && href.indexOf('javascript') !== 0 && href.indexOf('#') !== 0) {
+                            if (!href.startsWith(adminUrl)) {
                                 e.preventDefault();
                                 window.location.href = adminUrl + href;
                             }
