@@ -156,7 +156,7 @@ $recentRequests = $db->query("
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="card-title">Request Outlet Terbaru</h5>
-                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
+                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view?tab=pending" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
                 </div>
             </div>
             <div class="card-body">

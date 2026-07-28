@@ -395,6 +395,22 @@ $(document).ready(function() {
         $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
     });
 
+    // Auto switch tab if URL has ?tab=pending or ?tab=reject
+    let urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'pending' || window.location.hash === '#pending') {
+        let tabBtn = document.querySelector('#pending-tab');
+        if (tabBtn) {
+            let tab = new bootstrap.Tab(tabBtn);
+            tab.show();
+        }
+    } else if (urlParams.get('tab') === 'reject' || window.location.hash === '#reject') {
+        let tabBtn = document.querySelector('#reject-tab');
+        if (tabBtn) {
+            let tab = new bootstrap.Tab(tabBtn);
+            tab.show();
+        }
+    }
+
     // Modal popup detail alamat outlet
     $('.btn-lihat-alamat').on('click', function() {
         let nama = $(this).data('nama');
