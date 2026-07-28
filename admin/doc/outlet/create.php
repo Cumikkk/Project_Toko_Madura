@@ -40,11 +40,11 @@ $investorList = $db->query("
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5"><?= $isEdit ? "Edit Outlet Toko" : "Registrasi Outlet Baru"; ?></h2>
+        <h2 class="main-content-title tx-24 mg-b-5"><?= $isEdit ? "Edit Data Outlet" : "Registrasi Outlet Baru"; ?></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view">Outlet</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><?= $isEdit ? "Edit Outlet" : "Registrasi"; ?></li>
+            <li class="breadcrumb-item active" aria-current="page"><?= $isEdit ? "Edit Data" : "Registrasi"; ?></li>
         </ol>
     </div>
 </div>
@@ -87,6 +87,7 @@ $investorList = $db->query("
                                         <?php endwhile; ?>
                                     <?php endif; ?>
                                 </select>
+                                <small class="text-muted">Pilih investor pemodal yang menaungi toko ini.</small>
                             </div>
                         </div>
 
@@ -101,7 +102,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP Kasir (Opsional)</label>
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp Kasir (Opsional)</label>
                                 <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
                                     placeholder="Contoh: 081234567890"
                                     value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
@@ -111,7 +112,7 @@ $investorList = $db->query("
                         <!-- 3. USERNAME - PASSWORD -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kasir_username" class="form-label fw-bold">Username Login Kasir</label>
+                                <label for="kasir_username" class="form-label fw-bold">Username Kasir</label>
                                 <input type="text" class="form-control" id="kasir_username" name="kasir_username"
                                     placeholder="Contoh: kasir_waru"
                                     value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
@@ -119,13 +120,11 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kasir_password" class="form-label fw-bold">
-                                    Password Login Kasir <?= $isEdit ? '<span class="text-muted fw-normal">(Opsional)</span>' : ''; ?>
-                                </label>
+                                <label for="kasir_password" class="form-label fw-bold">Password Kasir <?= $isEdit ? "(Opsional)" : ""; ?></label>
                                 <input type="password" class="form-control" id="kasir_password" name="kasir_password"
-                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password kasir'; ?>"
+                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
                                     <?= $isEdit ? '' : 'required'; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, kecil & angka.</small>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
                         </div>
 
@@ -142,9 +141,9 @@ $investorList = $db->query("
                         <!-- 5. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet</label>
+                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet</label>
                                 <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
-                                    placeholder="Contoh: Jl. Raya Waru No. 45, RT 01 / RW 03, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
+                                    placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
