@@ -71,69 +71,63 @@ $rejectedOutlets = $db->query("
     </div>
 </div>
 
-<!-- Summary Metrics Cards (3 Cards Layout) -->
+<!-- Summary Metrics Cards (Interactive Clickable Tabs) -->
 <div class="row row-sm mb-3">
-    <div class="col-sm-4 col-lg-4">
-        <div class="card custom-card">
+    <div class="col-sm-4 col-lg-4 mb-2">
+        <div class="card custom-card outlet-stat-card active-card" id="card-active" data-target="active-tab">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Outlet Aktif</h6>
-                    <h3 class="text-end mb-0"><i class="fa fa-check-circle icon-size float-start text-success"></i><span><?= $activeCount ?></span></h3>
+                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-check-circle icon-size float-start text-success me-2"></i>Outlet Aktif</h6>
+                    <h3 class="text-end mb-0 text-success fw-bold"><span><?= $activeCount ?></span></h3>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-4 col-lg-4">
-        <div class="card custom-card">
+    <div class="col-sm-4 col-lg-4 mb-2">
+        <div class="card custom-card outlet-stat-card" id="card-pending" data-target="pending-tab">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Request Masuk</h6>
-                    <h3 class="text-end mb-0"><i class="fa fa-clock-o icon-size float-start text-warning"></i><span><?= $pendingCount ?></span></h3>
+                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-clock-o icon-size float-start text-warning me-2"></i>Request Masuk</h6>
+                    <h3 class="text-end mb-0 text-warning fw-bold"><span><?= $pendingCount ?></span></h3>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-4 col-lg-4">
-        <div class="card custom-card">
+    <div class="col-sm-4 col-lg-4 mb-2">
+        <div class="card custom-card outlet-stat-card" id="card-reject" data-target="reject-tab">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Request Ditolak</h6>
-                    <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-danger"></i><span><?= $rejectCount ?></span></h3>
+                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-times-circle icon-size float-start text-danger me-2"></i>Request Ditolak</h6>
+                    <h3 class="text-end mb-0 text-danger fw-bold"><span><?= $rejectCount ?></span></h3>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Table Card with Navigation Tabs -->
+<!-- Main Table Card -->
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0">List Outlet</h5>
+                    <h5 class="card-title mb-0" id="table-card-title">List Outlet Aktif</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
                     <?php endif; ?>
                 </div>
             </div>
             <div class="card-body">
-                <!-- Navigation Tabs -->
-                <ul class="nav nav-pills mb-3 gap-2" id="outlet-tab-list" role="tablist">
+                <!-- Hidden Bootstrap Nav Tabs for underlying state engine -->
+                <ul class="nav nav-pills mb-3 gap-2 d-none" id="outlet-tab-list" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link tab-bordered-btn active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">
-                            <i class="fas fa-store me-1"></i> Outlet Aktif
-                        </button>
+                        <button class="nav-link active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">Outlet Aktif</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link tab-bordered-btn" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">
-                            <i class="fas fa-clock me-1 text-warning"></i> Request Outlet
-                        </button>
+                        <button class="nav-link" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">Request Outlet</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link tab-bordered-btn" id="reject-tab" data-bs-toggle="pill" data-bs-target="#tab-reject" type="button" role="tab" aria-controls="tab-reject" aria-selected="false">
-                            <i class="fas fa-times-circle me-1 text-danger"></i> Ditolak
-                        </button>
+                        <button class="nav-link" id="reject-tab" data-bs-toggle="pill" data-bs-target="#tab-reject" type="button" role="tab" aria-controls="tab-reject" aria-selected="false">Ditolak</button>
                     </li>
                 </ul>
 
@@ -396,8 +390,30 @@ $(document).ready(function() {
         }
     });
 
-    // Fix DataTables column recalculation on Tab Switch
+    // Clickable Stat Card Navigation Handler
+    $('.outlet-stat-card').on('click', function() {
+        let targetId = $(this).data('target');
+        let tabBtn = document.getElementById(targetId);
+        if (tabBtn) {
+            (new bootstrap.Tab(tabBtn)).show();
+        }
+    });
+
+    // Sync active card highlight and card title on Tab Switch
     $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+        let targetId = $(e.target).attr('id');
+        $('.outlet-stat-card').removeClass('active-card');
+        $('.outlet-stat-card[data-target="' + targetId + '"]').addClass('active-card');
+
+        // Update card header title dynamically
+        if (targetId === 'pending-tab') {
+            $('#table-card-title').html('<i class="fas fa-clock text-warning me-2"></i>List Request Outlet (Pending)');
+        } else if (targetId === 'reject-tab') {
+            $('#table-card-title').html('<i class="fas fa-times-circle text-danger me-2"></i>List Request Outlet (Ditolak)');
+        } else {
+            $('#table-card-title').html('<i class="fas fa-store text-success me-2"></i>List Outlet Aktif');
+        }
+
         $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
     });
 
@@ -405,20 +421,14 @@ $(document).ready(function() {
     let urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'pending' || window.location.hash === '#pending') {
         let tabBtn = document.querySelector('#pending-tab');
-        if (tabBtn) {
-            let tab = new bootstrap.Tab(tabBtn);
-            tab.show();
-        }
+        if (tabBtn) (new bootstrap.Tab(tabBtn)).show();
     } else if (urlParams.get('tab') === 'reject' || window.location.hash === '#reject') {
         let tabBtn = document.querySelector('#reject-tab');
-        if (tabBtn) {
-            let tab = new bootstrap.Tab(tabBtn);
-            tab.show();
-        }
+        if (tabBtn) (new bootstrap.Tab(tabBtn)).show();
     }
 
-    // Modal popup detail alamat outlet
-    $('.btn-lihat-alamat').on('click', function() {
+    // Modal popup detail alamat outlet (using Event Delegation for DataTables compatibility)
+    $(document).on('click', '.btn-lihat-alamat', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
         Swal.fire({

@@ -102,3 +102,23 @@ input[type=number] {
 .edit-icon:hover {
     background-color: #052e60;
 }
+
+/* Interactive Outlet Stat Cards */
+.outlet-stat-card {
+    transition: all 0.25s ease-in-out;
+    border: 2px solid #e2e8f0 !important;
+    cursor: pointer;
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+}
+.outlet-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
+    border-color: #a5b4fc !important;
+}
+.outlet-stat-card.active-card {
+    border-color: #6259ca !important;
+    background-color: #f7f7fe !important;
+    box-shadow: 0 4px 12px rgba(98, 89, 202, 0.2) !important;
+}
+
