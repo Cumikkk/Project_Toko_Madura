@@ -25,7 +25,7 @@ if (!$isEdit && empty($password)) {
     JsonResponse([
         'code'      => 200,
         'success'   => false,
-        'message'   => "Password wajib diisi untuk Master Owner baru",
+        'message'   => "Password wajib diisi untuk Master baru",
         'data'      => []
     ]);
 }
@@ -78,7 +78,7 @@ if ($isEdit) {
     JsonResponse([
         'code'      => 200,
         'success'   => true,
-        'message'   => "Berhasil memperbarui data Master Owner: {$nama_lengkap}",
+        'message'   => "Berhasil memperbarui data Master: {$nama_lengkap}",
         'data'      => [
             'redirect' => SystemInfo::app('ADMIN_URL') . "/master/view"
         ]
@@ -105,7 +105,7 @@ if ($isEdit) {
         JsonResponse([
             'code'      => 200,
             'success'   => false,
-            'message'   => "Gagal membuat akun Master Owner: " . $db->error,
+            'message'   => "Gagal membuat akun Master: " . $db->error,
             'data'      => []
         ]);
     }
@@ -113,7 +113,7 @@ if ($isEdit) {
     JsonResponse([
         'code'      => 200,
         'success'   => true,
-        'message'   => "Berhasil mendaftarkan Master Owner baru: {$nama_lengkap}",
+        'message'   => "Berhasil mendaftarkan Master baru: {$nama_lengkap}",
         'data'      => [
             'redirect' => SystemInfo::app('ADMIN_URL') . "/master/view"
         ]

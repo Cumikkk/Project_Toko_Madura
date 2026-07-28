@@ -20,14 +20,14 @@ if ($db->affected_rows > 0) {
     JsonResponse([
         'code'      => 200,
         'success'   => true,
-        'message'   => "Berhasil menghapus akun Master Owner",
+        'message'   => "Berhasil menghapus akun Master",
         'data'      => []
     ]);
 } else {
     JsonResponse([
         'code'      => 200,
         'success'   => false,
-        'message'   => "Gagal menghapus data Master Owner atau data tidak ditemukan",
+        'message'   => "Gagal menghapus data Master atau data tidak ditemukan",
         'data'      => []
     ]);
 }

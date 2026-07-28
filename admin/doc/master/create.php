@@ -4,7 +4,7 @@ use Config\Core\SystemInfo;
 
 $db = Database::connect();
 
-$idMaster = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$idMaster = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['c']) ? intval($_GET['c']) : 0);
 $isEdit   = ($idMaster > 0);
 $masterData = null;
 
@@ -13,7 +13,7 @@ if ($isEdit) {
         $redirectUrl = SystemInfo::app('ADMIN_URL') . '/master/view';
         die("<script>location.href = '{$redirectUrl}';</script>");
     }
-    $res = $db->query("SELECT * FROM users WHERE id_users = {$idMaster} AND role = 'master'");
+    $res = $db->query("SELECT * FROM users WHERE id_users = {$idMaster} AND role = 'master' LIMIT 1");
     if ($res && $res->num_rows > 0) {
         $masterData = $res->fetch_assoc();
     } else {
@@ -30,49 +30,63 @@ if ($isEdit) {
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5"><?= $isEdit ? "Edit Master Owner" : "Tambah Master Owner Baru" ?></h2>
+        <h2 class="main-content-title tx-24 mg-b-5"><?= $isEdit ? "Edit Data Master" : "Registrasi Master Baru"; ?></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/view">Master</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><?= $isEdit ? "Edit" : "Tambah" ?></li>
+            <li class="breadcrumb-item active" aria-current="page"><?= $isEdit ? "Edit Data" : "Registrasi"; ?></li>
         </ol>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6 mx-auto mb-4">
-        <div class="card custom-card">
+    <div class="col-md-10 mx-auto mb-3">
+        <div class="card custom-card overflow-hidden">
             <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fa fa-user-circle text-primary me-2"></i><?= $isEdit ? "Form Edit Master Owner" : "Form Tambah Master Owner" ?></h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title"><?= $isEdit ? "Form Edit Data Master" : "Form Registrasi Master"; ?></h5>
+                </div>
             </div>
             <div class="card-body">
-                <form id="form-master">
-                    <input type="hidden" name="id_users" value="<?= $isEdit ? $masterData['id_users'] : '' ?>">
+                <form action="" method="post" id="form-create-master">
+                    <?php if ($isEdit) : ?>
+                        <input type="hidden" name="id_users" value="<?= $idMaster; ?>">
+                    <?php endif; ?>
                     
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Nama Lengkap Master Owner <span class="text-danger">*</span></label>
-                        <input type="text" name="nama_lengkap" class="form-control" placeholder="Contoh: H. Ahmad Subagyo" value="<?= $isEdit ? htmlspecialchars($masterData['nama_lengkap']) : '' ?>" required>
-                    </div>
+                    <div class="row">
+                        <!-- BARIS 1: NAMA LENGKAP & NO. HP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Master</label>
+                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($masterData['nama_lengkap'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($masterData['no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Username <span class="text-danger">*</span></label>
-                        <input type="text" name="username" class="form-control" placeholder="Contoh: master_ahmad" value="<?= $isEdit ? htmlspecialchars($masterData['username']) : '' ?>" required>
-                        <small class="text-muted">Username digunakan untuk login ke Portal Client.</small>
-                    </div>
+                        <!-- BARIS 2: USERNAME & PASSWORD -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="username" class="form-label fw-bold">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: master_ahmad" value="<?= htmlspecialchars($masterData['username'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
+                            </div>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                        <input type="text" name="no_hp" class="form-control" placeholder="Contoh: 081234567890" value="<?= $isEdit ? htmlspecialchars($masterData['no_hp'] ?? '') : '' ?>">
-                    </div>
-
-                    <div class="form-group mb-4">
-                        <label class="form-label fw-bold">Password <?= $isEdit ? '<span class="text-muted fw-normal">(Kosongkan jika tidak ingin diubah)</span>' : '<span class="text-danger">*</span>' ?></label>
-                        <input type="password" name="password" class="form-control" placeholder="<?= $isEdit ? 'Masukkan password baru jika ingin mengubah' : 'Masukkan password' ?>" <?= $isEdit ? '' : 'required' ?>>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/view" class="btn btn-secondary">Batal</a>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> <?= $isEdit ? "Simpan Perubahan" : "Tambah Master" ?></button>
+                        <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
+                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/view" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary" data-original-text="Submit"><?= $isEdit ? "Simpan Perubahan" : "Simpan Master"; ?></button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -81,32 +95,44 @@ if ($isEdit) {
 </div>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    $('#form-master').on('submit', function(e) {
-        e.preventDefault();
-        var data = $(this).serialize();
-        var btn  = $(this).find('button[type="submit"]');
-
-        btn.prop('disabled', true);
-        $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/create", data, function(resp) {
-            btn.prop('disabled', false);
-            if (resp.success) {
+    $(document).ready(function() {
+        $('#form-create-master').on('submit', function(el) {
+            el.preventDefault();
+            let button = $(this).find('button[type="submit"]'), 
+                data = $(this).serialize();
+                
+            button.addClass('loading').prop('disabled', true);
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/create", data, (resp) => {
+                button.removeClass('loading').prop('disabled', false);
+                if (resp.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: resp.message || 'Data master berhasil disimpan.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.href = resp.data?.redirect || "<?= SystemInfo::app('ADMIN_URL') ?>/master/view";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Perhatian!',
+                        text: resp.message || 'Gagal menyimpan data master.'
+                    });
+                }
+            }, 'json').fail(function(xhr) {
+                button.removeClass('loading').prop('disabled', false);
+                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: resp.message,
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(function() {
-                    location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/view";
+                    icon: 'error',
+                    title: 'Perhatian!',
+                    text: errorMsg
                 });
-            } else {
-                Swal.fire('Gagal!', resp.message || 'Gagal menyimpan data master', 'error');
-            }
-        }, 'json').fail(function() {
-            btn.prop('disabled', false);
-            Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+            });
         });
     });
-});
 </script>
