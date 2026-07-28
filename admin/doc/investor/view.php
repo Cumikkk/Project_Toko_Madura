@@ -55,14 +55,14 @@ $investors = $db->query("
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="investor-table">
                         <thead>
                             <tr class="text-center">
-                                <th style="width: 5%;">No</th>
-                                <th>Nama Lengkap</th>
-                                <th>Username</th>
-                                <th>No HP</th>
-                                <th>Kecamatan</th>
-                                <th>Bagi Hasil (%)</th>
-                                <th>Master Owner</th>
-                                <th width="15%">#</th>
+                                <th class="text-center" style="width: 5%;">No</th>
+                                <th class="text-center">Nama Lengkap</th>
+                                <th class="text-center">Username</th>
+                                <th class="text-center">No HP</th>
+                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Bagi Hasil (%)</th>
+                                <th class="text-center">Master Owner</th>
+                                <th class="text-center" width="15%">#</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,8 +70,9 @@ $investors = $db->query("
                                 <?php $no = 1; while ($row = $investors->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
-                                        <td><code><?= htmlspecialchars($row['username']) ?></code></td>
+                                        <td class="text-start"><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
+                                        <td class="text-start"><code><?= htmlspecialchars($row['username']) ?></code></td>
+                                        <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                             <?php if (!empty($row['alamat_investor'])) : ?>
@@ -84,7 +85,7 @@ $investors = $db->query("
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
-                                        <td><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
+                                        <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
