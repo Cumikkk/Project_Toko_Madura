@@ -23,7 +23,6 @@ if ($loggedInLevel == 1) {
 $activeCount  = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'active' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
 $pendingCount = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'pending' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
 $rejectCount  = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'reject' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
-$totalRevenue = $db->query("SELECT IFNULL(SUM(o.nominal_biaya), 0) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'active' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
 
 // 1. Fetch Active Outlets
 $activeOutlets = $db->query("
@@ -72,9 +71,9 @@ $rejectedOutlets = $db->query("
     </div>
 </div>
 
-<!-- Summary Metrics Cards -->
+<!-- Summary Metrics Cards (3 Cards Layout) -->
 <div class="row row-sm mb-3">
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-4 col-lg-4">
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
@@ -84,7 +83,7 @@ $rejectedOutlets = $db->query("
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-4 col-lg-4">
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
@@ -94,22 +93,12 @@ $rejectedOutlets = $db->query("
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-4 col-lg-4">
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted">Request Ditolak</h6>
                     <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-danger"></i><span><?= $rejectCount ?></span></h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card">
-            <div class="card-body">
-                <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Total Biaya Langganan</h6>
-                    <h4 class="text-end mb-0"><i class="fa fa-money icon-size float-start text-primary"></i><span>Rp <?= number_format($totalRevenue, 0, ',', '.') ?></span></h4>
                 </div>
             </div>
         </div>
@@ -156,12 +145,12 @@ $rejectedOutlets = $db->query("
                                 <thead>
                                     <tr class="text-center">
                                         <th class="text-center" style="width: 5%;">No</th>
-                                        <th class="text-center">Nama Toko / Cabang</th>
-                                        <th class="text-center">Pengelola (Kasir)</th>
+                                        <th class="text-center">Nama Toko</th>
+                                        <th class="text-center">Nama Pengelola Toko</th>
                                         <th class="text-center">No. HP</th>
                                         <th class="text-center">Kecamatan</th>
-                                        <th class="text-center">Investor Pemodal</th>
-                                        <th class="text-center" width="15%">#</th>
+                                        <th class="text-center">Investor</th>
+                                        <th class="text-center" style="width: 15%;">#</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -187,7 +176,7 @@ $rejectedOutlets = $db->query("
                                                     <?php if (!empty($row['nama_investor'])) : ?>
                                                         <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persen_bagian_investor'], 0) ?>%)</span>
                                                     <?php else : ?>
-                                                        <span class="badge bg-warning text-dark">Belum Ada Pemodal</span>
+                                                        <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
@@ -204,7 +193,7 @@ $rejectedOutlets = $db->query("
                                         <?php endwhile; ?>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">Belum ada data cabang toko aktif.</td>
+                                            <td colspan="7" class="text-center text-muted py-4">Belum ada data toko aktif.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -221,11 +210,11 @@ $rejectedOutlets = $db->query("
                                         <th class="text-center" style="width: 5%;">No</th>
                                         <th class="text-center">Nama Outlet</th>
                                         <th class="text-center">Kecamatan</th>
-                                        <th class="text-center">Investor Pemodal</th>
+                                        <th class="text-center">Investor</th>
                                         <th class="text-center">Biaya Langganan</th>
                                         <th class="text-center">Bukti Bayar</th>
                                         <th class="text-center">Tanggal Request</th>
-                                        <th class="text-center" style="width: 15%;">Aksi</th>
+                                        <th class="text-center" style="width: 15%;">#</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -297,7 +286,7 @@ $rejectedOutlets = $db->query("
                                         <th class="text-center" style="width: 5%;">No</th>
                                         <th class="text-center">Nama Outlet</th>
                                         <th class="text-center">Kecamatan</th>
-                                        <th class="text-center">Investor Pemodal</th>
+                                        <th class="text-center">Investor</th>
                                         <th class="text-center">Biaya Langganan</th>
                                         <th class="text-center">Alasan Penolakan</th>
                                         <th class="text-center">Tanggal Request</th>
@@ -380,7 +369,7 @@ $rejectedOutlets = $db->query("
 
 <script type="text/javascript">
 $(document).ready(function() {
-    // Initialize DataTables for each tab
+    // Initialize DataTables for ALL THREE tabs so show entries & pagination exist everywhere
     const tables = ['#table-outlet-active', '#table-outlet-pending', '#table-outlet-reject'];
     tables.forEach(tableId => {
         if ($.fn.DataTable && !$.fn.DataTable.isDataTable(tableId)) {
