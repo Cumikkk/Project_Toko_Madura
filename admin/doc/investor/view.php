@@ -8,21 +8,17 @@ $loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
 $loggedInId    = intval($user['ADM_ID'] ?? 1);
 
 // Role Filtering:
-// Programmer (Level 1): Show all investors nationally
-// Master Owner (Level 2): Show only investors belonging to this Master Owner
-// Admin Staff (Level 3): Show only investors belonging to Master Owner
 if ($loggedInLevel == 1) {
     $whereClause = "";
 } elseif ($loggedInLevel == 2) {
     $whereClause = "WHERE i.id_master = {$loggedInId}";
 } else {
-    // Admin Staff (Level 3): Filter by Master Owner IDs dynamically
     $whereClause = "WHERE i.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
 }
 
 // Fetch investors list with Master Owner name
 $investors = $db->query("
-    SELECT i.*, u.nama_lengkap, u.username, u.email, u.no_hp,
+    SELECT i.*, u.nama_lengkap, u.username, u.no_hp,
            u_master.nama_lengkap as nama_master
     FROM investor i
     JOIN users u ON (u.id_users = i.id_users)
@@ -63,8 +59,7 @@ $investors = $db->query("
                                 <th>Nama Lengkap</th>
                                 <th>Username</th>
                                 <th>No HP</th>
-                                <th>Kecamatan</th>
-                                <th>Alamat Investor</th>
+                                <th>Kecamatan & Alamat</th>
                                 <th>Bagi Hasil (%)</th>
                                 <th>Master Owner</th>
                                 <th width="15%">#</th>
@@ -78,8 +73,17 @@ $investors = $db->query("
                                         <td><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
                                         <td><code><?= htmlspecialchars($row['username']) ?></code></td>
                                         <td><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['alamat_investor'] ?? '-') ?></td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
+                                            <?php if (!empty($row['alamat_investor'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                        title="Lihat Alamat Lengkap">
+                                                    <i class="fa fa-info-circle"></i> Detail Alamat
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center">
@@ -96,7 +100,7 @@ $investors = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -133,6 +137,18 @@ $(document).ready(function() {
             order: [[1, 'asc']]
         });
     }
+
+    // Modal popup detail alamat investor
+    $('.btn-lihat-alamat').on('click', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        Swal.fire({
+            title: 'Alamat Lengkap Investor',
+            html: '<p class="text-start mb-1"><strong>Investor:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
 });
 
 function deleteInvestor(id, name) {

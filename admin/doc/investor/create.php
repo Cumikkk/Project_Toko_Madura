@@ -9,7 +9,7 @@ $isEdit = ($idInvestor > 0);
 $investorData = null;
 if ($isEdit) {
     $resInv = $db->query("
-        SELECT i.*, u.nama_lengkap, u.username, u.email, u.no_hp
+        SELECT i.*, u.nama_lengkap, u.username, u.no_hp
         FROM investor i
         JOIN users u ON (u.id_users = i.id_users)
         WHERE i.id_investor = {$idInvestor}
@@ -56,26 +56,26 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Investor</label>
-                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Masukkan nama lengkap" value="<?= htmlspecialchars($investorData['nama_lengkap'] ?? ''); ?>" required>
+                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($investorData['nama_lengkap'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="username" class="form-label fw-bold">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username login" value="<?= htmlspecialchars($investorData['username'] ?? ''); ?>" required>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: investor_ahmad" value="<?= htmlspecialchars($investorData['username'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password'; ?>" <?= $isEdit ? "" : "required"; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.</small>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
+                                <small class="text-muted d-block mt-1">Minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.</small>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 08123456789" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
@@ -87,7 +87,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_investor" class="form-label fw-bold">Alamat Investor</label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Masukkan alamat lengkap investor"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
+                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
@@ -143,11 +143,6 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                 let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
                 if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
-                } else if (xhr && xhr.responseText) {
-                    try {
-                        let res = JSON.parse(xhr.responseText);
-                        if (res.message) errorMsg = res.message;
-                    } catch(e) {}
                 }
                 Swal.fire({
                     icon: 'error',

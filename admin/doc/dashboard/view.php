@@ -5,21 +5,14 @@ use Config\Core\SystemInfo;
 $db = Database::connect();
 
 // -------------------------------------------------------------------------
-// DASHBOARD GENERAL PROGRAMMER / ADMIN STAF (ADMIN PORTAL)
+// DASHBOARD GENERAL PROGRAMMER (ADMIN PORTAL)
 // -------------------------------------------------------------------------
+
+// Counts per Role & Entity
+$adminCount    = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'programmer'")->fetch_assoc()['total'] ?? 0;
+$masterCount   = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'master'")->fetch_assoc()['total'] ?? 0;
 $investorCount = $db->query("SELECT COUNT(*) as total FROM investor")->fetch_assoc()['total'] ?? 0;
 $outletCount   = $db->query("SELECT COUNT(*) as total FROM outlet")->fetch_assoc()['total'] ?? 0;
-
-$omzetSumResult = $db->query("SELECT SUM(omzet) as total FROM laporan_omzet")->fetch_assoc();
-$totalOmzet     = $omzetSumResult['total'] ?? 0;
-
-// Hitung total potongan 10% dari omzet
-$potonganSumResult = $db->query("SELECT SUM(nominal_potongan) as total FROM laporan_omzet")->fetch_assoc();
-$totalPotongan     = $potonganSumResult['total'] ?? 0;
-
-$omzetBersih  = $totalOmzet - $totalPotongan;
-$hakInvestor  = $omzetBersih * 0.50;
-$hakOutlet    = $omzetBersih * 0.50;
 
 // Top 5 Outlet berdasarkan Omzet
 $topOutlets = $db->query("
@@ -31,12 +24,13 @@ $topOutlets = $db->query("
     LIMIT 5
 ");
 
-// 5 Transaksi Omzet Terbaru
-$recentOmzet = $db->query("
-    SELECT l.*, o.nama_outlet
-    FROM laporan_omzet l
-    JOIN outlet o ON l.id_outlet = o.id_outlet
-    ORDER BY l.waktu_input DESC
+// 5 Request Outlet Terbaru
+$recentRequests = $db->query("
+    SELECT o.*, u_inv.nama_lengkap as nama_investor
+    FROM outlet o
+    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
+    LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
+    ORDER BY CASE WHEN o.status = 'pending' THEN 1 ELSE 2 END, o.id_outlet DESC
     LIMIT 5
 ");
 ?>
@@ -45,20 +39,40 @@ $recentOmzet = $db->query("
     <div>
         <h2 class="main-content-title tx-24 mg-b-5">Dashboard Administrator</h2>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
         </ol>
     </div>
 </div>
 
-<!-- Row Stat Cards (RRFX Default Template Style) -->
+<!-- Row Stat Cards (RRFX Default Template Style: Total Admin, Master, Investor, Outlet) -->
 <div class="row row-sm">
     <div class="col-sm-6 col-lg-3">
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Total Admin</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-user-secret icon-size float-start text-primary"></i><span><?= number_format($adminCount) ?></span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Total Master</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-user-circle icon-size float-start text-info"></i><span><?= number_format($masterCount) ?></span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted">Total Investor</h6>
-                    <h3 class="text-end mb-0"><i class="fa fa-handshake-o icon-size float-start text-primary"></i><span><?= number_format($investorCount) ?></span></h3>
+                    <h3 class="text-end mb-0"><i class="fa fa-handshake-o icon-size float-start text-warning"></i><span><?= number_format($investorCount) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -73,32 +87,13 @@ $recentOmzet = $db->query("
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card">
-            <div class="card-body">
-                <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Akumulasi Omzet</h6>
-                    <h4 class="text-end mb-0"><i class="fa fa-line-chart icon-size float-start text-warning"></i><span>Rp <?= number_format($totalOmzet, 0, ',', '.') ?></span></h4>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card">
-            <div class="card-body">
-                <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Total Potongan (10%)</h6>
-                    <h4 class="text-end mb-0"><i class="fa fa-calculator icon-size float-start text-info"></i><span>Rp <?= number_format($totalPotongan, 0, ',', '.') ?></span></h4>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Row Summary Tables -->
 <div class="row row-sm">
-    <div class="col-lg-6">
-        <div class="card custom-card">
+    <!-- TOP 5 OUTLET OMZET -->
+    <div class="col-lg-6 mb-4">
+        <div class="card custom-card h-100 mb-0">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h6 class="main-content-label mb-0">Top 5 Outlet Omzet Tertinggi</h6>
                 <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
@@ -136,36 +131,48 @@ $recentOmzet = $db->query("
         </div>
     </div>
 
-    <div class="col-lg-6">
-        <div class="card custom-card">
+    <!-- RINGKASAN REQUEST OUTLET -->
+    <div class="col-lg-6 mb-4">
+        <div class="card custom-card h-100 mb-0">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="main-content-label mb-0">Transaksi Omzet Terbaru</h6>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+                <h6 class="main-content-label mb-0">Ringkasan Request Outlet Terbaru</h6>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>Outlet</th>
-                                <th>Periode</th>
-                                <th class="text-end">Omzet</th>
+                                <th>Nama Outlet</th>
+                                <th>Investor Pemodal</th>
+                                <th class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($recentOmzet && $recentOmzet->num_rows > 0) : ?>
-                                <?php while ($row = $recentOmzet->fetch_assoc()) : ?>
+                            <?php if ($recentRequests && $recentRequests->num_rows > 0) : ?>
+                                <?php while ($row = $recentRequests->fetch_assoc()) : ?>
                                     <tr>
                                         <td>
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
+                                            <?php if(!empty($row['kecamatan'])) : ?>
+                                                <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
+                                            <?php endif; ?>
                                         </td>
-                                        <td><?= date("M Y", strtotime($row['periode_laporan'])) ?></td>
-                                        <td class="text-end fw-bold">Rp <?= number_format($row['omzet'], 0, ',', '.') ?></td>
+                                        <td><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
+                                        <td class="text-center">
+                                            <?php if ($row['status'] === 'pending') : ?>
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            <?php elseif ($row['status'] === 'active') : ?>
+                                                <span class="badge bg-success">Active</span>
+                                            <?php else : ?>
+                                                <span class="badge bg-danger">Reject</span>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">Belum ada transaksi omzet.</td>
+                                    <td colspan="3" class="text-center text-muted py-3">Belum ada request outlet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
