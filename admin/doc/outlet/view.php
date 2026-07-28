@@ -58,7 +58,7 @@ $sqlReject = "
 ";
 $rejectedOutlets = $db->query($sqlReject);
 
-// Helper: safely encode alamat for JS variable (JSON encode to avoid any attribute issues)
+// Helper: safely encode alamat for JS variable
 function safeJsonAlamat($str) {
     return json_encode(trim(preg_replace('/\s+/', ' ', $str ?? '')));
 }
@@ -74,14 +74,14 @@ function safeJsonAlamat($str) {
     </div>
 </div>
 
-<!-- Summary Metrics Cards (Interactive Clickable Tabs) -->
+<!-- Summary Metrics Cards (Gaya Dashboard RRFX: Header text-muted + H3 icon & count) -->
 <div class="row row-sm mb-3">
     <div class="col-sm-4 col-lg-4 mb-2">
         <div class="card custom-card outlet-stat-card active-card" id="card-active" onclick="switchOutletTab('active')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-check-circle icon-size float-start text-success me-2"></i>Outlet Aktif</h6>
-                    <h3 class="text-end mb-0 text-success fw-bold"><span><?= $activeCount ?></span></h3>
+                    <h6 class="mb-3 text-muted">Outlet Aktif</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-building icon-size float-start text-success"></i><span><?= number_format($activeCount) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -90,8 +90,8 @@ function safeJsonAlamat($str) {
         <div class="card custom-card outlet-stat-card" id="card-pending" onclick="switchOutletTab('pending')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-clock-o icon-size float-start text-warning me-2"></i>Request Masuk</h6>
-                    <h3 class="text-end mb-0 text-warning fw-bold"><span><?= $pendingCount ?></span></h3>
+                    <h6 class="mb-3 text-muted">Request Masuk</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-clock-o icon-size float-start text-warning"></i><span><?= number_format($pendingCount) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -100,8 +100,8 @@ function safeJsonAlamat($str) {
         <div class="card custom-card outlet-stat-card" id="card-reject" onclick="switchOutletTab('reject')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-times-circle icon-size float-start text-danger me-2"></i>Request Ditolak</h6>
-                    <h3 class="text-end mb-0 text-danger fw-bold"><span><?= $rejectCount ?></span></h3>
+                    <h6 class="mb-3 text-muted">Request Ditolak</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-danger"></i><span><?= number_format($rejectCount) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -114,9 +114,9 @@ function safeJsonAlamat($str) {
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0" id="table-card-title"><i class="fas fa-store text-success me-2"></i>List Outlet Aktif</h5>
+                    <h5 class="card-title mb-0" id="table-card-title">List Outlet Aktif</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
-                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
+                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" id="btn-tambah-outlet" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -369,63 +369,66 @@ function showAlamat(nama, alamat) {
 var dtInitialized = { active: false, pending: false, reject: false };
 
 function initDataTable(tabKey) {
-    if (dtInitialized[tabKey]) {
-        // Already initialized — just adjust columns
-        if ($.fn.DataTable) {
-            var tableId = '#table-outlet-' + tabKey;
-            if ($.fn.DataTable.isDataTable(tableId)) {
-                $(tableId).DataTable().columns.adjust();
-            }
-        }
-        return;
-    }
-
     var tableId = '#table-outlet-' + tabKey;
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable(tableId)) {
-        $(tableId).DataTable({
-            processing: true,
-            deferRender: true,
-            scrollX: true,
-            lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
-            language: {
-                searchPlaceholder: 'Cari outlet...',
-                sSearch: '',
-                lengthMenu: 'Show _MENU_ entries',
-                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-                paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
-            },
-            order: [[0, 'asc']]
-        });
-        dtInitialized[tabKey] = true;
+    if ($.fn.DataTable) {
+        if (!dtInitialized[tabKey] && !$.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable({
+                processing: true,
+                deferRender: true,
+                scrollX: true,
+                lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
+                language: {
+                    searchPlaceholder: 'Cari outlet...',
+                    sSearch: '',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
+                },
+                order: [[0, 'asc']]
+            });
+            dtInitialized[tabKey] = true;
+        } else if ($.fn.DataTable.isDataTable(tableId)) {
+            var dt = $(tableId).DataTable();
+            dt.columns.adjust().draw(false);
+        }
     }
 }
 
 // ============================================================
-// Switch Tab — pure display:none/block, NO Bootstrap tab class
+// Switch Tab — pure display:none/block
 // ============================================================
 function switchOutletTab(tabKey) {
     // 1. Update card highlight
     $('.outlet-stat-card').removeClass('active-card');
     $('#card-' + tabKey).addClass('active-card');
 
-    // 2. Hide all sections, show the selected one
+    // 2. Hide all tab sections, show selected one
     $('.outlet-tab-section').hide();
     $('#tab-' + tabKey).show();
 
-    // 3. Update table header title
-    var titles = {
-        active:  '<i class="fas fa-store text-success me-2"></i>List Outlet Aktif',
-        pending: '<i class="fas fa-clock text-warning me-2"></i>List Request Outlet (Pending)',
-        reject:  '<i class="fas fa-times-circle text-danger me-2"></i>List Request Outlet (Ditolak)'
-    };
-    $('#table-card-title').html(titles[tabKey] || titles.active);
+    // 3. Toggle "Tambah Outlet" button (ONLY visible in active tab)
+    if (tabKey === 'active') {
+        $('#btn-tambah-outlet').show();
+    } else {
+        $('#btn-tambah-outlet').hide();
+    }
 
-    // 4. Initialize DataTable for this tab (lazy, only when first shown)
-    initDataTable(tabKey);
+    // 4. Update title without icon (matches Investor view header style)
+    var titles = {
+        active:  'List Outlet Aktif',
+        pending: 'List Request Outlet (Pending)',
+        reject:  'List Request Outlet (Ditolak)'
+    };
+    $('#table-card-title').text(titles[tabKey] || titles.active);
+
+    // 5. Initialize or recalculate DataTable AFTER section is displayed
+    setTimeout(function() {
+        initDataTable(tabKey);
+    }, 50);
 }
 
 $(document).ready(function() {
-    // Initialize the default visible tab (active) on load
+    // Initialize default visible tab (active) on load
     initDataTable('active');
 
     // Auto switch tab from URL param
