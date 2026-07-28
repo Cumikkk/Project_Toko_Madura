@@ -111,8 +111,8 @@ $recentRequests = $db->query("
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 10%;">No</th>
-                                <th>Nama Outlet</th>
-                                <th class="text-end">Total Omzet</th>
+                                <th class="text-center">Nama Outlet</th>
+                                <th class="text-center">Total Omzet</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,7 +120,7 @@ $recentRequests = $db->query("
                                 <?php $no = 1; while ($row = $topOutlets->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td>
+                                        <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                         </td>
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
@@ -151,8 +151,8 @@ $recentRequests = $db->query("
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 10%;">No</th>
-                                <th>Nama Outlet</th>
-                                <th>Investor</th>
+                                <th class="text-center">Nama Outlet</th>
+                                <th class="text-center">Investor</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>
@@ -161,13 +161,13 @@ $recentRequests = $db->query("
                                 <?php $noReq = 1; while ($row = $recentRequests->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $noReq++ ?></td>
-                                        <td>
+                                        <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             <?php if(!empty($row['kecamatan'])) : ?>
                                                 <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
+                                        <td class="text-start"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <?php if ($row['status'] === 'pending') : ?>
                                                 <span class="badge bg-warning text-dark">Pending</span>
