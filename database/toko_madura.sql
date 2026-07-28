@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-28 11:39:33
+-- Generated: 2026-07-28 11:57:31
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -57,6 +57,7 @@ CREATE TABLE `outlet` (
   `id_outlet` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_users` int(10) unsigned NOT NULL,
   `id_investor` int(10) unsigned NOT NULL,
+  `persentase_potongan` decimal(5,2) NOT NULL DEFAULT 10.00,
   `nama_outlet` varchar(100) NOT NULL,
   `kecamatan` varchar(100) DEFAULT NULL,
   `alamat_outlet` text DEFAULT NULL,
@@ -73,7 +74,7 @@ CREATE TABLE `outlet` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `outlet`
-INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `nama_outlet`, `kecamatan`, `alamat_outlet`, `status`, `nominal_biaya`, `bukti_pembayaran`, `alasan_penolakan`, `tanggal_bergabung`) VALUES ('10', '49', '14', 'Toko Madura Merdeka', NULL, 'sidodadi', 'active', '0.00', NULL, NULL, '2026-07-27 15:49:36');
+INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `persentase_potongan`, `nama_outlet`, `kecamatan`, `alamat_outlet`, `status`, `nominal_biaya`, `bukti_pembayaran`, `alasan_penolakan`, `tanggal_bergabung`) VALUES ('10', '49', '14', '10.00', 'Toko Madura Merdeka', NULL, 'sidodadi', 'active', '0.00', NULL, NULL, '2026-07-27 15:49:36');
 
 -- --------------------------------------------------------
 -- Table structure for `laporan_omzet`

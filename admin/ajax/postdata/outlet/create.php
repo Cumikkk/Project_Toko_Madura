@@ -20,14 +20,16 @@ if (!$adminPermissionCore->hasPermission($authorizedPermission, $requiredPerm) &
 }
 
 // Collect fields
-$nama_outlet    = trim($data['nama_outlet']    ?? '');
-$id_investor    = intval($data['id_investor']  ?? 0);
-$alamat_outlet  = trim($data['alamat_outlet']  ?? '');
-$kasir_nama     = trim($data['kasir_nama']     ?? '');
-$kasir_username = trim($data['kasir_username'] ?? '');
-$kasir_password = trim($data['kasir_password'] ?? '');
-$kasir_no_hp    = trim($data['kasir_no_hp']    ?? '');
-$idUsersKasir   = intval($data['id_users_kasir'] ?? 0);
+$nama_outlet         = trim($data['nama_outlet']         ?? '');
+$id_investor         = intval($data['id_investor']       ?? 0);
+$kecamatan           = trim($data['kecamatan']           ?? '');
+$alamat_outlet       = trim($data['alamat_outlet']       ?? '');
+$persentase_potongan = floatval(str_replace(',', '.', $data['persentase_potongan'] ?? '10.00'));
+$kasir_nama          = trim($data['kasir_nama']          ?? '');
+$kasir_username      = trim($data['kasir_username']      ?? '');
+$kasir_password      = trim($data['kasir_password']      ?? '');
+$kasir_no_hp         = trim($data['kasir_no_hp']         ?? '');
+$idUsersKasir        = intval($data['id_users_kasir']    ?? 0);
 
 // Validate required fields
 if (empty($nama_outlet) || empty($id_investor) || empty($kasir_nama) || empty($kasir_username)) {
@@ -64,11 +66,12 @@ if (!empty($kasir_password)) {
 }
 
 // Escape strings
-$namaSafe    = $db->real_escape_string($nama_outlet);
-$alamatSafe  = $db->real_escape_string($alamat_outlet);
-$kasirNama   = $db->real_escape_string($kasir_nama);
-$kasirUser   = $db->real_escape_string($kasir_username);
-$kasirHp     = $db->real_escape_string($kasir_no_hp);
+$namaSafe      = $db->real_escape_string($nama_outlet);
+$kecamatanSafe = $db->real_escape_string($kecamatan);
+$alamatSafe    = $db->real_escape_string($alamat_outlet);
+$kasirNama     = $db->real_escape_string($kasir_nama);
+$kasirUser     = $db->real_escape_string($kasir_username);
+$kasirHp       = $db->real_escape_string($kasir_no_hp);
 
 if ($isEdit) {
     // =========== EDIT MODE ===========
@@ -109,7 +112,7 @@ if ($isEdit) {
     }
 
     // Update outlet
-    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, alamat_outlet = '{$alamatSafe}' WHERE id_outlet = {$idOutlet}");
+    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, kecamatan = '{$kecamatanSafe}', persentase_potongan = {$persentase_potongan}, alamat_outlet = '{$alamatSafe}' WHERE id_outlet = {$idOutlet}");
 
     JsonResponse([
         'code'    => 200,
@@ -150,8 +153,8 @@ if ($isEdit) {
 
     $newKasirId = $db->insert_id;
 
-    // 2. Insert outlet
-    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, status) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', '{$alamatSafe}', 'active')");
+    // 2. Insert outlet with persentase_potongan
+    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, kecamatan, persentase_potongan, alamat_outlet, status) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', '{$kecamatanSafe}', {$persentase_potongan}, '{$alamatSafe}', 'active')");
 
     if ($db->affected_rows < 1) {
         // Rollback: delete the kasir user we just created

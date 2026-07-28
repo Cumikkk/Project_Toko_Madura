@@ -53,6 +53,7 @@ $sqlBagiHasil = "
         u_kasir.nama_lengkap as pengelola,
         u_inv.nama_lengkap as nama_investor,
         inv.persen_bagian_investor,
+        o.persentase_potongan,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
@@ -61,7 +62,7 @@ $sqlBagiHasil = "
     LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
     LEFT JOIN laporan_omzet l ON l.id_outlet = o.id_outlet {$whereSql}
     GROUP BY o.id_outlet, o.nama_outlet, u_kasir.nama_lengkap,
-             u_inv.nama_lengkap, inv.persen_bagian_investor
+             u_inv.nama_lengkap, inv.persen_bagian_investor, o.persentase_potongan
     ORDER BY u_inv.nama_lengkap ASC, o.nama_outlet ASC
 ";
 
@@ -79,7 +80,8 @@ if ($resBagiHasil) {
         $persen = (float)($row['persen_bagian_investor'] ?? 50.00);
         $persenOutlet = 100.00 - $persen;
 
-        $potongan = round($omzet * ($potonganGlobal / 100.0), 2);
+        $potonganOutlet = (float)($row['persentase_potongan'] ?? $potonganGlobal);
+        $potongan = round($omzet * ($potonganOutlet / 100.0), 2);
         $hakInvestor = round($potongan * ($persen / 100.0), 2);
         $hakOutlet   = round($potongan * ($persenOutlet / 100.0), 2);
 

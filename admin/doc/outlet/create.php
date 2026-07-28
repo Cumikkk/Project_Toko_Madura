@@ -128,13 +128,25 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 4. KECAMATAN -->
-                        <div class="col-md-12 mb-3">
+                        <!-- 4. KECAMATAN - PERSENTASE POTONGAN MANAGEMENT -->
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan"
                                     placeholder="Contoh: Waru"
                                     value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="persentase_potongan" class="form-label fw-bold">Persentase Potongan Manajemen (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control" id="persentase_potongan" name="persentase_potongan"
+                                        placeholder="Contoh: 10.00"
+                                        value="<?= htmlspecialchars($outletData['persentase_potongan'] ?? '10.00'); ?>" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Persentase potongan manajemen/sistem khusus outlet ini (bukan global).</small>
                             </div>
                         </div>
 
