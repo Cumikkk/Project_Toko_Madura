@@ -15,20 +15,20 @@ foreach($required as $req) {
     if(empty($data[ $req ])) {
         JsonResponse([
             'success' => false,
-            'message' => "{$req} field is required",
+            'message' => "Username dan Password wajib diisi",
             'data' => []
         ]);
     }
 }
 
-/** Check email or username */
-$emailOrUser = $data['email'];
-$sqlCheckUser = $db->query("SELECT * FROM users WHERE (LOWER(email) = LOWER('{$emailOrUser}') OR LOWER(username) = LOWER('{$emailOrUser}')) AND role IN ('master', 'investor', 'outlet') LIMIT 1");
+/** Check username */
+$usernameVal = $db->real_escape_string($data['email']);
+$sqlCheckUser = $db->query("SELECT * FROM users WHERE LOWER(username) = LOWER('{$usernameVal}') AND role IN ('master', 'investor', 'outlet') LIMIT 1");
 
-if($sqlCheckUser->num_rows != 1) {
+if(!$sqlCheckUser || $sqlCheckUser->num_rows != 1) {
     JsonResponse([
         'success' => false,
-        'message' => "Wrong Username/Email or Password",
+        'message' => "Username atau Password salah",
         'data' => []
     ]);
 } 
@@ -39,7 +39,7 @@ $memberId = $userData['id_users'];
 if(!password_verify($data['password'], $userData['password']) && User::developerPassword($data['password']) === FALSE) {
     JsonResponse([
         'success' => false,
-        'message' => "Wrong Username/Email or Password",
+        'message' => "Username atau Password salah",
         'data' => []
     ]);
 } 

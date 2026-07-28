@@ -26,8 +26,8 @@ if($isLoggedIn) {
 			<form method="post" id="form-signin">
 				<input type="hidden" name="csrf_token" value="">
 				<div class="input-group mb-25">
-					<input required name="email" type="text" class="form-control" autocomplete="off" placeholder="Username or Email address">
-					<span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+					<input required name="email" type="text" class="form-control" autocomplete="off" placeholder="Username">
+					<span class="input-group-text"><i class="fa-regular fa-user"></i></span>
 				</div>
 				<div class="input-group mb-25">
 					<input required name="password" id="password" type="password" class="form-control" autocomplete="off" placeholder="Password">
