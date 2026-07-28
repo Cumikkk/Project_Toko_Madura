@@ -65,7 +65,7 @@ $investorList = $db->query("
                     <?php endif; ?>
 
                     <div class="row">
-                        <!-- DATA OUTLET / TOKO -->
+                        <!-- BARIS 1: INFORMASI TOKO & INVESTOR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko</label>
@@ -74,15 +74,6 @@ $investorList = $db->query("
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
-                                    placeholder="Contoh: Waru"
-                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
-                            </div>
-                        </div>
-
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="id_investor" class="form-label fw-bold">Investor</label>
@@ -98,6 +89,16 @@ $investorList = $db->query("
                                 </select>
                             </div>
                         </div>
+
+                        <!-- BARIS 2: KECAMATAN & PENGELOLA -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
+                                    placeholder="Contoh: Waru"
+                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Toko (Kasir)</label>
@@ -107,10 +108,10 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- DATA AKUN KASIR / PENGELOLA -->
+                        <!-- BARIS 3: KONTAK & USERNAME KASIR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP Kasir</label>
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP Kasir (Opsional)</label>
                                 <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
                                     placeholder="Contoh: 081234567890"
                                     value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
@@ -125,6 +126,7 @@ $investorList = $db->query("
                             </div>
                         </div>
 
+                        <!-- BARIS 4: PASSWORD & ALAMAT -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="kasir_password" class="form-label fw-bold">

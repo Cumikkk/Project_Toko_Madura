@@ -9,6 +9,47 @@
     float: left;
 }
 
+/* DataTables Pagination & Info Spacing Fix */
+/* Works when scrollX: true is set (adds dataTables_scrollBody wrapper) */
+.dataTables_wrapper .dataTables_scrollBody {
+    margin-bottom: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 16px !important;
+}
+
+/* Also fix for non-scrollX tables */
+.dataTables_wrapper .table-responsive {
+    margin-bottom: 16px !important;
+}
+
+/* Nav Pills Tab Buttons Border & Styling */
+.nav-pills .nav-link {
+    border: 1px solid #d1d5db !important;
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #6259ca !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(98, 89, 202, 0.2);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: #e9ecef !important;
+    border-color: #b0b5bc !important;
+    color: #212529 !important;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

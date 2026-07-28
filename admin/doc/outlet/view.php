@@ -119,7 +119,7 @@ $rejectedOutlets = $db->query("
             </div>
             <div class="card-body">
                 <!-- Navigation Tabs -->
-                <ul class="nav nav-pills mb-3" id="outlet-tab-list" role="tablist">
+                <ul class="nav nav-pills mb-3 gap-2" id="outlet-tab-list" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">
                             <i class="fas fa-store me-1"></i> Outlet Aktif <span class="badge bg-success ms-1"><?= $activeCount ?></span>
