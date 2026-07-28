@@ -81,7 +81,7 @@ $recentRequests = $db->query("
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Total Outlet Cabang</h6>
+                    <h6 class="mb-3 text-muted">Total Outlet</h6>
                     <h3 class="text-end mb-0"><i class="fa fa-building icon-size float-start text-success"></i><span><?= number_format($outletCount) ?></span></h3>
                 </div>
             </div>
@@ -91,11 +91,11 @@ $recentRequests = $db->query("
 
 <!-- Row Summary Tables -->
 <div class="row row-sm">
-    <!-- TOP 5 OUTLET OMZET -->
+    <!-- OUTLET DENGAN OMZET TERTINGGI -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card h-100 mb-0">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="main-content-label mb-0">Top 5 Outlet Omzet Tertinggi</h6>
+                <h6 class="main-content-label mb-0">Outlet dengan Omzet Tertinggi</h6>
                 <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
             </div>
             <div class="card-body">
@@ -131,11 +131,11 @@ $recentRequests = $db->query("
         </div>
     </div>
 
-    <!-- RINGKASAN REQUEST OUTLET -->
+    <!-- REQUEST OUTLET TERBARU -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card h-100 mb-0">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="main-content-label mb-0">Ringkasan Request Outlet Terbaru</h6>
+                <h6 class="main-content-label mb-0">Request Outlet Terbaru</h6>
                 <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
             </div>
             <div class="card-body">
@@ -144,7 +144,7 @@ $recentRequests = $db->query("
                         <thead class="table-light">
                             <tr>
                                 <th>Nama Outlet</th>
-                                <th>Investor Pemodal</th>
+                                <th>Investor</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>

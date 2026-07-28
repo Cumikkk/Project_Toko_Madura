@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-28 09:07:37
+-- Generated: 2026-07-28 09:23:25
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -47,7 +47,7 @@ CREATE TABLE `investor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `investor`
-INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', NULL, 'sidodadi', '50.00', '0.00', '2026-07-27 15:49:35');
+INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', 'Tulangan', 'GMCF+C87, Kadelesan, Kedondong, Kec. Tulangan, Kabupaten Sidoarjo, Jawa Timur 61273', '50.00', '0.00', '2026-07-27 15:49:35');
 
 -- --------------------------------------------------------
 -- Table structure for `outlet`

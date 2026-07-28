@@ -239,7 +239,7 @@ class Helper {
     
         // Validate Length
         if(strlen($input) < $min_length) {
-            return  "Password must be at least {$min_length} characters";
+            return "Password harus terdiri dari minimal {$min_length} karakter";
         }
     
         // Validate Character
@@ -269,19 +269,15 @@ class Helper {
         }
     
         if($return['upper'] == 0) {
-            return  "Password must contain at least one upper case letter.";
+            return "Password harus mengandung minimal satu huruf besar (A-Z)";
         }
     
         if($return['lower'] == 0) {
-            return  "Password must contain at least one lower case letter.";
+            return "Password harus mengandung minimal satu huruf kecil (a-z)";
         }
     
         if($return['numeric'] == 0) {
-            return  "Password must contain at least one number.";
-        }
-    
-        if(preg_match('/[^a-zA-Z0-9]/', $input) <= 0) {
-            return  "Password must contain symbols.";
+            return "Password harus mengandung minimal satu angka (0-9)";
         }
     
         return true;

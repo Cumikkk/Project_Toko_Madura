@@ -59,7 +59,7 @@ $investors = $db->query("
                                 <th>Nama Lengkap</th>
                                 <th>Username</th>
                                 <th>No HP</th>
-                                <th>Kecamatan & Alamat</th>
+                                <th>Kecamatan</th>
                                 <th>Bagi Hasil (%)</th>
                                 <th>Master Owner</th>
                                 <th width="15%">#</th>
@@ -73,17 +73,7 @@ $investors = $db->query("
                                         <td><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
                                         <td><code><?= htmlspecialchars($row['username']) ?></code></td>
                                         <td><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
-                                        <td>
-                                            <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
-                                            <?php if (!empty($row['alamat_investor'])) : ?>
-                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
-                                                        data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
-                                                        data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
-                                                        title="Lihat Alamat Lengkap">
-                                                    <i class="fa fa-info-circle"></i> Detail Alamat
-                                                </button>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center">
