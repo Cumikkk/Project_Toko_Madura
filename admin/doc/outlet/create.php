@@ -62,17 +62,25 @@ $investorList = $db->query("
         <!-- LEFT COLUMN: Data Toko / Cabang -->
         <div class="col-md-6 mb-3">
             <div class="card custom-card overflow-hidden h-100 mb-0">
-                <div class="card-header">
+                <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Data Toko / Cabang</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko / Cabang</label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
                                     placeholder="Contoh: Toko Madura Cabang Waru"
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
+                                    placeholder="Contoh: Waru"
+                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
@@ -94,7 +102,7 @@ $investorList = $db->query("
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Toko</label>
                                 <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
-                                    placeholder="Masukkan alamat lokasi toko cabang"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
+                                    placeholder="Contoh: Jl. Raya Waru No. 45, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -105,11 +113,8 @@ $investorList = $db->query("
         <!-- RIGHT COLUMN: Data Akun Kasir Pengelola -->
         <div class="col-md-6 mb-3">
             <div class="card custom-card overflow-hidden h-100 mb-0">
-                <div class="card-header">
+                <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Akun Kasir Pengelola</h5>
-                    <?php if ($isEdit) : ?>
-                        <p class="text-muted card-sub-title mb-0 mt-1">Kosongkan password jika tidak ingin mengubah.</p>
-                    <?php endif; ?>
                 </div>
                 <div class="card-body">
                     <div class="row">

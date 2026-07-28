@@ -86,24 +86,21 @@ $requests = $db->query($sqlRequests);
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="main-content-label mb-1">Daftar Permintaan Pembukaan Outlet</h6>
-                    <p class="text-muted card-sub-title mb-0">
-                        Pemeriksaan bukti pembayaran dan persetujuan pengaktifan outlet cabang Toko Madura.
-                    </p>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Daftar Request Pembukaan Outlet</h5>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover text-nowrap w-100 align-middle" id="request-outlet-table">
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="request-outlet-table">
                         <thead>
                             <tr class="text-center">
-                                <th style="width: 5%;">No</th>
-                                <th>Nama Outlet</th>
-                                <th>Kecamatan / Lokasi</th>
-                                <th>Investor Pemodal</th>
-                                <th class="text-end">Biaya Langganan</th>
+                                <th class="text-center" style="width: 5%;">No</th>
+                                <th class="text-center">Nama Outlet</th>
+                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Investor Pemodal</th>
+                                <th class="text-center">Biaya Langganan</th>
                                 <th class="text-center">Bukti Bayar</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Tanggal Request</th>
@@ -115,9 +112,19 @@ $requests = $db->query($sqlRequests);
                                 <?php $no = 1; while ($row = $requests->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
-                                        <td><?= htmlspecialchars($row['kecamatan'] ?? $row['alamat_outlet'] ?? '-') ?></td>
-                                        <td>
+                                        <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
+                                        <td class="text-center">
+                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat-req" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                        title="Lihat Alamat Lengkap">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-start">
                                             <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
                                             <?php if (!empty($row['no_hp_investor'])) : ?>
                                                 <br><small class="text-muted"><i class="fas fa-phone me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
@@ -167,7 +174,7 @@ $requests = $db->query($sqlRequests);
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="10" class="text-center text-muted py-4">Belum ada request outlet.</td>
+                                    <td colspan="9" class="text-center text-muted py-4">Belum ada request outlet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -216,6 +223,18 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Modal popup detail alamat outlet
+    $('.btn-lihat-alamat-req').on('click', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        Swal.fire({
+            title: 'Alamat Lengkap Outlet',
+            html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + (alamat || 'Belum ada alamat lengkap') + '</div>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
 
     // Handle Accept Click
     $('.btn-accept').on('click', function() {

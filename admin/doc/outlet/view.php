@@ -8,9 +8,6 @@ $loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
 $loggedInId    = intval($user['ADM_ID'] ?? 1);
 
 // Role Filtering for Outlets:
-// Programmer (Level 1): See all outlets nationally
-// Master Owner (Level 2): See only outlets belonging to his Master ID
-// Admin Staff (Level 3): See only outlets belonging to Master Owner
 if ($loggedInLevel == 1) {
     $whereClause = "";
 } elseif ($loggedInLevel == 2) {
@@ -45,27 +42,26 @@ $outlets = $db->query("
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="main-content-label mb-1">Daftar Outlet & Pemetaan Pemodal</h6>
-                    <p class="text-muted card-sub-title mb-0">Daftar seluruh cabang Toko Madura beserta investor pemodal di belakangnya.</p>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Daftar Outlet Toko Madura</h5>
+                    <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
+                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
+                    <?php endif; ?>
                 </div>
-                <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
-                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
-                <?php endif; ?>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="outlet-table">
                         <thead>
                             <tr class="text-center">
-                                <th style="width: 5%;">No</th>
-                                <th>Nama Toko / Cabang</th>
-                                <th>Pengelola (Kasir)</th>
-                                <th>No. HP</th>
-                                <th>Investor Pemodal</th>
-                                <th>Alamat Toko</th>
-                                <th width="15%">#</th>
+                                <th class="text-center" style="width: 5%;">No</th>
+                                <th class="text-center">Nama Toko / Cabang</th>
+                                <th class="text-center">Pengelola (Kasir)</th>
+                                <th class="text-center">No. HP</th>
+                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Investor Pemodal</th>
+                                <th class="text-center" width="15%">#</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,17 +69,27 @@ $outlets = $db->query("
                                 <?php $no = 1; while ($row = $outlets->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
-                                        <td><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>
-                                        <td>
+                                        <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
+                                        <td class="text-start"><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
+                                        <td class="text-center"><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>
+                                        <td class="text-center">
+                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat-outlet" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                        title="Lihat Alamat Lengkap">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
                                             <?php if (!empty($row['nama_investor'])) : ?>
                                                 <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persen_bagian_investor'], 0) ?>%)</span>
                                             <?php else : ?>
                                                 <span class="badge bg-warning">Belum Ada Pemodal</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= htmlspecialchars($row['alamat_outlet'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
@@ -98,7 +104,7 @@ $outlets = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data cabang toko terdaftar.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data cabang toko terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -132,9 +138,21 @@ $(document).ready(function() {
                     previous: 'Previous'
                 }
             },
-            order: [[2, 'asc']]
+            order: [[1, 'asc']]
         });
     }
+
+    // Modal popup detail alamat outlet
+    $('.btn-lihat-alamat-outlet').on('click', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        Swal.fire({
+            title: 'Alamat Lengkap Outlet',
+            html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + (alamat || 'Belum ada alamat lengkap') + '</div>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
 });
 
 function deleteOutlet(id, name) {
