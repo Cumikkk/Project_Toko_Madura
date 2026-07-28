@@ -104,8 +104,10 @@ if ($isEdit) {
         $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal} WHERE id_users = {$userId}");
     }
 
+    $idMaster = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
+
     // Update investor table
-    $db->query("UPDATE investor SET kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
+    $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
 
     JsonResponse([
         'code'      => 200,
@@ -143,9 +145,9 @@ if ($isEdit) {
     }
 
     $newUserId = $db->insert_id;
-    $masterId  = intval($user['ADM_ID'] ?? 1);
+    $idMaster  = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    $db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$masterId}, {$kecVal}, {$alamatVal}, {$persen}, NOW())");
+    $db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$kecVal}, {$alamatVal}, {$persen}, NOW())");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

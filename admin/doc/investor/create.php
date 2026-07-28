@@ -28,6 +28,9 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
     $redirectUrl = SystemInfo::app('ADMIN_URL') . '/investor/view';
     die("<script>location.href = '{$redirectUrl}'; </script>");
 }
+
+// Fetch list of Master Owners
+$masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 'master' ORDER BY nama_lengkap ASC");
 ?>
 
 <div class="page-header">
@@ -43,9 +46,11 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 
 <div class="row">
     <div class="col-md-10 mx-auto mb-3">
-        <div class="card custom-card">
-            <div class="card-header border-bottom">
-                <h5 class="card-title mb-0"><?= $isEdit ? "Form Edit Data Investor" : "Form Registrasi Investor"; ?></h5>
+        <div class="card custom-card overflow-hidden">
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title"><?= $isEdit ? "Form Edit Data Investor" : "Form Registrasi Investor"; ?></h5>
+                </div>
             </div>
             <div class="card-body">
                 <form action="" method="post" id="form-create-investor">
@@ -82,11 +87,28 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
+                                <label for="id_master" class="form-label fw-bold">Master Owner</label>
+                                <select class="form-control" id="id_master" name="id_master" required>
+                                    <option value="" disabled <?= empty($investorData['id_master']) ? 'selected' : ''; ?>>-- Pilih Master Owner --</option>
+                                    <?php if ($masterList && $masterList->num_rows > 0) : ?>
+                                        <?php while ($m = $masterList->fetch_assoc()) : ?>
+                                            <option value="<?= $m['id_users']; ?>" <?= (($investorData['id_master'] ?? 0) == $m['id_users']) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($m['nama_lengkap']); ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <small class="text-muted">Pilih Master Owner tempat investor ini dinaungi.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
                                 <div class="input-group">
