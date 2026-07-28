@@ -56,12 +56,6 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="add-email" class="form-label fw-bold">Email (Opsional)</label>
-                                <input type="email" class="form-control" id="add-email" name="add-email" placeholder="Contoh: admin@tokomadura.com">
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
                                 <label for="add-phone" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
                                 <input type="text" class="form-control" id="add-phone" name="add-phone" placeholder="Contoh: 08123456789">
                             </div>

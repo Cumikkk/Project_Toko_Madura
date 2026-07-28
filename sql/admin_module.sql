@@ -16,7 +16,7 @@ CREATE TABLE `admin_module` (
   UNIQUE KEY `unique_module_name` (`module`) USING BTREE,
   KEY `fk_group_id` (`group_id`) USING BTREE,
   CONSTRAINT `admin_module_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `admin_module_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_module`
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('1', '1', '1', 'Dashboard', '-1', '-1', '2026-07-23 12:19:52', NULL);
@@ -31,4 +31,5 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('16', '2', '5', 'request-outlet', '-1', '0', '2026-07-27 15:53:00', '2026-07-28 10:43:11');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('17', '1', '8', 'pengaturan-langganan', '-1', '-1', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('18', '2', '8', 'pengaturan-potongan', '-1', '-1', '2026-07-27 17:15:26', NULL);
+INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('19', '1', '12', 'Master', '-1', '-1', '2026-07-28 15:00:51', NULL);
 

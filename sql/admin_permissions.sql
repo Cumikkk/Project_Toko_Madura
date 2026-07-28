@@ -14,7 +14,7 @@ CREATE TABLE `admin_permissions` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `fk_module_id_on_permission` (`module_id`) USING BTREE,
   CONSTRAINT `fk_module_id_on_permission` FOREIGN KEY (`module_id`) REFERENCES `admin_module` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_permissions`
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('1', '1', 'view', 'View Dashboard', '/dashboard', '2026-07-23 12:19:52', NULL);
@@ -49,4 +49,8 @@ INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `crea
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('50', '17', 'update', 'Update Biaya Langganan', '/pengaturan-langganan/update', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('51', '18', 'view', 'View Potongan Global', '/pengaturan-potongan/view', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('52', '18', 'update', 'Update Potongan Global', '/pengaturan-potongan/update', '2026-07-27 17:15:26', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('53', '19', 'view', 'View Master List', '/master/view', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('54', '19', 'create', 'Create Master', '/master/create', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('55', '19', 'update', 'Update Master', '/master/update/*', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('56', '19', 'delete', 'Delete Master', '/master/delete', '2026-07-28 15:01:00', NULL);
 

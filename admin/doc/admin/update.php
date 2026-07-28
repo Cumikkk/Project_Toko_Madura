@@ -61,12 +61,6 @@ if(!$admin) {
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="email" class="form-label">Email (Opsional)</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Email admin" value="<?= htmlspecialchars($admin['ADM_EMAIL'] ?? '') ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
                                 <label for="no_hp" class="form-label">No. HP / WhatsApp (Opsional)</label>
                                 <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="No HP admin" value="<?= htmlspecialchars($admin['ADM_PHONE'] ?? '') ?>">
                             </div>

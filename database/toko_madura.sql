@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-28 13:56:16
+-- Generated: 2026-07-28 15:02:08
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -12,19 +12,17 @@ CREATE TABLE `users` (
   `nama_lengkap` varchar(100) NOT NULL,
   `username` varchar(50) NOT NULL,
   `no_hp` varchar(20) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('programmer','master','investor','outlet') NOT NULL DEFAULT 'outlet',
   PRIMARY KEY (`id_users`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `users`
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('1', 'Riski Ardhika', 'riski', NULL, NULL, '$2y$10$7ZFtaY7BgXqtmX/l0tpcq.YcEdsRzcPWsgSQox/GjVSq/w7G3/6kG', 'programmer');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('47', 'Riski Ardhika 1', 'master', '0123456789', 'master@tokomadura.com', '$2y$10$XLk1LKK8f9iIg0CAIk5XcuydhM.5GNuaQuIZYvys.MdMZfFog3KfG', 'master');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('48', 'M. Fahrul Alfanani', 'investor', '0987654321', 'investor@tokomadura.com', '$2y$10$PJoPaaGGwh6fM7ZR8wsuheJaKUeH1TicK2j1fmzZEMpedOmHQTvce', 'investor');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('49', 'Muhhamad Tegar Kurniawan', 'outlet', '014785236', 'outlet@tokomadura.com', '$2y$10$ZvCsayL/4w91UIHvYCzC7exJjvS2oa6wuIYfKfcNRF3CMzmEJC7H.', 'outlet');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('1', 'Riski Ardhika', 'riski', NULL, '$2y$10$7ZFtaY7BgXqtmX/l0tpcq.YcEdsRzcPWsgSQox/GjVSq/w7G3/6kG', 'programmer');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('47', 'Riski Ardhika 1', 'master', '0123456789', '$2y$10$XLk1LKK8f9iIg0CAIk5XcuydhM.5GNuaQuIZYvys.MdMZfFog3KfG', 'master');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('48', 'M. Fahrul Alfanani', 'investor', '0987654321', '$2y$10$PJoPaaGGwh6fM7ZR8wsuheJaKUeH1TicK2j1fmzZEMpedOmHQTvce', 'investor');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('49', 'Muhhamad Tegar Kurniawan', 'outlet', '014785236', '$2y$10$ZvCsayL/4w91UIHvYCzC7exJjvS2oa6wuIYfKfcNRF3CMzmEJC7H.', 'outlet');
 
 -- --------------------------------------------------------
 -- Table structure for `investor`
@@ -143,17 +141,18 @@ CREATE TABLE `admin_module_group` (
   `icon` text DEFAULT NULL,
   `min_level` int(11) NOT NULL DEFAULT 10,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_module_group`
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('1', '1', 'Dashboard', 'single', 'ti-home sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('2', '2', 'Investor', 'single', 'fa fa-handshake-o sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('3', '7', 'Admin', 'single', 'ti-user sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('4', '8', 'Developer', 'dropdown', 'ti-panel sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '3', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '4', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '5', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '6', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('2', '3', 'Investor', 'single', 'fa fa-handshake-o sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('3', '8', 'Admin', 'single', 'ti-user sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('4', '9', 'Developer', 'dropdown', 'ti-panel sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '4', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '5', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '6', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '7', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('12', '2', 'Master', 'single', 'fa fa-user-circle sidemenu-icon menu-icon', '1');
 
 -- --------------------------------------------------------
 -- Table structure for `admin_module`
@@ -172,7 +171,7 @@ CREATE TABLE `admin_module` (
   UNIQUE KEY `unique_module_name` (`module`) USING BTREE,
   KEY `fk_group_id` (`group_id`) USING BTREE,
   CONSTRAINT `admin_module_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `admin_module_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_module`
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('1', '1', '1', 'Dashboard', '-1', '-1', '2026-07-23 12:19:52', NULL);
@@ -187,6 +186,7 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('16', '2', '5', 'request-outlet', '-1', '0', '2026-07-27 15:53:00', '2026-07-28 10:43:11');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('17', '1', '8', 'pengaturan-langganan', '-1', '-1', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('18', '2', '8', 'pengaturan-potongan', '-1', '-1', '2026-07-27 17:15:26', NULL);
+INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('19', '1', '12', 'Master', '-1', '-1', '2026-07-28 15:00:51', NULL);
 
 -- --------------------------------------------------------
 -- Table structure for `admin_permissions`
@@ -203,7 +203,7 @@ CREATE TABLE `admin_permissions` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `fk_module_id_on_permission` (`module_id`) USING BTREE,
   CONSTRAINT `fk_module_id_on_permission` FOREIGN KEY (`module_id`) REFERENCES `admin_module` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_permissions`
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('1', '1', 'view', 'View Dashboard', '/dashboard', '2026-07-23 12:19:52', NULL);
@@ -238,6 +238,10 @@ INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `crea
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('50', '17', 'update', 'Update Biaya Langganan', '/pengaturan-langganan/update', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('51', '18', 'view', 'View Potongan Global', '/pengaturan-potongan/view', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('52', '18', 'update', 'Update Potongan Global', '/pengaturan-potongan/update', '2026-07-27 17:15:26', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('53', '19', 'view', 'View Master List', '/master/view', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('54', '19', 'create', 'Create Master', '/master/create', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('55', '19', 'update', 'Update Master', '/master/update/*', '2026-07-28 15:01:00', NULL);
+INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `created_at`, `updated_at`) VALUES ('56', '19', 'delete', 'Delete Master', '/master/delete', '2026-07-28 15:01:00', NULL);
 
 -- --------------------------------------------------------
 -- Table structure for `admin_authorize`
@@ -288,6 +292,10 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '50', '-1', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '51', '-1', '2026-07-27 17:15:26', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '52', '-1', '2026-07-27 17:15:26', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '53', '-1', '2026-07-28 15:01:08', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '54', '-1', '2026-07-28 15:01:08', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '55', '-1', '2026-07-28 15:01:08', NULL);
+INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('1', '56', '-1', '2026-07-28 15:01:08', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '1', '-1', '2026-07-28 10:20:48', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '2', '-1', '2026-07-28 10:20:48', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('47', '3', '-1', '2026-07-28 10:20:48', NULL);

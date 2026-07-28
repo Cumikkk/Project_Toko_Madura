@@ -11,15 +11,16 @@ CREATE TABLE `admin_module_group` (
   `icon` text DEFAULT NULL,
   `min_level` int(11) NOT NULL DEFAULT 10,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 -- Dumping data for `admin_module_group`
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('1', '1', 'Dashboard', 'single', 'ti-home sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('2', '2', 'Investor', 'single', 'fa fa-handshake-o sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('3', '7', 'Admin', 'single', 'ti-user sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('4', '8', 'Developer', 'dropdown', 'ti-panel sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '3', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '4', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '5', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '6', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('2', '3', 'Investor', 'single', 'fa fa-handshake-o sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('3', '8', 'Admin', 'single', 'ti-user sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('4', '9', 'Developer', 'dropdown', 'ti-panel sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '4', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '5', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '6', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '7', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('12', '2', 'Master', 'single', 'fa fa-user-circle sidemenu-icon menu-icon', '1');
 
