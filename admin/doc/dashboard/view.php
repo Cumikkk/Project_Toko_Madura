@@ -94,11 +94,9 @@ $recentRequests = $db->query("
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header border-bottom d-flex justify-content-between align-items-center py-2.5 px-3">
-                <div>
-                    <h6 class="main-content-label mb-0">Outlet dengan Omzet Tertinggi</h6>
-                </div>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm py-1 px-2">Lihat Semua</a>
+            <div class="card-header border-bottom d-flex align-items-center justify-content-between px-3" style="padding-top: 10px; padding-bottom: 10px; min-height: 48px;">
+                <h6 class="main-content-label mb-0" style="line-height: 1.2; margin: 0; padding: 0;">Outlet dengan Omzet Tertinggi</h6>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm py-1 px-2" style="line-height: 1.2;">Lihat Semua</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -136,17 +134,16 @@ $recentRequests = $db->query("
     <!-- REQUEST OUTLET TERBARU -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header border-bottom d-flex justify-content-between align-items-center py-2.5 px-3">
-                <div>
-                    <h6 class="main-content-label mb-0">Request Outlet Terbaru</h6>
-                </div>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm py-1 px-2">Lihat Semua</a>
+            <div class="card-header border-bottom d-flex align-items-center justify-content-between px-3" style="padding-top: 10px; padding-bottom: 10px; min-height: 48px;">
+                <h6 class="main-content-label mb-0" style="line-height: 1.2; margin: 0; padding: 0;">Request Outlet Terbaru</h6>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm py-1 px-2" style="line-height: 1.2;">Lihat Semua</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th class="text-center" style="width: 10%;">No</th>
                                 <th>Nama Outlet</th>
                                 <th>Investor</th>
                                 <th class="text-center">Status</th>
@@ -154,8 +151,9 @@ $recentRequests = $db->query("
                         </thead>
                         <tbody>
                             <?php if ($recentRequests && $recentRequests->num_rows > 0) : ?>
-                                <?php while ($row = $recentRequests->fetch_assoc()) : ?>
+                                <?php $noReq = 1; while ($row = $recentRequests->fetch_assoc()) : ?>
                                     <tr>
+                                        <td class="text-center"><?= $noReq++ ?></td>
                                         <td>
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             <?php if(!empty($row['kecamatan'])) : ?>
@@ -176,7 +174,7 @@ $recentRequests = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">Belum ada request outlet.</td>
+                                    <td colspan="4" class="text-center text-muted py-4">Belum ada request outlet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
