@@ -41,11 +41,13 @@ $investors = $db->query("
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header border-bottom d-flex align-items-center justify-content-between px-3" style="padding-top: 12px; padding-bottom: 12px; min-height: 48px;">
-                <h6 class="main-content-label mb-0" style="line-height: 1.2; margin: 0; padding: 0;">List Investor Toko Madura</h6>
-                <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
-                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create" class="btn btn-primary btn-sm my-0 py-1 px-2" style="line-height: 1.2;"><i class="fas fa-plus me-1"></i> Tambah Investor</a>
-                <?php endif; ?>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">List Investor Toko Madura</h5>
+                    <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
+                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Investor</a>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
