@@ -30,7 +30,7 @@ $requests = $db->query($sqlRequests);
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">Manajemen Request Outlet</h2>
+        <h2 class="main-content-title tx-24 mg-b-5">Daftar Request Outlet Toko Madura</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Request Outlet</li>
@@ -88,7 +88,7 @@ $requests = $db->query($sqlRequests);
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">Daftar Request Pembukaan Outlet</h5>
+                    <h5 class="card-title">List Request Outlet Toko Madura</h5>
                 </div>
             </div>
             <div class="card-body">

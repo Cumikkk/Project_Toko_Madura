@@ -31,7 +31,7 @@ $outlets = $db->query("
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">Daftar Cabang Toko Madura</h2>
+        <h2 class="main-content-title tx-24 mg-b-5">Daftar Outlet Toko Madura</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Outlet</li>
@@ -44,7 +44,7 @@ $outlets = $db->query("
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">Daftar Outlet Toko Madura</h5>
+                    <h5 class="card-title">List Outlet Toko Madura</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
                     <?php endif; ?>
