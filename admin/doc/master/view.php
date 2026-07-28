@@ -30,7 +30,7 @@ if ($resOutlet && $resOutlet->num_rows > 0) {
 
 // 2. Fetch Master list with sub-counts
 $sqlMasters = "
-    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.created_at,
+    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp,
            COUNT(DISTINCT inv.id_investor) as total_investor,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM users u
@@ -110,8 +110,7 @@ $masters = $db->query($sqlMasters);
                                 <th class="text-center">No. HP / WA</th>
                                 <th class="text-center">Total Investor</th>
                                 <th class="text-center">Total Outlet Active</th>
-                                <th class="text-center">Tanggal Bergabung</th>
-                                <th class="text-center" style="width: 15%;">#</th>
+                                <th class="text-center" style="width: 15%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,9 +134,6 @@ $masters = $db->query($sqlMasters);
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <?= !empty($row['created_at']) ? date("d/m/Y H:i", strtotime($row['created_at'])) : '-' ?>
                                         </td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
