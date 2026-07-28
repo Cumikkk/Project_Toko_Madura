@@ -109,7 +109,7 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="5" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor" placeholder="Contoh: 50" value="<?= htmlspecialchars($investorData['persen_bagian_investor'] ?? '50'); ?>" required>
+                                    <input type="number" step="0.01" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor" placeholder="Contoh: 50.00" value="<?= htmlspecialchars($investorData['persen_bagian_investor'] ?? '50.00'); ?>" required>
                                     <span class="input-group-text">%</span>
                                 </div>
                                 <small class="text-muted">Bagi hasil keuntungan hak Investor. Contoh: Jika diisi 60%, maka Investor menerima 60% dan Pengelola Toko menerima 40%.</small>

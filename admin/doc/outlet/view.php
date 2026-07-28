@@ -4,61 +4,59 @@ use Config\Core\SystemInfo;
 
 $db = Database::connect();
 
-$loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
-$loggedInId    = intval($user['ADM_ID'] ?? 1);
-
-// Role Filtering for Outlets:
-if ($loggedInLevel == 1) {
-    $whereClause = "";
-    $whereClauseInv = "";
-} elseif ($loggedInLevel == 2) {
-    $whereClause = "WHERE inv.id_master = {$loggedInId}";
-    $whereClauseInv = "AND inv.id_master = {$loggedInId}";
-} else {
-    $whereClause = "WHERE inv.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
-    $whereClauseInv = "AND inv.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
+// 1. Fetch counts for stats cards
+$activeCount = 0;
+$resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active'");
+if ($resActive && $resActive->num_rows > 0) {
+    $activeCount = (int)$resActive->fetch_assoc()['total'];
 }
 
-// Fetch Metrics Summary
-$activeCount  = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'active' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
-$pendingCount = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'pending' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
-$rejectCount  = $db->query("SELECT COUNT(*) as total FROM outlet o LEFT JOIN investor inv ON inv.id_investor = o.id_investor WHERE o.status = 'reject' {$whereClauseInv}")->fetch_assoc()['total'] ?? 0;
+$pendingCount = 0;
+$resPending = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'pending'");
+if ($resPending && $resPending->num_rows > 0) {
+    $pendingCount = (int)$resPending->fetch_assoc()['total'];
+}
 
-// 1. Fetch Active Outlets
-$activeOutlets = $db->query("
-    SELECT o.*, u.nama_lengkap as pengelola_toko, u.no_hp as no_hp_toko, 
-           inv_user.nama_lengkap as nama_investor, inv.persen_bagian_investor
+$rejectCount = 0;
+$resReject = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'reject'");
+if ($resReject && $resReject->num_rows > 0) {
+    $rejectCount = (int)$resReject->fetch_assoc()['total'];
+}
+
+// 2. Fetch Active Outlets
+$sqlActive = "
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+           u_inv.nama_lengkap as nama_investor, inv.persen_bagian_investor
     FROM outlet o
-    LEFT JOIN users u ON (u.id_users = o.id_users)
-    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-    LEFT JOIN users inv_user ON (inv_user.id_users = inv.id_users)
-    {$whereClause} " . ($whereClause ? "AND" : "WHERE") . " o.status = 'active'
+    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+    WHERE o.status = 'active'
     ORDER BY o.nama_outlet ASC
-");
+";
+$activeOutlets = $db->query($sqlActive);
 
-// 2. Fetch Pending Outlets
-$pendingOutlets = $db->query("
-    SELECT o.*, u.nama_lengkap as pengelola_toko, u.no_hp as no_hp_toko, 
-           inv_user.nama_lengkap as nama_investor, inv_user.no_hp as no_hp_investor
+// 3. Fetch Pending Outlets (Request Outlet)
+$sqlPending = "
+    SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
-    LEFT JOIN users u ON (u.id_users = o.id_users)
-    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-    LEFT JOIN users inv_user ON (inv_user.id_users = inv.id_users)
-    {$whereClause} " . ($whereClause ? "AND" : "WHERE") . " o.status = 'pending'
+    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+    WHERE o.status = 'pending'
     ORDER BY o.id_outlet DESC
-");
+";
+$pendingOutlets = $db->query($sqlPending);
 
-// 3. Fetch Rejected Outlets
-$rejectedOutlets = $db->query("
-    SELECT o.*, u.nama_lengkap as pengelola_toko, u.no_hp as no_hp_toko, 
-           inv_user.nama_lengkap as nama_investor, inv_user.no_hp as no_hp_investor
+// 4. Fetch Rejected Outlets
+$sqlReject = "
+    SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
-    LEFT JOIN users u ON (u.id_users = o.id_users)
-    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-    LEFT JOIN users inv_user ON (inv_user.id_users = inv.id_users)
-    {$whereClause} " . ($whereClause ? "AND" : "WHERE") . " o.status = 'reject'
+    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+    WHERE o.status = 'reject'
     ORDER BY o.id_outlet DESC
-");
+";
+$rejectedOutlets = $db->query($sqlReject);
 ?>
 
 <div class="page-header">
@@ -74,7 +72,7 @@ $rejectedOutlets = $db->query("
 <!-- Summary Metrics Cards (Interactive Clickable Tabs) -->
 <div class="row row-sm mb-3">
     <div class="col-sm-4 col-lg-4 mb-2">
-        <div class="card custom-card outlet-stat-card active-card" id="card-active" data-target="active-tab">
+        <div class="card custom-card outlet-stat-card active-card" id="card-active" data-tab="active">
             <div class="card-body">
                 <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-check-circle icon-size float-start text-success me-2"></i>Outlet Aktif</h6>
@@ -84,7 +82,7 @@ $rejectedOutlets = $db->query("
         </div>
     </div>
     <div class="col-sm-4 col-lg-4 mb-2">
-        <div class="card custom-card outlet-stat-card" id="card-pending" data-target="pending-tab">
+        <div class="card custom-card outlet-stat-card" id="card-pending" data-tab="pending">
             <div class="card-body">
                 <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-clock-o icon-size float-start text-warning me-2"></i>Request Masuk</h6>
@@ -94,7 +92,7 @@ $rejectedOutlets = $db->query("
         </div>
     </div>
     <div class="col-sm-4 col-lg-4 mb-2">
-        <div class="card custom-card outlet-stat-card" id="card-reject" data-target="reject-tab">
+        <div class="card custom-card outlet-stat-card" id="card-reject" data-tab="reject">
             <div class="card-body">
                 <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted fw-bold"><i class="fa fa-times-circle icon-size float-start text-danger me-2"></i>Request Ditolak</h6>
@@ -111,29 +109,16 @@ $rejectedOutlets = $db->query("
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0" id="table-card-title">List Outlet Aktif</h5>
+                    <h5 class="card-title mb-0" id="table-card-title"><i class="fas fa-store text-success me-2"></i>List Outlet Aktif</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
                     <?php endif; ?>
                 </div>
             </div>
             <div class="card-body">
-                <!-- Hidden Bootstrap Nav Tabs for underlying state engine -->
-                <ul class="nav nav-pills mb-3 gap-2 d-none" id="outlet-tab-list" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">Outlet Aktif</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">Request Outlet</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reject-tab" data-bs-toggle="pill" data-bs-target="#tab-reject" type="button" role="tab" aria-controls="tab-reject" aria-selected="false">Ditolak</button>
-                    </li>
-                </ul>
-
                 <div class="tab-content" id="outlet-tab-content">
                     <!-- TAB 1: OUTLET AKTIF -->
-                    <div class="tab-pane fade show active" id="tab-active" role="tabpanel" aria-labelledby="active-tab">
+                    <div class="tab-pane fade show active outlet-tab-pane" id="tab-active" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-active">
                                 <thead>
@@ -160,8 +145,8 @@ $rejectedOutlets = $db->query("
                                                     <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                     <?php if (!empty($row['alamat_outlet'])) : ?>
                                                         <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
-                                                                data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
-                                                                data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                                data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" 
+                                                                data-alamat="<?= htmlspecialchars(str_replace(["\r\n", "\r", "\n"], ' ', $row['alamat_outlet']), ENT_QUOTES, 'UTF-8') ?>" 
                                                                 title="Lihat Alamat Lengkap">
                                                             <i class="fa fa-info-circle"></i>
                                                         </button>
@@ -181,7 +166,7 @@ $rejectedOutlets = $db->query("
                                                             <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
                                                         <?php endif; ?>
                                                         <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
-                                                            <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Toko" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet']) ?>')"><i class="fas fa-trash"></i></button>
+                                                            <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Toko" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
                                                         <?php endif; ?>
                                                     </div>
                                                 </td>
@@ -198,7 +183,7 @@ $rejectedOutlets = $db->query("
                     </div>
 
                     <!-- TAB 2: REQUEST OUTLET (PENDING) -->
-                    <div class="tab-pane fade" id="tab-pending" role="tabpanel" aria-labelledby="pending-tab">
+                    <div class="tab-pane fade d-none outlet-tab-pane" id="tab-pending" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-pending">
                                 <thead>
@@ -223,8 +208,8 @@ $rejectedOutlets = $db->query("
                                                     <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                     <?php if (!empty($row['alamat_outlet'])) : ?>
                                                         <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
-                                                                data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
-                                                                data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                                data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" 
+                                                                data-alamat="<?= htmlspecialchars(str_replace(["\r\n", "\r", "\n"], ' ', $row['alamat_outlet']), ENT_QUOTES, 'UTF-8') ?>" 
                                                                 title="Lihat Alamat Lengkap">
                                                             <i class="fa fa-info-circle"></i>
                                                         </button>
@@ -253,10 +238,10 @@ $rejectedOutlets = $db->query("
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center gap-1">
-                                                        <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>">
+                                                        <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
                                                             <i class="fas fa-check me-1"></i> Setujui
                                                         </button>
-                                                        <button type="button" class="btn btn-danger btn-sm btn-reject" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>">
+                                                        <button type="button" class="btn btn-danger btn-sm btn-reject" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
                                                             <i class="fas fa-times me-1"></i> Tolak
                                                         </button>
                                                     </div>
@@ -274,7 +259,7 @@ $rejectedOutlets = $db->query("
                     </div>
 
                     <!-- TAB 3: DITOLAK (REJECT) -->
-                    <div class="tab-pane fade" id="tab-reject" role="tabpanel" aria-labelledby="reject-tab">
+                    <div class="tab-pane fade d-none outlet-tab-pane" id="tab-reject" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-reject">
                                 <thead>
@@ -299,8 +284,8 @@ $rejectedOutlets = $db->query("
                                                     <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                     <?php if (!empty($row['alamat_outlet'])) : ?>
                                                         <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
-                                                                data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
-                                                                data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                                data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" 
+                                                                data-alamat="<?= htmlspecialchars(str_replace(["\r\n", "\r", "\n"], ' ', $row['alamat_outlet']), ENT_QUOTES, 'UTF-8') ?>" 
                                                                 title="Lihat Alamat Lengkap">
                                                             <i class="fa fa-info-circle"></i>
                                                         </button>
@@ -368,8 +353,34 @@ $rejectedOutlets = $db->query("
 </div>
 
 <script type="text/javascript">
+function switchOutletTab(tabKey) {
+    // 1. Highlight card
+    $('.outlet-stat-card').removeClass('active-card');
+    $('#card-' + tabKey).addClass('active-card');
+
+    // 2. Switch tab pane visibility directly
+    $('.outlet-tab-pane').removeClass('show active').addClass('d-none');
+    $('#tab-' + tabKey).removeClass('d-none').addClass('show active');
+
+    // 3. Update table title
+    if (tabKey === 'pending') {
+        $('#table-card-title').html('<i class="fas fa-clock text-warning me-2"></i>List Request Outlet (Pending)');
+    } else if (tabKey === 'reject') {
+        $('#table-card-title').html('<i class="fas fa-times-circle text-danger me-2"></i>List Request Outlet (Ditolak)');
+    } else {
+        $('#table-card-title').html('<i class="fas fa-store text-success me-2"></i>List Outlet Aktif');
+    }
+
+    // 4. Adjust DataTables column width
+    if ($.fn.DataTable) {
+        setTimeout(() => {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }, 100);
+    }
+}
+
 $(document).ready(function() {
-    // Initialize DataTables for ALL THREE tabs so show entries & pagination exist everywhere
+    // Initialize DataTables for ALL THREE tables
     const tables = ['#table-outlet-active', '#table-outlet-pending', '#table-outlet-reject'];
     tables.forEach(tableId => {
         if ($.fn.DataTable && !$.fn.DataTable.isDataTable(tableId)) {
@@ -390,57 +401,40 @@ $(document).ready(function() {
         }
     });
 
-    // Clickable Stat Card Navigation Handler
-    $('.outlet-stat-card').on('click', function() {
-        let targetId = $(this).data('target');
-        let tabBtn = document.getElementById(targetId);
-        if (tabBtn) {
-            (new bootstrap.Tab(tabBtn)).show();
-        }
+    // Clickable Stat Card Navigation Event Handler
+    $(document).on('click', '.outlet-stat-card', function() {
+        let tabKey = $(this).data('tab');
+        switchOutletTab(tabKey);
     });
 
-    // Sync active card highlight and card title on Tab Switch
-    $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
-        let targetId = $(e.target).attr('id');
-        $('.outlet-stat-card').removeClass('active-card');
-        $('.outlet-stat-card[data-target="' + targetId + '"]').addClass('active-card');
-
-        // Update card header title dynamically
-        if (targetId === 'pending-tab') {
-            $('#table-card-title').html('<i class="fas fa-clock text-warning me-2"></i>List Request Outlet (Pending)');
-        } else if (targetId === 'reject-tab') {
-            $('#table-card-title').html('<i class="fas fa-times-circle text-danger me-2"></i>List Request Outlet (Ditolak)');
-        } else {
-            $('#table-card-title').html('<i class="fas fa-store text-success me-2"></i>List Outlet Aktif');
-        }
-
-        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-    });
-
-    // Auto switch tab if URL has ?tab=pending or ?tab=reject
+    // Auto switch tab if URL has ?tab=pending or ?tab=reject or hash #pending / #reject
     let urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'pending' || window.location.hash === '#pending') {
-        let tabBtn = document.querySelector('#pending-tab');
-        if (tabBtn) (new bootstrap.Tab(tabBtn)).show();
+        switchOutletTab('pending');
     } else if (urlParams.get('tab') === 'reject' || window.location.hash === '#reject') {
-        let tabBtn = document.querySelector('#reject-tab');
-        if (tabBtn) (new bootstrap.Tab(tabBtn)).show();
+        switchOutletTab('reject');
     }
 
-    // Modal popup detail alamat outlet (using Event Delegation for DataTables compatibility)
-    $(document).on('click', '.btn-lihat-alamat', function() {
-        let nama = $(this).data('nama');
-        let alamat = $(this).data('alamat');
-        Swal.fire({
-            title: 'Alamat Lengkap Outlet',
-            html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + (alamat || 'Belum ada alamat lengkap') + '</div>',
-            icon: 'info',
-            confirmButtonText: 'Tutup'
-        });
+    // Modal popup detail alamat outlet (Delegated event listener)
+    $(document).on('click', '.btn-lihat-alamat', function(e) {
+        e.preventDefault();
+        let nama = $(this).attr('data-nama') || $(this).data('nama');
+        let alamat = $(this).attr('data-alamat') || $(this).data('alamat');
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Alamat Lengkap Outlet',
+                html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + (nama || '-') + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + (alamat || 'Belum ada alamat lengkap') + '</div>',
+                icon: 'info',
+                confirmButtonText: 'Tutup'
+            });
+        } else {
+            alert('Outlet: ' + nama + '\nAlamat: ' + alamat);
+        }
     });
 
     // Handle Accept Request Click
-    $('.btn-accept').on('click', function() {
+    $(document).on('click', '.btn-accept', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
 
@@ -459,76 +453,77 @@ $(document).ready(function() {
                     if (resp.success) {
                         Swal.fire('Berhasil!', resp.message, 'success').then(() => location.reload());
                     } else {
-                        Swal.fire('Gagal!', resp.message, 'error');
+                        Swal.fire('Gagal!', resp.message || 'Gagal mengaktifkan outlet', 'error');
                     }
-                }, 'json');
+                }, 'json').fail(function() {
+                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                });
             }
         });
     });
 
-    // Handle Reject Request Click
-    $('.btn-reject').on('click', function() {
+    // Handle Reject Request Click (Open Modal)
+    $(document).on('click', '.btn-reject', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
         $('#reject_id_outlet').val(id);
         $('#reject_nama_outlet').text(nama);
-        $('#modalReject').modal('show');
+        $('#form-reject-outlet')[0].reset();
+        $('#reject_id_outlet').val(id);
+
+        let modalEl = document.getElementById('modalReject');
+        if (modalEl) {
+            let modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
     });
 
-    // Handle Form Reject Submit
+    // Handle Submit Form Reject
     $('#form-reject-outlet').on('submit', function(e) {
         e.preventDefault();
         let data = $(this).serialize();
+        let btn = $(this).find('button[type="submit"]');
+
+        btn.prop('disabled', true);
         $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/reject", data, function(resp) {
-            $('#modalReject').modal('hide');
+            btn.prop('disabled', false);
             if (resp.success) {
+                let modalEl = document.getElementById('modalReject');
+                let modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
                 Swal.fire('Berhasil!', resp.message, 'success').then(() => location.reload());
             } else {
-                Swal.fire('Gagal!', resp.message, 'error');
+                Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
             }
-        }, 'json');
+        }, 'json').fail(function() {
+            btn.prop('disabled', false);
+            Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+        });
     });
 });
 
-function deleteOutlet(id, name) {
+function deleteOutlet(id, nama) {
     Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: "Apakah Anda yakin ingin menghapus toko cabang '" + name + "'?",
+        title: 'Hapus Outlet?',
+        text: 'Apakah Anda yakin ingin menghapus outlet ' + nama + '? Data yang dihapus tidak dapat dikembalikan.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus!',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire({
-                text: "Loading...",
-                allowOutsideClick: false,
-                didOpen: function() {
-                    Swal.showLoading();
-                }
-            });
-
-            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/delete", { id: id }, function(resp) {
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/delete", { id_outlet: id }, function(resp) {
                 if (resp.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Terhapus!',
-                        text: resp.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
+                    Swal.fire('Dihapus!', resp.message, 'success').then(() => location.reload());
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: resp.message
-                    });
+                    Swal.fire('Gagal!', resp.message || 'Gagal menghapus outlet', 'error');
                 }
-            }, 'json');
+            }, 'json').fail(function() {
+                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+            });
         }
     });
 }
