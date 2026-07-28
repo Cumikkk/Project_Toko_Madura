@@ -19,78 +19,36 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
     public function getAuthrorizedPermissions(int $adminid): array {
         try {
             global $_SESSION;
-
-            $roleCheck = $this->db->query("SELECT role FROM users WHERE id_users = {$adminid} LIMIT 1");
-            $isProgrammer = false;
-            if ($roleCheck && $roleCheck->num_rows > 0) {
-                $uRole = strtolower($roleCheck->fetch_assoc()['role'] ?? '');
-                if ($uRole === 'programmer') {
-                    $isProgrammer = true;
-                }
-            }
-
-            if ($isProgrammer) {
-                $sqlGetModule = $this->db->query("
-                    SELECT 	
-                        module.*,
-                        ap.id as permission_id,
-                        ap.`code`,
-                        ap.`desc`,
-                        ap.url,
-                        COALESCE(aa.`status`, -1) as status,
-                        aa.created_at,
-                        aa.updated_at
-                    FROM admin_permissions ap
-                    LEFT JOIN admin_authorize aa ON (aa.permission_id = ap.id AND aa.admin_id = {$adminid})
-                    JOIN (
-                        SELECT 
-                            amg.id as group_id,
-                            amg.`order` as group_order,
-                            amg.`group`,
-                            amg.icon,
-                            amg.min_level,
-                            amg.type,
-                            am.id as module_id,
-                            am.module,
-                            am.`status` as module_status,
-                            am.visible
-                        FROM admin_module am
-                        JOIN admin_module_group amg ON (amg.id = am.group_id)
-                    ) as module ON (module.module_id = ap.module_id)
-                    ORDER BY module.group_order ASC, module.group_id ASC, ap.module_id ASC
-                ");
-            } else {
-                $sqlGetModule = $this->db->query("
-                    SELECT 	
-                        module.*,
-                        ap.id as permission_id,
-                        ap.`code`,
-                        ap.`desc`,
-                        ap.url,
-                        aa.`status`,
-                        aa.created_at,
-                        aa.updated_at
-                    FROM admin_permissions ap
-                    JOIN admin_authorize aa ON (aa.permission_id = ap.id)
-                    JOIN (
-                        SELECT 
-                            amg.id as group_id,
-                            amg.`order` as group_order,
-                            amg.`group`,
-                            amg.icon,
-                            amg.min_level,
-                            amg.type,
-                            am.id as module_id,
-                            am.module,
-                            am.`status` as module_status,
-                            am.visible
-                        FROM admin_module am
-                        JOIN admin_module_group amg ON (amg.id = am.group_id)
-                    ) as module ON (module.module_id = ap.module_id)
-                    WHERE aa.admin_id = {$adminid}
-                    ORDER BY module.group_order ASC, module.group_id ASC, ap.module_id ASC
-                ");
-            }
+            $sqlGetModule = $this->db->query("
+                SELECT 	
+                    module.*,
+                    ap.id as permission_id,
+                    ap.`code`,
+	                ap.`desc`,
+                    ap.url,
+                    aa.`status`,
+                    aa.created_at,
+                    aa.updated_at
+                FROM admin_permissions ap
+                JOIN admin_authorize aa ON (aa.permission_id = ap.id)
+                JOIN (
+                    SELECT 
+                        amg.id as group_id,
+                        amg.`order` as group_order,
+                        amg.`group`,
+                        amg.icon,
+                        amg.min_level,
+                        amg.type,
+                        am.id as module_id,
+                        am.module,
+                        am.`status` as module_status,
+                        am.visible
+                    FROM admin_module am
+                    JOIN admin_module_group amg ON (amg.id = am.group_id)
+                ) as module ON (module.module_id = ap.module_id)
+                WHERE aa.admin_id = {$adminid}
+                ORDER BY module.group_order ASC, module.group_id ASC, ap.module_id ASC
+            ");
 
             $result = [];
             foreach($sqlGetModule->fetch_all(MYSQLI_ASSOC) as $module) {
@@ -294,9 +252,10 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                             break;
                         }
 
-                        $basePattern = str_replace(['/*', '/.*'], '', $perm['pattern']);
-                        $pattern1 = preg_quote($basePattern, "#");
-                        $regex = "#^" . $pattern1 . "(?:/.*)?$#";
+                        $pattern1 = preg_quote($perm['pattern'], "#");
+                        $pattern2 = str_replace("\*", ".*", $pattern1);
+                        $regexPattern = str_replace("\/.*", "(?:/.*)?", $pattern2);
+                        $regex = "#^" . $regexPattern . "$#";
 
                         $cleanUri = preg_replace('#^/admin/#', '/', $requestUri);
                         if(preg_match($regex, $requestUri) || preg_match($regex, $cleanUri)) {
@@ -318,7 +277,7 @@ class AdminPermissionCore implements AdminPermissionCoreInterface {
                 return false;
             }
 
-            $patternReplace = str_replace(["/*", "/.*"], "", $permission['pattern']);
+            $patternReplace = str_replace(["/.*", "\\"], ["", ""], $pattern2);
             $filepath = "/doc/";
             $filepath .= UrlParser::urlToPath(explode("/", $patternReplace), "view");
             $filepath .= ".php";
