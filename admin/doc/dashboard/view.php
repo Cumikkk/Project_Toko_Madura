@@ -89,6 +89,13 @@ $recentRequests = $db->query("
     </div>
 </div>
 
+<style>
+    .table-dashboard-summary th, 
+    .table-dashboard-summary td {
+        border: 1px solid #e1e6f1 !important;
+    }
+</style>
+
 <!-- Row Summary Tables -->
 <div class="row row-sm">
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
@@ -100,7 +107,7 @@ $recentRequests = $db->query("
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle mb-0">
+                    <table class="table table-bordered table-dashboard-summary table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 10%;">No</th>
@@ -140,7 +147,7 @@ $recentRequests = $db->query("
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle mb-0">
+                    <table class="table table-bordered table-dashboard-summary table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 10%;">No</th>
