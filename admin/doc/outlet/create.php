@@ -65,7 +65,7 @@ $investorList = $db->query("
                     <?php endif; ?>
 
                     <div class="row">
-                        <!-- BARIS 1: INFORMASI TOKO & INVESTOR -->
+                        <!-- 1. NAMA TOKO - INVESTOR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Toko</label>
@@ -90,25 +90,15 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- BARIS 2: KECAMATAN & PENGELOLA -->
+                        <!-- 2. NAMA PENGELOLA - NO HP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
-                                    placeholder="Contoh: Waru"
-                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Toko (Kasir)</label>
+                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola (Kasir)</label>
                                 <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
                                     placeholder="Contoh: Budi Santoso"
                                     value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
                             </div>
                         </div>
-
-                        <!-- BARIS 3: KONTAK & USERNAME KASIR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kasir_no_hp" class="form-label fw-bold">No. HP Kasir (Opsional)</label>
@@ -117,6 +107,8 @@ $investorList = $db->query("
                                     value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
                             </div>
                         </div>
+
+                        <!-- 3. USERNAME - PASSWORD -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kasir_username" class="form-label fw-bold">Username Login Kasir</label>
@@ -125,9 +117,7 @@ $investorList = $db->query("
                                     value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
                             </div>
                         </div>
-
-                        <!-- BARIS 4: PASSWORD & ALAMAT -->
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kasir_password" class="form-label fw-bold">
                                     Password Login Kasir <?= $isEdit ? '<span class="text-muted fw-normal">(Opsional)</span>' : ''; ?>
@@ -135,10 +125,21 @@ $investorList = $db->query("
                                 <input type="password" class="form-control" id="kasir_password" name="kasir_password"
                                     placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password kasir'; ?>"
                                     <?= $isEdit ? '' : 'required'; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, kecil & angka.</small>
                             </div>
                         </div>
 
+                        <!-- 4. KECAMATAN -->
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
+                                    placeholder="Contoh: Waru"
+                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- 5. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet</label>

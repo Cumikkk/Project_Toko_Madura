@@ -121,18 +121,18 @@ $rejectedOutlets = $db->query("
                 <!-- Navigation Tabs -->
                 <ul class="nav nav-pills mb-3 gap-2" id="outlet-tab-list" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">
+                        <button class="nav-link tab-bordered-btn active" id="active-tab" data-bs-toggle="pill" data-bs-target="#tab-active" type="button" role="tab" aria-controls="tab-active" aria-selected="true">
                             <i class="fas fa-store me-1"></i> Outlet Aktif <span class="badge bg-success ms-1"><?= $activeCount ?></span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">
-                            <i class="fas fa-clock me-1"></i> Request Outlet <?php if ($pendingCount > 0) : ?><span class="badge bg-warning text-dark ms-1"><?= $pendingCount ?></span><?php endif; ?>
+                        <button class="nav-link tab-bordered-btn" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">
+                            <i class="fas fa-clock me-1 text-warning"></i> Request Outlet <?php if ($pendingCount > 0) : ?><span class="badge bg-warning text-dark ms-1"><?= $pendingCount ?></span><?php endif; ?>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reject-tab" data-bs-toggle="pill" data-bs-target="#tab-reject" type="button" role="tab" aria-controls="tab-reject" aria-selected="false">
-                            <i class="fas fa-times-circle me-1"></i> Ditolak <?php if ($rejectCount > 0) : ?><span class="badge bg-danger ms-1"><?= $rejectCount ?></span><?php endif; ?>
+                        <button class="nav-link tab-bordered-btn" id="reject-tab" data-bs-toggle="pill" data-bs-target="#tab-reject" type="button" role="tab" aria-controls="tab-reject" aria-selected="false">
+                            <i class="fas fa-times-circle me-1 text-danger"></i> Ditolak <?php if ($rejectCount > 0) : ?><span class="badge bg-danger ms-1"><?= $rejectCount ?></span><?php endif; ?>
                         </button>
                     </li>
                 </ul>

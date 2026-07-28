@@ -26,29 +26,36 @@
     margin-bottom: 16px !important;
 }
 
-/* Nav Pills Tab Buttons Border & Styling */
-.nav-pills .nav-link {
-    border: 1px solid #d1d5db !important;
-    background-color: #f8f9fa !important;
-    color: #495057 !important;
+/* High-Specificity Nav Pills Tab Buttons Border & Styling */
+.nav-pills .nav-item .nav-link,
+.nav-pills .nav-link,
+.tab-bordered-btn {
+    border: 1px solid #b0b8c5 !important;
+    background-color: #ffffff !important;
+    color: #333333 !important;
     border-radius: 6px !important;
-    padding: 8px 16px !important;
-    font-weight: 500 !important;
-    transition: all 0.2s ease-in-out;
+    padding: 8px 18px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
-.nav-pills .nav-link.active {
+.nav-pills .nav-item .nav-link.active,
+.nav-pills .nav-link.active,
+.tab-bordered-btn.active {
     background-color: #6259ca !important;
     border-color: #6259ca !important;
     color: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(98, 89, 202, 0.2);
+    box-shadow: 0 4px 8px rgba(98, 89, 202, 0.25) !important;
 }
 
-.nav-pills .nav-link:hover:not(.active) {
-    background-color: #e9ecef !important;
-    border-color: #b0b5bc !important;
-    color: #212529 !important;
+.nav-pills .nav-item .nav-link:hover:not(.active),
+.nav-pills .nav-link:hover:not(.active),
+.tab-bordered-btn:hover:not(.active) {
+    background-color: #f0f2f9 !important;
+    border-color: #6259ca !important;
+    color: #6259ca !important;
 }
+
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
