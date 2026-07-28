@@ -16,14 +16,17 @@ if ($loggedInLevel == 1) {
     $whereClause = "WHERE i.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
 }
 
-// Fetch investors list with Master Owner name
+// Fetch investors list with Master Owner name and active outlet counts
 $investors = $db->query("
     SELECT i.*, u.nama_lengkap, u.username, u.no_hp,
-           u_master.nama_lengkap as nama_master
+           u_master.nama_lengkap as nama_master,
+           COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM investor i
     JOIN users u ON (u.id_users = i.id_users)
     LEFT JOIN users u_master ON (u_master.id_users = i.id_master)
+    LEFT JOIN outlet o ON (o.id_investor = i.id_investor AND o.status = 'active')
     {$whereClause}
+    GROUP BY i.id_investor
     ORDER BY u.nama_lengkap ASC
 ");
 ?>
@@ -61,6 +64,7 @@ $investors = $db->query("
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
+                                <th class="text-center">Total Outlet Active</th>
                                 <th class="text-center">Tanggal Bergabung</th>
                                 <th class="text-center" width="15%">#</th>
                             </tr>
@@ -86,6 +90,7 @@ $investors = $db->query("
                                         </td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
+                                        <td class="text-center"><span class="badge bg-success fs-6"><?= number_format($row['total_outlet'] ?? 0) ?> Toko</span></td>
                                         <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
@@ -101,7 +106,7 @@ $investors = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
+                                    <td colspan="10" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

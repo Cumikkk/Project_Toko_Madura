@@ -4,7 +4,7 @@ use App\Models\Admin;
 $loggedInUser = Admin::authentication();
 $loggedInLevel = intval($loggedInUser['ADM_LEVEL'] ?? 1);
 
-$whereClause = "WHERE role IN ('programmer', 'master')";
+$whereClause = "WHERE role = 'programmer'";
 
 $dt->query("
     SELECT

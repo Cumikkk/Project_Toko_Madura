@@ -55,8 +55,9 @@ if($check_password !== TRUE) {
 }
 
 $add_phone = !empty($data['add-phone']) ? $data['add-phone'] : null;
+$add_level = intval($data['add-level'] ?? 1);
 
-$roleEnum = ($add_level == 1) ? 'programmer' : 'master';
+$roleEnum = 'programmer';
 
 // Insert into users table
 $insert = Database::insert("users", [

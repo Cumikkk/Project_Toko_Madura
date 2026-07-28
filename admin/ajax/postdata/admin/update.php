@@ -58,14 +58,30 @@ if($sql_check_username->num_rows != 0) {
 }
 
 $phone = !empty($data['no_hp']) ? $data['no_hp'] : null;
-$level = intval($data['level'] ?? 2);
+$level = intval($data['level'] ?? 1);
+$password = !empty($data['password']) ? trim($data['password']) : null;
 
-// Update users table
-$update = Database::update("users", [
+$updateFields = [
     'nama_lengkap' => $fullname,
     'username'     => $username,
     'no_hp'        => $phone
-], ['id_users' => $admin_id]);
+];
+
+if (!empty($password)) {
+    $check_password = Helper::validation_password($password);
+    if ($check_password !== true) {
+        JsonResponse([
+            'code'      => 200,
+            'success'   => false,
+            'message'   => $check_password,
+            'data'      => []
+        ]);
+    }
+    $updateFields['password'] = password_hash($password, PASSWORD_BCRYPT);
+}
+
+// Update users table
+$update = Database::update("users", $updateFields, ['id_users' => $admin_id]);
 
 if(!$update) {
     JsonResponse([

@@ -1,95 +1,87 @@
 <?php 
 use App\Models\Admin;
-use App\Models\Country;
 use App\Models\Helper;
+use Config\Core\SystemInfo;
 
 if(!$adminPermissionCore->isHavePermission($moduleId, "update")) {
-    $redirectUrl = \Config\Core\SystemInfo::app('ADMIN_URL') . '/admin/view';
+    $redirectUrl = SystemInfo::app('ADMIN_URL') . '/admin/view';
     die("<script>location.href = '{$redirectUrl}'; </script>");
 }
 
 $adminId = Helper::form_input(!empty($_GET['c']) ? $_GET['c'] : ($_GET['b'] ?? 0));
 $admin = Admin::findById($adminId);
 if(!$admin) {
-    $redirectUrl = \Config\Core\SystemInfo::app('ADMIN_URL') . '/admin/view';
+    $redirectUrl = SystemInfo::app('ADMIN_URL') . '/admin/view';
     die("<script>alert('ID Admin tidak valid'); location.href = '{$redirectUrl}'; </script>");
 }
 ?>
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">Update Admin</h2>
+        <h2 class="main-content-title tx-24 mg-b-5">Edit Data Admin</h2>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= pathbreadcrumb(0) ?>/dashboard">Home</a></li>
-            <li class="breadcrumb-item"><a href="<?= pathbreadcrumb(1) ?>/view">Admin</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Update</li>
+            <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
+            <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/admin/view">Admin</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Data</li>
         </ol>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6 mb-3">
-        <div class="card">
+    <div class="col-md-10 mx-auto mb-3">
+        <div class="card custom-card overflow-hidden">
             <div class="card-header">
-                <h5 class="card-title">Admin <b class="text-primary"><?= $admin['ADM_NAME'] ?></b></h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Form Edit Data Admin</h5>
+                </div>
             </div>
             <div class="card-body">
                 <form action="" method="post" id="form-update-admin">
                     <input type="hidden" name="admin_id" value="<?= $admin['ID_ADM']; ?>">
+                    
                     <div class="row">
-                        <div class="col-md-12">
+                        <!-- BARIS 1: NAMA LENGKAP ADMIN & NO. HP -->
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="fullname" class="form-label">Fullname</label>
-                                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" value="<?= $admin['ADM_NAME'] ?>" required>
+                                <label for="fullname" class="form-label fw-bold">Nama Lengkap Admin</label>
+                                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Contoh: Fahrul Alfanani" value="<?= htmlspecialchars($admin['ADM_NAME'] ?? '') ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="<?= $admin['ADM_USER'] ?>" required>
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($admin['ADM_PHONE'] ?? '') ?>">
                             </div>
                         </div>
+
+                        <!-- BARIS 2: ROLE & USERNAME -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="level" class="form-label">Role / Level</label>
-                                <select name="level" id="level" class="form-control">
-                                    <option value="1" <?= ($admin['ADM_LEVEL'] == 1)? "selected" : ""; ?>>Programmer (Super Master)</option>
-                                    <option value="2" <?= ($admin['ADM_LEVEL'] == 2)? "selected" : ""; ?>>Master (Owner)</option>
-                                    <option value="3" <?= ($admin['ADM_LEVEL'] == 3)? "selected" : ""; ?>>Admin Staf</option>
+                                <label for="level" class="form-label fw-bold">Role</label>
+                                <select name="level" id="level" class="form-control" required>
+                                    <option value="1" selected>Admin (Programmer)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="no_hp" class="form-label">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="No HP admin" value="<?= htmlspecialchars($admin['ADM_PHONE'] ?? '') ?>">
+                                <label for="username" class="form-label fw-bold">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: admin_fahrul" value="<?= htmlspecialchars($admin['ADM_USER'] ?? '') ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-4 text-end">
-                            <button type="submit" class="btn btn-primary" data-original-text="Submit">Submit</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Update Password</h5>
-            </div>
-            <div class="card-body">
-                <form action="" method="post" id="form-update-password">
-                    <input type="hidden" name="admin_id" value="<?= $adminId ?>">
-                    <div class="row">
-                        <div class="col-md-12">
+
+                        <!-- BARIS 3: PASSWORD -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="new-password" class="form-control-label">Password Baru</label>
-                                <div class="input-group">
-                                    <input type="password" name="new-password" class="form-control" placeholder="Masukkan password baru (opsional)" value="" required>
-                                    <button type="submit" class="input-group-text bg-primary" data-original-text="Update">Update</button>
-                                </div>
+                                <label for="password" class="form-label fw-bold">Password (Opsional)</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Biarkan kosong jika tidak diubah">
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
+                        </div>
+
+                        <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
+                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/admin/view" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary" data-original-text="Submit">Simpan Perubahan</button>
                         </div>
                     </div>
                 </form>
@@ -105,31 +97,38 @@ if(!$admin) {
             let button = $(this).find('button[type="submit"]'), 
                 data = $(this).serialize();
                 
-            button.addClass('loading');
-            $.post("/ajax/post/admin/update", data, (resp) => {
-                button.removeClass('loading');
-                Swal.fire(resp.alert).then(() => {
-                    if(resp.success) {
-                        location.href = resp.data?.redirect;
-                    }
-                })
-            }, 'json');
-        })
-
-        $('#form-update-password').on('submit', function(el) {
-            el.preventDefault();
-            let button = $(this).find('button[type="submit"]'), 
-                data = $(this).serialize();
-                
-            button.addClass('loading');
-            $.post("/ajax/post/admin/updatePassword", data, (resp) => {
-                button.removeClass('loading');
-                Swal.fire(resp.alert).then(() => {
-                    if(resp.success) {
-                        location.reload();
-                    }
-                })
-            }, 'json');
-        })
-    })
+            button.addClass('loading').prop('disabled', true);
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/admin/update", data, (resp) => {
+                button.removeClass('loading').prop('disabled', false);
+                if (resp.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: resp.message || 'Data admin berhasil diperbarui.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.href = resp.data?.redirect || "<?= SystemInfo::app('ADMIN_URL') ?>/admin/view";
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Perhatian!',
+                        text: resp.message || 'Gagal memperbarui data admin.'
+                    });
+                }
+            }, 'json').fail(function(xhr) {
+                button.removeClass('loading').prop('disabled', false);
+                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Perhatian!',
+                    text: errorMsg
+                });
+            });
+        });
+    });
 </script>

@@ -51,7 +51,6 @@ $masters = $db->query($sqlMasters);
                                 <th class="text-center">Username</th>
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Total Investor</th>
-                                <th class="text-center">Total Outlet Active</th>
                                 <th class="text-center" style="width: 15%;">#</th>
                             </tr>
                         </thead>
@@ -67,9 +66,6 @@ $masters = $db->query($sqlMasters);
                                             <span class="badge bg-info fs-6"><?= number_format($row['total_investor']) ?> Investor</span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko</span>
-                                        </td>
-                                        <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/create?id=<?= $row['id_users'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Master"><i class="fas fa-edit"></i></a>
@@ -83,7 +79,7 @@ $masters = $db->query($sqlMasters);
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
+                                    <td colspan="6" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
