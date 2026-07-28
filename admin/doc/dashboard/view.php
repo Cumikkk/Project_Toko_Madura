@@ -16,9 +16,12 @@ $outletCount   = $db->query("SELECT COUNT(*) as total FROM outlet")->fetch_assoc
 
 // Top 5 Outlet berdasarkan Omzet
 $topOutlets = $db->query("
-    SELECT o.nama_outlet, SUM(l.omzet) as total_omzet
+    SELECT o.id_outlet, o.nama_outlet, o.kecamatan, o.alamat_outlet, SUM(l.omzet) as total_omzet,
+           u_inv.nama_lengkap as nama_investor
     FROM laporan_omzet l
     JOIN outlet o ON l.id_outlet = o.id_outlet
+    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
+    LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
     GROUP BY l.id_outlet
     ORDER BY total_omzet DESC
     LIMIT 5
@@ -110,8 +113,10 @@ $recentRequests = $db->query("
                     <table class="table table-bordered table-dashboard-summary table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="text-center" style="width: 10%;">No</th>
+                                <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
+                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Investor</th>
                                 <th class="text-center">Total Omzet</th>
                             </tr>
                         </thead>
@@ -123,12 +128,24 @@ $recentRequests = $db->query("
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                         </td>
+                                        <td class="text-center">
+                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-detail-alamat-outlet" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                        title="Lihat Alamat Lengkap">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-start"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">Belum ada data omzet.</td>
+                                    <td colspan="5" class="text-center text-muted py-4">Belum ada data omzet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -191,3 +208,18 @@ $recentRequests = $db->query("
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.btn-detail-alamat-outlet').on('click', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        Swal.fire({
+            title: 'Alamat Lengkap Outlet',
+            html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
+});
+</script>
