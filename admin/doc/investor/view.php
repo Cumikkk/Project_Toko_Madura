@@ -57,7 +57,7 @@ $investors = $db->query("
                                 <th class="text-center" style="width: 5%;">No</th>
                                 <th class="text-center">Nama Lengkap</th>
                                 <th class="text-center">Username</th>
-                                <th class="text-center">No HP</th>
+                                <th class="text-center">No. HP</th>
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
