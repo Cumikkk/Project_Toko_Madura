@@ -88,7 +88,7 @@ $requests = $db->query($sqlRequests);
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">List Request Outlet Toko Madura</h5>
+                    <h5 class="card-title">List Request Outlet</h5>
                 </div>
             </div>
             <div class="card-body">

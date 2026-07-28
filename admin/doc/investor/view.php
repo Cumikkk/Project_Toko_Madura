@@ -43,7 +43,7 @@ $investors = $db->query("
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">List Investor Toko Madura</h5>
+                    <h5 class="card-title">List Investor</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Investor</a>
                     <?php endif; ?>

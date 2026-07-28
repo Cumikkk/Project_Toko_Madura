@@ -44,7 +44,7 @@ $outlets = $db->query("
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">List Outlet Toko Madura</h5>
+                    <h5 class="card-title">List Outlet</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Outlet</a>
                     <?php endif; ?>
