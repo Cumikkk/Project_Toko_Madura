@@ -93,17 +93,19 @@ $recentRequests = $db->query("
 <div class="row row-sm">
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
     <div class="col-lg-6 mb-4">
-        <div class="card custom-card h-100 mb-0">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="main-content-label mb-0">Outlet dengan Omzet Tertinggi</h6>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+        <div class="card custom-card overflow-hidden">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center py-2.5 px-3">
+                <div>
+                    <h6 class="main-content-label mb-0">Outlet dengan Omzet Tertinggi</h6>
+                </div>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm py-1 px-2">Lihat Semua</a>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle mb-0">
+                    <table class="table table-bordered table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>No</th>
+                                <th class="text-center" style="width: 10%;">No</th>
                                 <th>Nama Outlet</th>
                                 <th class="text-end">Total Omzet</th>
                             </tr>
@@ -121,7 +123,7 @@ $recentRequests = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">Belum ada data omzet.</td>
+                                    <td colspan="3" class="text-center text-muted py-4">Belum ada data omzet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -133,14 +135,16 @@ $recentRequests = $db->query("
 
     <!-- REQUEST OUTLET TERBARU -->
     <div class="col-lg-6 mb-4">
-        <div class="card custom-card h-100 mb-0">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="main-content-label mb-0">Request Outlet Terbaru</h6>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+        <div class="card custom-card overflow-hidden">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center py-2.5 px-3">
+                <div>
+                    <h6 class="main-content-label mb-0">Request Outlet Terbaru</h6>
+                </div>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm py-1 px-2">Lihat Semua</a>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle mb-0">
+                    <table class="table table-bordered table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Nama Outlet</th>
@@ -172,7 +176,7 @@ $recentRequests = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">Belum ada request outlet.</td>
+                                    <td colspan="3" class="text-center text-muted py-4">Belum ada request outlet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

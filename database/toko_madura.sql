@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-28 09:23:25
+-- Generated: 2026-07-28 09:33:42
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -18,12 +18,12 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id_users`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `users`
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('1', 'Riski Ardhika', 'riski', NULL, NULL, '$2y$10$7ZFtaY7BgXqtmX/l0tpcq.YcEdsRzcPWsgSQox/GjVSq/w7G3/6kG', 'programmer');
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('47', 'Riski Ardhika', 'master', '0123456789', 'master@tokomadura.com', '$2y$10$XLk1LKK8f9iIg0CAIk5XcuydhM.5GNuaQuIZYvys.MdMZfFog3KfG', 'master');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('48', 'M. Fahrul Alfanani', 'investor', '0987654321', 'investor@tokomadura.com', '$2y$10$HojLbbL3hqEeUWapG9DWXOnnXEAvYwwENM4hWbxiQOZfwZg/H19HS', 'investor');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('48', 'M. Fahrul Alfanani', 'investor', '0987654321', 'investor@tokomadura.com', '$2y$10$PJoPaaGGwh6fM7ZR8wsuheJaKUeH1TicK2j1fmzZEMpedOmHQTvce', 'investor');
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('49', 'Muhhamad Tegar Kurniawan', 'outlet', '014785236', 'outlet@tokomadura.com', '$2y$10$ZvCsayL/4w91UIHvYCzC7exJjvS2oa6wuIYfKfcNRF3CMzmEJC7H.', 'outlet');
 
 -- --------------------------------------------------------
@@ -44,7 +44,7 @@ CREATE TABLE `investor` (
   KEY `id_master` (`id_master`),
   CONSTRAINT `investor_ibfk_1` FOREIGN KEY (`id_users`) REFERENCES `users` (`id_users`) ON DELETE CASCADE,
   CONSTRAINT `investor_ibfk_2` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `investor`
 INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', 'Tulangan', 'GMCF+C87, Kadelesan, Kedondong, Kec. Tulangan, Kabupaten Sidoarjo, Jawa Timur 61273', '50.00', '0.00', '2026-07-27 15:49:35');
