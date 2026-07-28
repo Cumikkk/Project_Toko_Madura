@@ -13,7 +13,7 @@ if ($idOutlet <= 0) {
     ]);
 }
 
-$update = $db->query("UPDATE outlet SET status = 'active', updated_at = NOW() WHERE id_outlet = {$idOutlet}");
+$update = $db->query("UPDATE outlet SET status = 'active', tanggal_disetujui = NOW() WHERE id_outlet = {$idOutlet}");
 
 if (!$update) {
     JsonResponse([

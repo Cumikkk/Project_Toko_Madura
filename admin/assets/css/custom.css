@@ -57,17 +57,17 @@
 }
 
 
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+/* Enable Number Spin Buttons (Up/Down Arrows) */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: inner-spin-button !important;
+    opacity: 1 !important;
 }
 
-/* Firefox */
 input[type=number] {
-    -moz-appearance: textfield;
+    -moz-appearance: number-input !important;
 }
+
 
 
 .custom-avatar-container {

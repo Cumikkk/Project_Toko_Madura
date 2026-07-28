@@ -24,7 +24,7 @@ if (empty($alasan)) {
 }
 
 $escapedAlasan = $db->real_escape_string($alasan);
-$update = $db->query("UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', updated_at = NOW() WHERE id_outlet = {$idOutlet}");
+$update = $db->query("UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', tanggal_ditolak = NOW() WHERE id_outlet = {$idOutlet}");
 
 if (!$update) {
     JsonResponse([

@@ -61,6 +61,7 @@ $investors = $db->query("
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
+                                <th class="text-center">Tanggal Bergabung</th>
                                 <th class="text-center" width="15%">#</th>
                             </tr>
                         </thead>
@@ -85,6 +86,7 @@ $investors = $db->query("
                                         </td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
+                                        <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
@@ -99,7 +101,7 @@ $investors = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
+                                    <td colspan="9" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

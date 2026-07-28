@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-28 11:57:31
+-- Generated: 2026-07-28 13:36:39
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -18,13 +18,14 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id_users`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `users`
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('1', 'Riski Ardhika', 'riski', NULL, NULL, '$2y$10$7ZFtaY7BgXqtmX/l0tpcq.YcEdsRzcPWsgSQox/GjVSq/w7G3/6kG', 'programmer');
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('47', 'Riski Ardhika 1', 'master', '0123456789', 'master@tokomadura.com', '$2y$10$XLk1LKK8f9iIg0CAIk5XcuydhM.5GNuaQuIZYvys.MdMZfFog3KfG', 'master');
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('48', 'M. Fahrul Alfanani', 'investor', '0987654321', 'investor@tokomadura.com', '$2y$10$PJoPaaGGwh6fM7ZR8wsuheJaKUeH1TicK2j1fmzZEMpedOmHQTvce', 'investor');
 INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('49', 'Muhhamad Tegar Kurniawan', 'outlet', '014785236', 'outlet@tokomadura.com', '$2y$10$ZvCsayL/4w91UIHvYCzC7exJjvS2oa6wuIYfKfcNRF3CMzmEJC7H.', 'outlet');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `email`, `password`, `role`) VALUES ('54', 'Haji Ahmad', 'ahmad', '0123456789', NULL, '$2y$10$6CNQ31gxJLBwIw.ilb2CX.RFEa6zcTnYsJ603A11E7N5/Z2edtvzy', 'investor');
 
 -- --------------------------------------------------------
 -- Table structure for `investor`
@@ -44,10 +45,11 @@ CREATE TABLE `investor` (
   KEY `id_master` (`id_master`),
   CONSTRAINT `investor_ibfk_1` FOREIGN KEY (`id_users`) REFERENCES `users` (`id_users`) ON DELETE CASCADE,
   CONSTRAINT `investor_ibfk_2` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `investor`
 INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', 'Tulangan', 'GMCF+C87, Kadelesan, Kedondong, Kec. Tulangan, Kabupaten Sidoarjo, Jawa Timur 61273', '50.00', '0.00', '2026-07-27 15:49:35');
+INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('17', '54', '47', 'Waru', 'mskasmmmmmk', '60.00', '0.00', '2026-07-28 13:24:27');
 
 -- --------------------------------------------------------
 -- Table structure for `outlet`
@@ -62,6 +64,9 @@ CREATE TABLE `outlet` (
   `kecamatan` varchar(100) DEFAULT NULL,
   `alamat_outlet` text DEFAULT NULL,
   `status` enum('pending','active','reject') NOT NULL DEFAULT 'active',
+  `tanggal_request` datetime DEFAULT current_timestamp(),
+  `tanggal_disetujui` datetime DEFAULT NULL,
+  `tanggal_ditolak` datetime DEFAULT NULL,
   `nominal_biaya` decimal(15,2) NOT NULL DEFAULT 0.00,
   `bukti_pembayaran` varchar(255) DEFAULT NULL,
   `alasan_penolakan` text DEFAULT NULL,
@@ -74,7 +79,7 @@ CREATE TABLE `outlet` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `outlet`
-INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `persentase_potongan`, `nama_outlet`, `kecamatan`, `alamat_outlet`, `status`, `nominal_biaya`, `bukti_pembayaran`, `alasan_penolakan`, `tanggal_bergabung`) VALUES ('10', '49', '14', '10.00', 'Toko Madura Merdeka', NULL, 'sidodadi', 'active', '0.00', NULL, NULL, '2026-07-27 15:49:36');
+INSERT INTO `outlet` (`id_outlet`, `id_users`, `id_investor`, `persentase_potongan`, `nama_outlet`, `kecamatan`, `alamat_outlet`, `status`, `tanggal_request`, `tanggal_disetujui`, `tanggal_ditolak`, `nominal_biaya`, `bukti_pembayaran`, `alasan_penolakan`, `tanggal_bergabung`) VALUES ('10', '49', '14', '10.00', 'Toko Madura Merdeka', NULL, 'sidodadi', 'active', '2026-07-27 15:49:36', '2026-07-27 15:49:36', NULL, '0.00', NULL, NULL, '2026-07-27 15:49:36');
 
 -- --------------------------------------------------------
 -- Table structure for `laporan_omzet`

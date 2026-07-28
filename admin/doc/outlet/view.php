@@ -150,6 +150,7 @@ $rejectedOutlets = $db->query("
                                         <th class="text-center">No. HP</th>
                                         <th class="text-center">Kecamatan</th>
                                         <th class="text-center">Investor</th>
+                                        <th class="text-center">Tanggal Disetujui</th>
                                         <th class="text-center" style="width: 15%;">#</th>
                                     </tr>
                                 </thead>
@@ -179,6 +180,7 @@ $rejectedOutlets = $db->query("
                                                         <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                     <?php endif; ?>
                                                 </td>
+                                                <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
                                                 <td class="text-center">
                                                     <div class="action d-flex justify-content-center gap-2">
                                                         <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
@@ -193,7 +195,7 @@ $rejectedOutlets = $db->query("
                                         <?php endwhile; ?>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">Belum ada data toko aktif.</td>
+                                            <td colspan="8" class="text-center text-muted py-4">Belum ada data toko aktif.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -253,7 +255,7 @@ $rejectedOutlets = $db->query("
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?>
+                                                    <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center gap-1">
@@ -290,6 +292,7 @@ $rejectedOutlets = $db->query("
                                         <th class="text-center">Biaya Langganan</th>
                                         <th class="text-center">Alasan Penolakan</th>
                                         <th class="text-center">Tanggal Request</th>
+                                        <th class="text-center">Tanggal Ditolak</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -322,13 +325,16 @@ $rejectedOutlets = $db->query("
                                                     <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i><?= htmlspecialchars($row['alasan_penolakan'] ?? 'Tidak ada catatan') ?></span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?>
+                                                    <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
                                     <?php else : ?>
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">Belum ada request outlet yang ditolak.</td>
+                                            <td colspan="8" class="text-center text-muted py-4">Belum ada request outlet yang ditolak.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
