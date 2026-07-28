@@ -7,6 +7,16 @@ $data = Helper::getSafeInput($_POST);
 $idUsers = intval($data['id_users'] ?? 0);
 $isEdit  = ($idUsers > 0);
 
+$requiredPerm = $isEdit ? "/master/update" : "/master/create";
+if (!$adminPermissionCore->hasPermission($authorizedPermission, $requiredPerm) && !$adminPermissionCore->hasPermission($authorizedPermission, "/master/create")) {
+    JsonResponse([
+        'code'      => 200,
+        'success'   => false,
+        'message'   => "Authorization Failed",
+        'data'      => []
+    ]);
+}
+
 $nama_lengkap = trim($data['nama_lengkap'] ?? '');
 $username     = trim($data['username'] ?? '');
 $password     = trim($data['password'] ?? '');

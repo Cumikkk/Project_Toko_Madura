@@ -2,6 +2,15 @@
 use App\Models\Helper;
 use Config\Core\Database;
 
+if (!$adminPermissionCore->hasPermission($authorizedPermission, "/master/delete")) {
+    JsonResponse([
+        'code'      => 200,
+        'success'   => false,
+        'message'   => "Authorization Failed",
+        'data'      => []
+    ]);
+}
+
 $data = Helper::getSafeInput($_POST);
 $idUsers = intval($data['id_users'] ?? 0);
 
