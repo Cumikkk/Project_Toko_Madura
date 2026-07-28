@@ -34,8 +34,8 @@ $masters = $db->query($sqlMasters);
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0">List Master</h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">List Master</h5>
                     <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Tambah Master</a>
                     <?php endif; ?>
