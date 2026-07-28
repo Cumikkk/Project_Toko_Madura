@@ -92,27 +92,22 @@ $recentRequests = $db->query("
     </div>
 </div>
 
-<style>
-    .table-dashboard-summary th, 
-    .table-dashboard-summary td {
-        border: 1px solid #e1e6f1 !important;
-    }
-</style>
-
 <!-- Row Summary Tables -->
 <div class="row row-sm">
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header border-bottom d-flex align-items-center justify-content-between px-3" style="padding-top: 10px; padding-bottom: 10px; min-height: 48px;">
-                <h6 class="main-content-label mb-0" style="line-height: 1.2; margin: 0; padding: 0;">Outlet dengan Omzet Tertinggi</h6>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-outline-primary btn-sm py-1 px-2" style="line-height: 1.2;">Lihat Semua</a>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Outlet dengan Omzet Tertinggi</h5>
+                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/omzet/view" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
+                </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-dashboard-summary table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
+                        <thead>
+                            <tr class="text-center">
                                 <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Kecamatan</th>
@@ -158,15 +153,17 @@ $recentRequests = $db->query("
     <!-- REQUEST OUTLET TERBARU -->
     <div class="col-lg-6 mb-4">
         <div class="card custom-card overflow-hidden">
-            <div class="card-header border-bottom d-flex align-items-center justify-content-between px-3" style="padding-top: 10px; padding-bottom: 10px; min-height: 48px;">
-                <h6 class="main-content-label mb-0" style="line-height: 1.2; margin: 0; padding: 0;">Request Outlet Terbaru</h6>
-                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-outline-primary btn-sm py-1 px-2" style="line-height: 1.2;">Lihat Semua</a>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Request Outlet Terbaru</h5>
+                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/request-outlet/view" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
+                </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-dashboard-summary table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
+                        <thead>
+                            <tr class="text-center">
                                 <th class="text-center" style="width: 10%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Investor</th>
