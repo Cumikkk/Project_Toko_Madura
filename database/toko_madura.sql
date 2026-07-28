@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-27 17:17:59
+-- Generated: 2026-07-28 08:51:12
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -34,6 +34,7 @@ CREATE TABLE `investor` (
   `id_investor` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_users` int(10) unsigned NOT NULL,
   `id_master` int(10) unsigned NOT NULL,
+  `kecamatan` varchar(100) DEFAULT NULL,
   `alamat_investor` text DEFAULT NULL,
   `persen_bagian_investor` decimal(5,2) NOT NULL DEFAULT 50.00,
   `persen_bagian_master` decimal(5,2) NOT NULL DEFAULT 0.00,
@@ -46,7 +47,7 @@ CREATE TABLE `investor` (
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `investor`
-INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', 'sidodadi', '50.00', '0.00', '2026-07-27 15:49:35');
+INSERT INTO `investor` (`id_investor`, `id_users`, `id_master`, `kecamatan`, `alamat_investor`, `persen_bagian_investor`, `persen_bagian_master`, `tanggal_bergabung`) VALUES ('14', '48', '47', NULL, 'sidodadi', '50.00', '0.00', '2026-07-27 15:49:35');
 
 -- --------------------------------------------------------
 -- Table structure for `outlet`
@@ -145,7 +146,7 @@ INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_l
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('2', '2', 'Investor', 'single', 'fa fa-handshake-o sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('3', '7', 'Admin', 'single', 'ti-user sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('4', '8', 'Developer', 'dropdown', 'ti-panel sidemenu-icon menu-icon', '1');
-INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '3', 'Outlet', 'single', 'fa fa-building sidemenu-icon menu-icon', '1');
+INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('5', '3', 'Outlet', 'dropdown', 'fa fa-building sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('6', '4', 'Omzet', 'single', 'ti-stats-up sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('7', '5', 'Bagi Hasil', 'single', 'ti-wallet sidemenu-icon menu-icon', '1');
 INSERT INTO `admin_module_group` (`id`, `order`, `group`, `type`, `icon`, `min_level`) VALUES ('8', '6', 'Pengaturan', 'dropdown', 'fa fa-cog sidemenu-icon menu-icon', '1');
@@ -176,7 +177,7 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('4', '1', '3', 'Admin', '-1', '-1', '2026-07-23 12:19:52', NULL);
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('5', '1', '4', 'group', '-1', '-1', '2026-07-23 12:19:52', NULL);
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('6', '2', '4', 'module', '-1', '-1', '2026-07-23 12:19:52', NULL);
-INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('7', '4', '5', 'Outlet', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
+INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('7', '1', '5', 'Outlet', '-1', '-1', '2026-07-23 15:47:15', '2026-07-28 08:49:08');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('8', '5', '6', 'Omzet', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('9', '6', '7', 'Bagi Hasil', '-1', '-1', '2026-07-23 15:47:15', '2026-07-24 13:46:45');
 INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `visible`, `created_at`, `updated_at`) VALUES ('16', '2', '5', 'request-outlet', '-1', '-1', '2026-07-27 15:53:00', NULL);

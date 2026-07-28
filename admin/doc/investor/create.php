@@ -72,13 +72,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.</small>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="email" class="form-label fw-bold">Email (Opsional)</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Contoh: investor@tokomadura.com" value="<?= htmlspecialchars($investorData['email'] ?? ''); ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
                                 <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 08123456789" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
@@ -86,8 +80,14 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
                                 <label for="alamat_investor" class="form-label fw-bold">Alamat Investor</label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Masukkan alamat domisili investor"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
+                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Masukkan alamat lengkap investor"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">

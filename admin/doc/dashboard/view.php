@@ -51,37 +51,45 @@ $recentOmzet = $db->query("
     </div>
 </div>
 
-<!-- Row Stat Cards -->
+<!-- Row Stat Cards (RRFX Default Template Style) -->
 <div class="row row-sm">
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-primary text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Total Investor</p>
-                <h3 class="mb-0 fw-bold"><?= number_format($investorCount) ?></h3>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Total Investor</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-handshake-o icon-size float-start text-primary"></i><span><?= number_format($investorCount) ?></span></h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-success text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Total Outlet Cabang</p>
-                <h3 class="mb-0 fw-bold"><?= number_format($outletCount) ?></h3>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Total Outlet Cabang</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-building icon-size float-start text-success"></i><span><?= number_format($outletCount) ?></span></h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-warning text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Akumulasi Omzet Kotor</p>
-                <h4 class="mb-0 fw-bold">Rp <?= number_format($totalOmzet, 0, ',', '.') ?></h4>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Akumulasi Omzet</h6>
+                    <h4 class="text-end mb-0"><i class="fa fa-line-chart icon-size float-start text-warning"></i><span>Rp <?= number_format($totalOmzet, 0, ',', '.') ?></span></h4>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-info text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Total Potongan (10%)</p>
-                <h4 class="mb-0 fw-bold">Rp <?= number_format($totalPotongan, 0, ',', '.') ?></h4>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Total Potongan (10%)</h6>
+                    <h4 class="text-end mb-0"><i class="fa fa-calculator icon-size float-start text-info"></i><span>Rp <?= number_format($totalPotongan, 0, ',', '.') ?></span></h4>
+                </div>
             </div>
         </div>
     </div>

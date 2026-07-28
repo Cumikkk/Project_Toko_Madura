@@ -38,41 +38,45 @@ $requests = $db->query($sqlRequests);
     </div>
 </div>
 
-<!-- Summary Cards -->
+<!-- Summary Cards (RRFX Default Template Style) -->
 <div class="row row-sm mb-3">
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-warning text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Pending Request</p>
-                <h3 class="mb-0 fw-bold"><?= $pendingCount ?></h3>
-                <small class="opacity-75">Menunggu Pembayaran / Verifikasi</small>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Pending Request</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-clock-o icon-size float-start text-warning"></i><span><?= $pendingCount ?></span></h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-success text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Outlet Active</p>
-                <h3 class="mb-0 fw-bold"><?= $activeCount ?></h3>
-                <small class="opacity-75">Resmi Aktif Beroperasi</small>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Outlet Active</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-check-circle icon-size float-start text-success"></i><span><?= $activeCount ?></span></h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-danger text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Request Rejected</p>
-                <h3 class="mb-0 fw-bold"><?= $rejectCount ?></h3>
-                <small class="opacity-75">Ditolak oleh Admin</small>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Request Rejected</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-danger"></i><span><?= $rejectCount ?></span></h3>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <div class="card custom-card bg-primary text-white">
-            <div class="card-body text-center">
-                <p class="mb-1 fs-12 fw-bold opacity-75">Total Biaya Langganan</p>
-                <h4 class="mb-0 fw-bold">Rp <?= number_format($totalRevenue, 0, ',', '.') ?></h4>
-                <small class="opacity-75">Outlet Aktif</small>
+        <div class="card custom-card">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Biaya Langganan</h6>
+                    <h4 class="text-end mb-0"><i class="fa fa-money icon-size float-start text-primary"></i><span>Rp <?= number_format($totalRevenue, 0, ',', '.') ?></span></h4>
+                </div>
             </div>
         </div>
     </div>

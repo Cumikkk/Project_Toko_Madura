@@ -63,8 +63,8 @@ $investors = $db->query("
                                 <th>Nama Lengkap</th>
                                 <th>Username</th>
                                 <th>No HP</th>
-                                <th>Email</th>
-                                <th>Alamat Domisili</th>
+                                <th>Kecamatan</th>
+                                <th>Alamat Investor</th>
                                 <th>Bagi Hasil (%)</th>
                                 <th>Master Owner</th>
                                 <th width="15%">#</th>
@@ -78,7 +78,7 @@ $investors = $db->query("
                                         <td><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
                                         <td><code><?= htmlspecialchars($row['username']) ?></code></td>
                                         <td><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['email'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></td>
                                         <td><?= htmlspecialchars($row['alamat_investor'] ?? '-') ?></td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>

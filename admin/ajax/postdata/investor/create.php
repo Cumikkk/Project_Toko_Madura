@@ -20,11 +20,11 @@ if (!$adminPermissionCore->hasPermission($authorizedPermission, $requiredPerm) &
 $nama_lengkap = $data['nama_lengkap'] ?? '';
 $username     = $data['username'] ?? '';
 $password     = $data['password'] ?? '';
-$email        = !empty($data['email']) ? $data['email'] : null;
 $no_hp        = !empty($data['no_hp']) ? $data['no_hp'] : null;
+$kecamatan    = !empty($data['kecamatan']) ? $data['kecamatan'] : null;
 $alamat       = !empty($data['alamat_investor']) ? $data['alamat_investor'] : null;
-$persenRaw = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
-$persen    = floatval($persenRaw);
+$persenRaw    = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
+$persen       = floatval($persenRaw);
 
 if (empty($nama_lengkap) || empty($username)) {
     JsonResponse([
@@ -65,6 +65,12 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
     ]);
 }
 
+$nameSafe     = $db->real_escape_string($nama_lengkap);
+$usernameSafe = $db->real_escape_string($username);
+$hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
+$kecVal       = $kecamatan ? "'" . $db->real_escape_string($kecamatan) . "'" : "NULL";
+$alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
+
 if ($isEdit) {
     // 1. Edit Mode
     $resInv = $db->query("SELECT id_users FROM investor WHERE id_investor = {$idInvestor} LIMIT 1");
@@ -79,7 +85,7 @@ if ($isEdit) {
     $userId = intval($resInv->fetch_assoc()['id_users']);
 
     // Username uniqueness check excluding current user
-    $sql_check = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('".$db->real_escape_string($username)."') AND id_users != {$userId} LIMIT 1");
+    $sql_check = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('{$usernameSafe}') AND id_users != {$userId} LIMIT 1");
     if ($sql_check && $sql_check->num_rows > 0) {
         JsonResponse([
             'code'      => 200,
@@ -92,13 +98,14 @@ if ($isEdit) {
     // Update users table
     if (!empty($password)) {
         $hashedPass = password_hash($password, PASSWORD_BCRYPT);
-        $db->query("UPDATE users SET nama_lengkap = '".$db->real_escape_string($nama_lengkap)."', username = '".$db->real_escape_string($username)."', email = ".($email ? "'".$db->real_escape_string($email)."'" : "NULL").", no_hp = ".($no_hp ? "'".$db->real_escape_string($no_hp)."'" : "NULL").", password = '".$db->real_escape_string($hashedPass)."' WHERE id_users = {$userId}");
+        $passSafe   = $db->real_escape_string($hashedPass);
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, password = '{$passSafe}' WHERE id_users = {$userId}");
     } else {
-        $db->query("UPDATE users SET nama_lengkap = '".$db->real_escape_string($nama_lengkap)."', username = '".$db->real_escape_string($username)."', email = ".($email ? "'".$db->real_escape_string($email)."'" : "NULL").", no_hp = ".($no_hp ? "'".$db->real_escape_string($no_hp)."'" : "NULL")." WHERE id_users = {$userId}");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal} WHERE id_users = {$userId}");
     }
 
     // Update investor table
-    $db->query("UPDATE investor SET alamat_investor = ".($alamat ? "'".$db->real_escape_string($alamat)."'" : "NULL").", persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
+    $db->query("UPDATE investor SET kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
 
     JsonResponse([
         'code'      => 200,
@@ -111,7 +118,7 @@ if ($isEdit) {
 
 } else {
     // 2. Create Mode
-    $sql_check = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('".$db->real_escape_string($username)."') LIMIT 1");
+    $sql_check = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('{$usernameSafe}') LIMIT 1");
     if ($sql_check && $sql_check->num_rows > 0) {
         JsonResponse([
             'code'      => 200,
@@ -121,15 +128,10 @@ if ($isEdit) {
         ]);
     }
 
-    // Insert user dengan raw query agar tidak terkena bug Database::insert pada tipe enum/decimal
-    $hashedPass   = password_hash($password, PASSWORD_BCRYPT);
-    $nameSafe     = $db->real_escape_string($nama_lengkap);
-    $usernameSafe = $db->real_escape_string($username);
-    $emailVal     = $email ? "'" . $db->real_escape_string($email) . "'" : "NULL";
-    $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
-    $passSafe     = $db->real_escape_string($hashedPass);
+    $hashedPass = password_hash($password, PASSWORD_BCRYPT);
+    $passSafe   = $db->real_escape_string($hashedPass);
 
-    $db->query("INSERT INTO users (nama_lengkap, username, email, no_hp, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$emailVal}, {$hpVal}, '{$passSafe}', 'investor')");
+    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, '{$passSafe}', 'investor')");
 
     if ($db->affected_rows < 1) {
         JsonResponse([
@@ -142,10 +144,8 @@ if ($isEdit) {
 
     $newUserId = $db->insert_id;
     $masterId  = intval($user['ADM_ID'] ?? 1);
-    $alamatVal = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
 
-    // Insert investor dengan raw query agar decimal tidak error di Database::insert
-    $db->query("INSERT INTO investor (id_users, id_master, alamat_investor, persen_bagian_investor) VALUES ({$newUserId}, {$masterId}, {$alamatVal}, {$persen})");
+    $db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$masterId}, {$kecVal}, {$alamatVal}, {$persen}, NOW())");
 
     if ($db->affected_rows < 1) {
         JsonResponse([
