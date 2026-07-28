@@ -44,7 +44,7 @@ class Admin extends AdminAuth {
                 'ADM_ID' => $rawUser['id_users'],
                 'ADM_NAME' => $rawUser['nama_lengkap'],
                 'ADM_USER' => $rawUser['username'],
-                'ADM_EMAIL' => $rawUser['email'],
+                'ADM_EMAIL' => $rawUser['email'] ?? null,
                 'ADM_PHONE' => $rawUser['no_hp'],
                 'ADM_PASS'  => $rawUser['password'],
                 'ADM_LEVEL' => $level,

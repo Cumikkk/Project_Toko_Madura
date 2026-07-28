@@ -50,7 +50,7 @@ class User extends UserAuth {
                 'MBR_ID' => $rawUser['id_users'],
                 'ID_MBR' => $rawUser['id_users'],
                 'MBR_NAME' => $rawUser['nama_lengkap'],
-                'MBR_EMAIL' => $rawUser['email'],
+                'MBR_EMAIL' => $rawUser['email'] ?? null,
                 'MBR_USER' => $rawUser['username'],
                 'MBR_STS' => -1, 
                 'MBR_LOCKED' => 0,

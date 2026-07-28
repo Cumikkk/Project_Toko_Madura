@@ -57,7 +57,6 @@ if($sql_check_username->num_rows != 0) {
     ]);
 }
 
-$email = !empty($data['email']) ? $data['email'] : null;
 $phone = !empty($data['no_hp']) ? $data['no_hp'] : null;
 $level = intval($data['level'] ?? 2);
 
@@ -65,7 +64,6 @@ $level = intval($data['level'] ?? 2);
 $update = Database::update("users", [
     'nama_lengkap' => $fullname,
     'username'     => $username,
-    'email'        => $email,
     'no_hp'        => $phone
 ], ['id_users' => $admin_id]);
 
