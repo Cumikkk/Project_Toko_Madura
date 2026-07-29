@@ -1,7 +1,7 @@
 <?php
 /**
  * Image proxy endpoint untuk menampilkan bukti pembayaran dari client/uploads/
- * Diakses via: /admin/image-proxy?file=uploads/bukti_pembayaran/filename.jpg
+ * Diakses via: /admin/image-proxy.php?file=uploads/bukti_pembayaran/filename.jpg
  */
 require_once __DIR__ . '/../config/setting.php';
 
@@ -29,14 +29,11 @@ if (strpos($file, 'uploads/bukti_pembayaran/') !== 0) {
     exit('Access denied');
 }
 
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
-$curDir  = rtrim(str_replace('\\', '/', __DIR__), '/');
-$relDir  = str_replace($docRoot, '', $curDir);
-$parts   = array_values(array_filter(explode('/', $relDir)));
-$projectDir = count($parts) > 0 ? $parts[0] : '';
-
-$filePath = $_SERVER['DOCUMENT_ROOT'] . '/' . $projectDir . '/client/' . $file;
-$filePath = str_replace('/', DIRECTORY_SEPARATOR, $filePath);
+// dirname(__DIR__) = Project root (parent of admin/)
+// client/ ada sejajar dengan admin/
+$projectRoot = dirname(__DIR__);
+$filePath = $projectRoot . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR
+          . str_replace('/', DIRECTORY_SEPARATOR, $file);
 
 if (!file_exists($filePath) || !is_file($filePath)) {
     http_response_code(404);

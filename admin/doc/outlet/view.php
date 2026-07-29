@@ -441,7 +441,7 @@ function previewBukti(filePath, namaOutlet) {
         return;
     }
     var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
-    var proxyUrl = adminUrl + '/image-proxy?file=' + encodeURIComponent(filePath);
+    var proxyUrl = adminUrl + '/image-proxy.php?file=' + encodeURIComponent(filePath);
     var ext = filePath.split('.').pop().toLowerCase();
     if (ext === 'pdf') {
         window.open(proxyUrl, '_blank');
