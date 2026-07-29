@@ -21,7 +21,6 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '38', '-1', '2026-07-29 10:23:59', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '41', '-1', '2026-07-29 10:23:59', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '42', '-1', '2026-07-29 10:23:59', NULL);
-INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '48', '-1', '2026-07-29 10:23:59', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '53', '-1', '2026-07-29 10:23:59', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '54', '-1', '2026-07-29 10:23:59', NULL);
 INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_at`, `updated_at`) VALUES ('59', '55', '-1', '2026-07-29 10:23:59', NULL);
