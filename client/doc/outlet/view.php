@@ -181,64 +181,100 @@ if ($resInv && $resInv->num_rows > 0) {
     $investorId = $db->insert_id;
 }
 
-// Separate Month & Year Filter (Default: 0 = Semua Bulan)
+// Filter Data Outlet Toko (Tanggal, Bulan, Tahun Dibuat)
+$selectedTgl   = isset($_GET['tgl']) && !empty($_GET['tgl']) ? trim($_GET['tgl']) : '';
 $selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
+$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
 $availableYears = [];
-// Fetch distinct years available in database for this investor's outlets
-$resYears = $db->query("SELECT DISTINCT YEAR(l.periode_laporan) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE o.id_investor = {$investorId} ORDER BY y_periode DESC");
+// Fetch distinct years of outlet registration for this investor
+$resYears = $db->query("SELECT DISTINCT YEAR(created_at) as y_year FROM outlet WHERE id_investor = {$investorId} AND created_at IS NOT NULL ORDER BY y_year DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
-        $availableYears[] = (int)$yRow['y_periode'];
+        if (!empty($yRow['y_year'])) {
+            $availableYears[] = (int)$yRow['y_year'];
+        }
     }
 }
 if (!in_array((int)date('Y'), $availableYears)) {
     array_unshift($availableYears, (int)date('Y'));
 }
 
-// Build WHERE clause for filtering laporan_omzet
-$whereOmzet = [];
-if ($selectedBulan > 0) {
-    $whereOmzet[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
-}
-if ($selectedTahun > 0) {
-    $whereOmzet[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
-}
-$whereOmzetSql = !empty($whereOmzet) ? " AND " . implode(" AND ", $whereOmzet) : "";
+// Build WHERE clause for Outlet Registration Date & Ownership
+$whereOutletConds = ["o.id_investor = {$investorId}"];
 
-// Fetch Outlets belonging to this Investor with omzet filter
+if (!empty($selectedTgl)) {
+    $safeTgl = $db->real_escape_string($selectedTgl);
+    $whereOutletConds[] = "DATE(o.created_at) = '{$safeTgl}'";
+} else {
+    if ($selectedBulan > 0) {
+        $whereOutletConds[] = "MONTH(o.created_at) = {$selectedBulan}";
+    }
+    if ($selectedTahun > 0) {
+        $whereOutletConds[] = "YEAR(o.created_at) = {$selectedTahun}";
+    }
+}
+$whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);
+
+// Pagination Setup (Max 10 records per page)
+$limit = 10;
+$page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+
+// Count Total Outlets Matching Filter
+$sqlCount = "
+    SELECT COUNT(*) as total
+    FROM outlet o
+    JOIN users u ON o.id_users = u.id_users
+    {$whereOutletSql}
+";
+$resCount = $db->query($sqlCount);
+$totalRecords = $resCount ? (int)$resCount->fetch_assoc()['total'] : 0;
+$totalPages = ($totalRecords > 0) ? (int)ceil($totalRecords / $limit) : 1;
+
+if ($page > $totalPages) {
+    $page = $totalPages;
+}
+$offset = ($page - 1) * $limit;
+
+// Fetch Outlets belonging to this Investor with Limit & Offset
 $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
         o.alamat_outlet,
+        o.created_at,
         o.id_users,
-        u.username,
-        IFNULL(SUM(l.omzet), 0) as total_omzet,
-        COUNT(l.id_laporan) as total_laporan
+        u.username
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
-    LEFT JOIN laporan_omzet l ON o.id_outlet = l.id_outlet {$whereOmzetSql}
-    WHERE o.id_investor = {$investorId}
-    GROUP BY o.id_outlet
+    {$whereOutletSql}
     ORDER BY o.id_outlet DESC
+    LIMIT {$limit} OFFSET {$offset}
 ";
 $resOutlets = $db->query($sqlOutlets);
 $outlets = [];
-$totalAkumulasiOmzet = 0;
 
 if ($resOutlets) {
     while ($row = $resOutlets->fetch_assoc()) {
         $outlets[] = $row;
-        $totalAkumulasiOmzet += (float)$row['total_omzet'];
     }
 }
-$totalOutlet = count($outlets);
+$totalOutlet = $totalRecords;
 
-$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : '') . ($selectedTahun > 0 ? $selectedTahun : '');
-if ($selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Periode';
+$periodeLabelStr = (!empty($selectedTgl) ? date('d/m/Y', strtotime($selectedTgl)) . ' ' : '') . 
+    ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : '') . 
+    ($selectedTahun > 0 ? $selectedTahun : '');
+
+if (empty($selectedTgl) && $selectedBulan === 0 && $selectedTahun === 0) {
+    $periodeLabelStr = 'Semua Tanggal';
+}
+
+function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTahun) {
+    $params = ['page' => $pageNum];
+    if (!empty($selectedTgl)) $params['tgl'] = $selectedTgl;
+    if ($selectedBulan > 0) $params['bulan'] = $selectedBulan;
+    if ($selectedTahun > 0) $params['tahun'] = $selectedTahun;
+    return SystemInfo::app('CLIENT_URL') . '/outlet?' . http_build_query($params);
 }
 ?>
 
@@ -263,10 +299,28 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
     box-shadow: none !important;
 }
 
+.stat-card-icon-box {
+    width: 48px;
+    height: 48px;
+}
+.micro-text-responsive {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
 @media (max-width: 575.98px) {
     .filter-pill-container {
         width: 100%;
         justify-content: space-between;
+    }
+    .stat-card-icon-box {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    .micro-text-responsive {
+        font-size: 10px !important;
+        letter-spacing: 0.3px;
+        line-height: 1.1;
     }
 }
 </style>
@@ -296,31 +350,21 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
         </div>
     </div>
 
-    <!-- Summary Metrics Cards -->
-    <div class="row g-2 g-md-3 mb-4">
-        <div class="col-6">
-            <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px;">
-                <div class="card-body p-3 d-flex align-items-center gap-2 gap-md-3">
-                    <div class="rounded-3 p-2 p-md-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: linear-gradient(135deg, #7D0A0A 0%, #580608 100%);">
-                        <i class="fa-light fa-store fs-4"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-body-secondary small fw-semibold">Total Outlet Milik Anda</div>
-                        <div class="fs-5 fs-md-4 fw-bold text-body-emphasis mb-0"><?= number_format($totalOutlet, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px;">
-                <div class="card-body p-3 d-flex align-items-center gap-2 gap-md-3">
-                    <div class="rounded-3 p-2 p-md-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: linear-gradient(135deg, #198754 0%, #0d5132 100%);">
-                        <i class="fa-light fa-money-bill-trend-up fs-4"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-body-secondary small fw-semibold">Total Omzet (<?= htmlspecialchars($periodeLabelStr); ?>)</div>
-                        <div class="fs-6 fs-md-5 fw-bold text-success mb-0">Rp <?= number_format($totalAkumulasiOmzet, 0, ',', '.'); ?></div>
+    <!-- Summary Metrics Card -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 16px;">
+                <div class="card-body p-3 p-md-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-xs stat-card-icon-box" style="background: linear-gradient(135deg, #7D0A0A 0%, #580608 100%);">
+                            <i class="fa-light fa-store fs-4"></i>
+                        </div>
+                        <div class="min-w-0 flex-fill">
+                            <div class="text-body-secondary text-uppercase fw-bold micro-text-responsive mb-1 text-truncate">Total Outlet Milik Anda</div>
+                            <div class="fs-4 fs-md-3 fw-extrabold text-body-emphasis mb-0">
+                                <?= number_format($totalOutlet, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -331,35 +375,25 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
     <div class="row">
         <div class="col-12">
             <div class="card border border-body-subtle shadow-sm" style="border-radius: 16px;">
-                <!-- Header with Title & Filter Omzet Periode (Mobile Responsive Pill) -->
-                <div class="card-header bg-body py-3 px-3 px-md-4 d-flex flex-wrap align-items-center justify-content-between border-bottom border-body-subtle gap-3">
+                <!-- Header with Title & Filter Trigger Button -->
+                <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-body-emphasis mb-1 fs-6"><i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar</h5>
-                        <p class="text-body-secondary small mb-0">Rincian omzet bulanan outlet periode <?= htmlspecialchars($periodeLabelStr); ?></p>
+                        <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
-                    <!-- Sleek Filter Omzet Periode Bar (Filter Bulan & Tahun Terpisah) -->
-                    <div class="filter-pill-container d-inline-flex align-items-center gap-2">
-                        <span class="text-body-secondary small fw-semibold text-nowrap"><i class="fa-light fa-filter me-1 text-danger"></i>Filter Omzet:</span>
-                        <div class="d-inline-flex align-items-center gap-1">
-                            <select id="filterBulanOutlet" title="Pilih Bulan">
-                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>>
-                                        <?= $mName; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <span class="text-body-secondary opacity-50">/</span>
-                            <select id="filterTahunOutlet" title="Pilih Tahun">
-                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                                <?php foreach ($availableYears as $yVal) : ?>
-                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>>
-                                        <?= $yVal; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                    <!-- Live Search & Tombol Filter Utama (Side-by-Side Flex Nowrap) -->
+                    <div class="d-flex align-items-center gap-2 flex-nowrap ms-auto">
+                        <!-- Live Search Input Box -->
+                        <div class="input-group input-group-sm" style="width: 180px; sm:width: 220px;">
+                            <span class="input-group-text bg-body border-danger-subtle rounded-start-pill text-body-secondary"><i class="fa-light fa-magnifying-glass"></i></span>
+                            <input type="text" id="liveSearchOutlet" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" placeholder="Cari nama outlet..." title="Live Search Nama Outlet">
                         </div>
+
+                        <!-- Tombol Filter Utama (Membuka Modal Filter Data) -->
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet">
+                            <i class="fa-solid fa-filter me-1"></i> Filter Data
+                        </button>
                     </div>
                 </div>
 
@@ -371,19 +405,21 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                     <th class="ps-3" style="width: 50px;">No</th>
                                     <th>Nama Outlet</th>
                                     <th>Username Akun</th>
+                                    <th>Waktu Pendaftaran</th>
                                     <th>Alamat Outlet</th>
-                                    <th>Total Omzet (<?= htmlspecialchars($periodeLabelStr); ?>)</th>
                                     <th>Status</th>
-                                    <th class="text-center pe-3" style="width: 150px;">Aksi</th>
+                                    <th class="text-center pe-3" style="width: 140px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="border-0">
                                 <?php if (!empty($outlets)) : ?>
                                     <?php foreach ($outlets as $index => $row) : ?>
-                                        <tr>
-                                            <td class="ps-3 fw-bold text-body-secondary"><?= $index + 1; ?></td>
+                                        <tr class="outlet-data-row">
+                                            <td class="ps-3 fw-bold text-body-secondary"><?= $offset + $index + 1; ?></td>
                                             <td>
-                                                <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($row['nama_outlet']); ?></div>
+                                                <div class="fw-bold text-body-emphasis mb-0 fs-6">
+                                                    <i class="fa-solid fa-store text-danger me-1"></i><?= htmlspecialchars($row['nama_outlet']); ?>
+                                                </div>
                                             </td>
                                             <td>
                                                 <span class="text-body-secondary fw-semibold">
@@ -391,12 +427,13 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                                 </span>
                                             </td>
                                             <td>
-                                                <small class="text-body-secondary"><?= htmlspecialchars($row['alamat_outlet'] ?: '-'); ?></small>
+                                                <span class="badge bg-body-tertiary border text-body-emphasis px-2 py-1 rounded-3 fw-semibold font-monospace small">
+                                                    <i class="fa-regular fa-clock me-1 text-primary"></i>
+                                                    <?= !empty($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) . ' WIB' : '-'; ?>
+                                                </span>
                                             </td>
                                             <td>
-                                                <span class="fw-extrabold text-success fs-6">
-                                                    Rp <?= number_format((float)$row['total_omzet'], 0, ',', '.'); ?>
-                                                </span>
+                                                <small class="text-body-secondary"><?= htmlspecialchars($row['alamat_outlet'] ?: '-'); ?></small>
                                             </td>
                                             <td>
                                                 <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold">
@@ -423,8 +460,8 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                         <td colspan="8" class="text-center py-5">
                                             <div class="py-4">
                                                 <i class="fa-light fa-store-slash text-body-secondary mb-3" style="font-size: 60px; opacity: 0.5;"></i>
-                                                <h5 class="fw-bold text-body-secondary mb-1">Belum Ada Outlet</h5>
-                                                <p class="text-body-secondary small mb-3">Klik tombol di bawah untuk mendaftarkan akun outlet baru Anda.</p>
+                                                <h5 class="fw-bold text-body-secondary mb-1">Belum Ada Outlet Terdaftar</h5>
+                                                <p class="text-body-secondary small mb-3">Tidak ada outlet yang sesuai dengan kriteria filter pendaftaran.</p>
                                                 <button type="button" class="btn btn-danger btn-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalTambahOutlet">
                                                     <i class="fa-solid fa-plus me-1"></i> Tambah Outlet Baru
                                                 </button>
@@ -435,10 +472,49 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination Controls & Record Summary Footer -->
+                    <?php if ($totalRecords > 0) : ?>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
+                            <div class="small text-body-secondary fw-semibold ms-1">
+                                Menampilkan <span class="text-body-emphasis fw-bold"><?= ($totalRecords > 0) ? ($offset + 1) : 0; ?></span> - <span class="text-body-emphasis fw-bold"><?= min($offset + $limit, $totalRecords); ?></span> dari <span class="text-body-emphasis fw-bold"><?= $totalRecords; ?></span> outlet terdaftar
+                            </div>
+
+                            <?php if ($totalPages > 1) : ?>
+                                <nav aria-label="Navigasi Halaman Outlet">
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <!-- Previous Page -->
+                                        <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                                <i class="fa-solid fa-chevron-left me-1"></i> Prev
+                                            </a>
+                                        </li>
+
+                                        <!-- Page Numbers -->
+                                        <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
+                                            <li class="page-item <?= ($p === $page) ? 'active' : ''; ?>">
+                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTgl, $selectedBulan, $selectedTahun); ?>"><?= $p; ?></a>
+                                            </li>
+                                        <?php endfor; ?>
+
+                                        <!-- Next Page -->
+                                        <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                                Next <i class="fa-solid fa-chevron-right ms-1"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Jarak Aman Tambahan Sebelum Footer di Mobile -->
+    <div class="pb-4 pb-md-5"></div>
 </div>
 
 <!-- ========================================================================= -->
@@ -561,6 +637,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             <i class="fa-solid fa-store fs-2"></i>
                         </div>
                         <h4 class="fw-bold mb-1 text-body-emphasis" id="det_nama_outlet">-</h4>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill" id="det_created_at_badge"><i class="fa-regular fa-clock me-1"></i> Terdaftar: -</span>
                     </div>
 
                     <div class="list-group list-group-flush rounded-3 border border-body-subtle mb-3">
@@ -569,12 +646,12 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                             <span class="fw-bold text-body-emphasis" id="det_username">-</span>
                         </div>
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
-                            <span class="text-body-secondary small"><i class="fa-light fa-location-dot me-2 text-danger"></i>Alamat Outlet</span>
-                            <span class="fw-semibold text-body-emphasis text-end" id="det_alamat">-</span>
+                            <span class="text-body-secondary small"><i class="fa-regular fa-clock me-2 text-primary"></i>Waktu Pendaftaran</span>
+                            <span class="fw-bold text-body-emphasis" id="det_created_at_full">-</span>
                         </div>
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
-                            <span class="text-body-secondary small"><i class="fa-light fa-money-bill-trend-up me-2 text-success"></i>Total Omzet Terinput</span>
-                            <span class="fw-bold text-success fs-6" id="det_total_omzet">Rp 0</span>
+                            <span class="text-body-secondary small"><i class="fa-light fa-location-dot me-2 text-danger"></i>Alamat Outlet</span>
+                            <span class="fw-semibold text-body-emphasis text-end" id="det_alamat">-</span>
                         </div>
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
                             <span class="text-body-secondary small"><i class="fa-light fa-file-invoice me-2 text-primary"></i>Total Laporan Omzet</span>
@@ -590,19 +667,100 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
     </div>
 </div>
 
+<!-- ========================================================================= -->
+<!-- MODAL: FILTER TANGGAL PEMBUATAN OUTLET (Theme Adaptive) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-body-emphasis" id="modalFilterOutletLabel">
+                    <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Tanggal Pendaftaran Outlet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
+                <div class="modal-body p-4">
+                    <!-- 1. Filter Tanggal Spesifik Dibuat -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar me-1 text-danger"></i>Tanggal Dibuat (Hari/Bulan/Tahun)</label>
+                        <input type="date" name="tgl" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTgl); ?>" title="Filter Tanggal Dibuat">
+                    </div>
+
+                    <!-- 2. Filter Bulan & Tahun Dibuat -->
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-days me-1 text-danger"></i>Bulan Dibuat</label>
+                            <select name="bulan" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
+                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
+                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-lines me-1 text-danger"></i>Tahun Dibuat</label>
+                            <select name="tahun" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
+                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
+                                <?php foreach ($availableYears as $yVal) : ?>
+                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>><?= $yVal; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
 
-    // Filter Bulan & Filter Tahun Dropdown Change Handlers
-    function applyOutletFilters() {
-        const bVal = $('#filterBulanOutlet').val();
-        const yVal = $('#filterTahunOutlet').val();
-        window.location.href = '<?= SystemInfo::app('CLIENT_URL'); ?>/outlet?bulan=' + bVal + '&tahun=' + yVal;
-    }
+    // 0. Live Search Real-Time Filter for Outlet Table
+    $('#liveSearchOutlet').on('keyup input', function() {
+        const val = $(this).val().toLowerCase().trim();
+        let matchCount = 0;
 
-    $('#filterBulanOutlet, #filterTahunOutlet').on('change', function() {
-        applyOutletFilters();
+        $('#tableDataOutlet tbody tr.outlet-data-row').each(function() {
+            const text = $(this).text().toLowerCase();
+            if (text.indexOf(val) > -1) {
+                $(this).removeClass('d-none').show();
+                matchCount++;
+            } else {
+                $(this).addClass('d-none').hide();
+            }
+        });
+
+        if (val.length > 0 && matchCount === 0) {
+            if ($('#rowLiveSearchEmpty').length === 0) {
+                $('#tableDataOutlet tbody').append(`
+                    <tr id="rowLiveSearchEmpty">
+                        <td colspan="7" class="text-center py-4 text-danger fw-semibold">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i> Outlet "${val}" tidak ditemukan.
+                        </td>
+                    </tr>
+                `);
+            } else {
+                $('#rowLiveSearchEmpty').removeClass('d-none').show().find('td').html(`
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> Outlet "${val}" tidak ditemukan.
+                `);
+            }
+        } else {
+            $('#rowLiveSearchEmpty').remove();
+        }
+
+        if (val.length === 0) {
+            $('#tableDataOutlet tbody tr.outlet-data-row').removeClass('d-none').show();
+            $('#rowLiveSearchEmpty').remove();
+        }
     });
 
     // 1. Submit Form Tambah Outlet
@@ -721,7 +879,10 @@ $(document).ready(function() {
             success: function(res) {
                 $('#detailOutletLoading').addClass('d-none');
                 if (res.success) {
+                    let formattedCreated = res.data.created_at ? res.data.created_at : '-';
                     $('#det_nama_outlet').text(res.data.nama_outlet);
+                    $('#det_created_at_badge').html('<i class="fa-regular fa-clock me-1"></i> Terdaftar: ' + formattedCreated);
+                    $('#det_created_at_full').text(formattedCreated);
                     $('#det_username').text('@' + res.data.username);
                     $('#det_alamat').text(res.data.alamat_outlet || '-');
                     $('#det_total_omzet').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.data.total_omzet));

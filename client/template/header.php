@@ -13,118 +13,185 @@ use Config\Core\SystemInfo;
 </div>
 <!-- preloader end -->
 
-<!-- header start -->
-<div class="header">
-    <div class="row g-0 align-items-center">
-        <div class="col-3 col-sm-3 col-lg-5 d-flex align-items-center">
-            <div class="main-logo d-lg-block d-none">
-                <div class="logo-big">
-                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-flex align-items-center gap-2 text-decoration-none">
-                        <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 shadow-sm fw-bold" style="background: #7D0A0A; color: #ffffff;">
-                            <i class="fa-sharp fa-solid fa-shop fs-5"></i>
-                        </div>
-                        <span class="fw-extrabold fs-5 text-uppercase tracking-wide" style="color: var(--bs-body-color, #ffffff); font-weight: 800; letter-spacing: 0.5px;">TOKO MADURA</span>
-                    </a>
-                </div>
-            </div>
-            <div class="nav-close-btn ms-2 ms-lg-3">
-                <button id="navClose" type="button" aria-label="Toggle Sidebar"><i class="fa-light fa-bars-sort"></i></button>
-            </div>
-        </div>
-        <div class="col-6 col-sm-6 d-lg-none">
-            <div class="mobile-logo text-center">
-                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="d-inline-flex align-items-center text-decoration-none">
+<?php
+$topbarPage = $_GET['a'] ?? 'omzet';
+$topbarTab  = $_GET['tab'] ?? '';
+?>
+
+<!-- header start (Fixed Maroon Top Navigation Bar) -->
+<div class="header fixed-topbar-header py-2" style="background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%) !important; background-color: #7D0A0A !important;">
+    <div class="w-100 h-100">
+        <div class="d-flex align-items-center justify-content-between h-100">
+            
+            <!-- 1. Left: Brand Logo & Title -->
+            <div class="d-flex align-items-center">
+                <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="d-flex align-items-center gap-2 text-decoration-none">
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-extrabold text-uppercase text-body-emphasis" style="font-weight: 800; font-size: 13px; line-height: 1.1; letter-spacing: 0.5px;">TOKO MADURA</span>
-                        <span class="fw-bold text-uppercase text-body-secondary" style="font-weight: 700; font-size: 8.5px; letter-spacing: 0.8px;"><?= strtoupper($user['role'] ?? 'investor'); ?> PANEL</span>
+                        <span class="fw-extrabold fs-5 text-uppercase text-white mb-0" style="font-weight: 900; letter-spacing: 0.6px; line-height: 1.1;">TOKO MADURA</span>
+                        <span class="fw-bold text-uppercase text-white-50" style="font-size: 9px; letter-spacing: 1px;"><?= strtoupper($user['role'] ?? 'outlet'); ?> PANEL</span>
                     </div>
                 </a>
             </div>
-        </div>
-        <div class="col-3 col-sm-3 col-lg-7">
-            <div class="header-right-btns d-flex justify-content-end align-items-center">
-                <div class="header-collapse-group">
-                    <div class="header-right-btns d-flex justify-content-end align-items-center p-0">
-                        <div class="header-right-btns d-flex justify-content-end align-items-center p-0">
-                            <div class="header-btn-box">
-                                <div class="dropdown">
-                                    <button class="header-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                        <i class="fa-light fa-calculator"></i>
-                                    </button>
-                                    <ul class="dropdown-menu calculator-dropdown">
-                                        <div class="dgb-calc-box">
-                                            <div>
-                                                <input type="text" id="dgbCalcResult" placeholder="0" autocomplete="off" readonly>
-                                            </div>
-                                            <table>
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="bg-danger">C</td>
-                                                        <td class="bg-secondary">CE</td>
-                                                        <td class="dgb-calc-oprator bg-primary">/</td>
-                                                        <td class="dgb-calc-oprator bg-primary">*</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>7</td>
-                                                        <td>8</td>
-                                                        <td>9</td>
-                                                        <td class="dgb-calc-oprator bg-primary">-</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4</td>
-                                                        <td>5</td>
-                                                        <td>6</td>
-                                                        <td class="dgb-calc-oprator bg-primary">+</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>1</td>
-                                                        <td>2</td>
-                                                        <td>3</td>
-                                                        <td rowspan="2" class="dgb-calc-sum bg-primary">=</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">0</td>
-                                                        <td>.</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </ul>
+
+            <!-- 2. Center: Fixed Top Navigation Bar (Role-Adaptive) -->
+            <?php $role = strtolower($user['role'] ?? 'outlet'); ?>
+            <div class="d-none d-lg-flex align-items-center gap-2 topbar-nav-pill-container shadow-sm">
+                <?php if ($role === 'master') : ?>
+                    <!-- Menu 1 Master: Dashboard -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="topbar-nav-pill <?= ($topbarPage == 'dashboard') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-grid-2 me-2"></i> Dashboard
+                    </a>
+                    
+                    <!-- Menu 2 Master: Data Investor -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="topbar-nav-pill <?= ($topbarPage == 'investor') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-users me-2"></i> Data Investor
+                    </a>
+
+                    <!-- Menu 3 Master: Keuntungan Master -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/keuntungan-master" class="topbar-nav-pill <?= ($topbarPage == 'keuntungan-master') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-chart-line-up me-2"></i> Keuntungan Master
+                    </a>
+                <?php elseif ($role === 'investor') : ?>
+                    <!-- Menu 1 Investor: Data Outlet -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/outlet" class="topbar-nav-pill <?= ($topbarPage == 'outlet') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-store me-2"></i> Data Outlet Toko
+                    </a>
+                    
+                    <!-- Menu 2 Investor: Bagi Hasil & Omzet -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/bagi-hasil" class="topbar-nav-pill <?= ($topbarPage == 'bagi-hasil' || $topbarPage == 'omzet') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-vault me-2"></i> Rekap Bagi Hasil
+                    </a>
+                <?php else : ?>
+                    <!-- Menu 1 Outlet: Input Omzet -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="topbar-nav-pill <?= ($topbarPage == 'omzet' && empty($topbarTab)) ? 'active' : ''; ?>">
+                        <i class="fa-light fa-money-bill-trend-up me-2"></i> Input Omzet
+                    </a>
+                    
+                    <!-- Menu 2 Outlet: Riwayat & Potongan -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="topbar-nav-pill <?= ($topbarPage == 'omzet' && $topbarTab == 'riwayat') || $topbarPage == 'riwayat-omzet' || $topbarPage == 'bagi-hasil' ? 'active' : ''; ?>">
+                        <i class="fa-light fa-clock-rotate-left me-2"></i> Riwayat & Potongan
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <!-- 3. Right: Utility Buttons & User Profile -->
+            <div class="d-flex align-items-center gap-2">
+                <!-- Calculator Dropdown Button -->
+                <div class="header-btn-box">
+                    <div class="dropdown">
+                        <button class="header-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Kalkulator">
+                            <i class="fa-light fa-calculator"></i>
+                        </button>
+                        <ul class="dropdown-menu calculator-dropdown shadow-lg">
+                            <div class="dgb-calc-box">
+                                <div>
+                                    <input type="text" id="dgbCalcResult" placeholder="0" autocomplete="off" readonly>
                                 </div>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td class="bg-danger">C</td>
+                                            <td class="bg-secondary">CE</td>
+                                            <td class="dgb-calc-oprator bg-primary">/</td>
+                                            <td class="dgb-calc-oprator bg-primary">*</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>8</td>
+                                            <td>9</td>
+                                            <td class="dgb-calc-oprator bg-primary">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>5</td>
+                                            <td>6</td>
+                                            <td class="dgb-calc-oprator bg-primary">+</td>
+                                        </tr>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>3</td>
+                                            <td rowspan="2" class="dgb-calc-sum bg-primary">=</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">0</td>
+                                            <td>.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <button class="header-btn fullscreen-btn" id="btnFullscreen"><i class="fa-light fa-expand"></i></button>
-                        </div>
+                        </ul>
                     </div>
                 </div>
-                <button class="header-btn header-collapse-group-btn d-lg-none"><i class="fa-light fa-ellipsis-vertical"></i></button>
-                <button class="header-btn theme-settings-btn d-lg-none"><i class="fa-light fa-gear"></i></button>
+
+                <!-- Fullscreen Button -->
+                <button class="header-btn fullscreen-btn d-none d-md-inline-flex" id="btnFullscreen" title="Layar Penuh"><i class="fa-light fa-expand"></i></button>
+
+                <!-- Profile Avatar Dropdown -->
                 <div class="header-btn-box profile-btn-box">
-                    <button class="" data-bs-toggle="dropdown" aria-expanded="false" style="border: 0px; background: transparent;">
-                        <div class="custom-avatar-container" style="width: 40px; height: 40px;">
-                            <img class="custom-avatar" style="width: 40px; height: 40px;" src="<?= App\Models\User::avatar($user['MBR_AVATAR']); ?>" alt="image">
+                    <button class="p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="custom-avatar-container shadow-sm" style="width: 38px; height: 38px;">
+                            <img class="custom-avatar" style="width: 38px; height: 38px;" src="<?= App\Models\User::avatar($user['MBR_AVATAR']); ?>" alt="Avatar">
                         </div>
                     </button>
-                    <ul class="dropdown-menu profile-dropdown-menu">
+                    <ul class="dropdown-menu profile-dropdown-menu shadow-lg">
                         <li>
-                            <div class="dropdown-txt text-center">
-                                <p class="mb-0"><?php echo $user['MBR_NAME']; ?></p>
-                                <!-- <span class="d-block">Web Developer</span> -->
-                                <div class="d-flex justify-content-center">
-                                    <div class="form-check pt-3">
-                                        <input class="form-check-input" type="checkbox" id="seeProfileAsSidebar">
-                                        <label class="form-check-label" for="seeProfileAsSidebar">See as sidebar</label>
-                                    </div>
-                                </div>
+                            <div class="dropdown-txt text-center py-2">
+                                <p class="fw-bold mb-0 text-body-emphasis"><?php echo htmlspecialchars($user['MBR_NAME'] ?? 'User'); ?></p>
+                                <span class="badge bg-danger-subtle text-danger small text-uppercase rounded-pill px-2 py-1 mt-1"><?= strtoupper($user['role'] ?? 'outlet'); ?></span>
                             </div>
                         </li>
-                        <li><a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information"><span class="dropdown-icon"><i class="fa-regular fa-circle-user"></i></span> Profile</a></li>
-                        <li><a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/help-center"><span class="dropdown-icon"><i class="fa-regular fa-circle-question"></i></span> Help</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><span class="dropdown-icon"><i class="fa-regular fa-arrow-right-from-bracket"></i></span> Logout</a></li>
+                        <li><a class="dropdown-item fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger fw-bold" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><span class="dropdown-icon me-2 text-danger"><i class="fa-regular fa-arrow-right-from-bracket"></i></span> Logout</a></li>
                     </ul>
                 </div>
+
+                <!-- Mobile Menu Button (Hamburger Toggle for Topbar Menu) -->
+                <button class="btn btn-light btn-sm text-danger d-lg-none rounded-pill px-3 py-1 fw-bold shadow-sm ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#mobileTopNav" aria-expanded="false">
+                    <i class="fa-solid fa-bars me-1"></i> Menu
+                </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Mobile Fixed Top Bar Collapse Dropdown (Role-Adaptive) -->
+<div class="collapse d-lg-none mobile-topbar-dropdown" id="mobileTopNav">
+    <div class="d-flex flex-column gap-1">
+        <?php if ($role === 'master') : ?>
+            <!-- Menu 1 Master: Dashboard -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/dashboard" class="mobile-topbar-link <?= ($topbarPage == 'dashboard') ? 'active' : ''; ?>">
+                <i class="fa-light fa-grid-2 me-2 fs-5"></i> Dashboard
+            </a>
+            <!-- Menu 2 Master: Data Investor -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="mobile-topbar-link <?= ($topbarPage == 'investor') ? 'active' : ''; ?>">
+                <i class="fa-light fa-users me-2 fs-5"></i> Data Investor
+            </a>
+            <!-- Menu 3 Master: Keuntungan Master -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/keuntungan-master" class="mobile-topbar-link <?= ($topbarPage == 'keuntungan-master') ? 'active' : ''; ?>">
+                <i class="fa-light fa-chart-line-up me-2 fs-5"></i> Keuntungan Master
+            </a>
+        <?php elseif ($role === 'investor') : ?>
+            <!-- Menu 1 Investor: Data Outlet -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/outlet" class="mobile-topbar-link <?= ($topbarPage == 'outlet') ? 'active' : ''; ?>">
+                <i class="fa-light fa-store me-2 fs-5"></i> Data Outlet Toko
+            </a>
+            <!-- Menu 2 Investor: Rekap Bagi Hasil -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/bagi-hasil" class="mobile-topbar-link <?= ($topbarPage == 'bagi-hasil' || $topbarPage == 'omzet') ? 'active' : ''; ?>">
+                <i class="fa-light fa-vault me-2 fs-5"></i> Rekap Bagi Hasil
+            </a>
+        <?php else : ?>
+            <!-- Menu 1 Outlet: Input Omzet -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="mobile-topbar-link <?= ($topbarPage == 'omzet' && empty($topbarTab)) ? 'active' : ''; ?>">
+                <i class="fa-light fa-money-bill-trend-up me-2 fs-5"></i> Input Omzet
+            </a>
+            <!-- Menu 2 Outlet: Riwayat & Potongan -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="mobile-topbar-link <?= ($topbarPage == 'omzet' && $topbarTab == 'riwayat') || $topbarPage == 'riwayat-omzet' || $topbarPage == 'bagi-hasil' ? 'active' : ''; ?>">
+                <i class="fa-light fa-clock-rotate-left me-2 fs-5"></i> Riwayat & Potongan
+            </a>
+        <?php endif; ?>
     </div>
 </div>
 <!-- header end -->

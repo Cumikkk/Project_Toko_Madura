@@ -1,2 +1,3 @@
 <?php
-require_once __DIR__ . "/bagi-hasil/view.php";
+header("Location: " . SystemInfo::app('CLIENT_URL') . "/omzet?tab=riwayat");
+exit;
