@@ -45,9 +45,28 @@ if ($resSet && $resSet->num_rows > 0) {
     $potonganGlobal = (float)$resSet->fetch_assoc()['nilai'];
 }
 
-// Separate Month & Year Filter (Default: 0 = Semua Bulan)
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
+// Filter Logic (Outlet, Rentang Tanggal, Bulan, Tahun)
+$selectedOutletId   = isset($_GET['outlet_id']) ? (int)$_GET['outlet_id'] : (isset($_GET['id_outlet']) ? (int)$_GET['id_outlet'] : (isset($_GET['outlet']) ? (int)$_GET['outlet'] : 0));
+$selectedTglMulai   = isset($_GET['tgl_mulai']) && !empty($_GET['tgl_mulai']) ? trim($_GET['tgl_mulai']) : '';
+$selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']) ? trim($_GET['tgl_selesai']) : '';
+$selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
+$selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
+
+if (!isset($_GET['outlet_id']) && !isset($_GET['id_outlet']) && !isset($_GET['outlet']) && !isset($_GET['tgl_mulai']) && !isset($_GET['tgl_selesai']) && !isset($_GET['bulan']) && !isset($_GET['tahun'])) {
+    $selectedBulan = (int)date('n');
+    $selectedTahun = (int)date('Y');
+}
+
+// Fetch list of outlets belonging to logged in investor
+$investorOutlets = [];
+if ($role === 'investor' && $investorId > 0) {
+    $resOuts = $db->query("SELECT id_outlet, nama_outlet, kode_outlet FROM outlet WHERE id_investor = {$investorId} ORDER BY nama_outlet ASC");
+    if ($resOuts) {
+        while ($oRow = $resOuts->fetch_assoc()) {
+            $investorOutlets[] = $oRow;
+        }
+    }
+}
 
 // Determine last day of selected month/year to check if deduction is active
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
@@ -75,13 +94,63 @@ if (!in_array((int)date('Y'), $availableYears)) {
     array_unshift($availableYears, (int)date('Y'));
 }
 
-// Build WHERE clause based on Month & Year filter
 $whereConditions = ($role === 'investor') ? ["o.id_investor = {$investorId}"] : ["o.id_outlet = {$targetOutletId}"];
-if ($selectedBulan > 0) {
-    $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
+$selectedOutletNama = '';
+
+if ($selectedOutletId > 0 && $role === 'investor') {
+    $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
+    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$selectedOutletId} LIMIT 1");
+    if ($resOneOut && $resOneOut->num_rows > 0) {
+        $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
+    }
+} elseif ($role === 'outlet' && $targetOutletId > 0) {
+    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$targetOutletId} LIMIT 1");
+    if ($resOneOut && $resOneOut->num_rows > 0) {
+        $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
+    }
 }
-if ($selectedTahun > 0) {
-    $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+
+$periodeParts = [];
+
+if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereConditions[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    
+    if ($selectedTglMulai === $selectedTglSelesai) {
+        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai));
+    } else {
+        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai)) . ' - ' . date('d/m/Y', strtotime($selectedTglSelesai));
+    }
+} elseif (!empty($selectedTglMulai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $whereConditions[] = "l.periode_laporan >= '{$safeMulai}'";
+    $periodeParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
+} elseif (!empty($selectedTglSelesai)) {
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereConditions[] = "l.periode_laporan <= '{$safeSelesai}'";
+    $periodeParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
+} else {
+    if ($selectedBulan > 0) {
+        $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
+        $periodeParts[] = $bulanIndo[$selectedBulan] ?? '';
+    }
+    if ($selectedTahun > 0) {
+        $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+        $periodeParts[] = $selectedTahun;
+    }
+}
+
+$periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
+$periodeLabelStr = $periodeTitleStr;
+if (!empty($selectedOutletNama)) {
+    $periodeLabelStr .= " " . $selectedOutletNama;
+}
+
+$laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
+$joinOnClause = "o.id_outlet = l.id_outlet";
+if (!empty($laporanJoinConds)) {
+    $joinOnClause .= " AND " . implode(" AND ", $laporanJoinConds);
 }
 
 // Fetch breakdown per outlet
@@ -93,7 +162,7 @@ $sqlBagiHasil = "
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
-    LEFT JOIN laporan_omzet l ON o.id_outlet = l.id_outlet AND " . implode(" AND ", array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false)) . "
+    LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
     GROUP BY o.id_outlet
     ORDER BY o.id_outlet DESC
@@ -106,34 +175,32 @@ if ($resBagiHasil) {
         $omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
         
-        if ($selectedBulan > 0) {
-            // Specific Month Selected -> Cek apakah data omzet tanggal terakhir bulan tersebut sudah diinput untuk outlet ini
-            $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
-            $isLastDayDone = ($chkLast && $chkLast->num_rows > 0);
-
-            if ($isLastDayDone) {
-                $hasAnyLastDayDone = true;
-                $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
-                $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-                $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-            } else {
-                $potongan10 = 0.00;
-                $hakInvestor = 0.00;
-                $hakOutlet = 0.00;
-            }
-        } else {
-            // "Semua Bulan" Selected -> Mengakumulasi total potongan DB seluruh bulan yang sudah tutup
-            $potongan10 = (float)$row['total_potongan_db'];
-            $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-            $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-            $isLastDayDone = ($potongan10 > 0 || $omzet > 0);
-            if ($potongan10 > 0) {
-                $hasAnyLastDayDone = true;
+        $isCurrentFilterLastDay = true;
+        if (!empty($selectedTgl)) {
+            $tglNum = (int)date('j', strtotime($selectedTgl));
+            if ($tglNum !== $daysInMonth) {
+                $isCurrentFilterLastDay = false;
             }
         }
 
+        $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
+        $isLastDayDoneInDb = ($chkLast && $chkLast->num_rows > 0);
+
+        $isLastDayDone = ($isLastDayDoneInDb && $isCurrentFilterLastDay);
+
+        if ($isLastDayDone) {
+            $hasAnyLastDayDone = true;
+            $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
+            $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
+            $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+        } else {
+            $potongan10 = 0.00;
+            $hakInvestor = 0.00;
+            $hakOutlet = 0.00;
+        }
+
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
-        $totalBersihOutlet = $omzet - $hakInvestor;
+        $totalBersihOutlet = $isLastDayDone ? (($omzet - $potongan10) + $hakOutlet) : $omzet;
 
         $row['is_last_day_done'] = $isLastDayDone;
         $row['potongan_10'] = $potongan10;
@@ -260,7 +327,7 @@ $countOutlet = count($rows);
 }
 </style>
 
-<div class="main-content-inner py-3 py-md-4">
+<div class="main-content-inner pt-0 mt-0">
     <!-- Header Title & Action Bar Card (Sleek & Balanced) -->
     <div class="card border border-body-subtle shadow-sm mb-3 mb-md-4" style="border-radius: 16px;">
         <div class="card-body p-3 p-md-4">
@@ -278,34 +345,10 @@ $countOutlet = count($rows);
                     </div>
                 </div>
 
-                <!-- Controls: Filter & Export PDF -->
+                <!-- Controls: Export PDF -->
                 <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-lg-auto justify-content-start justify-content-lg-end">
-                    <!-- Sleek Pill Filter Bar -->
-                    <div class="filter-pill-container d-flex align-items-center justify-content-between gap-2 flex-grow-1 flex-lg-grow-0">
-                        <span class="text-body-secondary small fw-semibold text-nowrap"><i class="fa-light fa-filter me-1 text-danger"></i>Filter:</span>
-                        <div class="d-flex align-items-center gap-1">
-                            <select id="filterBulanBagiHasil" title="Pilih Bulan" class="form-select-sm border-0 bg-transparent fw-bold text-body shadow-none px-1">
-                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>>
-                                        <?= $mName; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <span class="text-body-secondary opacity-50">/</span>
-                            <select id="filterTahunBagiHasil" title="Pilih Tahun" class="form-select-sm border-0 bg-transparent fw-bold text-body shadow-none px-1">
-                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                                <?php foreach ($availableYears as $yVal) : ?>
-                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>>
-                                        <?= $yVal; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
                     <!-- Tombol Cetak PDF Bagi Hasil -->
-                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold text-nowrap flex-grow-1 flex-lg-grow-0 text-center">
+                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?outlet_id=<?= $selectedOutletId; ?>&tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold text-nowrap flex-grow-1 flex-lg-grow-0 text-center">
                         <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF Bagi Hasil
                     </a>
                 </div>
@@ -321,26 +364,25 @@ $countOutlet = count($rows);
                     <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-chart-pie me-1"></i> <?= strtoupper($role); ?> DASHBOARD
                     </span>
-                   
                 </div>
                 <h2 class="fw-bold text-white mb-1 fs-3 fs-md-2">Bagi Hasil Periode <?= htmlspecialchars($periodeLabelStr); ?></h2>
-                <p class="text-white-50 small mb-0">Total akumulasi komisi investor dan hak bersih outlet</p>
+                <?php if (!empty($selectedOutletNama)) : ?>
+                    <p class="text-white-50 small mb-0"><i class="fa-solid fa-circle-info me-1 text-warning"></i> Rekapitulasi bagi hasil khusus untuk toko <strong class="text-white"><?= htmlspecialchars($selectedOutletNama); ?></strong></p>
+                <?php else : ?>
+                    <p class="text-white-50 small mb-0">Total akumulasi komisi investor dan hak bersih seluruh outlet terdaftar</p>
+                <?php endif; ?>
             </div>
             <div class="col-lg-5 col-12 text-lg-end">
                 <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-10 text-center text-lg-end">
                     <div class="text-white-50 small fw-semibold">Total Hak Bagi Hasil Investor</div>
                     <div class="fs-2 fw-extrabold text-warning">
-                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
-                            Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?>
-                        <?php else : ?>
-                            -
-                        <?php endif; ?>
+                        Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?>
                     </div>
                     <div class="text-white-50 small">
-                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
-                            
+                        <?php if ($hasAnyLastDayDone) : ?>
+                            <i class="fa-solid fa-circle-check me-1 text-success"></i>Bagi Hasil Investor (50% dari 10%) Aktif
                         <?php else : ?>
-                            <i class="fa-light fa-clock me-1 text-warning"></i>Menunggu tanggal akhir bulan (Tgl <?= $daysInMonth; ?>)
+                            <i class="fa-light fa-clock me-1 text-warning"></i>Pendataan berjalan (Menunggu Tgl akhir bulan <?= $daysInMonth; ?>)
                         <?php endif; ?>
                     </div>
                 </div>
@@ -440,7 +482,7 @@ $countOutlet = count($rows);
     </div>
 
     <!-- Breakdown Table Per Outlet (Sleek Theme-Adaptive Card Container) -->
-    <div class="card border border-body-subtle shadow-sm rounded-4 overflow-hidden mb-4">
+    <div class="card border border-body-subtle shadow-sm rounded-4 overflow-hidden mb-5">
         <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
             <div>
                 <h5 class="fw-bold text-body-emphasis mb-0 fs-6">
@@ -448,9 +490,10 @@ $countOutlet = count($rows);
                 </h5>
                 <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan 10%, serta hak investor & outlet</p>
             </div>
-            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">
-                <i class="fa-solid fa-calculator me-1"></i> Rekap Final
-            </span>
+            <!-- Tombol Filter Utama (Menggantikan Rekap Final) -->
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
+                <i class="fa-solid fa-filter me-1"></i> Filter Data
+            </button>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -458,12 +501,13 @@ $countOutlet = count($rows);
                     <thead class="table-group-divider bg-body-secondary">
                         <tr class="text-uppercase small text-body-secondary">
                             <th class="py-3 ps-3 text-center fw-bold" style="width: 40px;">No</th>
-                            <th class="py-3 px-3 fw-bold">Kode & Nama Outlet</th>
+                            <th class="py-3 px-3 fw-bold">Nama Outlet</th>
                             <th class="py-3 px-3 text-end fw-bold">Total Omzet (100%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-danger">Potongan (10%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-success">Hak Investor (50%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-warning">Hak Outlet (50%)</th>
-                            <th class="py-3 px-3 text-end fw-bold">Bersih Outlet Total</th>
+                            <th class="py-3 px-3 text-end fw-bold text-body-emphasis">Bersih Outlet Total</th>
+                            <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px;">Aksi Detail</th>
                         </tr>
                     </thead>
                     <tbody class="border-0">
@@ -476,36 +520,40 @@ $countOutlet = count($rows);
                                             <i class="fa-solid fa-store text-danger me-1"></i>
                                             <?= htmlspecialchars($r['nama_outlet']); ?>
                                         </div>
-                                        <small class="text-body-secondary font-monospace"><?= htmlspecialchars($r['kode_outlet']); ?></small>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                                     <td class="py-3 px-3 text-end fw-bold text-danger">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?>
                                         <?php else : ?>
-                                            -
+                                            <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Dipotong)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-extrabold text-success fs-6">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?>
                                         <?php else : ?>
-                                            -
+                                            <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-extrabold text-warning fs-6">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?>
                                         <?php else : ?>
-                                            -
+                                            <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
+                                    <td class="py-3 px-3 text-center pe-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-detail-harian-outlet" data-id="<?= $r['id_outlet']; ?>" data-nama="<?= htmlspecialchars($r['nama_outlet']); ?>">
+                                            <i class="fa-solid fa-list-check me-1"></i> Rincian Harian
+                                        </button>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else : ?>
                             <tr>
-                                <td colspan="7" class="text-center text-body-secondary py-5">
+                                <td colspan="8" class="text-center text-body-secondary py-5">
                                     <div class="py-3">
                                         <i class="fa-light fa-vault text-body-secondary mb-3" style="font-size: 50px; opacity: 0.5;"></i>
                                         <h5 class="fw-bold text-body-secondary mb-1">Belum Ada Data Outlet / Omzet</h5>
@@ -523,13 +571,17 @@ $countOutlet = count($rows);
                                 <td class="py-3 px-3 text-end text-danger fs-6">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
                                 </td>
-                                <td class="py-3 px-3 text-end text-success fs-5">
-                                    <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakInvestor, 0, ',', '.') : '-'; ?>
+                                <!-- Highlighted ONLY Total Keseluruhan Hak Investor -->
+                                <td class="py-3 px-3 text-end text-success fs-5 bg-success-subtle bg-opacity-25" style="border: 2px solid #198754; border-radius: 8px;">
+                                    <span class="badge bg-success text-white px-3 py-2 fs-5 rounded-pill shadow-xs">
+                                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakInvestor, 0, ',', '.') : 'Rp 0'; ?>
+                                    </span>
                                 </td>
                                 <td class="py-3 px-3 text-end text-warning fs-5">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
                                 </td>
                                 <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
+                                <td class="py-3 px-3 text-center text-body-secondary pe-3">-</td>
                             </tr>
                         </tfoot>
                     <?php endif; ?>
@@ -537,19 +589,370 @@ $countOutlet = count($rows);
             </div>
         </div>
     </div>
+
+    <!-- Jarak Aman Tambahan Sebelum Footer -->
+    <div class="pb-4 pb-md-5"></div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: FILTER DATA REKAP BAGI HASIL (Theme Adaptive) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalFilterBagiHasil" tabindex="-1" aria-labelledby="modalFilterBagiHasilLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-body-emphasis" id="modalFilterBagiHasilLabel">
+                    <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Data Rekap Bagi Hasil
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/bagi-hasil">
+                <div class="modal-body p-4">
+                    <?php if ($role === 'investor' && !empty($investorOutlets)) : ?>
+                        <!-- 1. Pencarian Outlet Interaktif -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-body-secondary">
+                                <i class="fa-solid fa-store me-1 text-danger"></i>Cari & Pilih Toko / Outlet
+                            </label>
+                            <input type="hidden" name="outlet_id" id="filterModalOutletId" value="<?= $selectedOutletId; ?>">
+                            
+                            <div class="position-relative">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-body-secondary border-body-subtle text-body-secondary">
+                                        <i class="fa-light fa-magnifying-glass"></i>
+                                    </span>
+                                    <input type="text" id="filterModalOutletSearch" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold shadow-none" placeholder="Ketik nama toko..." value="<?= htmlspecialchars($selectedOutletNama); ?>" autocomplete="off">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnResetSelectedOutlet" title="Pilih Semua Outlet">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Badge Status Outlet Terpilih -->
+                                <div id="selectedOutletBadgeContainer" class="mt-2 <?= ($selectedOutletId > 0) ? '' : 'd-none'; ?>">
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold" id="selectedOutletBadgeText">
+                                        <i class="fa-solid fa-store me-1"></i> Terpilih: <?= htmlspecialchars($selectedOutletNama ?: 'Semua Outlet'); ?>
+                                    </span>
+                                </div>
+
+                                <!-- Box Hasil Pencarian Toko (Live Search Dropdown) -->
+                                <div id="outletSearchResultsBox" class="list-group position-absolute w-100 shadow-lg border border-body-subtle rounded-3 mt-1 d-none" style="z-index: 1056; max-height: 220px; overflow-y: auto;">
+                                    <!-- Rendered dynamically via JavaScript -->
+                                </div>
+                            </div>
+                            <div class="form-text text-body-secondary small mt-1">
+                                <i class="fa-solid fa-circle-info me-1 text-primary"></i>Pilih <strong>Semua Toko</strong> untuk melihat rekapitulasi akumulasi seluruh toko Anda, atau ketik nama toko untuk melihat per toko.
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- 2. Rentang Tanggal (Bebas: 1 Hari, 3 Hari, 1 Minggu, dll) -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <small class="text-body-secondary d-block mb-1">Tanggal Mulai</small>
+                                <input type="date" name="tgl_mulai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglMulai); ?>">
+                            </div>
+                            <div class="col-6">
+                                <small class="text-body-secondary d-block mb-1">Tanggal Selesai</small>
+                                <input type="date" name="tgl_selesai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
+                            </div>
+                        </div>
+                        <div class="form-text text-body-secondary micro-text mt-1">
+                            *Bisa pilih 1 hari (samakan tgl mulai & selesai), 3 hari, 1 minggu, atau bebas.
+                        </div>
+                    </div>
+
+                    <!-- 4. Filter Bulan & Tahun -->
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-days me-1 text-danger"></i>Filter Bulan</label>
+                            <select name="bulan" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
+                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
+                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-lines me-1 text-danger"></i>Filter Tahun</label>
+                            <select name="tahun" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
+                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
+                                <?php foreach ($availableYears as $yVal) : ?>
+                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>><?= $yVal; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: DETAIL RINCIAN OMZET HARIAN TOKO (Tgl 1 s.d. Tgl 31) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel">
+                    <i class="fa-solid fa-calendar-days me-2 text-danger"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Table of Daily Omzet -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 w-100" id="tableModalDetailHarian">
+                        <thead class="table-group-divider bg-body-secondary small text-body-secondary text-uppercase">
+                            <tr>
+                                <th class="ps-3" style="width: 50px;">No</th>
+                                <th>Tanggal Laporan</th>
+                                <th class="text-end">Omzet Harian</th>
+                                <th class="text-end text-danger">Potongan 10%</th>
+                                <th class="text-end text-success">Hak Investor (50%)</th>
+                                <th class="text-end text-warning pe-3">Hak Outlet (50%)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-0 small">
+                            <!-- Loaded dynamically via JS -->
+                        </tbody>
+                        <tfoot class="table-group-divider bg-body-secondary small fw-bold d-none" id="tfootModalDetailHarian">
+                            <tr>
+                                <td colspan="2" class="py-3 ps-3 text-end text-body-emphasis text-uppercase fw-bold">TOTAL KESELURUHAN:</td>
+                                <td class="py-3 text-end text-body-emphasis fs-6 fw-extrabold" id="tfootTotOmzet">Rp 0</td>
+                                <td class="py-3 text-end text-danger fs-6 fw-extrabold" id="tfootTotPotongan">Rp 0</td>
+                                <td class="py-3 text-end text-success fs-6 fw-extrabold bg-success-subtle bg-opacity-25" id="tfootTotHakInv">Rp 0</td>
+                                <td class="py-3 text-end text-warning fs-6 fw-extrabold pe-3" id="tfootTotHakOut">Rp 0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-between">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 $(document).ready(function() {
-    // Filter Bulan & Filter Tahun Dropdown Change Handlers
-    function applyBagiHasilFilters() {
-        const bVal = $('#filterBulanBagiHasil').val();
-        const yVal = $('#filterTahunBagiHasil').val();
-        window.location.href = '<?= SystemInfo::app('CLIENT_URL'); ?>/bagi-hasil?bulan=' + bVal + '&tahun=' + yVal;
+    const investorOutlets = <?= json_encode($investorOutlets); ?>;
+    const searchInput = $('#filterModalOutletSearch');
+    const resultsBox = $('#outletSearchResultsBox');
+    const hiddenInput = $('#filterModalOutletId');
+    const badgeContainer = $('#selectedOutletBadgeContainer');
+    const badgeText = $('#selectedOutletBadgeText');
+    let searchTimeout = null;
+
+    // Trigger Modal Rincian Omzet Harian
+    $(document).on('click', '.btn-detail-harian-outlet', function() {
+        const idOutlet = $(this).data('id');
+        const namaOutlet = $(this).data('nama');
+        const tglMulai = '<?= htmlspecialchars($selectedTglMulai); ?>';
+        const tglSelesai = '<?= htmlspecialchars($selectedTglSelesai); ?>';
+        const bulan = '<?= $selectedBulan; ?>';
+        const tahun = '<?= $selectedTahun; ?>';
+
+        $('#lblModalNamaOutlet').text(namaOutlet);
+        $('#tfootModalDetailHarian').addClass('d-none');
+        $('#tableModalDetailHarian tbody').html(`
+            <tr>
+                <td colspan="6" class="text-center py-4 text-body-secondary">
+                    <i class="fa-solid fa-spinner fa-spin me-2 text-danger fs-5"></i>Memuat rincian omzet harian...
+                </td>
+            </tr>
+        `);
+        $('#modalDetailOmzetHarian').modal('show');
+
+        $.ajax({
+            url: '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/action.php',
+            type: 'GET',
+            data: {
+                action: 'get_detail_harian',
+                id_outlet: idOutlet,
+                tgl_mulai: tglMulai,
+                tgl_selesai: tglSelesai,
+                bulan: bulan,
+                tahun: tahun
+            },
+            dataType: 'json',
+            success: function(res) {
+                if (res.success) {
+                    const tbody = $('#tableModalDetailHarian tbody');
+                    tbody.empty();
+
+                    if (res.items && res.items.length > 0) {
+                        const fmt = new Intl.NumberFormat('id-ID');
+                        res.items.forEach((item, idx) => {
+                            tbody.append(`
+                                <tr>
+                                    <td class="ps-3 fw-bold text-body-secondary">${idx + 1}</td>
+                                    <td class="fw-bold text-body-emphasis">
+                                        <i class="fa-regular fa-calendar-day me-1 text-danger"></i>${item.tgl_formatted}
+                                    </td>
+                                    <td class="text-end fw-bold text-body-emphasis">Rp ${fmt.format(item.omzet)}</td>
+                                    <td class="text-end fw-semibold text-danger">Rp ${fmt.format(item.potongan_10)}</td>
+                                    <td class="text-end fw-bold text-success">Rp ${fmt.format(item.hak_investor)}</td>
+                                    <td class="text-end fw-semibold text-warning pe-3">Rp ${fmt.format(item.hak_outlet)}</td>
+                                </tr>
+                            `);
+                        });
+
+                        // Set Foot Values
+                        $('#tfootTotOmzet').text('Rp ' + fmt.format(res.summary.total_omzet));
+                        $('#tfootTotPotongan').text('Rp ' + fmt.format(res.summary.total_potongan));
+                        $('#tfootTotHakInv').text('Rp ' + fmt.format(res.summary.total_hak_investor));
+                        $('#tfootTotHakOut').text('Rp ' + fmt.format(res.summary.total_hak_outlet));
+                        $('#tfootModalDetailHarian').removeClass('d-none');
+                    } else {
+                        $('#tfootModalDetailHarian').addClass('d-none');
+                        tbody.html(`
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-body-secondary">
+                                    Belum ada catatan omzet harian pada periode ini.
+                                </td>
+                            </tr>
+                        `);
+                    }
+                } else {
+                    $('#tfootModalDetailHarian').addClass('d-none');
+                    $('#tableModalDetailHarian tbody').html(`
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-danger fw-semibold">
+                                ${res.message}
+                            </td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function() {
+                $('#tfootModalDetailHarian').addClass('d-none');
+                $('#tableModalDetailHarian tbody').html(`
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-danger fw-semibold">
+                            Terjadi kesalahan saat memuat data rincian harian.
+                        </td>
+                    </tr>
+                `);
+            }
+        });
+    });
+
+    function renderResults(query) {
+        if (!investorOutlets || investorOutlets.length === 0) return;
+
+        const cleanQuery = (query || '').trim().toLowerCase();
+
+        if (cleanQuery.length === 0) {
+            resultsBox.removeClass('d-none').empty();
+            const isAllSelected = parseInt(hiddenInput.val()) === 0;
+            resultsBox.append(`
+                <button type="button" class="list-group-item list-group-item-action ${isAllSelected ? 'bg-danger-subtle text-danger fw-bold' : 'bg-body text-body-emphasis'} small py-2.5 px-3 btn-select-outlet" data-id="0" data-name="">
+                    <i class="fa-solid fa-store me-2 ${isAllSelected ? 'text-danger' : 'text-primary'}"></i><strong>Semua Toko</strong> <span class="small text-body-secondary ms-1">(Rekap Akumulasi Seluruh Toko)</span>
+                </button>
+            `);
+            return;
+        }
+
+        resultsBox.removeClass('d-none').html(`
+            <div class="list-group-item bg-body text-body-secondary small py-3 text-center fw-semibold border-0">
+                <i class="fa-solid fa-spinner fa-spin me-2 text-danger"></i>Mencari toko...
+            </div>
+        `);
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            resultsBox.empty();
+
+            const isAllSelected = parseInt(hiddenInput.val()) === 0;
+            resultsBox.append(`
+                <button type="button" class="list-group-item list-group-item-action ${isAllSelected ? 'bg-danger-subtle text-danger fw-bold' : 'bg-body text-body-emphasis'} small py-2.5 px-3 border-bottom btn-select-outlet" data-id="0" data-name="">
+                    <i class="fa-solid fa-store me-2 ${isAllSelected ? 'text-danger' : 'text-primary'}"></i><strong>Semua Toko</strong> <span class="small text-body-secondary ms-1">(Rekap Akumulasi Seluruh Toko)</span>
+                </button>
+            `);
+
+            const filtered = investorOutlets.filter(function(item) {
+                return (item.nama_outlet && item.nama_outlet.toLowerCase().includes(cleanQuery)) || 
+                       (item.kode_outlet && item.kode_outlet.toLowerCase().includes(cleanQuery));
+            });
+
+            if (filtered.length > 0) {
+                filtered.forEach(function(item) {
+                    const isSelected = parseInt(item.id_outlet) === parseInt(hiddenInput.val());
+                    const activeClass = isSelected ? 'bg-danger text-white fw-bold' : 'bg-body text-body-emphasis';
+                    const iconClass = isSelected ? 'text-white' : 'text-danger';
+
+                    resultsBox.append(`
+                        <button type="button" class="list-group-item list-group-item-action ${activeClass} small py-2 px-3 btn-select-outlet" data-id="${item.id_outlet}" data-name="${item.nama_outlet}">
+                            <i class="fa-solid fa-store me-2 ${iconClass}"></i>${item.nama_outlet}
+                        </button>
+                    `);
+                });
+            } else {
+                resultsBox.append(`
+                    <div class="list-group-item bg-body text-danger small py-3 text-center fw-semibold border-0">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> Data toko tidak ditemukan
+                    </div>
+                `);
+            }
+        }, 200);
     }
 
-    $('#filterBulanBagiHasil, #filterTahunBagiHasil').on('change', function() {
-        applyBagiHasilFilters();
+    searchInput.on('focus', function() {
+        if ($(this).val() === 'Semua Toko') {
+            $(this).select();
+        }
+        renderResults($(this).val() === 'Semua Toko' ? '' : $(this).val());
+    });
+
+    searchInput.on('input', function() {
+        renderResults($(this).val());
+    });
+
+    $(document).on('click', '.btn-select-outlet', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = parseInt($(this).data('id'));
+        const name = $(this).data('name') || '';
+
+        if (isNaN(id) || id === 0) {
+            hiddenInput.val(0);
+            searchInput.val('Semua Toko');
+            badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
+            badgeContainer.removeClass('d-none');
+        } else {
+            hiddenInput.val(id);
+            searchInput.val(name);
+            badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: ' + name);
+            badgeContainer.removeClass('d-none');
+        }
+        resultsBox.addClass('d-none');
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#filterModalOutletSearch, #outletSearchResultsBox').length) {
+            resultsBox.addClass('d-none');
+        }
+    });
+
+    $('#btnResetSelectedOutlet').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        hiddenInput.val(0);
+        searchInput.val('Semua Toko');
+        badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
+        badgeContainer.removeClass('d-none');
+        resultsBox.addClass('d-none');
     });
 });
 </script>

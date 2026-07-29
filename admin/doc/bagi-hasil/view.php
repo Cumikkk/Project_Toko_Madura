@@ -77,13 +77,29 @@ $totHakOutlet = 0;
 if ($resBagiHasil) {
     while ($row = $resBagiHasil->fetch_assoc()) {
         $omzet = (float)$row['total_omzet'];
+        $idOutletRow = (int)$row['id_outlet'];
         $persen = (float)($row['persen_bagian_investor'] ?? 50.00);
         $persenOutlet = 100.00 - $persen;
 
-        $potongan = round($omzet * ($potonganGlobal / 100.0), 2);
-        $hakInvestor = round($potongan * ($persen / 100.0), 2);
-        $hakOutlet   = round($potongan * ($persenOutlet / 100.0), 2);
+        $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
+        $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $checkBulan, $checkTahun);
+        $lastDayDateStr = sprintf('%04d-%02d-%02d', $checkTahun, $checkBulan, $daysInMonth);
 
+        $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
+        $isLastDayDone = ($chkLast && $chkLast->num_rows > 0);
+
+        if ($isLastDayDone) {
+            $potongan = round($omzet * ($potonganGlobal / 100.0), 2);
+            $hakInvestor = round($potongan * ($persen / 100.0), 2);
+            $hakOutlet   = round($potongan * ($persenOutlet / 100.0), 2);
+        } else {
+            $potongan = 0.00;
+            $hakInvestor = 0.00;
+            $hakOutlet = 0.00;
+        }
+
+        $row['is_last_day_done'] = $isLastDayDone;
         $row['potongan_hitung'] = $potongan;
         $row['hak_investor']    = $hakInvestor;
         $row['hak_outlet']      = $hakOutlet;
@@ -237,9 +253,9 @@ $periodeLabel = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '-') . ' ' 
                                             <span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'] ?? 50, 0) ?>%</span>
                                         </td>
                                         <td class="text-end fw-bold"><?= (float)$row['total_omzet'] > 0 ? 'Rp ' . number_format($row['total_omzet'], 0, ',', '.') : '<span class="text-muted">-</span>' ?></td>
-                                        <td class="text-end text-danger"><?= $row['potongan_hitung'] > 0 ? 'Rp ' . number_format($row['potongan_hitung'], 0, ',', '.') : '<span class="text-muted">-</span>' ?></td>
-                                        <td class="text-end fw-bold text-success"><?= $row['hak_investor'] > 0 ? 'Rp ' . number_format($row['hak_investor'], 0, ',', '.') : '<span class="text-muted">-</span>' ?></td>
-                                        <td class="text-end fw-bold text-info"><?= $row['hak_outlet'] > 0 ? 'Rp ' . number_format($row['hak_outlet'], 0, ',', '.') : '<span class="text-muted">-</span>' ?></td>
+                                        <td class="text-end text-danger"><?= $row['potongan_hitung'] > 0 ? 'Rp ' . number_format($row['potongan_hitung'], 0, ',', '.') : '<span class="badge bg-light text-muted">Rp 0 (Belum Dipotong)</span>' ?></td>
+                                        <td class="text-end fw-bold text-success"><?= $row['hak_investor'] > 0 ? 'Rp ' . number_format($row['hak_investor'], 0, ',', '.') : '<span class="badge bg-light text-muted">Rp 0 (Belum Aktif)</span>' ?></td>
+                                        <td class="text-end fw-bold text-info"><?= $row['hak_outlet'] > 0 ? 'Rp ' . number_format($row['hak_outlet'], 0, ',', '.') : '<span class="badge bg-light text-muted">Rp 0 (Belum Aktif)</span>' ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else : ?>

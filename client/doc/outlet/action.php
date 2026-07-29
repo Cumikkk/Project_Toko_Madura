@@ -72,8 +72,8 @@ try {
         }
         $newUserId = $db->insert_id;
 
-        // Insert Outlet Record
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}')";
+        // Insert Outlet Record with created_at timestamp
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet, created_at) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
@@ -112,9 +112,9 @@ try {
     // =========================================================================
     if ($action === 'edit') {
         $idOutlet = (int)($_POST['id_outlet'] ?? 0);
-        $namaOutlet = trim($db->real_escape_string($_POST['nama_outlet'] ?? ''));
-        $alamatOutlet = trim($db->real_escape_string($_POST['alamat_outlet'] ?? ''));
-        $username = trim($db->real_escape_string($_POST['username'] ?? ''));
+        $namaOutlet = trim($_POST['nama_outlet'] ?? '');
+        $alamatOutlet = trim($_POST['alamat_outlet'] ?? '');
+        $username = trim($_POST['username'] ?? '');
         $password = trim($_POST['password'] ?? '');
 
         if (empty($idOutlet) || empty($namaOutlet) || empty($username)) {
@@ -129,21 +129,29 @@ try {
         $associatedUserId = (int)$resCheck->fetch_assoc()['id_users'];
 
         // Check if username used by another user
-        $chkUser = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('{$username}') AND id_users != {$associatedUserId} LIMIT 1");
+        $safeUsername = $db->real_escape_string($username);
+        $chkUser = $db->query("SELECT id_users FROM users WHERE LOWER(username) = LOWER('{$safeUsername}') AND id_users != {$associatedUserId} LIMIT 1");
         if ($chkUser && $chkUser->num_rows > 0) {
             JsonResponse(['success' => false, 'message' => 'Username "' . htmlspecialchars($username) . '" sudah digunakan oleh pengguna lain.']);
         }
 
+        // Escape variables right before query execution
+        $safeNamaOutlet = $db->real_escape_string($namaOutlet);
+        $safeAlamatOutlet = $db->real_escape_string($alamatOutlet);
+
         // Update Outlet
-        $db->query("UPDATE outlet SET nama_outlet = '{$namaOutlet}', alamat_outlet = '{$alamatOutlet}' WHERE id_outlet = {$idOutlet}");
+        $updateOutlet = $db->query("UPDATE outlet SET nama_outlet = '{$safeNamaOutlet}', alamat_outlet = '{$safeAlamatOutlet}' WHERE id_outlet = {$idOutlet}");
+        if (!$updateOutlet) {
+            JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
+        }
 
         // Update User Account
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
-            $db->query("UPDATE users SET nama_lengkap = '{$namaOutlet}', username = '{$username}', password = '{$escapedHash}' WHERE id_users = {$associatedUserId}");
+            $db->query("UPDATE users SET nama_lengkap = '{$safeNamaOutlet}', username = '{$safeUsername}', password = '{$escapedHash}' WHERE id_users = {$associatedUserId}");
         } else {
-            $db->query("UPDATE users SET nama_lengkap = '{$namaOutlet}', username = '{$username}' WHERE id_users = {$associatedUserId}");
+            $db->query("UPDATE users SET nama_lengkap = '{$safeNamaOutlet}', username = '{$safeUsername}' WHERE id_users = {$associatedUserId}");
         }
 
         JsonResponse(['success' => true, 'message' => 'Data Outlet berhasil diperbarui!']);

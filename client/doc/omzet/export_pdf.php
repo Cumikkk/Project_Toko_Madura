@@ -32,29 +32,57 @@ if (!$outlet) {
 
 $idOutlet = (int)$outlet['id_outlet'];
 
-// Separate Month & Year Filter
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
-
 $bulanIndo = [
     1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
     7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 
-$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : 'Semua Bulan ') . ($selectedTahun > 0 ? $selectedTahun : '');
-if ($selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Periode';
+// 4 Dropdown Filter Columns (Tanggal 1-31, Minggu 1-5, Bulan, Tahun)
+$selectedTglNum = isset($_GET['tanggal']) ? (int)$_GET['tanggal'] : 0;
+$selectedMinggu = isset($_GET['minggu']) ? (int)$_GET['minggu'] : 0;
+$selectedBulan  = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
+$selectedTahun  = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
+
+if (!isset($_GET['tanggal']) && !isset($_GET['minggu']) && !isset($_GET['bulan']) && !isset($_GET['tahun'])) {
+    $selectedBulan = (int)date('n');
+    $selectedTahun = (int)date('Y');
 }
 
-// Build WHERE Clause for filtering
 $whereConditions = ["id_outlet = {$idOutlet}"];
+$labelParts = [];
+
+if ($selectedTglNum > 0) {
+    $whereConditions[] = "DAY(periode_laporan) = {$selectedTglNum}";
+    $labelParts[] = "Tanggal {$selectedTglNum}";
+}
 if ($selectedBulan > 0) {
     $whereConditions[] = "MONTH(periode_laporan) = {$selectedBulan}";
+    $labelParts[] = $bulanIndo[$selectedBulan] ?? '';
 }
 if ($selectedTahun > 0) {
     $whereConditions[] = "YEAR(periode_laporan) = {$selectedTahun}";
+    $labelParts[] = $selectedTahun;
+}
+if ($selectedMinggu > 0) {
+    if ($selectedMinggu === 1) {
+        $whereConditions[] = "DAY(periode_laporan) BETWEEN 1 AND 7";
+        $labelParts[] = "(Minggu Ke-1 / Tgl 1-7)";
+    } else if ($selectedMinggu === 2) {
+        $whereConditions[] = "DAY(periode_laporan) BETWEEN 8 AND 14";
+        $labelParts[] = "(Minggu Ke-2 / Tgl 8-14)";
+    } else if ($selectedMinggu === 3) {
+        $whereConditions[] = "DAY(periode_laporan) BETWEEN 15 AND 21";
+        $labelParts[] = "(Minggu Ke-3 / Tgl 15-21)";
+    } else if ($selectedMinggu === 4) {
+        $whereConditions[] = "DAY(periode_laporan) BETWEEN 22 AND 28";
+        $labelParts[] = "(Minggu Ke-4 / Tgl 22-28)";
+    } else if ($selectedMinggu === 5) {
+        $whereConditions[] = "DAY(periode_laporan) >= 29";
+        $labelParts[] = "(Minggu Ke-5 / Tgl 29+)";
+    }
 }
 
+$periodeLabelStr = !empty($labelParts) ? implode(" ", $labelParts) : "Semua Periode";
 $whereSql = "WHERE " . implode(" AND ", $whereConditions);
 
 $sqlOmzet = "SELECT * FROM laporan_omzet {$whereSql} ORDER BY periode_laporan ASC";
@@ -287,12 +315,65 @@ ob_start();
         </tbody>
         <tfoot>
             <tr style="background-color: #f1f5f9; font-weight: bold;">
-                <td colspan="3" class="text-end" style="padding: 10px; font-size: 11px; text-transform: uppercase;">TOTAL KESELURUHAN OMZET KOTOR:</td>
+                <td colspan="3" class="text-end" style="padding: 10px; font-size: 11px; text-transform: uppercase;">TOTAL KESELURUHAN OMZET KOTOR (100%):</td>
                 <td class="text-end text-success" style="padding: 10px; font-size: 13px;">
                     Rp <?= number_format($totalOmzet, 0, ',', '.'); ?>
                 </td>
             </tr>
         </tfoot>
+    </table>
+
+    <?php 
+        $potonganGlobal = 10.00;
+        $pot10Pdf  = round($totalOmzet * ($potonganGlobal / 100), 2);
+        $hakInvPdf = round($pot10Pdf * 0.50, 2);
+        $hakOutPdf = round($pot10Pdf * 0.50, 2);
+        $totalAkhirOutletPdf = ($totalOmzet - $pot10Pdf) + $hakOutPdf;
+    ?>
+
+    <!-- Summary Box Bagi Hasil (10% Potongan -> 50% Investor : 50% Outlet) -->
+    <table class="meta-box" style="margin-bottom: 25px; border: 1px solid #cbd5e1;">
+        <tr style="background-color: #f8fafc;">
+            <td colspan="2" style="font-weight: bold; font-size: 12px; color: #7D0A0A; border-bottom: 1px solid #e2e8f0; padding: 8px 12px;">
+                REKAPITULASI BAGI HASIL PERIODE <?= htmlspecialchars($periodeLabelStr); ?>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%; border-right: 1px solid #e2e8f0;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="meta-label">Total Omzet Toko</td>
+                        <td class="meta-value">: Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label" style="color: #dc2626;">Nominal Potongan 10%</td>
+                        <td class="meta-value" style="color: #dc2626;">: Rp <?= number_format($pot10Pdf, 0, ',', '.'); ?></td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 50%;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="meta-label" style="color: #16a34a;">Hak Investor (50% dari 10%)</td>
+                        <td class="meta-value" style="color: #16a34a;">: Rp <?= number_format($hakInvPdf, 0, ',', '.'); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label" style="color: #d97706;">Hak Outlet (50% dari 10%)</td>
+                        <td class="meta-value" style="color: #d97706;">: Rp <?= number_format($hakOutPdf, 0, ',', '.'); ?></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="background-color: #f0fdf4; border-top: 1px solid #bbf7d0;">
+            <td colspan="2" style="padding: 10px 12px;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="meta-label" style="color: #16a34a; font-weight: bold; font-size: 11px; text-transform: uppercase;">Total Pendapatan Akhir Diterima Outlet (Omzet 90% + Bagi Hasil 50%):</td>
+                        <td class="meta-value text-end" style="color: #16a34a; font-weight: bold; font-size: 13px;">Rp <?= number_format($totalAkhirOutletPdf, 0, ',', '.'); ?></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </table>
 
     <!-- Signatures -->

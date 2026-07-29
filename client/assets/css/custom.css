@@ -449,49 +449,18 @@ body.dark-theme .mobile-logo img.dark-theme {
     visibility: visible;
 }
 
-/* 11. Layout Dimensions & Responsive Alignment */
-@media (min-width: 992px) {
-    body.body-padding,
-    body.body-padding.light-theme,
-    body.body-padding.dark-theme {
-        padding-left: 260px !important;
-    }
-    
-    .header {
-        left: 260px !important;
-        width: calc(100% - 260px) !important;
-    }
+/* 11. Layout Dimensions & Responsive Alignment (Fixed Top Bar Override) */
+body.body-padding,
+body.body-padding.light-theme,
+body.body-padding.dark-theme,
+.body-padding {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
 
-    /* Collapsed Sidebar on Desktop */
-    .main-sidebar.tm-maroon-sidebar.collapsed {
-        width: 80px !important;
-    }
-
-    body.body-padding.expanded {
-        padding-left: 80px !important;
-    }
-
-    .header.expanded {
-        left: 80px !important;
-        width: calc(100% - 80px) !important;
-    }
-
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-txt,
-    .main-sidebar.tm-maroon-sidebar.collapsed .brand-text-container,
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-user-card,
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-section-title {
-        display: none !important;
-    }
-
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-link {
-        justify-content: center !important;
-        padding: 14px 0 !important;
-    }
-
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-brand {
-        justify-content: center !important;
-        padding: 16px 0 !important;
-    }
+.header {
+    left: 0 !important;
+    width: 100% !important;
 }
 
 @media (max-width: 991.98px) {
@@ -787,37 +756,20 @@ body.dark-theme .mobile-logo img.dark-theme {
     visibility: visible;
 }
 
-/* Desktop Layout Adjustments */
+/* Desktop Layout Adjustments (Fixed Top Bar Override) */
 @media (min-width: 992px) {
-    body.body-padding {
-        padding-left: 260px !important;
+    body.body-padding,
+    body.body-padding.expanded {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
     }
     
-    .header {
-        left: 260px !important;
-        width: calc(100% - 260px) !important;
-    }
-
-    /* Collapsed Sidebar on Desktop */
-    .main-sidebar.tm-maroon-sidebar.collapsed {
-        width: 80px !important;
-    }
-
-    body.body-padding.expanded {
-        padding-left: 80px !important;
-    }
-
+    .header,
     .header.expanded {
-        left: 80px !important;
-        width: calc(100% - 80px) !important;
+        left: 0 !important;
+        width: 100% !important;
     }
-
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-txt,
-    .main-sidebar.tm-maroon-sidebar.collapsed .brand-text-container,
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-user-card,
-    .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-section-title {
-        display: none !important;
-    }
+}
 
     .main-sidebar.tm-maroon-sidebar.collapsed .sidebar-link {
         justify-content: center !important;
@@ -849,5 +801,148 @@ body.dark-theme .mobile-logo img.dark-theme {
     .main-sidebar.tm-maroon-sidebar.mobile-open {
         transform: translateX(0) !important;
         box-shadow: 10px 0 35px rgba(0, 0, 0, 0.5) !important;
+    }
+}
+
+/* ==========================================================================
+   FIXED MAROON TOP BAR NAVIGATION OVERRIDES (EDGE-TO-EDGE)
+   ========================================================================== */
+body.body-padding, 
+body.body-p-top, 
+.main-content, 
+.main-content-inner {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.main-sidebar, 
+.sidebar-overlay, 
+#sidebarOverlay, 
+.nav-close-btn {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Maroon Fixed Header Edge-to-Edge (Forced Override Across All Themes) */
+html body .header,
+html body.light-theme .header,
+html body.dark-theme .header,
+html body .header.fixed-topbar-header,
+.header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 70px !important;
+    z-index: 1040 !important;
+    background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%) !important;
+    background-color: #7D0A0A !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 20px rgba(125, 10, 10, 0.35) !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+html body .header .text-body-emphasis,
+html body .header .text-body-secondary,
+html body .header span.brand-title {
+    color: #ffffff !important;
+}
+
+@media (min-width: 1200px) {
+    .header.fixed-topbar-header {
+        padding-left: 32px !important;
+        padding-right: 32px !important;
+    }
+}
+
+/* Topbar Pill Container on Maroon Header */
+.topbar-nav-pill-container {
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 4px 6px;
+    border-radius: 50rem;
+    backdrop-filter: blur(8px);
+}
+
+/* Topbar Nav Link Styling on Maroon */
+.topbar-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 22px;
+    border-radius: 50rem;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.88) !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease-in-out;
+}
+.topbar-nav-pill:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.topbar-nav-pill.active {
+    color: #7D0A0A !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Mobile Dropdown Topbar Menu (Maroon Style) */
+.mobile-topbar-dropdown {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1039;
+    background: #580808;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    padding: 14px 16px;
+}
+.mobile-topbar-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none !important;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 8px;
+}
+.mobile-topbar-link.active {
+    color: #7D0A0A !important;
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Custom Header Right Buttons for Maroon Topbar */
+.fixed-topbar-header .header-btn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+.fixed-topbar-header .header-btn:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        padding-top: 85px !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .main-content {
+        padding-top: 85px !important;
     }
 }

@@ -68,7 +68,7 @@ try {
     // ACTION: INPUT OMZET HARIAN (ADD LAPORAN OMZET)
     // =========================================================================
     if ($action === 'add') {
-        $tanggalOmzet = trim($_POST['tanggal_omzet'] ?? date('Y-m-d'));
+        $tanggalOmzet = trim($_POST['periode_laporan'] ?? $_POST['tanggal_omzet'] ?? date('Y-m-d'));
         $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', $_POST['omzet'] ?? '0');
         $omzet = (float)$rawOmzet;
 
@@ -126,9 +126,13 @@ try {
 
         JsonResponse([
             'success' => true,
-            'message' => 'Omzet harian tanggal ' . $tglStr . ' sebesar Rp ' . number_format($omzet, 0, ',', '.') . ' berhasil disimpan!' . $noteMsg,
+            'message' => 'Omzet harian tanggal ' . $tglStr . ' sebesar Rp ' . number_format($omzet, 0, ',', '.') . ' berhasil disimpan!',
             'data' => [
                 'omzet' => $omzet,
+                'omzet_formatted' => 'Rp ' . number_format($omzet, 0, ',', '.'),
+                'tgl_formatted' => $tglStr,
+                'waktu_input' => date('d/m/Y H:i', strtotime($waktuInput)),
+                'is_last_day' => ($isLastDayInput || $isLastDayInDb),
                 'potongan' => $nominalPotongan,
                 'bersih' => $bersihOutlet,
                 'presentase' => $appliedPercent,

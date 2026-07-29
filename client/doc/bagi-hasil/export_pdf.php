@@ -50,9 +50,17 @@ if ($resSet && $resSet->num_rows > 0) {
     $potonganGlobal = (float)$resSet->fetch_assoc()['nilai'];
 }
 
-// Separate Month & Year Filter
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
+// Filter Logic (Outlet, Rentang Tanggal, Bulan, Tahun)
+$selectedOutletId   = isset($_GET['outlet_id']) ? (int)$_GET['outlet_id'] : (isset($_GET['id_outlet']) ? (int)$_GET['id_outlet'] : (isset($_GET['outlet']) ? (int)$_GET['outlet'] : 0));
+$selectedTglMulai   = isset($_GET['tgl_mulai']) && !empty($_GET['tgl_mulai']) ? trim($_GET['tgl_mulai']) : '';
+$selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']) ? trim($_GET['tgl_selesai']) : '';
+$selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
+$selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
+
+if (!isset($_GET['outlet_id']) && !isset($_GET['id_outlet']) && !isset($_GET['outlet']) && !isset($_GET['tgl_mulai']) && !isset($_GET['tgl_selesai']) && !isset($_GET['bulan']) && !isset($_GET['tahun'])) {
+    $selectedBulan = (int)date('n');
+    $selectedTahun = (int)date('Y');
+}
 
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
@@ -67,11 +75,62 @@ $totHakOutlet = 0;
 $hasAnyLastDayDone = false;
 
 $whereConditions = ($role === 'investor') ? ["o.id_investor = {$investorId}"] : ["o.id_outlet = {$targetOutletId}"];
-if ($selectedBulan > 0) {
-    $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
+$selectedOutletNama = '';
+
+if ($selectedOutletId > 0 && $role === 'investor') {
+    $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
+    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$selectedOutletId} LIMIT 1");
+    if ($resOneOut && $resOneOut->num_rows > 0) {
+        $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
+    }
+} elseif ($role === 'outlet' && $targetOutletId > 0) {
+    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$targetOutletId} LIMIT 1");
+    if ($resOneOut && $resOneOut->num_rows > 0) {
+        $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
+    }
 }
-if ($selectedTahun > 0) {
-    $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+
+$periodeParts = [];
+
+if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereConditions[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    
+    if ($selectedTglMulai === $selectedTglSelesai) {
+        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai));
+    } else {
+        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai)) . ' - ' . date('d/m/Y', strtotime($selectedTglSelesai));
+    }
+} elseif (!empty($selectedTglMulai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $whereConditions[] = "l.periode_laporan >= '{$safeMulai}'";
+    $periodeParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
+} elseif (!empty($selectedTglSelesai)) {
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereConditions[] = "l.periode_laporan <= '{$safeSelesai}'";
+    $periodeParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
+} else {
+    if ($selectedBulan > 0) {
+        $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
+        $periodeParts[] = $bulanIndo[$selectedBulan] ?? '';
+    }
+    if ($selectedTahun > 0) {
+        $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+        $periodeParts[] = $selectedTahun;
+    }
+}
+
+$periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
+$periodeLabelStr = $periodeTitleStr;
+if (!empty($selectedOutletNama)) {
+    $periodeLabelStr .= " " . $selectedOutletNama;
+}
+
+$laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
+$joinOnClause = "o.id_outlet = l.id_outlet";
+if (!empty($laporanJoinConds)) {
+    $joinOnClause .= " AND " . implode(" AND ", $laporanJoinConds);
 }
 
 $sqlBagiHasil = "
@@ -82,7 +141,7 @@ $sqlBagiHasil = "
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
-    LEFT JOIN laporan_omzet l ON o.id_outlet = l.id_outlet AND " . implode(" AND ", array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false)) . "
+    LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
     GROUP BY o.id_outlet
     ORDER BY o.id_outlet DESC
@@ -358,7 +417,7 @@ ob_start();
         <thead>
             <tr>
                 <th class="text-center" style="width: 30px;">No</th>
-                <th style="width: 140px;">Kode & Nama Outlet</th>
+                <th style="width: 140px;">Nama Outlet</th>
                 <th class="text-end">Total Omzet (100%)</th>
                 <th class="text-end">Potongan (10%)</th>
                 <th class="text-end">Hak Investor (50%)</th>
@@ -372,8 +431,7 @@ ob_start();
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
                         <td>
-                            <strong><?= htmlspecialchars($r['nama_outlet']); ?></strong><br>
-                            <span style="font-size: 8.5px; color: #64748b; font-family: monospace;"><?= htmlspecialchars($r['kode_outlet']); ?></span>
+                            <strong><?= htmlspecialchars($r['nama_outlet']); ?></strong>
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                         <td class="text-end text-danger fw-bold">
