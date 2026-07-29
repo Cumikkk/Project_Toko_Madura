@@ -356,6 +356,39 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
     </div>
 </div>
 
+<!-- Modal Pratinjau Bukti Pembayaran -->
+<div class="modal fade" id="modalBuktiPembayaran" tabindex="-1" aria-labelledby="modalBuktiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px;overflow:hidden;">
+            <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-receipt text-info fs-5"></i>
+                    <div>
+                        <h6 class="modal-title text-white mb-0" id="modalBuktiLabel">Bukti Transfer Pembayaran</h6>
+                        <small class="text-info" id="bukti-outlet-name-sub"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 text-center" style="background:#0f0f1a;min-height:200px;">
+                <div id="bukti-spinner" class="py-5">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="text-muted mt-2 small">Memuat gambar...</p>
+                </div>
+                <img id="bukti-preview-img" src="" alt="Bukti Transfer"
+                     style="display:none;max-width:100%;max-height:70vh;object-fit:contain;"
+                     onload="document.getElementById('bukti-spinner').style.display='none';this.style.display='block';"
+                     onerror="document.getElementById('bukti-spinner').innerHTML='<p class=&quot;text-danger mt-4&quot;><i class=&quot;fas fa-exclamation-triangle me-2&quot;></i>Gagal memuat gambar</p>';">
+            </div>
+            <div class="modal-footer border-0 justify-content-end" style="background:#1a1a2e;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 // ============================================================
 // Show Alamat popup – called directly via onclick (no data-attr)
@@ -419,14 +452,17 @@ function previewBukti(filePath, namaOutlet) {
         window.open(proxyUrl, '_blank');
         return;
     }
-    Swal.fire({
-        title: 'Bukti Transfer: ' + namaOutlet,
-        imageUrl: proxyUrl,
-        imageAlt: 'Bukti Transfer Pembayaran',
-        showCloseButton: true,
-        confirmButtonText: 'Tutup',
-        confirmButtonColor: '#6c757d'
-    });
+    // Reset modal state
+    var img    = document.getElementById('bukti-preview-img');
+    var spin   = document.getElementById('bukti-spinner');
+    img.style.display = 'none';
+    img.src = '';
+    spin.style.display = 'block';
+    spin.innerHTML = '<div class="spinner-border text-info" role="status"></div><p class="text-muted mt-2 small">Memuat gambar...</p>';
+    document.getElementById('bukti-outlet-name-sub').textContent = namaOutlet;
+    img.src = proxyUrl;
+    var bsModal = new bootstrap.Modal(document.getElementById('modalBuktiPembayaran'));
+    bsModal.show();
 }
 
 function switchOutletTab(tabKey) {
