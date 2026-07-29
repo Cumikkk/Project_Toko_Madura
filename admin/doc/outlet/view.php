@@ -226,7 +226,7 @@ function safeJsonAlamat($str) {
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <a href="<?= SystemInfo::app('ADMIN_URL') . '/' . htmlspecialchars($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-sm">
+                                                    <a href="<?= SystemInfo::app('CLIENT_URL') . '/' . htmlspecialchars($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-sm">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </a>
                                                 <?php else : ?>

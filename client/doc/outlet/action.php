@@ -54,16 +54,16 @@ try {
             JsonResponse(['success' => false, 'message' => 'Username "' . htmlspecialchars($username) . '" sudah digunakan. Silakan gunakan username lain.']);
         }
 
-        // Fetch subscription fee from system config
+        // Fetch subscription fee or use posted/default Rp 500.000
+        $nominalBiaya = isset($_POST['nominal_biaya']) ? (float)$_POST['nominal_biaya'] : 500000.00;
         $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
-        $nominalBiaya = 50000.00;
         if ($resFee && $resFee->num_rows > 0) {
             $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
         }
 
         $kecamatan = trim($db->real_escape_string($_POST['kecamatan'] ?? ''));
 
-        // Handle Upload Bukti Pembayaran if uploaded
+        // Handle Upload Bukti Pembayaran
         $buktiPath = '';
         if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/../../uploads/bukti_pembayaran/';
@@ -71,12 +71,21 @@ try {
                 mkdir($uploadDir, 0777, true);
             }
             $fileExt = strtolower(pathinfo($_FILES['bukti_pembayaran']['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            if (!in_array($fileExt, $allowedExts)) {
+                JsonResponse(['success' => false, 'message' => 'Format file bukti bayar tidak didukung. Harap unggah JPG, PNG, atau PDF.']);
+            }
+
             $newFileName = 'bukti_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
             $targetFilePath = $uploadDir . $newFileName;
 
             if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
                 $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
             }
+        }
+
+        if (empty($buktiPath)) {
+            JsonResponse(['success' => false, 'message' => 'Harap unggah foto / file bukti transfer pembayaran pendaftaran outlet.']);
         }
 
         // Hash Password & Insert User Account
@@ -89,16 +98,16 @@ try {
         }
         $newUserId = $db->insert_id;
 
-        // Insert Outlet Record with status and timestamps
+        // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
 
         JsonResponse([
             'success' => true,
-            'message' => 'Request pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" berhasil dikirim! Menunggu verifikasi pembayaran oleh Admin.'
+            'message' => 'Request pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
         ]);
     }
 

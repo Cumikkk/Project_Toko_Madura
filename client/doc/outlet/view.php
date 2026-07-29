@@ -245,6 +245,10 @@ $sqlOutlets = "
         o.id_outlet,
         o.nama_outlet,
         o.alamat_outlet,
+        o.status,
+        o.nominal_biaya,
+        o.bukti_pembayaran,
+        o.alasan_penolakan,
         o.tanggal_bergabung,
         o.id_users,
         u.username
@@ -432,16 +436,26 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                             <td>
                                                 <span class="badge bg-body-tertiary border text-body-emphasis px-2 py-1 rounded-3 fw-semibold font-monospace small">
                                                     <i class="fa-regular fa-clock me-1 text-primary"></i>
-                                                    <?= !empty($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) . ' WIB' : '-'; ?>
+                                                    <?= !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : '-'; ?>
                                                 </span>
                                             </td>
                                             <td>
                                                 <small class="text-body-secondary"><?= htmlspecialchars($row['alamat_outlet'] ?: '-'); ?></small>
                                             </td>
                                             <td>
-                                                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold">
-                                                    <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif
-                                                </span>
+                                                <?php if (($row['status'] ?? 'active') === 'pending') : ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pembayaran Admin">
+                                                        <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Admin
+                                                    </span>
+                                                <?php elseif (($row['status'] ?? 'active') === 'reject') : ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="<?= htmlspecialchars($row['alasan_penolakan'] ?? 'Pembayaran Ditolak Admin') ?>">
+                                                        <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold">
+                                                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif
+                                                    </span>
+                                                <?php endif; ?>
                                             </td>
                                             <td class="text-center pe-3">
                                                 <div class="d-flex align-items-center justify-content-center gap-1">
@@ -532,35 +546,60 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formTambahOutlet" method="POST">
+            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add">
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-body-secondary required">Nama Outlet</label>
                         <input type="text" name="nama_outlet" class="form-control rounded-3" placeholder="Contoh: Toko Madura Sidoarjo" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary">Alamat Outlet</label>
-                        <textarea name="alamat_outlet" class="form-control rounded-3" rows="2" placeholder="Contoh: Jl. Raya Taman No. 12, Sidoarjo"></textarea>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-body-secondary required">Kecamatan</label>
+                            <input type="text" name="kecamatan" class="form-control rounded-3" placeholder="Contoh: Taman" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-body-secondary">Alamat Lengkap</label>
+                            <input type="text" name="alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12">
+                        </div>
                     </div>
+
                     <hr class="my-3 text-body-secondary opacity-25">
+
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Username Login Outlet</label>
+                        <label class="form-label fw-semibold small text-body-secondary required">Username Login Kasir</label>
                         <div class="input-group">
                             <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">@</span>
                             <input type="text" name="username" class="form-control rounded-end-3 border-start-0" placeholder="outlet_sidoarjo" required>
                         </div>
-                        <div class="form-text small text-body-secondary">Username ini akan digunakan oleh pengelola toko untuk login ke aplikasi.</div>
+                        <div class="form-text small text-body-secondary">Username ini digunakan oleh kasir/pengelola toko untuk login.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Password Login Outlet</label>
+                        <label class="form-label fw-semibold small text-body-secondary required">Password Login Kasir</label>
                         <input type="password" name="password" class="form-control rounded-3" placeholder="Masukkan password akun" required>
+                    </div>
+
+                    <!-- Payment Information Section -->
+                    <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3 rounded-4 mb-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fw-bold small"><i class="fa-solid fa-receipt me-1"></i> Biaya Pendaftaran Lisensi</span>
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fs-6">Rp 500.000</span>
+                        </div>
+                        <p class="small text-body-secondary mb-0">
+                            Transfer ke <strong>Bank BCA: 123-456-7890</strong> a.n. <strong>Toko Madura Pusat</strong>. Setelah transfer, harap unggah foto bukti pembayaran di bawah ini.
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-body-secondary required">Upload Bukti Transfer Pembayaran</label>
+                        <input type="file" name="bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf" required>
+                        <div class="form-text small text-body-secondary">Format yang didukung: JPG, PNG, WEBP, atau PDF. Max 5MB.</div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0 pb-4 px-4">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-danger rounded-pill px-4">
-                        <i class="fa-solid fa-check me-1"></i> Simpan Outlet
+                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Request & Pembayaran
                     </button>
                 </div>
             </form>
@@ -655,6 +694,10 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
                             <span class="text-body-secondary small"><i class="fa-light fa-location-dot me-2 text-danger"></i>Alamat Outlet</span>
                             <span class="fw-semibold text-body-emphasis text-end" id="det_alamat">-</span>
+                        </div>
+                        <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
+                            <span class="text-body-secondary small"><i class="fa-light fa-receipt me-2 text-success"></i>Bukti Transfer Bayar</span>
+                            <span id="det_bukti_container" class="fw-semibold text-body-emphasis">-</span>
                         </div>
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
                             <span class="text-body-secondary small"><i class="fa-light fa-file-invoice me-2 text-primary"></i>Total Laporan Omzet</span>
@@ -766,30 +809,32 @@ $(document).ready(function() {
         }
     });
 
-    // 1. Submit Form Tambah Outlet
+    // 1. Submit Form Tambah Outlet & Bukti Transfer
     $('#formTambahOutlet').on('submit', function(e) {
         e.preventDefault();
         const form = $(this);
+        const formData = new FormData(this);
         const submitBtn = form.find('button[type="submit"]');
 
-        submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...');
+        submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim Request...');
 
         $.ajax({
             url: ACTION_URL,
             type: 'POST',
-            data: form.serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
             dataType: 'json',
             success: function(res) {
-                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-check me-1"></i> Simpan Outlet');
+                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Request & Pembayaran');
                 if (res.success) {
                     $('#modalTambahOutlet').modal('hide');
                     form[0].reset();
                     Swal.fire({
                         icon: 'success',
-                        title: 'Berhasil!',
+                        title: 'Request Berhasil Dikirim!',
                         text: res.message,
-                        timer: 2000,
-                        showConfirmButton: false
+                        confirmButtonColor: '#7D0A0A'
                     }).then(() => {
                         location.reload();
                     });
@@ -798,8 +843,8 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-check me-1"></i> Simpan Outlet');
-                Swal.fire('Error', 'Terjadi kesalahan sistem saat menyimpan outlet.', 'error');
+                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Request & Pembayaran');
+                Swal.fire('Error', 'Terjadi kesalahan sistem saat mengirim request.', 'error');
             }
         });
     });
@@ -888,6 +933,12 @@ $(document).ready(function() {
                     $('#det_created_at_full').text(formattedCreated);
                     $('#det_username').text('@' + res.data.username);
                     $('#det_alamat').text(res.data.alamat_outlet || '-');
+                    if (res.data.bukti_pembayaran) {
+                        let fileUrl = '<?= SystemInfo::app("CLIENT_URL"); ?>/' + res.data.bukti_pembayaran;
+                        $('#det_bukti_container').html('<a href="' + fileUrl + '" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 text-decoration-none"><i class="fa-solid fa-file-arrow-down me-1"></i> Lihat Bukti Bayar</a>');
+                    } else {
+                        $('#det_bukti_container').text('-');
+                    }
                     $('#det_total_omzet').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.data.total_omzet));
                     $('#det_total_laporan').text(res.data.total_laporan + ' Laporan');
                     $('#detailOutletContent').removeClass('d-none');
