@@ -111,26 +111,34 @@ $(document).ready(function() {
 });
 
 function deleteMaster(id, nama, totalInvestor, totalOutlet) {
+    let logoUrl = '<?= SystemInfo::app("ADMIN_URL") ?>/assets/img/toko_madura_logo_nobg.png';
     let alertHtml = `
+        <div class="text-center mb-3">
+            <img src="${logoUrl}" alt="Toko Madura" style="max-height: 42px;" class="img-fluid">
+        </div>
         <div class="text-start fs-14">
             <p class="text-muted mb-3">Tindakan ini akan menghapus akun Master <strong class="text-dark">${nama}</strong> beserta seluruh ekosistem terikat di bawahnya:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                    <span class="text-dark"><i class="fa fa-handshake-o text-primary me-2 fs-16"></i>Akun Investor</span>
+                    <span class="text-dark"><i class="fas fa-user-shield text-info me-2 fs-16"></i>Akun Master (${nama})</span>
+                    <span class="badge bg-info rounded-pill px-3">Master</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="text-dark"><i class="fas fa-user-tie text-primary me-2 fs-16"></i>Akun Investor</span>
                     <span class="badge bg-primary rounded-pill px-3">${totalInvestor} Investor</span>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                    <span class="text-dark"><i class="fa fa-building text-warning me-2 fs-16"></i>Toko / Outlet</span>
+                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Toko / Outlet</span>
                     <span class="badge bg-warning text-dark rounded-pill px-3">${totalOutlet} Outlet</span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <i class="fa fa-file-text-o text-danger me-2 fs-16"></i>
+                    <i class="fas fa-file-invoice-dollar text-danger me-2 fs-16"></i>
                     <span class="text-dark">Seluruh Laporan Omzet & Bagi Hasil</span>
                 </div>
             </div>
             
-            <p class="text-danger small mb-0 fw-semibold"><i class="fa fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
+            <p class="text-danger small mb-0 fw-semibold"><i class="fas fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
         </div>
     `;
 

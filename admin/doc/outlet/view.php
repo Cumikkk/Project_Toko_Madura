@@ -511,22 +511,30 @@ $(document).ready(function() {
 });
 
 function deleteOutlet(id, nama) {
+    let logoUrl = '<?= SystemInfo::app("ADMIN_URL") ?>/assets/img/toko_madura_logo_nobg.png';
     let alertHtml = `
+        <div class="text-center mb-3">
+            <img src="${logoUrl}" alt="Toko Madura" style="max-height: 42px;" class="img-fluid">
+        </div>
         <div class="text-start fs-14">
             <p class="text-muted mb-3">Tindakan ini akan menghapus outlet <strong class="text-dark">${nama}</strong> beserta seluruh data terkait:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Data Outlet (${nama})</span>
+                    <span class="badge bg-warning text-dark rounded-pill px-3">Outlet</span>
+                </div>
                 <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
-                    <i class="fa fa-file-text-o text-danger me-2 fs-16"></i>
+                    <i class="fas fa-file-invoice-dollar text-danger me-2 fs-16"></i>
                     <span class="text-dark">Riwayat Laporan Omzet Penjualan</span>
                 </div>
                 <div class="d-flex align-items-center">
-                    <i class="fa fa-user-times text-danger me-2 fs-16"></i>
+                    <i class="fas fa-user-slash text-danger me-2 fs-16"></i>
                     <span class="text-dark">Akun Pengguna Kasir Outlet</span>
                 </div>
             </div>
             
-            <p class="text-danger small mb-0 fw-semibold"><i class="fa fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
+            <p class="text-danger small mb-0 fw-semibold"><i class="fas fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
         </div>
     `;
 
