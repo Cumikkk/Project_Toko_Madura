@@ -164,7 +164,7 @@ function deleteInvestor(id, name, totalOutlet) {
             <img src="${logoUrl}" alt="Toko Madura" style="max-height: 42px;" class="img-fluid">
         </div>
         <div class="text-start fs-14">
-            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Investor <strong class="text-dark">${name}</strong> beserta seluruh cabang terkait:</p>
+            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Investor <strong class="text-dark">${name}</strong> beserta seluruh outlet di bawah kepemilikannya:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
@@ -172,7 +172,7 @@ function deleteInvestor(id, name, totalOutlet) {
                     <span class="badge bg-primary rounded-pill px-3">Investor</span>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Toko / Outlet Terikat</span>
+                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Outlet di Bawah Kepemilikannya</span>
                     <span class="badge bg-warning text-dark rounded-pill px-3">${totalOutlet} Outlet</span>
                 </div>
                 <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
@@ -181,7 +181,7 @@ function deleteInvestor(id, name, totalOutlet) {
                 </div>
                 <div class="d-flex align-items-center">
                     <i class="fas fa-user-slash text-danger me-2 fs-16"></i>
-                    <span class="text-dark">Akun Kasir Toko Terikat</span>
+                    <span class="text-dark">Akun Kasir Outlet</span>
                 </div>
             </div>
             

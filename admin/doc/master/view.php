@@ -117,7 +117,7 @@ function deleteMaster(id, nama, totalInvestor, totalOutlet) {
             <img src="${logoUrl}" alt="Toko Madura" style="max-height: 42px;" class="img-fluid">
         </div>
         <div class="text-start fs-14">
-            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Master <strong class="text-dark">${nama}</strong> beserta seluruh ekosistem terikat di bawahnya:</p>
+            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Master <strong class="text-dark">${nama}</strong> beserta seluruh data yang terikat di bawahnya:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
@@ -129,7 +129,7 @@ function deleteMaster(id, nama, totalInvestor, totalOutlet) {
                     <span class="badge bg-primary rounded-pill px-3">${totalInvestor} Investor</span>
                 </div>
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Toko / Outlet</span>
+                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Outlet</span>
                     <span class="badge bg-warning text-dark rounded-pill px-3">${totalOutlet} Outlet</span>
                 </div>
                 <div class="d-flex align-items-center">

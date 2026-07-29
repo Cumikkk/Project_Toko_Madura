@@ -521,7 +521,7 @@ function deleteOutlet(id, nama) {
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Data Outlet (${nama})</span>
+                    <span class="text-dark"><i class="fas fa-store text-warning me-2 fs-16"></i>Outlet (${nama})</span>
                     <span class="badge bg-warning text-dark rounded-pill px-3">Outlet</span>
                 </div>
                 <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
