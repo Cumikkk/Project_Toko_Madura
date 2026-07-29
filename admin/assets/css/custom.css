@@ -359,4 +359,17 @@ body.dark-theme,
     color: #ffffff !important;
 }
 
+/* ==========================================================================
+   STICKY FOOTER FIX
+   .page adalah flex column dengan min-height:100vh, tetapi .main-content
+   perlu flex-grow:1 agar mengisi sisa ruang dan mendorong footer ke bawah
+   ========================================================================== */
+.main-content.side-content {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
 
+.main-content.side-content .main-container {
+    flex: 1 1 auto !important;
+}

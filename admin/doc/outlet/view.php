@@ -236,7 +236,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>')">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>
@@ -355,12 +355,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 </div>
 </div>
 
-<style>
-.main-content {
-    min-height: calc(100vh - 75px) !important;
-}
-</style>
-
 <script type="text/javascript">
 // ============================================================
 // Show Alamat popup – called directly via onclick (no data-attr)
@@ -412,7 +406,7 @@ function initDataTable(tabKey) {
 // ============================================================
 // Switch Tab — pure display:none/block
 // ============================================================
-function previewBukti(filePath, namaOutlet, namaInvestor) {
+function previewBukti(filePath, namaOutlet, namaInvestor, biayaLangganan) {
     if (!filePath) {
         Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
         return;
@@ -425,11 +419,13 @@ function previewBukti(filePath, namaOutlet, namaInvestor) {
         return;
     }
     var investorInfo = namaInvestor ? ' &nbsp;|&nbsp; <i class="fas fa-user-tie me-1 text-success"></i> <strong>Investor:</strong> ' + namaInvestor : '';
+    var biayaInfo   = biayaLangganan ? '<br><i class="fas fa-tags me-1 text-warning"></i> <strong>Biaya Langganan:</strong> Rp ' + biayaLangganan : '';
     Swal.fire({
         title: '<i class="fas fa-receipt me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
         html: '<div class="text-muted mb-3" style="font-size:13.5px;">'
             + '<i class="fas fa-store me-1 text-primary"></i> <strong>Outlet:</strong> ' + namaOutlet
             + investorInfo
+            + biayaInfo
             + '</div>'
             + '<img src="' + proxyUrl + '" '
             + 'style="max-width:100%;max-height:65vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
