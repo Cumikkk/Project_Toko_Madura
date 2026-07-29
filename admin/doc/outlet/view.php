@@ -62,6 +62,16 @@ $rejectedOutlets = $db->query($sqlReject);
 function safeJsonAlamat($str) {
     return json_encode(trim(preg_replace('/\s+/', ' ', $str ?? '')));
 }
+
+// Build reliable client base URL from DOCUMENT_ROOT
+$_protocol   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$_host       = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$_docRoot    = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
+$_curDir     = rtrim(str_replace('\\', '/', __DIR__), '/');
+$_relDir     = str_replace($_docRoot, '', $_curDir);
+$_parts      = array_values(array_filter(explode('/', $_relDir)));
+$_projectDir = count($_parts) > 0 ? '/' . $_parts[0] : '';
+$clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 ?>
 
 <div class="page-header">
@@ -226,7 +236,7 @@ function safeJsonAlamat($str) {
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= SystemInfo::app('CLIENT_URL') . '/' . ltrim(htmlspecialchars($row['bukti_pembayaran']), '/') ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>')">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= $clientBaseUrl . '/' . ltrim($row['bukti_pembayaran'], '/') ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>
@@ -412,7 +422,7 @@ function previewBukti(imgUrl, namaOutlet) {
         imageAlt: 'Bukti Transfer Pembayaran',
         showCloseButton: true,
         confirmButtonText: 'Tutup',
-        confirmButtonColor: '#7D0A0A',
+        confirmButtonColor: '#6c757d',
         customClass: {
             image: 'img-fluid rounded border shadow-sm my-2'
         }
