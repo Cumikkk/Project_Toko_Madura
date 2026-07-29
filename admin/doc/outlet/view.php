@@ -419,22 +419,13 @@ function previewBukti(filePath, namaOutlet) {
         return;
     }
     Swal.fire({
-        title: '<span style="font-size:15px;font-weight:600;color:#4fc3f7;"><i class="fas fa-receipt me-2"></i>Bukti Transfer Pembayaran</span>',
-        html: '<p style="color:#aaa;font-size:13px;margin:0 0 12px;">' + namaOutlet + '</p>'
-            + '<div style="background:#0f0f1a;border-radius:10px;padding:12px;">' 
-            + '<img src="' + proxyUrl + '" '
-            + 'style="max-width:100%;max-height:60vh;border-radius:8px;object-fit:contain;" '
-            + 'onerror="this.outerHTML=\'<p style=color:salmon;margin:20px 0><i class=fas\\ fa-exclamation-triangle></i> Gambar gagal dimuat</p>\'">'
-            + '</div>',
-        background: '#1e1e2e',
-        color: '#fff',
-        width: 640,
+        title: '<i class="fas fa-receipt me-2 text-info"></i>Bukti Transfer: ' + namaOutlet,
+        html: '<img src="' + proxyUrl + '" '
+            + 'style="max-width:100%;max-height:65vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fas fa-exclamation-triangle me-1\\\'></i>Gambar gagal dimuat</p>\'">',
         showCloseButton: true,
         showConfirmButton: false,
-        customClass: {
-            popup: 'swal2-bukti-popup',
-            closeButton: 'text-white'
-        }
+        width: 640
     });
 }
 
