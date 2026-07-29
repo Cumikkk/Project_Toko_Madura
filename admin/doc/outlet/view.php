@@ -236,7 +236,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= $clientBaseUrl . '/' . ltrim($row['bukti_pembayaran'], '/') ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>')">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>
@@ -407,25 +407,25 @@ function initDataTable(tabKey) {
 // ============================================================
 // Switch Tab — pure display:none/block
 // ============================================================
-function previewBukti(imgUrl, namaOutlet) {
-    if (!imgUrl || imgUrl.endsWith('/')) {
+function previewBukti(filePath, namaOutlet) {
+    if (!filePath) {
         Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
         return;
     }
-    if (imgUrl.toLowerCase().endsWith('.pdf')) {
-        window.open(imgUrl, '_blank');
+    var ext = filePath.split('.').pop().toLowerCase();
+    var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+    var proxyUrl = adminUrl + '/image-proxy?file=' + encodeURIComponent(filePath);
+    if (ext === 'pdf') {
+        window.open(proxyUrl, '_blank');
         return;
     }
     Swal.fire({
         title: 'Bukti Transfer: ' + namaOutlet,
-        imageUrl: imgUrl,
-        imageAlt: 'Bukti Transfer Pembayaran',
+        html: '<img src="' + proxyUrl + '" style="max-width:100%;max-height:70vh;border-radius:8px;border:1px solid #dee2e6;" alt="Bukti Transfer" onerror="this.parentElement.innerHTML=\'<div class=\'text-danger\'>Gambar tidak dapat ditampilkan. <a href=\''+proxyUrl+'\' target=\'_blank\'>Buka di tab baru</a></div>\'">' ,
         showCloseButton: true,
         confirmButtonText: 'Tutup',
         confirmButtonColor: '#6c757d',
-        customClass: {
-            image: 'img-fluid rounded border shadow-sm my-2'
-        }
+        width: 600
     });
 }
 
