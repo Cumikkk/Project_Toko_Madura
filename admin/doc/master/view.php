@@ -111,38 +111,54 @@ $(document).ready(function() {
 });
 
 function deleteMaster(id, nama, totalInvestor, totalOutlet) {
-    let alertHtml = '<div class="text-start">' +
-        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS MASTER!</p>' +
-        '<p class="mb-2">Menghapus akun Master <strong>' + nama + '</strong> akan menghapus secara permanen seluruh data terikat di bawahnya:</p>' +
-        '<ol class="ps-3 mb-3 text-dark">' +
-            '<li>Seluruh <strong>Laporan Omzet</strong> outlet di bawah master ini</li>' +
-            '<li>Sebanyak <strong>' + totalOutlet + ' Toko / Outlet</strong> terkait</li>' +
-            '<li>Sebanyak <strong>' + totalInvestor + ' Akun Investor</strong> di bawah master ini</li>' +
-            '<li>Akun Pengguna <strong>Master (' + nama + ')</strong></li>' +
-        '</ol>' +
-        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus semua data terkait ini?</p>' +
-    '</div>';
+    let alertHtml = `
+        <div class="text-start fs-14">
+            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Master <strong class="text-dark">${nama}</strong> beserta seluruh ekosistem terikat di bawahnya:</p>
+            
+            <div class="bg-light p-3 rounded-3 border mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="text-dark"><i class="fa fa-handshake-o text-primary me-2 fs-16"></i>Akun Investor</span>
+                    <span class="badge bg-primary rounded-pill px-3">${totalInvestor} Investor</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="text-dark"><i class="fa fa-building text-warning me-2 fs-16"></i>Toko / Outlet</span>
+                    <span class="badge bg-warning text-dark rounded-pill px-3">${totalOutlet} Outlet</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-file-text-o text-danger me-2 fs-16"></i>
+                    <span class="text-dark">Seluruh Laporan Omzet & Bagi Hasil</span>
+                </div>
+            </div>
+            
+            <p class="text-danger small mb-0 fw-semibold"><i class="fa fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
+        </div>
+    `;
 
     Swal.fire({
-        title: 'Konfirmasi Hapus Master',
+        title: 'Hapus Master?',
         html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus Semua Data Terkait',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya, Hapus Master',
+        cancelButtonText: 'Batal',
+        customClass: {
+            confirmButton: 'px-4 py-2',
+            cancelButton: 'px-4 py-2'
+        }
     }).then(function(result) {
         if (result.isConfirmed) {
             Swal.fire({
-                text: "Memproses penghapusan bertingkat...",
+                title: 'Memproses...',
+                text: 'Sedang menghapus data Master & data terkait',
                 allowOutsideClick: false,
                 didOpen: function() { Swal.showLoading(); }
             });
 
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/delete", { id_users: id, id: id }, function(resp) {
                 if (resp.success) {
-                    Swal.fire('Dihapus!', resp.message, 'success').then(function() { location.reload(); });
+                    Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
                 } else {
                     Swal.fire('Gagal!', resp.message || 'Gagal menghapus data master', 'error');
                 }

@@ -158,30 +158,47 @@ $(document).ready(function() {
 });
 
 function deleteInvestor(id, name, totalOutlet) {
-    let alertHtml = '<div class="text-start">' +
-        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS INVESTOR!</p>' +
-        '<p class="mb-2">Menghapus investor <strong>' + name + '</strong> akan menghapus secara permanen:</p>' +
-        '<ol class="ps-3 mb-3 text-dark">' +
-            '<li>Seluruh <strong>Laporan Omzet</strong> & <strong>Rekap Bagi Hasil</strong> terikat</li>' +
-            '<li>Sebanyak <strong>' + totalOutlet + ' Toko / Outlet</strong> milik investor ini (beserta akun kasirnya)</li>' +
-            '<li>Profil & Akun User Investor <strong>(' + name + ')</strong></li>' +
-        '</ol>' +
-        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus investor ini beserta seluruh toko cabangnya?</p>' +
-    '</div>';
+    let alertHtml = `
+        <div class="text-start fs-14">
+            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Investor <strong class="text-dark">${name}</strong> beserta seluruh cabang terkait:</p>
+            
+            <div class="bg-light p-3 rounded-3 border mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="text-dark"><i class="fa fa-building text-warning me-2 fs-16"></i>Toko / Outlet Terikat</span>
+                    <span class="badge bg-warning text-dark rounded-pill px-3">${totalOutlet} Outlet</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
+                    <i class="fa fa-file-text-o text-danger me-2 fs-16"></i>
+                    <span class="text-dark">Riwayat Laporan Omzet & Rekap Bagi Hasil</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-user-times text-danger me-2 fs-16"></i>
+                    <span class="text-dark">Akun Pengguna Investor & Kasir</span>
+                </div>
+            </div>
+            
+            <p class="text-danger small mb-0 fw-semibold"><i class="fa fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
+        </div>
+    `;
 
     Swal.fire({
-        title: 'Konfirmasi Hapus Investor',
+        title: 'Hapus Investor?',
         html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus Investor & Cabangnya',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya, Hapus Investor',
+        cancelButtonText: 'Batal',
+        customClass: {
+            confirmButton: 'px-4 py-2',
+            cancelButton: 'px-4 py-2'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                text: "Memproses penghapusan bertingkat...",
+                title: 'Memproses...',
+                text: "Sedang menghapus investor & outlet terkait",
                 allowOutsideClick: false,
                 didOpen: function() {
                     Swal.showLoading();
@@ -192,7 +209,7 @@ function deleteInvestor(id, name, totalOutlet) {
                 if (resp.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Terhapus!',
+                        title: 'Berhasil!',
                         text: resp.message,
                         confirmButtonText: 'OK'
                     }).then(function() {

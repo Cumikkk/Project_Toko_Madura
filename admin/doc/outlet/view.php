@@ -511,36 +511,50 @@ $(document).ready(function() {
 });
 
 function deleteOutlet(id, nama) {
-    let alertHtml = '<div class="text-start">' +
-        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS OUTLET!</p>' +
-        '<p class="mb-2">Menghapus Outlet <strong>' + nama + '</strong> akan menghapus secara permanen:</p>' +
-        '<ol class="ps-3 mb-3 text-dark">' +
-            '<li>Seluruh <strong>Laporan Omzet</strong> milik outlet ini</li>' +
-            '<li>Data <strong>Outlet (' + nama + ')</strong> & Akun User <strong>Kasir</strong></li>' +
-        '</ol>' +
-        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus outlet & seluruh data omzet terkait secara permanen?</p>' +
-    '</div>';
+    let alertHtml = `
+        <div class="text-start fs-14">
+            <p class="text-muted mb-3">Tindakan ini akan menghapus outlet <strong class="text-dark">${nama}</strong> beserta seluruh data terkait:</p>
+            
+            <div class="bg-light p-3 rounded-3 border mb-3">
+                <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
+                    <i class="fa fa-file-text-o text-danger me-2 fs-16"></i>
+                    <span class="text-dark">Riwayat Laporan Omzet Penjualan</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-user-times text-danger me-2 fs-16"></i>
+                    <span class="text-dark">Akun Pengguna Kasir Outlet</span>
+                </div>
+            </div>
+            
+            <p class="text-danger small mb-0 fw-semibold"><i class="fa fa-info-circle me-1"></i> Data yang dihapus bersifat permanen dan tidak dapat dikembalikan.</p>
+        </div>
+    `;
 
     Swal.fire({
-        title: 'Konfirmasi Hapus Outlet',
+        title: 'Hapus Outlet?',
         html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus Outlet & Omzet',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya, Hapus Outlet',
+        cancelButtonText: 'Batal',
+        customClass: {
+            confirmButton: 'px-4 py-2',
+            cancelButton: 'px-4 py-2'
+        }
     }).then(function(result) {
         if (result.isConfirmed) {
             Swal.fire({
-                text: "Memproses penghapusan bertingkat...",
+                title: 'Memproses...',
+                text: 'Sedang menghapus outlet & omzet terkait',
                 allowOutsideClick: false,
                 didOpen: function() { Swal.showLoading(); }
             });
 
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/delete", { id_outlet: id, id: id }, function(resp) {
                 if (resp.success) {
-                    Swal.fire('Dihapus!', resp.message, 'success').then(function() { location.reload(); });
+                    Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
                 } else {
                     Swal.fire('Gagal!', resp.message || 'Gagal menghapus outlet', 'error');
                 }
