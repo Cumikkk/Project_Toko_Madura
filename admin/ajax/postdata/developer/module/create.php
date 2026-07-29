@@ -110,7 +110,15 @@ foreach($permissions as $perm) {
     }
 
     $permId = $db->insert_id;
-    $adminIdsToAuthorize = array_unique([$user['ADM_ID'], 1]);
+    $adminUsersRes = $db->query("SELECT id_users FROM users WHERE role IN ('programmer', 'admin', 'master')");
+    $adminIdsToAuthorize = [(int)$user['ADM_ID']];
+    if ($adminUsersRes && $adminUsersRes->num_rows > 0) {
+        while ($aur = $adminUsersRes->fetch_assoc()) {
+            $adminIdsToAuthorize[] = (int)$aur['id_users'];
+        }
+    }
+    $adminIdsToAuthorize = array_unique($adminIdsToAuthorize);
+
     foreach ($adminIdsToAuthorize as $aid) {
         Database::insert("admin_authorize", [
             'admin_id' => $aid,
