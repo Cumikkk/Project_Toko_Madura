@@ -226,9 +226,9 @@ function safeJsonAlamat($str) {
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <a href="<?= SystemInfo::app('CLIENT_URL') . '/' . htmlspecialchars($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-sm">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= SystemInfo::app('CLIENT_URL') . '/' . ltrim(htmlspecialchars($row['bukti_pembayaran']), '/') ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
-                                                    </a>
+                                                    </button>
                                                 <?php else : ?>
                                                     <span class="badge bg-light text-dark">Belum ada</span>
                                                 <?php endif; ?>
@@ -397,6 +397,35 @@ function initDataTable(tabKey) {
 // ============================================================
 // Switch Tab — pure display:none/block
 // ============================================================
+function previewBukti(imgUrl, namaOutlet) {
+    if (!imgUrl || imgUrl.endsWith('/')) {
+        Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
+        return;
+    }
+    if (imgUrl.toLowerCase().endsWith('.pdf')) {
+        window.open(imgUrl, '_blank');
+        return;
+    }
+    Swal.fire({
+        title: 'Bukti Transfer: ' + namaOutlet,
+        imageUrl: imgUrl,
+        imageAlt: 'Bukti Transfer Pembayaran',
+        showCloseButton: true,
+        confirmButtonText: '<i class="fa fa-external-link-alt me-1"></i> Buka Gambar Penuh',
+        showCancelButton: true,
+        cancelButtonText: 'Tutup',
+        confirmButtonColor: '#17a2b8',
+        cancelButtonColor: '#6c757d',
+        customClass: {
+            image: 'img-fluid rounded border shadow-sm my-2'
+        }
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            window.open(imgUrl, '_blank');
+        }
+    });
+}
+
 function switchOutletTab(tabKey) {
     // 1. Update card highlight
     $('.outlet-stat-card').removeClass('active-card');
