@@ -17,7 +17,7 @@ $outletCount   = $db->query("SELECT COUNT(*) as total FROM outlet")->fetch_assoc
 // Top 5 Outlet berdasarkan Omzet
 $topOutlets = $db->query("
     SELECT o.id_outlet, o.nama_outlet, o.kecamatan, o.alamat_outlet, SUM(l.omzet) as total_omzet,
-           u_inv.nama_lengkap as nama_investor
+           u_inv.nama_lengkap as nama_investor, inv.kecamatan as kecamatan_investor, inv.alamat_investor
     FROM laporan_omzet l
     JOIN outlet o ON l.id_outlet = o.id_outlet
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
@@ -29,7 +29,7 @@ $topOutlets = $db->query("
 
 // 5 Request Outlet Terbaru
 $recentRequests = $db->query("
-    SELECT o.*, u_inv.nama_lengkap as nama_investor
+    SELECT o.*, u_inv.nama_lengkap as nama_investor, inv.kecamatan as kecamatan_investor, inv.alamat_investor
     FROM outlet o
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
@@ -110,7 +110,6 @@ $recentRequests = $db->query("
                             <tr class="text-center">
                                 <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
-                                <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Investor</th>
                                 <th class="text-center">Total Omzet</th>
                             </tr>
@@ -122,25 +121,38 @@ $recentRequests = $db->query("
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                        </td>
-                                        <td class="text-center">
-                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <?php if (!empty($row['kecamatan'])) : ?>
+                                                <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
+                                            <?php endif; ?>
                                             <?php if (!empty($row['alamat_outlet'])) : ?>
                                                 <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-detail-alamat-outlet" 
                                                         data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
                                                         data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
-                                                        title="Lihat Alamat Lengkap">
+                                                        title="Lihat Alamat Lengkap Outlet">
                                                     <i class="fa fa-info-circle"></i>
                                                 </button>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-start"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
+                                        <td class="text-start">
+                                            <span><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></span>
+                                            <?php if (!empty($row['kecamatan_investor'])) : ?>
+                                                <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?></small>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row['alamat_investor'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-detail-alamat-investor" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_investor'] ?? '-') ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                        title="Lihat Alamat Lengkap Investor">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Belum ada data omzet.</td>
+                                    <td colspan="4" class="text-center text-muted py-4">Belum ada data omzet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -164,9 +176,10 @@ $recentRequests = $db->query("
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 10%;">No</th>
+                                <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Investor</th>
+                                <th class="text-center">Tanggal Request</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>
@@ -177,11 +190,35 @@ $recentRequests = $db->query("
                                         <td class="text-center"><?= $noReq++ ?></td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                            <?php if(!empty($row['kecamatan'])) : ?>
+                                            <?php if (!empty($row['kecamatan'])) : ?>
                                                 <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
                                             <?php endif; ?>
+                                            <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-detail-alamat-outlet" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                        title="Lihat Alamat Lengkap Outlet">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
                                         </td>
-                                        <td class="text-start"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></td>
+                                        <td class="text-start">
+                                            <span><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></span>
+                                            <?php if (!empty($row['kecamatan_investor'])) : ?>
+                                                <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?></small>
+                                            <?php endif; ?>
+                                            <?php if (!empty($row['alamat_investor'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-detail-alamat-investor" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_investor'] ?? '-') ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                        title="Lihat Alamat Lengkap Investor">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <?= !empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) : '-' ?>
+                                        </td>
                                         <td class="text-center">
                                             <?php if ($row['status'] === 'pending') : ?>
                                                 <span class="badge bg-warning text-dark">Pending</span>
@@ -195,7 +232,7 @@ $recentRequests = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">Belum ada request outlet.</td>
+                                    <td colspan="5" class="text-center text-muted py-4">Belum ada request outlet.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -214,6 +251,17 @@ $(document).ready(function() {
         Swal.fire({
             title: 'Alamat Lengkap Outlet',
             html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
+
+    $('.btn-detail-alamat-investor').on('click', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        Swal.fire({
+            title: 'Alamat Lengkap Investor',
+            html: '<p class="text-start mb-1"><strong>Investor:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
             icon: 'info',
             confirmButtonText: 'Tutup'
         });
