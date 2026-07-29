@@ -60,7 +60,7 @@ if (!isset($_GET['outlet_id']) && !isset($_GET['id_outlet']) && !isset($_GET['ou
 // Fetch list of outlets belonging to logged in investor
 $investorOutlets = [];
 if ($role === 'investor' && $investorId > 0) {
-    $resOuts = $db->query("SELECT id_outlet, nama_outlet, kode_outlet FROM outlet WHERE id_investor = {$investorId} ORDER BY nama_outlet ASC");
+    $resOuts = $db->query("SELECT id_outlet, nama_outlet FROM outlet WHERE id_investor = {$investorId} ORDER BY nama_outlet ASC");
     if ($resOuts) {
         while ($oRow = $resOuts->fetch_assoc()) {
             $investorOutlets[] = $oRow;

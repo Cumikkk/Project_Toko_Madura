@@ -25,6 +25,17 @@ if (!$user) {
     die("<script>alert('Session Expired, please re-login'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
 }
 
+$role = strtolower($user['role'] ?? '');
+
+// Investor and Outlet do not use Dashboard -> Redirect to main modules
+if ($pageFile === 'dashboard' || empty($_GET['a'])) {
+    if ($role === 'investor') {
+        die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/outlet';</script>");
+    } elseif ($role === 'outlet') {
+        die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/omzet';</script>");
+    }
+}
+
 $userid = md5(md5($user['MBR_ID'])) ?? "";
 
 $GETT = $_GET ?? [];

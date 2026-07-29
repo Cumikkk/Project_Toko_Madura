@@ -91,7 +91,7 @@ try {
 
         // Insert Outlet Record with status and timestamps
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, kode_outlet, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, created_at, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$kodeOutlet}', '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
@@ -107,7 +107,7 @@ try {
     // =========================================================================
     if ($action === 'get_detail') {
         $idOutlet = (int)($_GET['id_outlet'] ?? 0);
-        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.email FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
+        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.no_hp FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
         if (!$resDetail || $resDetail->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data outlet tidak ditemukan.']);
         }

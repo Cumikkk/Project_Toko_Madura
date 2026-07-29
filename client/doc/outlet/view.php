@@ -3,6 +3,9 @@ use Config\Core\Database;
 use App\Models\User;
 use Config\Core\SystemInfo;
 
+$user = User::user();
+$db = Database::connect();
+$userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 $role = strtolower($user['role'] ?? '');
 
 if ($role === 'master') {
@@ -188,7 +191,7 @@ $selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
 $availableYears = [];
 // Fetch distinct years of outlet registration for this investor
-$resYears = $db->query("SELECT DISTINCT YEAR(created_at) as y_year FROM outlet WHERE id_investor = {$investorId} AND created_at IS NOT NULL ORDER BY y_year DESC");
+$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_bergabung) as y_year FROM outlet WHERE id_investor = {$investorId} AND tanggal_bergabung IS NOT NULL ORDER BY y_year DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
         if (!empty($yRow['y_year'])) {
@@ -205,13 +208,13 @@ $whereOutletConds = ["o.id_investor = {$investorId}"];
 
 if (!empty($selectedTgl)) {
     $safeTgl = $db->real_escape_string($selectedTgl);
-    $whereOutletConds[] = "DATE(o.created_at) = '{$safeTgl}'";
+    $whereOutletConds[] = "DATE(o.tanggal_bergabung) = '{$safeTgl}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereOutletConds[] = "MONTH(o.created_at) = {$selectedBulan}";
+        $whereOutletConds[] = "MONTH(o.tanggal_bergabung) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereOutletConds[] = "YEAR(o.created_at) = {$selectedTahun}";
+        $whereOutletConds[] = "YEAR(o.tanggal_bergabung) = {$selectedTahun}";
     }
 }
 $whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);
@@ -242,7 +245,7 @@ $sqlOutlets = "
         o.id_outlet,
         o.nama_outlet,
         o.alamat_outlet,
-        o.created_at,
+        o.tanggal_bergabung,
         o.id_users,
         u.username
     FROM outlet o
@@ -879,7 +882,7 @@ $(document).ready(function() {
             success: function(res) {
                 $('#detailOutletLoading').addClass('d-none');
                 if (res.success) {
-                    let formattedCreated = res.data.created_at ? res.data.created_at : '-';
+                    let formattedCreated = res.data.tanggal_bergabung ? res.data.tanggal_bergabung : (res.data.created_at ? res.data.created_at : '-');
                     $('#det_nama_outlet').text(res.data.nama_outlet);
                     $('#det_created_at_badge').html('<i class="fa-regular fa-clock me-1"></i> Terdaftar: ' + formattedCreated);
                     $('#det_created_at_full').text(formattedCreated);
