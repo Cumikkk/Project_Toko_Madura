@@ -341,6 +341,9 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
         font-size: 10px !important;
         letter-spacing: 0.3px;
         line-height: 1.1;
+@media (min-width: 992px) {
+    .border-end-lg {
+        border-right: 1px solid var(--bs-border-color, #dee2e6) !important;
     }
 }
 </style>
@@ -558,93 +561,169 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL: TAMBAH OUTLET (Theme Adaptive) -->
+<!-- MODAL: TAMBAH OUTLET (WIZARD 2 SESI / 2 HALAMAN) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahOutlet" tabindex="-1" aria-labelledby="modalTambahOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalTambahOutletLabel">
-                    <i class="fa-solid fa-store me-2 text-danger"></i>Mendaftarkan Outlet Baru
-                </h5>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 650px;">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 20px;">
+            
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="modal-title fw-extrabold text-body-emphasis mb-0" id="modalTambahOutletLabel">
+                        <i class="fa-solid fa-store me-2 text-danger"></i>Mendaftarkan Outlet Baru
+                    </h5>
+                    <small class="text-body-secondary" id="modalSubtitleWizard">Sesi 1 dari 2: Identitas &amp; Alamat Toko</small>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="add">
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Nama Outlet</label>
-                        <input type="text" name="nama_outlet" class="form-control rounded-3" placeholder="Contoh: Toko Madura Sidoarjo" required>
-                    </div>
 
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-body-secondary">Nama Pengelola Toko / Kasir</label>
-                            <input type="text" name="nama_pengelola" class="form-control rounded-3" placeholder="Contoh: Budi Santoso">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-body-secondary">No. HP / WhatsApp Pengelola</label>
-                            <input type="text" name="no_hp" class="form-control rounded-3" placeholder="Contoh: 081234567890">
-                        </div>
+            <!-- Step Progress Indicator Bar -->
+            <div class="px-4 py-3 bg-body-tertiary border-bottom border-body-subtle">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                    <!-- Step 1 Badge -->
+                    <div id="stepTab1" class="d-flex align-items-center gap-2 fw-bold text-danger">
+                        <span id="badgeStep1" class="badge rounded-circle bg-danger text-white d-flex align-items-center justify-content-center shadow-xs" style="width: 28px; height: 28px; font-size: 13px;">1</span>
+                        <span class="small">Profil &amp; Alamat Toko</span>
                     </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-body-secondary required">Kecamatan</label>
-                            <input type="text" name="kecamatan" class="form-control rounded-3" placeholder="Contoh: Taman" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-body-secondary">Alamat Lengkap</label>
-                            <input type="text" name="alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Persentase Bagi Hasil Investor (%)</label>
-                        <div class="input-group">
-                            <input type="number" step="0.01" min="0" max="100" name="persentase_potongan" class="form-control rounded-start-3" value="10.00" required>
-                            <span class="input-group-text bg-body-tertiary text-body-secondary">%</span>
-                        </div>
-                        <div class="form-text small text-body-secondary">Persentase bagian pembagian hasil untuk investor.</div>
-                    </div>
-
-                    <hr class="my-3 text-body-secondary opacity-25">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Username Login Kasir</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">@</span>
-                            <input type="text" name="username" class="form-control rounded-end-3 border-start-0" placeholder="outlet_sidoarjo" required>
-                        </div>
-                        <div class="form-text small text-body-secondary">Username ini digunakan oleh kasir/pengelola toko untuk login.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Password Login Kasir</label>
-                        <input type="password" name="password" class="form-control rounded-3" placeholder="Masukkan password akun" required>
-                    </div>
-
-                    <!-- Payment Information Section -->
-                    <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3 rounded-4 mb-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="fw-bold small"><i class="fa-solid fa-receipt me-1"></i> Biaya Pendaftaran Lisensi</span>
-                            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fs-6">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
-                        </div>
-                        <p class="small text-body-secondary mb-0">
-                            Transfer ke <strong>Bank <?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama); ?></strong>. Setelah transfer, harap unggah foto bukti pembayaran di bawah ini.
-                        </p>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Upload Bukti Transfer Pembayaran</label>
-                        <input type="file" name="bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf" required>
-                        <div class="form-text small text-body-secondary">Format yang didukung: JPG, PNG, WEBP, atau PDF. Max 5MB.</div>
+                    <i class="fa-solid fa-chevron-right text-body-tertiary small"></i>
+                    <!-- Step 2 Badge -->
+                    <div id="stepTab2" class="d-flex align-items-center gap-2 fw-semibold text-body-tertiary opacity-75">
+                        <span id="badgeStep2" class="badge rounded-circle bg-body-secondary text-body-secondary d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 13px;">2</span>
+                        <span class="small">Akun Kasir &amp; Pembayaran</span>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Request & Pembayaran
-                    </button>
+            </div>
+
+            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="modal-body p-4">
+                    
+                    <!-- ========================================== -->
+                    <!-- SESI 1: INFORMASI IDENTITAS & ALAMAT TOKO -->
+                    <!-- ========================================== -->
+                    <div id="stepSection1">
+                        <div class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-1.5 mb-3 text-uppercase" style="font-size: 11px;">
+                            <i class="fa-solid fa-store me-1"></i> Sesi 1: Identitas Toko &amp; Alamat Lengkap
+                        </div>
+
+                        <!-- Nama Outlet -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-body-secondary required">Nama Outlet Toko</label>
+                            <input type="text" name="nama_outlet" id="wizard_nama_outlet" class="form-control rounded-3 py-2" placeholder="Contoh: Toko Madura Sidoarjo" required>
+                        </div>
+
+                        <!-- Nama & No HP Pengelola -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-semibold small text-body-secondary">Nama Pengelola / Kasir</label>
+                                <input type="text" name="nama_pengelola" class="form-control rounded-3 py-2" placeholder="Contoh: Budi Santoso">
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-semibold small text-body-secondary">No. HP / WhatsApp</label>
+                                <input type="text" name="no_hp" class="form-control rounded-3 py-2" placeholder="Contoh: 081234567890">
+                            </div>
+                        </div>
+
+                        <!-- Kecamatan & Alamat Lengkap -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-sm-5">
+                                <label class="form-label fw-semibold small text-body-secondary required">Kecamatan</label>
+                                <input type="text" name="kecamatan" id="wizard_kecamatan" class="form-control rounded-3 py-2" placeholder="Contoh: Taman" required>
+                            </div>
+                            <div class="col-12 col-sm-7">
+                                <label class="form-label fw-semibold small text-body-secondary">Alamat Lengkap Toko</label>
+                                <input type="text" name="alamat_outlet" class="form-control rounded-3 py-2" placeholder="Jl. Raya Taman No. 12">
+                            </div>
+                        </div>
+
+                        <!-- Persentase Bagi Hasil -->
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold small text-body-secondary required">Persentase Bagi Hasil Investor (%)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" min="0" max="100" name="persentase_potongan" class="form-control rounded-start-3 py-2" value="10.00" required>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold">%</span>
+                            </div>
+                            <div class="form-text small text-body-secondary">Default 10.00% untuk potongan investor.</div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- SESI 2: AKUN KASIR & INFORMASI PEMBAYARAN -->
+                    <!-- ========================================== -->
+                    <div id="stepSection2" class="d-none">
+                        <div class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1.5 mb-3 text-uppercase" style="font-size: 11px;">
+                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Kasir &amp; Upload Bukti Pembayaran
+                        </div>
+
+                        <!-- Username & Password Kasir -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-semibold small text-body-secondary required">Username Login Kasir</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2.5">@</span>
+                                    <input type="text" name="username" id="wizard_username" class="form-control rounded-end-3 border-start-0 py-2" placeholder="outlet_sidoarjo" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label fw-semibold small text-body-secondary required">Password Login Kasir</label>
+                                <input type="password" name="password" id="wizard_password" class="form-control rounded-3 py-2" placeholder="Masukkan password" required>
+                            </div>
+                        </div>
+
+                        <!-- Payment Info Box -->
+                        <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3.5 rounded-4 mb-3 shadow-xs">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold fs-6"><i class="fa-solid fa-receipt me-1"></i> Biaya Lisensi Toko</span>
+                                <span class="badge bg-danger text-white rounded-pill px-3 py-1 fs-6">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
+                            </div>
+                            <p class="small text-body-secondary mb-0 lh-sm">
+                                Silakan melakukan transfer ke rekening resmi berikut:<br>
+                                <strong class="text-body-emphasis">Bank <?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong><br>
+                                a.n. <strong class="text-body-emphasis"><?= htmlspecialchars($bankAtasNama); ?></strong>
+                            </p>
+                        </div>
+
+                        <!-- Upload Bukti Pembayaran -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-body-secondary required">Upload Bukti Transfer Pembayaran</label>
+                            <input type="file" name="bukti_pembayaran" id="wizard_bukti_pembayaran" class="form-control rounded-3 py-2" accept="image/*,.pdf">
+                            <div class="form-text small text-body-secondary">Format: JPG, PNG, WEBP, atau PDF (Maksimal 5MB).</div>
+                        </div>
+
+                        <!-- Informational Alert Box -->
+                        <div class="alert alert-info border-0 rounded-3 p-3 mb-0">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="fa-solid fa-circle-info text-info fs-5 flex-shrink-0 mt-0.5"></i>
+                                <small class="text-body-secondary lh-sm">
+                                    Outlet baru akan diverifikasi dan diaktifkan oleh Admin setelah bukti pendaftaran valid terkirim.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer Navigation Controls -->
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between align-items-center">
+                    <!-- Step 1 Footer Buttons -->
+                    <div id="footerStep1" class="d-flex align-items-center justify-content-between w-100">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" onclick="goToWizardStep(2)">
+                            Lanjut Ke Pembayaran <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2 Footer Buttons -->
+                    <div id="footerStep2" class="d-flex align-items-center justify-content-between w-100 d-none">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" onclick="goToWizardStep(1)">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pendaftaran
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -851,6 +930,68 @@ $(document).ready(function() {
             $('#tableDataOutlet tbody tr.outlet-data-row').removeClass('d-none').show();
             $('#rowLiveSearchEmpty').remove();
         }
+    });
+
+    // 0. Wizard Navigation Function for Modal Tambah Outlet (2 Sesi)
+    window.goToWizardStep = function(step) {
+        if (step === 2) {
+            // Validate Step 1 Required Fields (Nama Outlet & Kecamatan)
+            const nama = $('#wizard_nama_outlet').val().trim();
+            const kec = $('#wizard_kecamatan').val().trim();
+
+            if (!nama) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Belum Lengkap',
+                    text: 'Harap isi Nama Outlet Toko terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_nama_outlet').focus());
+                return;
+            }
+            if (!kec) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Belum Lengkap',
+                    text: 'Harap isi Kecamatan outlet terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_kecamatan').focus());
+                return;
+            }
+
+            // Transition to Step 2
+            $('#stepSection1').addClass('d-none');
+            $('#stepSection2').removeClass('d-none');
+            $('#footerStep1').addClass('d-none');
+            $('#footerStep2').removeClass('d-none');
+
+            // Update Indicator
+            $('#modalSubtitleWizard').text('Sesi 2 dari 2: Akun Kasir & Pembayaran Lisensi');
+            $('#stepTab1').removeClass('text-danger').addClass('text-success');
+            $('#badgeStep1').removeClass('bg-danger').addClass('bg-success').html('<i class="fa-solid fa-check"></i>');
+            
+            $('#stepTab2').removeClass('text-body-tertiary opacity-75').addClass('text-danger fw-bold');
+            $('#badgeStep2').removeClass('bg-body-secondary text-body-secondary').addClass('bg-danger text-white shadow-xs');
+        } else {
+            // Return to Step 1
+            $('#stepSection2').addClass('d-none');
+            $('#stepSection1').removeClass('d-none');
+            $('#footerStep2').addClass('d-none');
+            $('#footerStep1').removeClass('d-none');
+
+            // Reset Indicator
+            $('#modalSubtitleWizard').text('Sesi 1 dari 2: Identitas & Alamat Toko');
+            $('#stepTab1').removeClass('text-success').addClass('text-danger');
+            $('#badgeStep1').removeClass('bg-success').addClass('bg-danger').text('1');
+            
+            $('#stepTab2').removeClass('text-danger fw-bold').addClass('text-body-tertiary opacity-75');
+            $('#badgeStep2').removeClass('bg-danger text-white shadow-xs').addClass('bg-body-secondary text-body-secondary').text('2');
+        }
+    };
+
+    // Reset Wizard on Modal Close
+    $('#modalTambahOutlet').on('hidden.bs.modal', function () {
+        goToWizardStep(1);
+        $('#formTambahOutlet')[0].reset();
     });
 
     // 1. Submit Form Tambah Outlet & Bukti Transfer
