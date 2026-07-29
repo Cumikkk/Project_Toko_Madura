@@ -160,7 +160,7 @@ $(document).ready(function() {
 function deleteInvestor(id, name, totalOutlet) {
     let alertHtml = `
         <div class="text-start fs-14">
-            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Investor <strong class="text-dark">${name}</strong> beserta seluruh outlet di bawah kepemilikannya:</p>
+            <p class="text-muted mb-3">Tindakan ini akan menghapus akun Investor <strong class="text-dark">${name}</strong> beserta seluruh data yang terikat di bawahnya:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">

@@ -513,7 +513,7 @@ $(document).ready(function() {
 function deleteOutlet(id, nama) {
     let alertHtml = `
         <div class="text-start fs-14">
-            <p class="text-muted mb-3">Tindakan ini akan menghapus outlet <strong class="text-dark">${nama}</strong> beserta seluruh data terkait:</p>
+            <p class="text-muted mb-3">Tindakan ini akan menghapus outlet <strong class="text-dark">${nama}</strong> beserta seluruh data yang terikat di bawahnya:</p>
             
             <div class="bg-light p-3 rounded-3 border mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
