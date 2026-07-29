@@ -81,3 +81,7 @@ CREATE TABLE pengaturan_sistem (
     nama_pengaturan VARCHAR(50) NOT NULL UNIQUE,
     nilai DECIMAL(5,2) NOT NULL
 );
+
+== CATATAN UPDATE MODUL ADMIN ==
+- Modul Omzet, Bagi Hasil, dan Pengaturan telah dihapus dari Portal Admin.
+- Menu sidebar Portal Admin saat ini: Dashboard, Master, Investor, Outlet, Admin, dan Developer.
