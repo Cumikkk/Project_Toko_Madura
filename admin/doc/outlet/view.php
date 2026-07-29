@@ -356,6 +356,34 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
     </div>
 </div>
 
+<!-- Modal Pratinjau Bukti Pembayaran -->
+<div class="modal fade" id="modalBuktiPembayaran" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-image me-2 text-info"></i> Bukti Transfer: <span id="bukti-outlet-name"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <div id="bukti-loading" class="text-muted py-4">
+                    <div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading...</span></div>
+                    <p class="mt-2">Memuat gambar...</p>
+                </div>
+                <img id="bukti-image" src="" alt="Bukti Transfer Pembayaran"
+                     style="max-width:100%;max-height:65vh;border-radius:8px;border:1px solid #dee2e6;display:none;"
+                     onload="document.getElementById('bukti-loading').style.display='none';this.style.display='block';"
+                     onerror="document.getElementById('bukti-loading').innerHTML='<p class=text-danger>Gambar gagal dimuat.</p><a href=\''+this.src+'\' target=\'_blank\' class=\'btn btn-sm btn-outline-primary mt-2\'>Buka di Tab Baru</a>';">
+            </div>
+            <div class="modal-footer">
+                <a id="bukti-open-link" href="#" target="_blank" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 // ============================================================
 // Show Alamat popup – called directly via onclick (no data-attr)
@@ -409,24 +437,28 @@ function initDataTable(tabKey) {
 // ============================================================
 function previewBukti(filePath, namaOutlet) {
     if (!filePath) {
-        Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
+        alert('Bukti pembayaran belum diunggah.');
         return;
     }
-    var ext = filePath.split('.').pop().toLowerCase();
     var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
     var proxyUrl = adminUrl + '/image-proxy?file=' + encodeURIComponent(filePath);
+    var ext = filePath.split('.').pop().toLowerCase();
     if (ext === 'pdf') {
         window.open(proxyUrl, '_blank');
         return;
     }
-    Swal.fire({
-        title: 'Bukti Transfer: ' + namaOutlet,
-        html: '<img src="' + proxyUrl + '" style="max-width:100%;max-height:70vh;border-radius:8px;border:1px solid #dee2e6;" alt="Bukti Transfer" onerror="this.parentElement.innerHTML=\'<div class=\'text-danger\'>Gambar tidak dapat ditampilkan. <a href=\''+proxyUrl+'\' target=\'_blank\'>Buka di tab baru</a></div>\'">' ,
-        showCloseButton: true,
-        confirmButtonText: 'Tutup',
-        confirmButtonColor: '#6c757d',
-        width: 600
-    });
+    // Reset & show Bootstrap modal
+    var img = document.getElementById('bukti-image');
+    var loading = document.getElementById('bukti-loading');
+    img.style.display = 'none';
+    img.src = '';
+    loading.innerHTML = '<div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Memuat gambar...</p>';
+    loading.style.display = 'block';
+    document.getElementById('bukti-outlet-name').textContent = namaOutlet;
+    document.getElementById('bukti-open-link').href = proxyUrl;
+    img.src = proxyUrl;
+    var modal = new bootstrap.Modal(document.getElementById('modalBuktiPembayaran'));
+    modal.show();
 }
 
 function switchOutletTab(tabKey) {
