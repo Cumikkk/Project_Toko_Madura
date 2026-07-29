@@ -419,12 +419,17 @@ function previewBukti(filePath, namaOutlet) {
         return;
     }
     Swal.fire({
-        title: '<i class="fas fa-receipt me-2 text-info"></i>Bukti Transfer: ' + namaOutlet,
-        html: '<img src="' + proxyUrl + '" '
+        title: '<i class="fas fa-receipt me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
+        html: '<p class="text-muted mb-3" style="font-size:13px;">'
+            + '<i class="fas fa-store me-1"></i> <strong>Outlet:</strong> ' + namaOutlet
+            + '</p>'
+            + '<img src="' + proxyUrl + '" '
             + 'style="max-width:100%;max-height:65vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
-            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fas fa-exclamation-triangle me-1\\\'></i>Gambar gagal dimuat</p>\'">',
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fas fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
         showCloseButton: true,
         showConfirmButton: false,
+        scrollbarPadding: false,
+        heightAuto: false,
         width: 640
     });
 }
