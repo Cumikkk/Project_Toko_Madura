@@ -13,6 +13,7 @@ $sqlInv = "
         i.id_investor,
         u.nama_lengkap,
         u.no_hp,
+        i.kecamatan,
         i.alamat_investor,
         i.tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet
@@ -31,21 +32,20 @@ $investors = $db->query($sqlInv);
     <div class="col-12 d-flex justify-content-between align-items-center">
         <div>
             <h3 class="fw-bold text-dark mb-1">Data Investor Pemodal</h3>
-            <p class="text-muted fs-14 mb-0">Daftar investor mitra di bawah naungan Master Owner (Fokus Non-Keuangan).</p>
+            <p class="text-muted fs-14 mb-0">Daftar investor mitra di bawah naungan Master Owner.</p>
         </div>
     </div>
 </div>
 
-<div class="card custom-card border-0 shadow-sm">
-    <div class="card-body">
+<div class="card custom-card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-body p-2 p-md-4">
         <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover align-middle w-100" id="table-master-investor">
-                <thead class="bg-light text-center">
+            <table class="table table-hover align-middle w-100" id="table-master-investor">
+                <thead class="bg-body-secondary text-uppercase small text-body-secondary">
                     <tr>
                         <th style="width: 5%;">No</th>
-                        <th>Nama Lengkap</th>
-                        <th>No. HP</th>
-                        <th>Alamat Investor</th>
+                        <th>Nama Investor</th>
+                        <th>Kecamatan & Detail Alamat</th>
                         <th class="text-center">Jumlah Outlet</th>
                         <th class="text-center">Tanggal Bergabung</th>
                         <th class="text-center" style="width: 15%;">Aksi</th>
@@ -55,18 +55,30 @@ $investors = $db->query($sqlInv);
                     <?php if ($investors && $investors->num_rows > 0) : ?>
                         <?php $no = 1; while ($inv = $investors->fetch_assoc()) : ?>
                             <tr>
-                                <td class="text-center"><?= $no++ ?></td>
-                                <td><strong class="text-primary"><?= htmlspecialchars($inv['nama_lengkap']) ?></strong></td>
-                                <td><i class="fa-light fa-phone me-1 text-muted"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?></td>
-                                <td><?= htmlspecialchars($inv['alamat_investor'] ?? '-') ?></td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary rounded-pill px-3 fs-13"><?= $inv['total_outlet'] ?> Outlet</span>
+                                <td class="text-center fw-bold text-body-secondary"><?= $no++ ?></td>
+                                <td>
+                                    <strong class="text-body-emphasis fs-6"><?= htmlspecialchars($inv['nama_lengkap']) ?></strong>
+                                    <br><small class="text-body-secondary"><i class="fa-light fa-phone me-1"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?></small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <span class="badge bg-light text-body-emphasis border"><i class="fa-light fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'Kecamatan N/A') ?></span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-detail-alamat-investor rounded-pill px-2 py-0" style="font-size: 11px;"
+                                                data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>"
+                                                data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-') ?>"
+                                                data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-') ?>">
+                                            <i class="fa-light fa-eye me-1"></i> Detail Alamat
+                                        </button>
+                                    </div>
                                 </td>
                                 <td class="text-center">
-                                    <?= !empty($inv['tanggal_bergabung']) ? date("d/m/Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-semibold"><?= $inv['total_outlet'] ?> Outlet</span>
+                                </td>
+                                <td class="text-center small text-body-secondary">
+                                    <?= !empty($inv['tanggal_bergabung']) ? date("d M Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-info btn-sm btn-lihat-outlet text-white" data-id="<?= $inv['id_investor'] ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>">
+                                    <button type="button" class="btn btn-danger btn-sm btn-lihat-outlet rounded-pill px-3" data-id="<?= $inv['id_investor'] ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>">
                                         <i class="fa-light fa-store me-1"></i> Lihat Outlet
                                     </button>
                                 </td>
@@ -74,7 +86,7 @@ $investors = $db->query($sqlInv);
                         <?php endwhile; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data investor terdaftar.</td>
+                            <td colspan="6" class="text-center py-4 text-body-secondary">Belum ada data investor terdaftar.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -82,6 +94,43 @@ $investors = $db->query($sqlInv);
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $(document).on('click', '.btn-detail-alamat-investor', function() {
+        const nama = $(this).data('nama');
+        const kec = $(this).data('kecamatan');
+        const alamat = $(this).data('alamat');
+
+        let html = `
+            <div class="text-start fs-14">
+                <div class="bg-body-tertiary p-3 rounded-3 border mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                        <span class="text-body-secondary"><i class="fa-solid fa-user-tie text-danger me-2"></i>Nama Investor</span>
+                        <span class="fw-bold text-body-emphasis">${nama}</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                        <span class="text-body-secondary"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Kecamatan</span>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span>
+                    </div>
+                    <div class="pt-1">
+                        <span class="text-body-secondary d-block mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i>Detail Alamat Lengkap:</span>
+                        <p class="fw-semibold text-body-emphasis mb-0 bg-body p-2 rounded border">${alamat}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        Swal.fire({
+            title: 'Detail Alamat Investor',
+            html: html,
+            icon: 'info',
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#7D0A0A'
+        });
+    });
+});
+</script>
 
 <!-- Modal Detail Outlet Investor -->
 <div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-hidden="true">
