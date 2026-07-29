@@ -10,7 +10,6 @@ $dt->query("
         MD5(Md5(am.id)) as id_module
     FROM admin_module am
     JOIN admin_module_group amg ON (amg.id = am.group_id)
-    WHERE amg.type = 'dropdown'
 ");
 
 $dt->hide("id_group");
