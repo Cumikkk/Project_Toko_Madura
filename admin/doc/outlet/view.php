@@ -411,17 +411,10 @@ function previewBukti(imgUrl, namaOutlet) {
         imageUrl: imgUrl,
         imageAlt: 'Bukti Transfer Pembayaran',
         showCloseButton: true,
-        confirmButtonText: '<i class="fa fa-external-link-alt me-1"></i> Buka Gambar Penuh',
-        showCancelButton: true,
-        cancelButtonText: 'Tutup',
-        confirmButtonColor: '#17a2b8',
-        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Tutup',
+        confirmButtonColor: '#7D0A0A',
         customClass: {
             image: 'img-fluid rounded border shadow-sm my-2'
-        }
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            window.open(imgUrl, '_blank');
         }
     });
 }

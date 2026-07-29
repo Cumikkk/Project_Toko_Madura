@@ -50,7 +50,7 @@ class SystemInfo {
                 } else {
                     $parts = explode('/', trim($scriptName, '/'));
                     $projectPath = '';
-                    if (count($parts) > 1 && $parts[0] !== $currentFolder) {
+                    if (count($parts) > 1 && $parts[0] !== 'client' && $parts[0] !== 'admin') {
                         $projectPath = '/' . $parts[0];
                     }
                     return $protocol . $host . $projectPath . '/' . $currentFolder;
