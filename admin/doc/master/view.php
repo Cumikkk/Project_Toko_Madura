@@ -71,7 +71,7 @@ $masters = $db->query($sqlMasters);
                                                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/master/create?id=<?= $row['id_users'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Master"><i class="fas fa-edit"></i></a>
                                                 <?php endif; ?>
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
-                                                    <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Master" onclick="deleteMaster(<?= $row['id_users'] ?>, '<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Master" onclick="deleteMaster(<?= $row['id_users'] ?>, '<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>', <?= intval($row['total_investor'] ?? 0) ?>, <?= intval($row['total_outlet'] ?? 0) ?>)"><i class="fas fa-trash"></i></button>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
@@ -110,19 +110,37 @@ $(document).ready(function() {
     }
 });
 
-function deleteMaster(id, nama) {
+function deleteMaster(id, nama, totalInvestor, totalOutlet) {
+    let alertHtml = '<div class="text-start">' +
+        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS MASTER!</p>' +
+        '<p class="mb-2">Menghapus akun Master <strong>' + nama + '</strong> akan menghapus secara permanen seluruh data terikat di bawahnya:</p>' +
+        '<ol class="ps-3 mb-3 text-dark">' +
+            '<li>Seluruh <strong>Laporan Omzet</strong> outlet di bawah master ini</li>' +
+            '<li>Sebanyak <strong>' + totalOutlet + ' Toko / Outlet</strong> terkait</li>' +
+            '<li>Sebanyak <strong>' + totalInvestor + ' Akun Investor</strong> di bawah master ini</li>' +
+            '<li>Akun Pengguna <strong>Master (' + nama + ')</strong></li>' +
+        '</ol>' +
+        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus semua data terkait ini?</p>' +
+    '</div>';
+
     Swal.fire({
-        title: 'Hapus Master?',
-        text: "Apakah Anda yakin ingin menghapus akun Master '" + nama + "'?",
+        title: 'Konfirmasi Hapus Master',
+        html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus',
+        confirmButtonText: 'Ya, Hapus Semua Data Terkait',
         cancelButtonText: 'Batal'
     }).then(function(result) {
         if (result.isConfirmed) {
-            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/delete", { id_users: id }, function(resp) {
+            Swal.fire({
+                text: "Memproses penghapusan bertingkat...",
+                allowOutsideClick: false,
+                didOpen: function() { Swal.showLoading(); }
+            });
+
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/delete", { id_users: id, id: id }, function(resp) {
                 if (resp.success) {
                     Swal.fire('Dihapus!', resp.message, 'success').then(function() { location.reload(); });
                 } else {

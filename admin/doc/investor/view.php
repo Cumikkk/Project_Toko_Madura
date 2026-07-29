@@ -98,7 +98,7 @@ $investors = $db->query("
                                                     <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/create?id=<?= $row['id_investor'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Investor"><i class="fas fa-edit"></i></a>
                                                 <?php endif; ?>
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
-                                                    <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Investor" onclick="deleteInvestor(<?= $row['id_investor'] ?>, '<?= htmlspecialchars($row['nama_lengkap']) ?>')"><i class="fas fa-trash"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Investor" onclick="deleteInvestor(<?= $row['id_investor'] ?>, '<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES, 'UTF-8') ?>', <?= intval($row['total_outlet'] ?? 0) ?>)"><i class="fas fa-trash"></i></button>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
@@ -157,20 +157,31 @@ $(document).ready(function() {
     });
 });
 
-function deleteInvestor(id, name) {
+function deleteInvestor(id, name, totalOutlet) {
+    let alertHtml = '<div class="text-start">' +
+        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS INVESTOR!</p>' +
+        '<p class="mb-2">Menghapus investor <strong>' + name + '</strong> akan menghapus secara permanen:</p>' +
+        '<ol class="ps-3 mb-3 text-dark">' +
+            '<li>Seluruh <strong>Laporan Omzet</strong> & <strong>Rekap Bagi Hasil</strong> terikat</li>' +
+            '<li>Sebanyak <strong>' + totalOutlet + ' Toko / Outlet</strong> milik investor ini (beserta akun kasirnya)</li>' +
+            '<li>Profil & Akun User Investor <strong>(' + name + ')</strong></li>' +
+        '</ol>' +
+        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus investor ini beserta seluruh toko cabangnya?</p>' +
+    '</div>';
+
     Swal.fire({
-        title: 'Konfirmasi Hapus',
-        text: "Apakah Anda yakin ingin menghapus investor '" + name + "'?",
+        title: 'Konfirmasi Hapus Investor',
+        html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus!',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus Investor & Cabangnya',
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                text: "Loading...",
+                text: "Memproses penghapusan bertingkat...",
                 allowOutsideClick: false,
                 didOpen: function() {
                     Swal.showLoading();
@@ -183,24 +194,15 @@ function deleteInvestor(id, name) {
                         icon: 'success',
                         title: 'Terhapus!',
                         text: resp.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
+                        confirmButtonText: 'OK'
+                    }).then(function() {
                         location.reload();
                     });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: resp.message
-                    });
+                    Swal.fire('Gagal!', resp.message || 'Gagal menghapus data investor', 'error');
                 }
-            }, 'json').fail(function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Terjadi kesalahan sistem saat menghapus data'
-                });
+            }, 'json').fail(function() {
+                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
             });
         }
     });

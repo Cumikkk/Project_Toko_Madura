@@ -511,18 +511,34 @@ $(document).ready(function() {
 });
 
 function deleteOutlet(id, nama) {
+    let alertHtml = '<div class="text-start">' +
+        '<p class="mb-2 text-danger fw-bold"><i class="fa fa-exclamation-triangle me-1"></i> PERINGATAN HAPUS OUTLET!</p>' +
+        '<p class="mb-2">Menghapus Outlet <strong>' + nama + '</strong> akan menghapus secara permanen:</p>' +
+        '<ol class="ps-3 mb-3 text-dark">' +
+            '<li>Seluruh <strong>Laporan Omzet</strong> milik outlet ini</li>' +
+            '<li>Data <strong>Outlet (' + nama + ')</strong> & Akun User <strong>Kasir</strong></li>' +
+        '</ol>' +
+        '<p class="mb-0 text-muted fs-13">Apakah Anda yakin ingin menghapus outlet & seluruh data omzet terkait secara permanen?</p>' +
+    '</div>';
+
     Swal.fire({
-        title: 'Hapus Outlet?',
-        text: 'Apakah Anda yakin ingin menghapus outlet ' + nama + '? Data yang dihapus tidak dapat dikembalikan.',
+        title: 'Konfirmasi Hapus Outlet',
+        html: alertHtml,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus',
+        confirmButtonText: 'Ya, Hapus Outlet & Omzet',
         cancelButtonText: 'Batal'
     }).then(function(result) {
         if (result.isConfirmed) {
-            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/delete", { id_outlet: id }, function(resp) {
+            Swal.fire({
+                text: "Memproses penghapusan bertingkat...",
+                allowOutsideClick: false,
+                didOpen: function() { Swal.showLoading(); }
+            });
+
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/delete", { id_outlet: id, id: id }, function(resp) {
                 if (resp.success) {
                     Swal.fire('Dihapus!', resp.message, 'success').then(function() { location.reload(); });
                 } else {
