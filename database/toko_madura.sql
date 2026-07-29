@@ -1,6 +1,6 @@
 -- ========================================================
 -- EXPORT DATABASE TOKO MADURA (REVISED SCHEMA & DATA)
--- Generated: 2026-07-29 11:28:12
+-- Generated: 2026-07-29 11:39:50
 -- ========================================================
 
 -- --------------------------------------------------------
@@ -19,10 +19,10 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for `users`
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('59', 'Anonymous', 'admin', '0123456789', '$2y$10$j/N2qDpha8PSREHSlVx2QuE.VYOkeQiFUl2IjVezR0vPVew/axZqm', 'programmer');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('61', 'Riski Ardhika', 'master', '0123456789', '$2y$10$F6t/r3tWPGlReGPEy.AqMOuc1uXD1OScd8H05I5c8VH312q3Ln6RC', 'master');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('62', 'M. Fahrul Alfanani', 'investor', '0987654321', '$2y$10$himpCNDmqGtOJ4OUTPsegODeVexswINpWy.ODK3DwlGUUUn6Mijjq', 'investor');
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('63', 'Muhhamad Tegar Kurniawan', 'outlet', '0147852369', '$2y$10$/TCK0hkCnnC7RSSaoOaklurPqd8V3Cgk0lmtEWA6KCHtGClsk.ib2', 'outlet');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('59', 'Anonymous', 'admin', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'programmer');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('61', 'Riski Ardhika', 'master', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'master');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('62', 'M. Fahrul Alfanani', 'investor', '0987654321', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'investor');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES ('63', 'Muhhamad Tegar Kurniawan', 'outlet', '0147852369', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'outlet');
 
 -- --------------------------------------------------------
 -- Table structure for `investor`
