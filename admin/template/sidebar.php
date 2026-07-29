@@ -60,7 +60,7 @@
                                         <?php foreach($module['permission'] as $permission) : ?>
                                             <?php if(strcasecmp($permission['code'], "view") == 0 && ($module['visible'] == -1 || $module['visible'] == 1) && ($permission['status'] == -1 || $permission['status'] == 1)) : ?>
                                                 <li class="nav-sub-item <?= (strcasecmp($module['module'], $login_page) == 0 || strcasecmp($module['module'], $page_sub) == 0)? "active" : ""; ?>">
-                                                    <a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= $module['alias'] ?></a>
+                                                    <a class="nav-sub-link" href="<?= SystemInfo::app('ADMIN_URL') . $permission['link'] ?>"><?= ucwords(str_replace(['_', '-'], ' ', $module['alias'] ?? $module['module'])) ?></a>
                                                 </li>
                                             <?php endif; ?>
                                         <?php endforeach; ?>

@@ -4,7 +4,7 @@ Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan
 
 1. Tugas Master
 - Mendaftarkan akun untuk setiap investor.
-- Melihat daftar investor ia daftarkan saja
+- Melihat daftar investor yang didaftarkan saja.
 - Mengatur persentase potongan global. Pengaturan ini dibuat dinamis karena nilai persentase belum bersifat tetap.
 - Memantau berjalannya sistem secara garis besar. Setiap Master dapat melihat daftar investor di bawah naungannya.
 
@@ -17,7 +17,7 @@ Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan
 - Menginput total omzet penjualan yang didapatkan dari operasional toko pada setiap akhir periode pelaporan (misalnya harian, mingguan, atau bulanan).
 - Setelah penginputan, sistem akan secara otomatis menghitung nilai potongan berdasarkan persentase global yang sedang berlaku saat itu dan menyimpannya sebagai riwayat data.
 
-== DATABASE ==
+== DATABASE SCHEMA TERBARU ==
 
 CREATE DATABASE toko_madura;
 USE toko_madura;
@@ -29,7 +29,7 @@ CREATE TABLE users (
     no_hp VARCHAR(20) DEFAULT NULL,
     email VARCHAR(100) DEFAULT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('master', 'investor', 'outlet') NOT NULL
+    role ENUM('master', 'investor', 'outlet', 'programmer') NOT NULL
 );
 
 CREATE TABLE investor (
@@ -47,7 +47,17 @@ CREATE TABLE outlet (
     id_users INT(10) UNSIGNED NOT NULL UNIQUE,
     id_investor INT(10) UNSIGNED NOT NULL,
     nama_outlet VARCHAR(100) NOT NULL,
+    kecamatan VARCHAR(100) DEFAULT NULL,
     alamat_outlet TEXT DEFAULT NULL,
+    persentase_potongan DECIMAL(5,2) DEFAULT 10.00,
+    status ENUM('pending','active','reject','inactive') NOT NULL DEFAULT 'pending',
+    nominal_biaya DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    tanggal_request DATETIME DEFAULT NULL,
+    tanggal_bergabung DATETIME DEFAULT NULL,
+    tanggal_ditolak DATETIME DEFAULT NULL,
+    alasan_penolakan TEXT DEFAULT NULL,
+    tgl_jatuh_tempo DATETIME DEFAULT NULL,
     FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
     FOREIGN KEY (id_investor) REFERENCES investor(id_investor) ON DELETE RESTRICT
 );
@@ -79,9 +89,13 @@ CREATE TABLE rekap_bagi_hasil (
 CREATE TABLE pengaturan_sistem (
     id_pengaturan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nama_pengaturan VARCHAR(50) NOT NULL UNIQUE,
-    nilai DECIMAL(5,2) NOT NULL
+    nilai VARCHAR(255) NOT NULL
 );
 
 == CATATAN UPDATE MODUL ADMIN ==
-- Modul Omzet, Bagi Hasil, dan Pengaturan telah dihapus dari Portal Admin.
-- Menu sidebar Portal Admin saat ini: Dashboard, Master, Investor, Outlet, Admin, dan Developer.
+- Group Pengaturan pada Portal Admin dikonfigurasi sebagai Dropdown Group (`type = 'dropdown'`) dengan sub-modul terpisah:
+  1. Biaya Langganan (/setting/biaya_langganan)
+  2. Rekening Bank (/setting/rekening_bank)
+- Portal Admin Outlet dilengkapi 4 tab: Outlet Aktif, Expired / Non-Aktif, Request Masuk (Pending), dan Request Ditolak (Reject).
+- Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
+- Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.

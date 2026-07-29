@@ -27,6 +27,29 @@ if (!$user) {
 
 $role = strtolower($user['role'] ?? '');
 
+// If outlet user, verify outlet is active and not expired
+if ($role === 'outlet') {
+    $dbCheck = \Config\Core\Database::connect();
+    $sqlStatus = $dbCheck->query("SELECT status, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$user['MBR_ID']} LIMIT 1");
+    if ($sqlStatus && $sqlStatus->num_rows > 0) {
+        $stData = $sqlStatus->fetch_assoc();
+        $today = date('Y-m-d');
+        $jt = !empty($stData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($stData['tgl_jatuh_tempo'])) : null;
+
+        if ($stData['status'] !== 'active') {
+            User::logout();
+            $msg = ($stData['status'] === 'reject') 
+                ? "Akun outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui') 
+                : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+            die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
+        } elseif ($jt && $today > $jt) {
+            User::logout();
+            $msg = "Masa langganan outlet Anda telah berakhir pada tanggal " . date('d/m/Y', strtotime($jt)) . ". Silakan hubungi Investor/Admin untuk perpanjangan.";
+            die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
+        }
+    }
+}
+
 // Investor and Outlet do not use Dashboard -> Redirect to main modules
 if ($pageFile === 'dashboard' || empty($_GET['a'])) {
     if ($role === 'investor') {

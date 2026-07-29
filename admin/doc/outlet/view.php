@@ -6,9 +6,15 @@ $db = Database::connect();
 
 // 1. Fetch counts for stats cards
 $activeCount = 0;
-$resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active'");
+$resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active' AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
 if ($resActive && $resActive->num_rows > 0) {
     $activeCount = (int)$resActive->fetch_assoc()['total'];
+}
+
+$expiredCount = 0;
+$resExpired = $db->query("SELECT COUNT(*) as total FROM outlet WHERE (status = 'active' AND DATE(tgl_jatuh_tempo) < CURRENT_DATE()) OR status = 'inactive'");
+if ($resExpired && $resExpired->num_rows > 0) {
+    $expiredCount = (int)$resExpired->fetch_assoc()['total'];
 }
 
 $pendingCount = 0;
@@ -23,7 +29,7 @@ if ($resReject && $resReject->num_rows > 0) {
     $rejectCount = (int)$resReject->fetch_assoc()['total'];
 }
 
-// 2. Fetch Active Outlets
+// 2. Fetch Active Outlets (not expired)
 $sqlActive = "
     SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
            u_inv.nama_lengkap as nama_investor, inv.persen_bagian_investor
@@ -31,12 +37,25 @@ $sqlActive = "
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
     LEFT JOIN investor inv ON inv.id_investor = o.id_investor
     LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE o.status = 'active'
+    WHERE o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
     ORDER BY o.nama_outlet ASC
 ";
 $activeOutlets = $db->query($sqlActive);
 
-// 3. Fetch Pending Outlets (Request Outlet)
+// 3. Fetch Expired Outlets
+$sqlExpired = "
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+           u_inv.nama_lengkap as nama_investor, inv.persen_bagian_investor
+    FROM outlet o
+    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+    WHERE (o.status = 'active' AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
+    ORDER BY o.tgl_jatuh_tempo DESC, o.nama_outlet ASC
+";
+$expiredOutlets = $db->query($sqlExpired);
+
+// 4. Fetch Pending Outlets (Request Outlet)
 $sqlPending = "
     SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
@@ -47,7 +66,7 @@ $sqlPending = "
 ";
 $pendingOutlets = $db->query($sqlPending);
 
-// 4. Fetch Rejected Outlets
+// 5. Fetch Rejected Outlets
 $sqlReject = "
     SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
@@ -86,7 +105,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 
 <!-- Summary Metrics Cards (Gaya Dashboard RRFX: Header text-muted + H3 icon & count) -->
 <div class="row row-sm mb-3">
-    <div class="col-sm-4 col-lg-4 mb-2">
+    <div class="col-sm-3 col-lg-3 mb-2">
         <div class="card custom-card outlet-stat-card active-card" id="card-active" onclick="switchOutletTab('active')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
@@ -96,7 +115,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
             </div>
         </div>
     </div>
-    <div class="col-sm-4 col-lg-4 mb-2">
+    <div class="col-sm-3 col-lg-3 mb-2">
+        <div class="card custom-card outlet-stat-card" id="card-expired" onclick="switchOutletTab('expired')" style="cursor:pointer;">
+            <div class="card-body">
+                <div class="card-order-reviews">
+                    <h6 class="mb-3 text-muted">Expired / Non-Aktif</h6>
+                    <h3 class="text-end mb-0"><i class="fa fa-exclamation-triangle icon-size float-start text-danger"></i><span><?= number_format($expiredCount) ?></span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-lg-3 mb-2">
         <div class="card custom-card outlet-stat-card" id="card-pending" onclick="switchOutletTab('pending')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
@@ -106,12 +135,12 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
             </div>
         </div>
     </div>
-    <div class="col-sm-4 col-lg-4 mb-2">
+    <div class="col-sm-3 col-lg-3 mb-2">
         <div class="card custom-card outlet-stat-card" id="card-reject" onclick="switchOutletTab('reject')" style="cursor:pointer;">
             <div class="card-body">
                 <div class="card-order-reviews">
                     <h6 class="mb-3 text-muted">Request Ditolak</h6>
-                    <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-danger"></i><span><?= number_format($rejectCount) ?></span></h3>
+                    <h3 class="text-end mb-0"><i class="fa fa-times-circle icon-size float-start text-muted"></i><span><?= number_format($rejectCount) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -144,6 +173,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Tanggal Disetujui</th>
+                                    <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
@@ -174,6 +204,21 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
                                             <td class="text-center">
+                                                <?php
+                                                if (!empty($row['tgl_jatuh_tempo'])) {
+                                                    $jt = date('Y-m-d', strtotime($row['tgl_jatuh_tempo']));
+                                                    $today = date('Y-m-d');
+                                                    if ($today > $jt) {
+                                                        echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-exclamation-triangle me-1"></i>' . date("d/m/Y", strtotime($jt)) . ' (Expired)</span>';
+                                                    } else {
+                                                        echo '<span class="badge bg-success"><i class="fas fa-calendar-check me-1"></i>' . date("d/m/Y", strtotime($jt)) . '</span>';
+                                                    }
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
@@ -193,7 +238,80 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                     </div>
                 </div>
 
-                <!-- TAB 2: REQUEST OUTLET (PENDING) -->
+                <!-- TAB 2: EXPIRED / NON-AKTIF -->
+                <div id="tab-expired" class="outlet-tab-section" style="display:none;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-expired">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="text-center" style="width: 5%;">No</th>
+                                    <th class="text-center">Nama Toko</th>
+                                    <th class="text-center">Nama Pengelola Toko</th>
+                                    <th class="text-center">No. HP</th>
+                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Investor</th>
+                                    <th class="text-center">Tanggal Disetujui</th>
+                                    <th class="text-center">Jatuh Tempo Langganan</th>
+                                    <th class="text-center" style="width: 15%;">#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if ($expiredOutlets && $expiredOutlets->num_rows > 0) : ?>
+                                    <?php $no = 1; while ($row = $expiredOutlets->fetch_assoc()) : ?>
+                                        <tr>
+                                            <td class="text-center"><?= $no++ ?></td>
+                                            <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
+                                            <td class="text-start"><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>
+                                            <td class="text-center">
+                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
+                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
+                                                            title="Lihat Alamat Lengkap">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <?php if (!empty($row['nama_investor'])) : ?>
+                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persen_bagian_investor'], 0) ?>%)</span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-warning text-dark">Belum Ada Investor</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
+                                            <td class="text-center">
+                                                <?php
+                                                if (!empty($row['tgl_jatuh_tempo'])) {
+                                                    $jt = date('Y-m-d', strtotime($row['tgl_jatuh_tempo']));
+                                                    echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-exclamation-triangle me-1"></i>' . date("d/m/Y", strtotime($jt)) . ' (Expired)</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-secondary">Non-Aktif</span>';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="action d-flex justify-content-center gap-2">
+                                                    <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
+                                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
+                                                    <?php endif; ?>
+                                                    <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
+                                                        <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Toko" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                <?php else : ?>
+                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data outlet expired / non-aktif.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: REQUEST OUTLET (PENDING) -->
                 <div id="tab-pending" class="outlet-tab-section" style="display:none;">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-pending">
@@ -330,29 +448,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
     </div>
 </div>
 
-<!-- Modal Reject Request Outlet -->
-<div class="modal fade" id="modalReject" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="form-reject-outlet">
-                <input type="hidden" name="id_outlet" id="reject_id_outlet">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="fas fa-times-circle me-2"></i>Tolak Request Outlet</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menolak request pembukaan toko <strong id="reject_nama_outlet"></strong>?</p>
-                    <div class="form-group mb-0">
-                        <label class="form-label fw-bold">Alasan Penolakan <span class="text-danger">*</span></label>
-                        <textarea name="alasan_penolakan" class="form-control" rows="3" placeholder="Masukkan alasan penolakan untuk investor..." required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger"><i class="fas fa-times me-1"></i> Proses Penolakan</button>
-                </div>
-            </form>
-</div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -375,7 +471,7 @@ function showAlamat(nama, alamat) {
 // ============================================================
 // Track which DataTables have been initialized
 // ============================================================
-var dtInitialized = { active: false, pending: false, reject: false };
+var dtInitialized = { active: false, expired: false, pending: false, reject: false };
 
 function initDataTable(tabKey) {
     var tableId = '#table-outlet-' + tabKey;
@@ -396,6 +492,15 @@ function initDataTable(tabKey) {
                 order: [[0, 'asc']]
             });
             dtInitialized[tabKey] = true;
+
+            if ($.fn.select2) {
+                setTimeout(function() {
+                    $(tableId + '_wrapper .dataTables_length select').select2({
+                        minimumResultsForSearch: Infinity,
+                        width: 'auto'
+                    });
+                }, 50);
+            }
         } else if ($.fn.DataTable.isDataTable(tableId)) {
             var dt = $(tableId).DataTable();
             dt.columns.adjust().draw(false);
@@ -418,18 +523,31 @@ function previewBukti(filePath, namaOutlet, namaInvestor, biayaLangganan) {
         window.open(proxyUrl, '_blank');
         return;
     }
-    var investorInfo = namaInvestor ? ' &nbsp;|&nbsp; <i class="fas fa-user-tie me-1 text-success"></i> <strong>Investor:</strong> ' + namaInvestor : '';
-    var biayaInfo   = biayaLangganan ? '<br><i class="fas fa-tags me-1 text-warning"></i> <strong>Biaya Langganan:</strong> Rp ' + biayaLangganan : '';
+
+    var infoHtml = '<div class="text-start bg-light p-3 rounded mb-3" style="font-size:13.5px; border:1px solid #e9ecef;">'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-building text-primary me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nama Outlet:</span>'
+        + '  <span class="text-dark fw-semibold">' + namaOutlet + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-handshake-o text-success me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nama Investor:</span>'
+        + '  <span class="text-dark">' + (namaInvestor || '-') + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center">'
+        + '  <i class="fa fa-money text-warning me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Biaya Langganan:</span>'
+        + '  <span class="text-success fw-bold">Rp ' + (biayaLangganan || '0') + '</span>'
+        + '</div>'
+        + '</div>';
+
     Swal.fire({
-        title: '<i class="fas fa-receipt me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
-        html: '<div class="text-muted mb-3" style="font-size:13.5px;">'
-            + '<i class="fas fa-store me-1 text-primary"></i> <strong>Outlet:</strong> ' + namaOutlet
-            + investorInfo
-            + biayaInfo
-            + '</div>'
+        title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
+        html: infoHtml
             + '<img src="' + proxyUrl + '" '
-            + 'style="max-width:100%;max-height:65vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
-            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fas fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
+            + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
         showCloseButton: true,
         showConfirmButton: false,
         scrollbarPadding: false,
@@ -457,6 +575,7 @@ function switchOutletTab(tabKey) {
     // 4. Update title without icon (matches Investor view header style)
     var titles = {
         active:  'List Outlet Aktif',
+        expired: 'List Outlet Expired / Non-Aktif',
         pending: 'List Request Outlet (Pending)',
         reject:  'List Request Outlet (Ditolak)'
     };
@@ -475,7 +594,9 @@ $(document).ready(function() {
     // Auto switch tab from URL param
     var urlParams = new URLSearchParams(window.location.search);
     var tabParam = urlParams.get('tab');
-    if (tabParam === 'pending' || window.location.hash === '#pending') {
+    if (tabParam === 'expired' || window.location.hash === '#expired') {
+        switchOutletTab('expired');
+    } else if (tabParam === 'pending' || window.location.hash === '#pending') {
         switchOutletTab('pending');
     } else if (tabParam === 'reject' || window.location.hash === '#reject') {
         switchOutletTab('reject');
@@ -510,43 +631,58 @@ $(document).ready(function() {
         });
     });
 
-    // Handle Reject Request Click (Open Modal)
+    // Handle Reject Request Click (SweetAlert2)
     $(document).on('click', '.btn-reject', function() {
         var id   = $(this).data('id');
         var nama = $(this).data('nama');
-        $('#reject_id_outlet').val(id);
-        $('#reject_nama_outlet').text(nama);
-        $('#form-reject-outlet')[0].reset();
-        $('#reject_id_outlet').val(id);
 
-        var modalEl = document.getElementById('modalReject');
-        if (modalEl) {
-            var modal = new bootstrap.Modal(modalEl);
-            modal.show();
-        }
-    });
-
-    // Handle Submit Form Reject
-    $('#form-reject-outlet').on('submit', function(e) {
-        e.preventDefault();
-        var data = $(this).serialize();
-        var btn  = $(this).find('button[type="submit"]');
-
-        btn.prop('disabled', true);
-        $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/reject", data, function(resp) {
-            btn.prop('disabled', false);
-            if (resp.success) {
-                var modalEl = document.getElementById('modalReject');
-                var modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-
-                Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
-            } else {
-                Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
+        Swal.fire({
+            title: 'Tolak Request Outlet',
+            html: '<p class="text-muted mb-2" style="font-size:14px;">Apakah Anda yakin ingin menolak request pembukaan outlet <strong class="text-dark">' + nama + '</strong>?</p>',
+            input: 'textarea',
+            inputLabel: 'Alasan Penolakan',
+            inputPlaceholder: 'Masukkan alasan penolakan untuk investor...',
+            inputAttributes: {
+                'aria-label': 'Masukkan alasan penolakan untuk investor...'
+            },
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-times me-1"></i> Proses Penolakan',
+            cancelButtonText: 'Batal',
+            scrollbarPadding: false,
+            heightAuto: false,
+            inputValidator: function(value) {
+                if (!value || !value.trim()) {
+                    return 'Alasan penolakan wajib diisi!';
+                }
             }
-        }, 'json').fail(function() {
-            btn.prop('disabled', false);
-            Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var alasan = result.value;
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang memproses penolakan request outlet',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/reject", {
+                    id_outlet: id,
+                    alasan_penolakan: alasan
+                }, function(resp) {
+                    if (resp.success) {
+                        Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
+                    } else {
+                        Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
+                    }
+                }, 'json').fail(function() {
+                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                });
+            }
         });
     });
 });

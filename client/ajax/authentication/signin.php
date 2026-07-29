@@ -44,6 +44,38 @@ if(!password_verify($data['password'], $userData['password']) && User::developer
     ]);
 } 
 
+/** Check Outlet Status & Expiration if role is outlet */
+if ($userData['role'] === 'outlet') {
+    $sqlOutlet = $db->query("SELECT status, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$memberId} LIMIT 1");
+    if ($sqlOutlet && $sqlOutlet->num_rows > 0) {
+        $outletInfo = $sqlOutlet->fetch_assoc();
+        if ($outletInfo['status'] === 'pending') {
+            JsonResponse([
+                'success' => false,
+                'message' => "Request pendaftaran outlet Anda masih dalam proses peninjauan / persetujuan oleh Admin.",
+                'data' => []
+            ]);
+        } elseif ($outletInfo['status'] === 'reject') {
+            $alasan = !empty($outletInfo['alasan_penolakan']) ? " Alasan penolakan: " . $outletInfo['alasan_penolakan'] : "";
+            JsonResponse([
+                'success' => false,
+                'message' => "Request pendaftaran outlet Anda ditolak oleh Admin." . $alasan,
+                'data' => []
+            ]);
+        } elseif ($outletInfo['status'] === 'active' && !empty($outletInfo['tgl_jatuh_tempo'])) {
+            $today = date('Y-m-d');
+            $jt = date('Y-m-d', strtotime($outletInfo['tgl_jatuh_tempo']));
+            if ($today > $jt) {
+                JsonResponse([
+                    'success' => false,
+                    'message' => "Masa langganan outlet Anda telah berakhir pada tanggal " . date('d/m/Y', strtotime($jt)) . ". Silakan hubungi Investor/Admin untuk perpanjangan.",
+                    'data' => []
+                ]);
+            }
+        }
+    }
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

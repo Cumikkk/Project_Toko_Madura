@@ -40,6 +40,7 @@ try {
     // =========================================================================
     if ($action === 'add') {
         $namaOutlet = trim($db->real_escape_string($_POST['nama_outlet'] ?? ''));
+        $kecamatan = trim($db->real_escape_string($_POST['kecamatan'] ?? ''));
         $alamatOutlet = trim($db->real_escape_string($_POST['alamat_outlet'] ?? ''));
         $username = trim($db->real_escape_string($_POST['username'] ?? ''));
         $password = trim($_POST['password'] ?? '');
@@ -61,7 +62,12 @@ try {
             $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
         }
 
-        $kecamatan = trim($db->real_escape_string($_POST['kecamatan'] ?? ''));
+        $namaPengelola = trim($db->real_escape_string($_POST['nama_pengelola'] ?? ''));
+        if (empty($namaPengelola)) {
+            $namaPengelola = $namaOutlet;
+        }
+        $noHp = trim($db->real_escape_string($_POST['no_hp'] ?? ''));
+        $persentasePotongan = isset($_POST['persentase_potongan']) ? (float)$_POST['persentase_potongan'] : 10.00;
 
         // Handle Upload Bukti Pembayaran
         $buktiPath = '';
@@ -92,7 +98,7 @@ try {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $escapedHash = $db->real_escape_string($hashedPassword);
 
-        $sqlUser = "INSERT INTO users (nama_lengkap, username, password, role) VALUES ('{$namaOutlet}', '{$username}', '{$escapedHash}', 'outlet')";
+        $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', '{$escapedHash}', 'outlet')";
         if (!$db->query($sqlUser)) {
             JsonResponse(['success' => false, 'message' => 'Gagal membuat akun user outlet: ' . $db->error]);
         }
@@ -100,7 +106,7 @@ try {
 
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }

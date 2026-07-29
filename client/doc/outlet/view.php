@@ -203,6 +203,19 @@ if (!in_array((int)date('Y'), $availableYears)) {
     array_unshift($availableYears, (int)date('Y'));
 }
 
+// Fetch system settings (fee & bank details) from pengaturan_sistem
+$sysSettings = [];
+$resSysSetting = $db->query("SELECT nama_pengaturan, nilai FROM pengaturan_sistem");
+if ($resSysSetting) {
+    while ($r = $resSysSetting->fetch_assoc()) {
+        $sysSettings[$r['nama_pengaturan']] = $r['nilai'];
+    }
+}
+$biayaLangganan = (float)($sysSettings['biaya_langganan_outlet'] ?? 100000.00);
+$bankNama       = $sysSettings['bank_nama'] ?? 'BCA';
+$bankNoRek      = $sysSettings['bank_no_rekening'] ?? '123-456-7890';
+$bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';
+
 // Build WHERE clause for Outlet Registration Date & Ownership
 $whereOutletConds = ["o.id_investor = {$investorId}"];
 
@@ -452,9 +465,19 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                         <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold">
-                                                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif
-                                                    </span>
+                                                    <?php
+                                                    $today = date('Y-m-d');
+                                                    $jt = !empty($row['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($row['tgl_jatuh_tempo'])) : null;
+                                                    if ($jt && $today > $jt) :
+                                                    ?>
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Telah Berakhir">
+                                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" title="Langganan Aktif">
+                                                            <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center pe-3">
@@ -553,6 +576,18 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <label class="form-label fw-semibold small text-body-secondary required">Nama Outlet</label>
                         <input type="text" name="nama_outlet" class="form-control rounded-3" placeholder="Contoh: Toko Madura Sidoarjo" required>
                     </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-body-secondary">Nama Pengelola Toko / Kasir</label>
+                            <input type="text" name="nama_pengelola" class="form-control rounded-3" placeholder="Contoh: Budi Santoso">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-body-secondary">No. HP / WhatsApp Pengelola</label>
+                            <input type="text" name="no_hp" class="form-control rounded-3" placeholder="Contoh: 081234567890">
+                        </div>
+                    </div>
+
                     <div class="row g-2 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small text-body-secondary required">Kecamatan</label>
@@ -562,6 +597,15 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                             <label class="form-label fw-semibold small text-body-secondary">Alamat Lengkap</label>
                             <input type="text" name="alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12">
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-body-secondary required">Persentase Bagi Hasil Investor (%)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0" max="100" name="persentase_potongan" class="form-control rounded-start-3" value="10.00" required>
+                            <span class="input-group-text bg-body-tertiary text-body-secondary">%</span>
+                        </div>
+                        <div class="form-text small text-body-secondary">Persentase bagian pembagian hasil untuk investor.</div>
                     </div>
 
                     <hr class="my-3 text-body-secondary opacity-25">
@@ -583,10 +627,10 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                     <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3 rounded-4 mb-3">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="fw-bold small"><i class="fa-solid fa-receipt me-1"></i> Biaya Pendaftaran Lisensi</span>
-                            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fs-6">Rp 500.000</span>
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-1 fs-6">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
                         </div>
                         <p class="small text-body-secondary mb-0">
-                            Transfer ke <strong>Bank BCA: 123-456-7890</strong> a.n. <strong>Toko Madura Pusat</strong>. Setelah transfer, harap unggah foto bukti pembayaran di bawah ini.
+                            Transfer ke <strong>Bank <?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama); ?></strong>. Setelah transfer, harap unggah foto bukti pembayaran di bawah ini.
                         </p>
                     </div>
 
