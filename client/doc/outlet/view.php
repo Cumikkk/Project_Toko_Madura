@@ -488,8 +488,9 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                         <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Pendaftaran
                                                     </span>
                                                 <?php elseif (($row['status'] ?? '') === 'reject') : ?>
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="<?= htmlspecialchars($row['alasan_penolakan'] ?? 'Pembayaran Ditolak Admin') ?>">
-                                                        <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
+                                                    <?php $isRejectRenew = (($row['tipe_request'] ?? '') === 'perpanjangan'); ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Pembayaran Ditolak Admin">
+                                                        <i class="fa-solid fa-circle-xmark me-1"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
                                                     </span>
                                                 <?php elseif ($isExpired) : ?>
                                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Telah Berakhir">
@@ -1221,12 +1222,14 @@ $(document).ready(function() {
 
                     let bannerHtml = '';
                     if (statusText === 'reject') {
+                        let titleReject = (tipeReq === 'perpanjangan') ? 'Perpanjangan Langganan Ditolak Admin' : 'Pendaftaran Baru Ditolak Admin';
+                        let btnReject = (tipeReq === 'perpanjangan') ? 'Ajukan Ulang Perpanjangan' : 'Ajukan Ulang Pendaftaran';
                         bannerHtml = `
                             <div class="alert alert-danger border-0 shadow-sm rounded-3 p-3 mb-3 text-center">
                                 <i class="fa-solid fa-circle-xmark text-danger fs-4 mb-1"></i>
-                                <div class="fw-bold text-danger mb-2">Pendaftaran / Perpanjangan Ditolak Admin</div>
+                                <div class="fw-bold text-danger mb-2">${titleReject}</div>
                                 <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1 btn-trigger-ajukan-ulang" data-id="${res.data.id_outlet}" data-nama="${res.data.nama_outlet}">
-                                    <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Ulang Pembayaran
+                                    <i class="fa-solid fa-paper-plane me-1"></i> ${btnReject}
                                 </button>
                             </div>`;
                     } else if (statusText === 'pending') {
