@@ -560,61 +560,63 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                     $tglPengajuanFormatted = !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : (!empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) . ' WIB' : '-');
                                                     $buktiUrl = !empty($row['bukti_pembayaran']) ? (SystemInfo::app('CLIENT_URL') . '/' . $row['bukti_pembayaran']) : '';
                                                     ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 185px;">
-                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="<?= $isPendingRenewal ? 'fa-solid fa-clock-rotate-left' : 'fa-regular fa-clock'; ?> me-2 text-warning" style="margin-right: 6px !important;"></i><?= $isPendingRenewal ? 'Verifikasi Perpanjangan' : 'Verifikasi Pendaftaran'; ?>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
+                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="<?= $isPendingRenewal ? 'fa-solid fa-clock-rotate-left' : 'fa-regular fa-clock'; ?> me-1.5 text-warning"></i><?= $isPendingRenewal ? 'Verifikasi Perpanjangan' : 'Verifikasi Pendaftaran'; ?>
                                                         </span>
-                                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark border-warning py-1 px-3 rounded-pill btn-detail-pending fw-bold w-100 text-center shadow-xs mt-1"
+                                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark border-warning py-1 px-2 rounded-pill btn-detail-pending fw-bold w-100 text-center shadow-xs mt-0.5"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-tipe="<?= $isPendingRenewal ? 'Perpanjangan Langganan' : 'Pendaftaran Baru'; ?>"
                                                             data-waktu="<?= htmlspecialchars($tglPengajuanFormatted, ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-bukti="<?= htmlspecialchars($buktiUrl, ENT_QUOTES, 'UTF-8'); ?>"
                                                             style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-circle-info me-2 text-warning" style="margin-right: 6px !important;"></i>Detail Pengajuan
+                                                            <i class="fa-solid fa-circle-info me-1.5 text-warning"></i>Detail Pengajuan
                                                         </button>
                                                     </div>
                                                 <?php elseif (($row['status'] ?? '') === 'reject') : ?>
                                                     <?php $isRejectRenew = (($row['tipe_request'] ?? '') === 'perpanjangan'); ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-circle-xmark me-2" style="margin-right: 6px !important;"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-circle-xmark me-1.5"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
                                                         </span>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill btn-cek-alasan fw-bold w-100 text-center shadow-xs mt-1"
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill btn-cek-alasan fw-bold w-100 text-center shadow-xs mt-0.5"
                                                             data-id="<?= htmlspecialchars($row['id_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?: 'Tidak ada catatan alasan dari admin.', ENT_QUOTES, 'UTF-8'); ?>"
                                                             style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-circle-exclamation me-2" style="margin-right: 6px !important;"></i>Cek Alasan
+                                                            <i class="fa-solid fa-circle-exclamation me-1.5"></i>Cek Alasan
                                                         </button>
                                                     </div>
                                                 <?php elseif ($isExpired) : ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-triangle-exclamation me-2"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-triangle-exclamation me-1.5"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
                                                         </span>
-                                                        <button type="button" class="btn btn-sm btn-danger py-1 px-3 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-1"
+                                                        <button type="button" class="btn btn-sm btn-danger py-1 px-2 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-0.5"
                                                             data-id="<?= $row['id_outlet']; ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-rotate-right me-2"></i>Perpanjang Langganan
+                                                            <i class="fa-solid fa-rotate-right me-1.5"></i>Perpanjang Langganan
                                                         </button>
                                                     </div>
                                                 <?php elseif ($isNearExpiry) : ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
-                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-triangle-exclamation me-2 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
+                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-triangle-exclamation me-1.5 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
                                                         </span>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-1"
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-0.5"
                                                             data-id="<?= $row['id_outlet']; ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-rotate-right me-2"></i>Perpanjang Langganan
+                                                            <i class="fa-solid fa-rotate-right me-1.5"></i>Perpanjang Langganan
                                                         </button>
                                                     </div>
                                                 <?php else : ?>
-                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" title="Langganan Aktif">
-                                                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
-                                                    </span>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center mx-auto" style="width: 175px;">
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;" title="Langganan Aktif">
+                                                            <i class="fa-solid fa-circle me-1.5 text-success" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
+                                                        </span>
+                                                    </div>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center pe-3">
