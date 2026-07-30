@@ -191,7 +191,7 @@ $selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
 $availableYears = [];
 // Fetch distinct years of outlet registration for this investor
-$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_bergabung) as y_year FROM outlet WHERE id_investor = {$investorId} AND tanggal_bergabung IS NOT NULL ORDER BY y_year DESC");
+$resYears = $db->query("SELECT DISTINCT YEAR(COALESCE(tanggal_bergabung, tanggal_disetujui, tanggal_request)) as y_year FROM outlet WHERE id_investor = {$investorId} ORDER BY y_year DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
         if (!empty($yRow['y_year'])) {
@@ -221,13 +221,13 @@ $whereOutletConds = ["o.id_investor = {$investorId}"];
 
 if (!empty($selectedTgl)) {
     $safeTgl = $db->real_escape_string($selectedTgl);
-    $whereOutletConds[] = "DATE(o.tanggal_bergabung) = '{$safeTgl}'";
+    $whereOutletConds[] = "DATE(COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request)) = '{$safeTgl}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereOutletConds[] = "MONTH(o.tanggal_bergabung) = {$selectedBulan}";
+        $whereOutletConds[] = "MONTH(COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request)) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereOutletConds[] = "YEAR(o.tanggal_bergabung) = {$selectedTahun}";
+        $whereOutletConds[] = "YEAR(COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request)) = {$selectedTahun}";
     }
 }
 $whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);
@@ -1120,7 +1120,21 @@ $(document).ready(function() {
             success: function(res) {
                 $('#detailOutletLoading').addClass('d-none');
                 if (res.success) {
-                    let formattedCreated = res.data.tanggal_bergabung ? res.data.tanggal_bergabung : (res.data.created_at ? res.data.created_at : '-');
+                    let rawDate = res.data.tanggal_bergabung || res.data.tanggal_disetujui || res.data.tanggal_request;
+                    let formattedCreated = '-';
+                    if (rawDate && rawDate !== '0000-00-00 00:00:00') {
+                        let d = new Date(rawDate.replace(/-/g, "/"));
+                        if (!isNaN(d.getTime())) {
+                            let day = String(d.getDate()).padStart(2, '0');
+                            let month = String(d.getMonth() + 1).padStart(2, '0');
+                            let year = d.getFullYear();
+                            let hours = String(d.getHours()).padStart(2, '0');
+                            let mins = String(d.getMinutes()).padStart(2, '0');
+                            formattedCreated = day + '/' + month + '/' + year + ' ' + hours + ':' + mins + ' WIB';
+                        } else {
+                            formattedCreated = rawDate;
+                        }
+                    }
                     $('#det_nama_outlet').text(res.data.nama_outlet);
                     $('#det_created_at_badge').html('<i class="fa-regular fa-clock me-1"></i> Terdaftar: ' + formattedCreated);
                     $('#det_created_at_full').text(formattedCreated);

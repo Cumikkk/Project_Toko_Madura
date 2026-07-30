@@ -15,7 +15,7 @@ $sqlInv = "
         u.no_hp,
         i.kecamatan,
         i.alamat_investor,
-        i.tanggal_bergabung,
+        COALESCE(i.tanggal_bergabung, u.created_at) as tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet
     FROM investor i
     JOIN users u ON u.id_users = i.id_users
