@@ -38,11 +38,10 @@ if ($role === 'investor') {
 }
 $persenOutletBagiHasil = 100.00 - $persenInvestor; // 50%
 
-// Get global platform deduction percentage
-$resSet = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'potongan_global' LIMIT 1");
-$potonganGlobal = 10.00; // Default 10%
-if ($resSet && $resSet->num_rows > 0) {
-    $potonganGlobal = (float)$resSet->fetch_assoc()['nilai'];
+// Get outlet deduction percentage dynamically from outlet table
+$potonganGlobal = 10.00;
+if (!empty($outletsList[0]['persentase_potongan'])) {
+    $potonganGlobal = (float)$outletsList[0]['persentase_potongan'];
 }
 
 // Filter Logic (Outlet, Rentang Tanggal, Bulan, Tahun)
@@ -158,12 +157,13 @@ $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
+        o.persentase_potongan,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan
     ORDER BY o.id_outlet DESC
 ";
 
@@ -173,35 +173,20 @@ if ($resBagiHasil) {
     while ($row = $resBagiHasil->fetch_assoc()) {
         $omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
+        $ratePotongan = (float)($row['persentase_potongan'] ?? 10.00);
+
+        // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
+        $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
         
-        $isCurrentFilterLastDay = true;
-        if (!empty($selectedTgl)) {
-            $tglNum = (int)date('j', strtotime($selectedTgl));
-            if ($tglNum !== $daysInMonth) {
-                $isCurrentFilterLastDay = false;
-            }
-        }
-
-        $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
-        $isLastDayDoneInDb = ($chkLast && $chkLast->num_rows > 0);
-
-        $isLastDayDone = ($isLastDayDoneInDb && $isCurrentFilterLastDay);
-
-        if ($isLastDayDone) {
-            $hasAnyLastDayDone = true;
-            $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
-            $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-            $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-        } else {
-            $potongan10 = 0.00;
-            $hakInvestor = 0.00;
-            $hakOutlet = 0.00;
-        }
+        $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
+        $hakOutlet   = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+        $hasAnyLastDayDone = true;
 
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
-        $totalBersihOutlet = $isLastDayDone ? (($omzet - $potongan10) + $hakOutlet) : $omzet;
+        $totalBersihOutlet = ($omzet - $potongan10) + $hakOutlet;
 
-        $row['is_last_day_done'] = $isLastDayDone;
+        $row['persentase_potongan'] = $ratePotongan;
+        $row['is_last_day_done'] = true;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
@@ -379,7 +364,7 @@ $countOutlet = count($rows);
                     </div>
                     <div class="text-white-50 small">
                         <?php if ($hasAnyLastDayDone) : ?>
-                            <i class="fa-solid fa-circle-check me-1 text-success"></i>Bagi Hasil Investor (50% dari 10%) Aktif
+                            <i class="fa-solid fa-circle-check me-1 text-success"></i>Bagi Hasil Investor (50% dari <?= number_format($potonganGlobal, 0); ?>%) Aktif
                         <?php else : ?>
                             <i class="fa-light fa-clock me-1 text-warning"></i>Pendataan berjalan (Menunggu Tgl akhir bulan <?= $daysInMonth; ?>)
                         <?php endif; ?>
@@ -407,11 +392,11 @@ $countOutlet = count($rows);
             </div>
         </div>
 
-        <!-- 2. Potongan 10% -->
+        <!-- 2. Potongan Dynamic -->
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-potongan h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-danger text-uppercase card-stat-title-full">Potongan (10%)</span>
+                    <span class="text-danger text-uppercase card-stat-title-full">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</span>
                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-percent"></i>
                     </div>
@@ -487,7 +472,7 @@ $countOutlet = count($rows);
                 <h5 class="fw-bold text-body-emphasis mb-0 fs-6">
                     <i class="fa-solid fa-list-check me-2 text-danger"></i>Rincian Pembagian Hak Per Outlet (<?= htmlspecialchars($periodeLabelStr); ?>)
                 </h5>
-                <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan 10%, serta hak investor & outlet</p>
+                <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan investor, serta hak investor &amp; outlet</p>
             </div>
             <!-- Tombol Filter Utama (Menggantikan Rekap Final) -->
             <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
@@ -502,7 +487,7 @@ $countOutlet = count($rows);
                             <th class="py-3 ps-3 text-center fw-bold" style="width: 40px;">No</th>
                             <th class="py-3 px-3 fw-bold">Nama Outlet</th>
                             <th class="py-3 px-3 text-end fw-bold">Total Omzet (100%)</th>
-                            <th class="py-3 px-3 text-end fw-bold text-danger">Potongan (10%)</th>
+                            <th class="py-3 px-3 text-end fw-bold text-danger">Potongan Investor</th>
                             <th class="py-3 px-3 text-end fw-bold text-success">Hak Investor (50%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-warning">Hak Outlet (50%)</th>
                             <th class="py-3 px-3 text-end fw-bold text-body-emphasis">Bersih Outlet Total</th>
@@ -716,7 +701,7 @@ $countOutlet = count($rows);
                                 <th class="ps-3" style="width: 50px;">No</th>
                                 <th>Tanggal Laporan</th>
                                 <th class="text-end">Omzet Harian</th>
-                                <th class="text-end text-danger">Potongan 10%</th>
+                                <th class="text-end text-danger">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</th>
                                 <th class="text-end text-success">Hak Investor (50%)</th>
                                 <th class="text-end text-warning pe-3">Hak Outlet (50%)</th>
                             </tr>

@@ -24,12 +24,8 @@ $bulanIndo = [
 $resOutlet = $db->query("SELECT o.*, i.alamat_investor, u_inv.nama_lengkap as nama_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users WHERE o.id_users = {$userId} LIMIT 1");
 $outlet = $resOutlet ? $resOutlet->fetch_assoc() : null;
 
-// Get Current Global Cut Percentage from pengaturan_sistem
-$resGlobal = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'potongan_global' LIMIT 1");
-$presentaseGlobal = 10.00;
-if ($resGlobal && $rowGlobal = $resGlobal->fetch_assoc()) {
-    $presentaseGlobal = (float)$rowGlobal['nilai'];
-}
+// Get Current Cut Percentage directly from Outlet record (set during registration by Investor)
+$presentaseGlobal = isset($outlet['persentase_potongan']) ? (float)$outlet['persentase_potongan'] : 10.00;
 
 $activeTab = $_GET['tab'] ?? 'input';
 
@@ -299,7 +295,25 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
             $tglJoinRaw = !empty($outlet['tanggal_bergabung']) ? $outlet['tanggal_bergabung'] : (!empty($outlet['tanggal_disetujui']) ? $outlet['tanggal_disetujui'] : (!empty($outlet['tanggal_request']) ? $outlet['tanggal_request'] : ''));
             $tglJoinFormatted = (!empty($tglJoinRaw) && strtotime($tglJoinRaw) > 0) ? (date('d', strtotime($tglJoinRaw)) . ' ' . ($bulanIndo[(int)date('n', strtotime($tglJoinRaw))] ?? '') . ' ' . date('Y', strtotime($tglJoinRaw))) : '-';
             $namaInvestorStr = !empty($outlet['nama_investor']) ? $outlet['nama_investor'] : 'Investor Mitra';
-            $alamatOutletStr = !empty($outlet['alamat_outlet']) ? $outlet['alamat_outlet'] : 'Alamat belum diisi';
+            
+            $kecamatanStr = !empty($outlet['kecamatan']) ? trim($outlet['kecamatan']) : '';
+            $alamatLengkapStr = !empty($outlet['alamat_outlet']) ? trim($outlet['alamat_outlet']) : '';
+
+            if (isset($isInvestor) && $isInvestor) {
+                // Investor mode: Show Kecamatan only
+                $lokasiDisplay = !empty($kecamatanStr) ? ('Kec. ' . $kecamatanStr) : (!empty($alamatLengkapStr) ? $alamatLengkapStr : 'Lokasi belum diisi');
+            } else {
+                // Outlet mode: Show BOTH Kecamatan and Alamat Lengkap
+                if (!empty($kecamatanStr) && !empty($alamatLengkapStr)) {
+                    $lokasiDisplay = 'Kec. ' . $kecamatanStr . ' — ' . $alamatLengkapStr;
+                } elseif (!empty($kecamatanStr)) {
+                    $lokasiDisplay = 'Kec. ' . $kecamatanStr;
+                } elseif (!empty($alamatLengkapStr)) {
+                    $lokasiDisplay = $alamatLengkapStr;
+                } else {
+                    $lokasiDisplay = 'Lokasi & Alamat Toko belum diisi';
+                }
+            }
         ?>
 
         <!-- Header Banner Card (TAMPILAN PROFIL OUTLET BALANCED & PRESISI TINGGI PC/MOBILE) -->
@@ -311,14 +325,14 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                             
                             <!-- Sisi Kiri: Identitas Utama Toko -->
                             <div class="me-md-auto">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="fa-solid fa-store text-warning fs-5"></i>
-                                    <h3 class="fw-extrabold mb-0 text-white fs-4"><?= htmlspecialchars($outlet['nama_outlet']); ?></h3>
+                                <div class="d-flex align-items-center flex-nowrap gap-2.5 mb-2">
+                                    <i class="fa-solid fa-store text-warning fs-4 flex-shrink-0"></i>
+                                    <h3 class="fw-extrabold mb-0 text-white fs-3 lh-sm text-nowrap"><?= htmlspecialchars($outlet['nama_outlet']); ?></h3>
                                 </div>
-                                <p class="text-white-50 small mb-0 lh-sm">
-                                    <i class="fa-solid fa-location-dot me-1 text-warning"></i><?= htmlspecialchars($alamatOutletStr); ?>
-                                </p>
-                                </p>
+                                <div class="d-flex align-items-start gap-2.5 text-white-50 small mt-1.5" style="line-height: 1.45;">
+                                    <i class="fa-solid fa-location-dot text-warning flex-shrink-0 mt-0.5 me-1" style="font-size: 13.5px;"></i>
+                                    <span><?= htmlspecialchars($lokasiDisplay); ?></span>
+                                </div>
                             </div>
 
                             <!-- Sisi Kanan (POJOK KANAN AT PC): Metadata Badges -->
@@ -582,19 +596,19 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                     <?php endif; ?>
                 </div>
 
-                <!-- NOTIFIKASI INFORMASI ATURAN POTONGAN 10% PER HARI -->
+                <!-- NOTIFIKASI INFORMASI ATURAN POTONGAN PER HARI -->
                 <div class="alert alert-success d-flex align-items-start align-items-sm-center gap-3 mb-4 rounded-4 shadow-sm border-0 p-3">
                     <div class="rounded-circle bg-success text-white p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
                         <i class="fa-solid fa-circle-check fs-5"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-1 text-success">Potongan 10% &amp; Bagi Hasil Aktif Setiap Hari!</h6>
-                        <p class="small mb-0 text-success-emphasis">Setiap omzet harian yang di-input secara otomatis dipotong 10%. Hasil potongan 10% tersebut langsung dibagi 50% untuk Hak Investor dan 50% untuk Hak Outlet secara transparan.</p>
+                        <h6 class="fw-bold mb-1 text-success">Potongan <?= number_format($presentaseGlobal, 0); ?>% &amp; Bagi Hasil Aktif Setiap Hari!</h6>
+                        <p class="small mb-0 text-success-emphasis">Setiap omzet harian yang di-input secara otomatis dipotong <?= number_format($presentaseGlobal, 0); ?>%. Hasil potongan <?= number_format($presentaseGlobal, 0); ?>% tersebut langsung dibagi 50% untuk Hak Investor dan 50% untuk Hak Outlet secara transparan.</p>
                     </div>
                 </div>
 
                 <!-- 2. REKAPITULASI 2-TIER BAGI HASIL (DI BAWAH TABEL) -->
-                <!-- TIER 1: TOTAL OMZET & NOMINAL POTONGAN 10% -->
+                <!-- TIER 1: TOTAL OMZET & NOMINAL POTONGAN -->
                 <div class="row g-3 mb-3">
                     <!-- Total Omzet Toko -->
                     <div class="col-12 col-md-6">
@@ -612,12 +626,12 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                         </div>
                     </div>
 
-                    <!-- Nominal Potongan 10% -->
+                    <!-- Nominal Potongan Dynamic -->
                     <div class="col-12 col-md-6">
                         <div class="card border border-danger-subtle shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, rgba(220,53,69,0.03) 0%, rgba(220,53,69,0.08) 100%);">
                             <div class="card-body p-3 p-md-4">
                                 <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <span class="text-danger small fw-bold text-uppercase" style="letter-spacing: 0.5px;">2. Nominal Potongan 10%</span>
+                                    <span class="text-danger small fw-bold text-uppercase" style="letter-spacing: 0.5px;">2. Nominal Potongan <?= number_format($presentaseGlobal, 0); ?>%</span>
                                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
                                         <i class="fa-solid fa-scissors fs-5"></i>
                                     </div>
@@ -626,19 +640,19 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     Rp <?= number_format($potongan10Val, 0, ',', '.'); ?>
                                 </h3>
                                 <p class="small mb-0 text-danger-emphasis">
-                                    <i class="fa-solid fa-circle-check me-1 text-success"></i>Aktif (Dipotong 10% per hari dari omzet harian)
+                                    <i class="fa-solid fa-circle-check me-1 text-success"></i>Aktif (Dipotong <?= number_format($presentaseGlobal, 0); ?>% per hari dari omzet harian)
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TIER 2: PEMBAGIAN DARI POTONGAN 10% MENJADI 2 (50% INVESTOR : 50% OUTLET) -->
+                <!-- TIER 2: PEMBAGIAN DARI POTONGAN MENJADI 2 (50% INVESTOR : 50% OUTLET) -->
                 <div class="card border border-body-subtle shadow-sm mb-3" style="border-radius: 16px;">
                     <div class="card-body p-3 p-md-4">
                         <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 mb-3">
                             <div class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-2 text-wrap text-start">
-                                <i class="fa-solid fa-arrows-split-up-and-left me-1"></i> Pembagian Hasil Dari Potongan 10%
+                                <i class="fa-solid fa-arrows-split-up-and-left me-1"></i> Pembagian Hasil Dari Potongan <?= number_format($presentaseGlobal, 0); ?>%
                             </div>
                             <span class="text-body-secondary small fw-semibold">Rincian alokasi 50% Investor : 50% Outlet</span>
                         </div>
@@ -655,7 +669,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                         Rp <?= number_format($hakInvestorVal, 0, ',', '.'); ?>
                                     </h4>
                                     <span class="text-body-secondary small">
-                                        Alokasi 50% dari potongan 10% omzet harian
+                                        Alokasi 50% dari potongan <?= number_format($presentaseGlobal, 0); ?>% omzet harian
                                     </span>
                                 </div>
                             </div>
@@ -671,7 +685,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                         Rp <?= number_format($hakOutletVal, 0, ',', '.'); ?>
                                     </h4>
                                     <span class="text-body-secondary small">
-                                        Alokasi 50% dari potongan 10% omzet harian
+                                        Alokasi 50% dari potongan <?= number_format($presentaseGlobal, 0); ?>% omzet harian
                                     </span>
                                 </div>
                             </div>
@@ -679,7 +693,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                     </div>
                 </div>
 
-                <!-- TIER 3: TOTAL PENERIMAAN AKHIR OUTLET (90% Omzet + 50% Hak Bagi Hasil Outlet) -->
+                <!-- TIER 3: TOTAL PENERIMAAN AKHIR OUTLET -->
                 <?php 
                     $totalPenerimaanAkhirOutlet = $isDeductionActive ? (($totalOmzet - $potongan10Val) + $hakOutletVal) : $totalOmzet;
                 ?>
@@ -705,9 +719,9 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
 
                         <p class="text-success-emphasis small mb-0 lh-sm" style="font-size: 12px;">
                             <?php if ($isDeductionActive) : ?>
-                                <i class="fa-solid fa-circle-check me-1"></i>Hasil Penjumlahan: Omzet Bersih Toko (90%) + Hak Bagi Hasil Toko (50% dari Potongan 10%)
+                                <i class="fa-solid fa-circle-check me-1"></i>Hasil Penjumlahan: Omzet Bersih Toko (<?= (100 - (float)$presentaseGlobal); ?>%) + Hak Bagi Hasil Toko (50% dari Potongan <?= number_format($presentaseGlobal, 0); ?>%)
                             <?php else : ?>
-                                <i class="fa-solid fa-circle-info me-1"></i>Akumulasi omzet berjalan (Belum dipotong 10% karena belum menyentuh tanggal akhir bulan)
+                                <i class="fa-solid fa-circle-info me-1"></i>Akumulasi omzet berjalan (Belum dipotong <?= number_format($presentaseGlobal, 0); ?>% karena belum menyentuh tanggal akhir bulan)
                             <?php endif; ?>
                         </p>
                     </div>
@@ -1103,11 +1117,11 @@ $(document).ready(function() {
                                     <span class="text-body-emphasis">${dt.waktu_input || '-'}</span>
                                 </div>
                                 <div class="d-flex justify-content-between small">
-                                    <span class="text-body-secondary"><i class="fa-solid fa-scissors me-1 text-warning"></i>Potongan 10%:</span>
-                                    <span class="badge ${dt.is_last_day ? 'bg-danger text-white' : 'bg-secondary-subtle text-secondary'} fw-bold">
-                                        ${dt.is_last_day ? 'Aktif (Tanggal Akhir Bulan)' : 'Belum Dipotong (Menunggu Akhir Bulan)'}
-                                    </span>
-                                </div>
+                                     <span class="text-body-secondary"><i class="fa-solid fa-scissors me-1 text-warning"></i>Potongan ${dt.persentase_potongan || '<?= number_format($presentaseGlobal, 0); ?>'}%:</span>
+                                     <span class="badge bg-danger text-white fw-bold">
+                                         Dipotong Setiap Hari
+                                     </span>
+                                 </div>
                             </div>
                         </div>
                     `;
