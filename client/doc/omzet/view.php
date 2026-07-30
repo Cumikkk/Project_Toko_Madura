@@ -237,6 +237,18 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
     color: #ffffff !important;
 }
 
+/* Override padding bawah main-content agar footer naik mendekati card form */
+.main-content {
+    padding-bottom: 0px !important;
+}
+.footer {
+    margin-top: 8px !important;
+}
+#paneInputOmzet {
+    padding-top: 8px;
+    padding-bottom: 16px;
+}
+
 /* Sleek Clickable Date Input Field Styling */
 .date-input-custom-group .input-group-text {
     background-color: rgba(125, 10, 10, 0.08) !important;
