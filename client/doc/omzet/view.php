@@ -314,7 +314,41 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                     $lokasiDisplay = 'Lokasi & Alamat Toko belum diisi';
                 }
             }
+
+            // Calculate Expiration Days Remaining for Outlet Warning Banner
+            $jtRaw = $outlet['tgl_jatuh_tempo'] ?? '';
+            $jtFormatted = (!empty($jtRaw) && strtotime($jtRaw) > 0) ? (date('d', strtotime($jtRaw)) . ' ' . ($bulanIndo[(int)date('n', strtotime($jtRaw))] ?? '') . ' ' . date('Y', strtotime($jtRaw))) : '-';
+
+            $daysRemaining = null;
+            if (!empty($jtRaw) && strtotime($jtRaw) > 0) {
+                $todayTs = strtotime(date('Y-m-d'));
+                $jtTs = strtotime(date('Y-m-d', strtotime($jtRaw)));
+                $daysRemaining = (int)ceil(($jtTs - $todayTs) / 86400);
+            }
         ?>
+
+        <!-- Banner Warning Masa Langganan (Mendekati Expired H-7 s.d H-0) -->
+        <?php if (!$isInvestor && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 7) : ?>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-warning border border-warning-subtle shadow-sm rounded-4 p-3 mb-0 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(255, 193, 7, 0.1);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; font-size: 18px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 13.5px;">
+                                    Peringatan Masa Langganan Toko (H-<?= $daysRemaining; ?> Expired)
+                                </h6>
+                                <p class="text-body-secondary mb-0" style="font-size: 12px;">
+                                    Masa langganan toko Anda akan berakhir pada <strong><?= $jtFormatted; ?></strong> (tersisa <strong><?= $daysRemaining; ?> hari lagi</strong>). Silakan ingatkan Investor Anda (<strong><?= htmlspecialchars($namaInvestorStr); ?></strong>) untuk melakukan perpanjangan.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Header Banner Card (TAMPILAN PROFIL OUTLET BALANCED & PRESISI TINGGI PC/MOBILE) -->
         <div class="row mt-0 pt-0 mb-3">

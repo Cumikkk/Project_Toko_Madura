@@ -46,20 +46,26 @@ if(!password_verify($data['password'], $userData['password']) && User::developer
 
 /** Check Outlet Status & Expiration if role is outlet */
 if ($userData['role'] === 'outlet') {
-    $sqlOutlet = $db->query("SELECT status, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$memberId} LIMIT 1");
+    $sqlOutlet = $db->query("SELECT status, tipe_request, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$memberId} LIMIT 1");
     if ($sqlOutlet && $sqlOutlet->num_rows > 0) {
         $outletInfo = $sqlOutlet->fetch_assoc();
         if ($outletInfo['status'] === 'pending') {
+            $isRenew = (($outletInfo['tipe_request'] ?? '') === 'perpanjangan');
+            $msg = $isRenew
+                ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
+                : "Request pendaftaran outlet Anda masih dalam proses peninjauan / persetujuan oleh Admin.";
             JsonResponse([
                 'success' => false,
-                'message' => "Request pendaftaran outlet Anda masih dalam proses peninjauan / persetujuan oleh Admin.",
+                'message' => $msg,
                 'data' => []
             ]);
         } elseif ($outletInfo['status'] === 'reject') {
+            $isRenew = (($outletInfo['tipe_request'] ?? '') === 'perpanjangan');
+            $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Request pendaftaran";
             $alasan = !empty($outletInfo['alasan_penolakan']) ? " Alasan penolakan: " . $outletInfo['alasan_penolakan'] : "";
             JsonResponse([
                 'success' => false,
-                'message' => "Request pendaftaran outlet Anda ditolak oleh Admin." . $alasan,
+                'message' => $label . " outlet Anda ditolak oleh Admin." . $alasan,
                 'data' => []
             ]);
         } elseif ($outletInfo['status'] === 'active' && !empty($outletInfo['tgl_jatuh_tempo'])) {

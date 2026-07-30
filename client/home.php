@@ -30,7 +30,7 @@ $role = strtolower($user['role'] ?? '');
 // If outlet user, verify outlet is active and not expired
 if ($role === 'outlet') {
     $dbCheck = \Config\Core\Database::connect();
-    $sqlStatus = $dbCheck->query("SELECT status, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$user['MBR_ID']} LIMIT 1");
+    $sqlStatus = $dbCheck->query("SELECT status, tipe_request, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$user['MBR_ID']} LIMIT 1");
     if ($sqlStatus && $sqlStatus->num_rows > 0) {
         $stData = $sqlStatus->fetch_assoc();
         $today = date('Y-m-d');
@@ -38,9 +38,15 @@ if ($role === 'outlet') {
 
         if ($stData['status'] !== 'active') {
             User::logout();
-            $msg = ($stData['status'] === 'reject') 
-                ? "Akun outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui') 
-                : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+            $isRenew = (($stData['tipe_request'] ?? '') === 'perpanjangan');
+            if ($stData['status'] === 'reject') {
+                $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Akun";
+                $msg = $label . " outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui');
+            } else {
+                $msg = $isRenew 
+                    ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
+                    : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+            }
             die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
         } elseif ($jt && $today > $jt) {
             User::logout();
