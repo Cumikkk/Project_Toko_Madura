@@ -153,8 +153,8 @@ if ($isEdit) {
 
     $newKasirId = $db->insert_id;
 
-    // 2. Insert outlet with persentase_potongan, tanggal_request, and tanggal_disetujui
-    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, kecamatan, persentase_potongan, alamat_outlet, status, tanggal_request, tanggal_disetujui) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', '{$kecamatanSafe}', {$persentase_potongan}, '{$alamatSafe}', 'active', NOW(), NOW())");
+    // 2. Insert outlet with persentase_potongan, tanggal_request, tanggal_disetujui, and tanggal_bergabung
+    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, kecamatan, persentase_potongan, alamat_outlet, status, tanggal_request, tanggal_disetujui, tanggal_bergabung) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', '{$kecamatanSafe}', {$persentase_potongan}, '{$alamatSafe}', 'active', NOW(), NOW(), NOW())");
 
     if ($db->affected_rows < 1) {
         // Rollback: delete the kasir user we just created

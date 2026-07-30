@@ -231,7 +231,7 @@ CREATE TABLE `outlet` (
   KEY `id_investor` (`id_investor`),
   CONSTRAINT `outlet_ibfk_1` FOREIGN KEY (`id_users`) REFERENCES `users` (`id_users`) ON DELETE CASCADE,
   CONSTRAINT `outlet_ibfk_2` FOREIGN KEY (`id_investor`) REFERENCES `investor` (`id_investor`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -240,7 +240,7 @@ CREATE TABLE `outlet` (
 
 LOCK TABLES `outlet` WRITE;
 /*!40000 ALTER TABLE `outlet` DISABLE KEYS */;
-INSERT INTO `outlet` VALUES (13,63,19,10.00,'Toko Madura Merdeka','Tulangan','GMCF+C87, Kadelesan, Kedondong, Kec. Tulangan, Kabupaten Sidoarjo, Jawa Timur 61273','active','2026-08-29 23:59:59','2026-07-29 10:52:36','2026-07-29 10:52:36',NULL,0.00,NULL,NULL,'2026-07-29 10:52:36'),(19,71,19,10.00,'Toko Madura Melati','Socah','Jl. Raya Socah No. 12, Bangkalan','pending',NULL,'2026-07-27 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_1.png',NULL,'2026-07-27 17:03:27'),(20,72,19,10.00,'Toko Madura Mawar','Burneh','Jl. Embong Miring No. 45, Burneh','pending',NULL,'2026-07-28 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_2.png',NULL,'2026-07-28 17:03:27'),(21,73,19,10.00,'Toko Madura Kenanga','Kamal','Jl. Pelabuhan Kamal No. 88, Bangkalan','reject',NULL,'2026-07-24 17:03:27',NULL,'2026-07-25 17:03:27',100000.00,'uploads/bukti_pembayaran/bukti_dummy_3.png','Foto bukti transfer pembayaran buram dan tidak terbaca.','2026-07-24 17:03:27'),(22,74,19,10.00,'Toko Madura Kamboja','Arosbaya','Jl. Makam Lontar No. 05, Arosbaya','reject',NULL,'2026-07-22 17:03:27',NULL,'2026-07-23 17:03:27',100000.00,'uploads/bukti_pembayaran/bukti_dummy_4.png','Nominal pada bukti transfer kurang dari tarif biaya langganan.','2026-07-22 17:03:27'),(23,75,19,10.00,'Toko Madura Anggrek','Kwanyar','Jl. Pantai Rongkang No. 17, Kwanyar','active','2026-07-24 17:03:27','2026-06-24 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_5.png',NULL,'2026-06-24 17:03:27'),(24,76,19,10.00,'Toko Madura Dahlia','Blega','Jl. Pasar Blega No. 32, Blega','','2026-07-14 17:03:27','2026-06-14 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_6.png',NULL,'2026-06-14 17:03:27');
+INSERT INTO `outlet` VALUES (13,63,19,10.00,'Toko Madura Merdeka','Tulangan','GMCF+C87, Kadelesan, Kedondong, Kec. Tulangan, Kabupaten Sidoarjo, Jawa Timur 61273','active','2026-08-29 23:59:59','2026-07-29 10:52:36','2026-07-29 10:52:36',NULL,0.00,NULL,NULL,'2026-07-29 10:52:36'),(19,71,19,10.00,'Toko Madura Melati','Socah','Jl. Raya Socah No. 12, Bangkalan','pending',NULL,'2026-07-27 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_1.png',NULL,'2026-07-27 17:03:27'),(20,72,19,10.00,'Toko Madura Mawar','Burneh','Jl. Embong Miring No. 45, Burneh','pending',NULL,'2026-07-28 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_2.png',NULL,'2026-07-28 17:03:27'),(21,73,19,10.00,'Toko Madura Kenanga','Kamal','Jl. Pelabuhan Kamal No. 88, Bangkalan','reject',NULL,'2026-07-24 17:03:27',NULL,'2026-07-25 17:03:27',100000.00,'uploads/bukti_pembayaran/bukti_dummy_3.png','Foto bukti transfer pembayaran buram dan tidak terbaca.','2026-07-24 17:03:27'),(22,74,19,10.00,'Toko Madura Kamboja','Arosbaya','Jl. Makam Lontar No. 05, Arosbaya','reject',NULL,'2026-07-22 17:03:27',NULL,'2026-07-23 17:03:27',100000.00,'uploads/bukti_pembayaran/bukti_dummy_4.png','Nominal pada bukti transfer kurang dari tarif biaya langganan.','2026-07-22 17:03:27'),(23,75,19,10.00,'Toko Madura Anggrek','Kwanyar','Jl. Pantai Rongkang No. 17, Kwanyar','active','2026-07-24 17:03:27','2026-06-24 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_5.png',NULL,'2026-06-24 17:03:27'),(24,76,19,10.00,'Toko Madura Dahlia','Blega','Jl. Pasar Blega No. 32, Blega','','2026-07-14 17:03:27','2026-06-14 17:03:27',NULL,NULL,100000.00,'uploads/bukti_pembayaran/bukti_dummy_6.png',NULL,'2026-06-14 17:03:27'),(28,80,19,10.00,'sdsds','212','dsds','active',NULL,'2026-07-30 11:00:54','2026-07-30 11:00:54',NULL,0.00,NULL,NULL,'2026-07-30 11:00:54');
 /*!40000 ALTER TABLE `outlet` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -317,7 +317,7 @@ CREATE TABLE `users` (
   `role` enum('programmer','master','investor','outlet') NOT NULL DEFAULT 'outlet',
   PRIMARY KEY (`id_users`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -326,7 +326,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (59,'Anonymous','admin','0123456789','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','programmer'),(61,'Riski Ardhika','master','0123456789','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','master'),(62,'M. Fahrul Alfanani','investor','0987654321','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','investor'),(63,'Muhhamad Tegar Kurniawan','outlet','0147852369','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','outlet'),(68,'adad','addad','dadad','$2y$10$6Iw7aMEuTqfMihVkZzHntOTmL.G/RlkRKvuuJKA3XBRMqp.e8SQOi','outlet'),(69,'daddadad','dadadadadad','dadad','$2y$10$KWrLeHrdveagQIQXTcyml.NzaGBQci6RiX4f1l2FIiAFe3vZRROM2','outlet'),(71,'Budi Santoso','toko_melati','081234567891','$2y$10$hdZtfWoZgtCTRYbAPEvRXupryzzsl9OdFQwD3j1ZuaAWuQoaMjupy','outlet'),(72,'Siti Aminah','toko_mawar','085678901234','$2y$10$zWZwNviexvn4UaRa6n2juuOQGnV5DrlnypOZ2q8oTcd7sWmMQjf6i','outlet'),(73,'Ahmad Fauzi','toko_kenanga','089876543210','$2y$10$qIwZVd40wKO/ELCIUxaLkezsk8L3ZTE6yUyJwroS.FnhsFp19ctLG','outlet'),(74,'Dewi Lestari','toko_kamboja','082143658709','$2y$10$bucOjS01byrX6CIdnDFo0eRZW9NgwH6MQr9WObqBryYcVCoWBvdgq','outlet'),(75,'Rudi Hermawan','toko_anggrek','087712345678','$2y$10$QdtvKYgim7iBEc7spyO7h.Abxb7ONMptGgw8ym3i8HPGnc9s7jtI6','outlet'),(76,'Agus Prasetyo','toko_dahlia','083890123456','$2y$10$TRZ8k2T3OxOCuG52N16GHuFQ1euAHOcv5YEaHFYx64VM8v0jnqGe.','outlet');
+INSERT INTO `users` VALUES (59,'Anonymous','admin','0123456789','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','programmer'),(61,'Riski Ardhika','master','0123456789','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','master'),(62,'M. Fahrul Alfanani','investor','0987654321','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','investor'),(63,'Muhhamad Tegar Kurniawan','outlet','0147852369','$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C','outlet'),(68,'adad','addad','dadad','$2y$10$6Iw7aMEuTqfMihVkZzHntOTmL.G/RlkRKvuuJKA3XBRMqp.e8SQOi','outlet'),(69,'daddadad','dadadadadad','dadad','$2y$10$KWrLeHrdveagQIQXTcyml.NzaGBQci6RiX4f1l2FIiAFe3vZRROM2','outlet'),(71,'Budi Santoso','toko_melati','081234567891','$2y$10$hdZtfWoZgtCTRYbAPEvRXupryzzsl9OdFQwD3j1ZuaAWuQoaMjupy','outlet'),(72,'Siti Aminah','toko_mawar','085678901234','$2y$10$zWZwNviexvn4UaRa6n2juuOQGnV5DrlnypOZ2q8oTcd7sWmMQjf6i','outlet'),(73,'Ahmad Fauzi','toko_kenanga','089876543210','$2y$10$qIwZVd40wKO/ELCIUxaLkezsk8L3ZTE6yUyJwroS.FnhsFp19ctLG','outlet'),(74,'Dewi Lestari','toko_kamboja','082143658709','$2y$10$bucOjS01byrX6CIdnDFo0eRZW9NgwH6MQr9WObqBryYcVCoWBvdgq','outlet'),(75,'Rudi Hermawan','toko_anggrek','087712345678','$2y$10$QdtvKYgim7iBEc7spyO7h.Abxb7ONMptGgw8ym3i8HPGnc9s7jtI6','outlet'),(76,'Agus Prasetyo','toko_dahlia','083890123456','$2y$10$TRZ8k2T3OxOCuG52N16GHuFQ1euAHOcv5YEaHFYx64VM8v0jnqGe.','outlet'),(80,'sdsds','dsdsd','dsdsds','$2y$10$iagKsGRzQstQp9Rfo6i1FeNgfVri4UTJURIiXQ7FpzT5vHtakLjgm','outlet');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -339,4 +339,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-30 10:58:06
+-- Dump completed on 2026-07-30 11:06:52

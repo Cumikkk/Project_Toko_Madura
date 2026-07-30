@@ -101,5 +101,6 @@ CREATE TABLE pengaturan_sistem (
 - Portal Admin Outlet dilengkapi 4 tab: Outlet Aktif, Expired / Non-Aktif, Request Masuk (Pending), dan Request Ditolak (Reject).
 - Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
 - Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.
-- Memperbaiki pemanggilan `tanggal_bergabung` pada badge header banner kanan Outlet Panel (`client/doc/omzet/view.php`).
+- Memperbaiki pemanggilan `tanggal_bergabung` pada badge header banner kanan Outlet Panel (`client/doc/omzet/view.php`) dengan mengutamakan `tanggal_disetujui`.
+- Mengatur aturan bahwa `tanggal_bergabung` outlet = tanggal saat outlet disetujui (approval) oleh Admin (`admin/ajax/postdata/request-outlet/accept.php` & `create.php`).
 - Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.
