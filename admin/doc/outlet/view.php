@@ -332,7 +332,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $pendingOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
-                                            <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
+                                            <td class="text-start">
+                                                <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
+                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
+                                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 10px;"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-center">
                                                 <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
@@ -405,7 +412,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $rejectedOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
-                                            <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
+                                            <td class="text-start">
+                                                <strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
+                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
+                                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 10px;"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-center">
                                                 <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
