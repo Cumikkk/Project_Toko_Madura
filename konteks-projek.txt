@@ -94,8 +94,10 @@ CREATE TABLE pengaturan_sistem (
 
 == CATATAN UPDATE MODUL ADMIN ==
 - Group Pengaturan pada Portal Admin dikonfigurasi sebagai Dropdown Group (`type = 'dropdown'`) dengan sub-modul terpisah:
-  1. Biaya Langganan (/setting/biaya_langganan)
-  2. Rekening Bank (/setting/rekening_bank)
+  1. Biaya Langganan (/pengaturan/biaya_langganan)
+  2. Rekening Bank (/pengaturan/rekening_bank)
+- Folder view dan ajax post untuk modul Pengaturan disesuaikan dari `setting` menjadi `pengaturan` (`admin/doc/pengaturan` dan `admin/ajax/postdata/pengaturan`).
+- Card Request Outlet Terbaru pada Dashboard Admin difilter hanya menampilkan data berstatus pending.
 - Portal Admin Outlet dilengkapi 4 tab: Outlet Aktif, Expired / Non-Aktif, Request Masuk (Pending), dan Request Ditolak (Reject).
 - Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
 - Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.

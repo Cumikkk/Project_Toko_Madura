@@ -69,7 +69,7 @@ $(document).ready(function() {
             }
         });
 
-        $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/setting/update", formData, function(resp) {
+        $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/pengaturan/update", formData, function(resp) {
             btn.prop('disabled', false);
             if (resp.success) {
                 Swal.fire('Berhasil!', resp.message, 'success').then(function() {

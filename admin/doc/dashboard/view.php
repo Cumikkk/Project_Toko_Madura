@@ -27,13 +27,14 @@ $topOutlets = $db->query("
     LIMIT 5
 ");
 
-// 5 Request Outlet Terbaru
+// 5 Request Outlet Terbaru (Khusus Pending)
 $recentRequests = $db->query("
     SELECT o.*, u_inv.nama_lengkap as nama_investor, inv.kecamatan as kecamatan_investor, inv.alamat_investor
     FROM outlet o
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
-    ORDER BY CASE WHEN o.status = 'pending' THEN 1 ELSE 2 END, o.id_outlet DESC
+    WHERE o.status = 'pending'
+    ORDER BY o.id_outlet DESC
     LIMIT 5
 ");
 ?>
