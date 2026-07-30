@@ -120,16 +120,17 @@ try {
     // =========================================================================
     // ACTION: REQUEST PERPANJANGAN LANGGANAN OUTLET (RENEWAL)
     // =========================================================================
-    if ($action === 'request_perpanjangan') {
+    if ($action === 'request_perpanjangan' || $action === 'ajukan_ulang') {
         $idOutlet = (int)($_POST['id_outlet'] ?? 0);
         
         // Verify ownership
-        $resCheck = $db->query("SELECT id_outlet, nama_outlet, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
+        $resCheck = $db->query("SELECT id_outlet, nama_outlet, bukti_pembayaran, tipe_request FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
         if (!$resCheck || $resCheck->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Outlet tidak ditemukan atau Anda tidak memiliki akses.']);
         }
         $rowOutlet = $resCheck->fetch_assoc();
         $namaOutlet = $rowOutlet['nama_outlet'];
+        $tipeReqNow = ($action === 'request_perpanjangan') ? 'perpanjangan' : ($rowOutlet['tipe_request'] ?: 'baru');
 
         // Get system fee for subscription
         $nominalBiaya = 100000.00;
@@ -138,7 +139,7 @@ try {
             $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
         }
 
-        // Handle Upload Bukti Pembayaran Perpanjangan
+        // Handle Upload Bukti Pembayaran
         $buktiPath = '';
         if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/../../uploads/bukti_pembayaran/';
@@ -151,7 +152,8 @@ try {
                 JsonResponse(['success' => false, 'message' => 'Format file bukti bayar tidak didukung. Harap unggah JPG, PNG, atau PDF.']);
             }
 
-            $newFileName = 'bukti_renew_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
+            $prefix = ($tipeReqNow === 'perpanjangan') ? 'bukti_renew_' : 'bukti_reapp_';
+            $newFileName = $prefix . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
             $targetFilePath = $uploadDir . $newFileName;
 
             if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
@@ -160,7 +162,7 @@ try {
         }
 
         if (empty($buktiPath)) {
-            JsonResponse(['success' => false, 'message' => 'Harap unggah foto / file bukti transfer pembayaran perpanjangan langganan.']);
+            JsonResponse(['success' => false, 'message' => 'Harap unggah foto / file bukti transfer pembayaran baru.']);
         }
 
         // Unlink old payment proof if exists
@@ -174,22 +176,26 @@ try {
 
         $escapedBukti = $db->real_escape_string($buktiPath);
 
-        // Update outlet status to pending perpanjangan
+        // Update outlet status to pending
         $sqlUpdate = "UPDATE outlet SET 
                         status = 'pending',
-                        tipe_request = 'perpanjangan',
+                        tipe_request = '{$tipeReqNow}',
                         nominal_biaya = {$nominalBiaya},
                         bukti_pembayaran = '{$escapedBukti}',
                         tanggal_request = NOW()
                       WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId}";
 
         if (!$db->query($sqlUpdate)) {
-            JsonResponse(['success' => false, 'message' => 'Gagal mengajukan perpanjangan: ' . $db->error]);
+            JsonResponse(['success' => false, 'message' => 'Gagal mengajukan request: ' . $db->error]);
         }
+
+        $msgText = ($tipeReqNow === 'perpanjangan')
+            ? 'Request perpanjangan langganan untuk outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
+            : 'Pengajuan ulang pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.';
 
         JsonResponse([
             'success' => true,
-            'message' => 'Request perpanjangan langganan untuk outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
+            'message' => $msgText
         ]);
     }
 

@@ -507,16 +507,9 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                             </td>
                                             <td class="text-center pe-3">
                                                 <div class="d-flex align-items-center justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-light border text-info btn-detail-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Lihat Detail">
+                                                    <button type="button" class="btn btn-sm btn-light border text-info btn-detail-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Lihat Detail & Tindakan">
                                                         <i class="fa-light fa-eye"></i>
                                                     </button>
-                                                    
-                                                    <?php if ($isExpired || $isNearExpiry) : ?>
-                                                        <button type="button" class="btn btn-sm btn-danger rounded-3 px-2 py-1 btn-perpanjang-outlet" data-id="<?= $row['id_outlet']; ?>" data-nama="<?= htmlspecialchars($row['nama_outlet']); ?>" title="Perpanjang Langganan Outlet">
-                                                            <i class="fa-solid fa-rotate-right me-1"></i>Perpanjang
-                                                        </button>
-                                                    <?php endif; ?>
-
                                                     <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Edit Outlet">
                                                         <i class="fa-light fa-pen-to-square"></i>
                                                     </button>
@@ -834,6 +827,9 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill" id="det_created_at_badge"><i class="fa-regular fa-clock me-1"></i> Terdaftar: -</span>
                     </div>
 
+                    <!-- Container Banner Action (Opsi B: Perpanjang / Ajukan Ulang / Notifikasi Verifikasi) -->
+                    <div id="det_banner_action"></div>
+
                     <div class="list-group list-group-flush rounded-3 border border-body-subtle mb-3">
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
                             <span class="text-body-secondary small"><i class="fa-light fa-user me-2 text-danger"></i>Username Akun Login</span>
@@ -878,7 +874,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formPerpanjangOutlet" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="request_perpanjangan">
+                <input type="hidden" name="action" id="renew_action" value="request_perpanjangan">
                 <input type="hidden" name="id_outlet" id="renew_id_outlet" value="">
                 <div class="modal-body p-4">
                     <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
@@ -1207,6 +1203,53 @@ $(document).ready(function() {
                     }
                     $('#det_total_omzet').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.data.total_omzet));
                     $('#det_total_laporan').text(res.data.total_laporan + ' Laporan');
+
+                    // Render Opsi B Action Banner inside Modal Detail
+                    let statusText = res.data.status || 'active';
+                    let tipeReq = res.data.tipe_request || 'baru';
+                    let jtRaw = res.data.tgl_jatuh_tempo || '';
+                    let today = new Date().toISOString().split('T')[0];
+                    let jt = jtRaw ? jtRaw.split(' ')[0] : '';
+                    let isExpired = (jt && today > jt);
+                    let daysRem = 999;
+                    if (jt && !isExpired) {
+                        let d1 = new Date(today);
+                        let d2 = new Date(jt);
+                        daysRem = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+                    }
+                    let isNearExp = (jt && !isExpired && daysRem <= 7);
+
+                    let bannerHtml = '';
+                    if (statusText === 'reject') {
+                        bannerHtml = `
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 p-3 mb-3 text-center">
+                                <i class="fa-solid fa-circle-xmark text-danger fs-4 mb-1"></i>
+                                <div class="fw-bold text-danger mb-2">Pendaftaran / Perpanjangan Ditolak Admin</div>
+                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1 btn-trigger-ajukan-ulang" data-id="${res.data.id_outlet}" data-nama="${res.data.nama_outlet}">
+                                    <i class="fa-solid fa-paper-plane me-1"></i> Ajukan Ulang Pembayaran
+                                </button>
+                            </div>`;
+                    } else if (statusText === 'pending') {
+                        let labelReq = (tipeReq === 'perpanjangan') ? 'Perpanjangan' : 'Pendaftaran Baru';
+                        bannerHtml = `
+                            <div class="alert alert-warning border-0 shadow-sm rounded-3 p-3 mb-3 text-center">
+                                <i class="fa-solid fa-clock-rotate-left text-warning fs-4 mb-1"></i>
+                                <div class="fw-bold text-body-emphasis mb-1">Permohonan ${labelReq} Sedang Diverifikasi Admin</div>
+                                <small class="text-body-secondary">Mohon tunggu konfirmasi verifikasi dari pihak Admin.</small>
+                            </div>`;
+                    } else if (statusText === 'active' && (isExpired || isNearExp)) {
+                        let labelExp = isExpired ? 'Masa Langganan Outlet Telah Berakhir (Expired)' : 'Masa Langganan Mendekati Expired (H-' + daysRem + ')';
+                        bannerHtml = `
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 p-3 mb-3 text-center">
+                                <i class="fa-solid fa-triangle-exclamation text-danger fs-4 mb-1"></i>
+                                <div class="fw-bold text-body-emphasis mb-2">${labelExp}</div>
+                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1 btn-trigger-perpanjang" data-id="${res.data.id_outlet}" data-nama="${res.data.nama_outlet}">
+                                    <i class="fa-solid fa-rotate-right me-1"></i> Perpanjang Langganan
+                                </button>
+                            </div>`;
+                    }
+
+                    $('#det_banner_action').html(bannerHtml);
                     $('#detailOutletContent').removeClass('d-none');
                 } else {
                     $('#modalDetailOutlet').modal('hide');
@@ -1270,13 +1313,34 @@ $(document).ready(function() {
         });
     });
 
-    // Handle Click Perpanjang Langganan Outlet Modal
-    $(document).on('click', '.btn-perpanjang-outlet', function() {
+    // Handle Click Trigger Perpanjang dari Modal Detail (Opsi B)
+    $(document).on('click', '.btn-trigger-perpanjang', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
-        $('#renew_id_outlet').val(id);
-        $('#renew_nama_outlet').text(nama);
-        $('#modalPerpanjangOutlet').modal('show');
+        $('#modalDetailOutlet').modal('hide');
+        setTimeout(function() {
+            $('#renew_action').val('request_perpanjangan');
+            $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-rotate-right me-2 text-danger"></i>Perpanjang Langganan Outlet');
+            $('#renew_id_outlet').val(id);
+            $('#renew_nama_outlet').text(nama);
+            $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Request Perpanjangan');
+            $('#modalPerpanjangOutlet').modal('show');
+        }, 400);
+    });
+
+    // Handle Click Trigger Ajukan Ulang Pembayaran dari Modal Detail (Opsi B)
+    $(document).on('click', '.btn-trigger-ajukan-ulang', function() {
+        let id = $(this).data('id');
+        let nama = $(this).data('nama');
+        $('#modalDetailOutlet').modal('hide');
+        setTimeout(function() {
+            $('#renew_action').val('ajukan_ulang');
+            $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet');
+            $('#renew_id_outlet').val(id);
+            $('#renew_nama_outlet').text(nama);
+            $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
+            $('#modalPerpanjangOutlet').modal('show');
+        }, 400);
     });
 
     // Handle Form Submit Perpanjangan Langganan via AJAX
