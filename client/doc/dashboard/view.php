@@ -40,6 +40,7 @@ if ($role === 'master') {
     // Fetch Outlets (Limit 5)
     $listOutlets = $db->query("
         SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
+               o.status, o.tgl_jatuh_tempo, o.tipe_request,
                u_inv.nama_lengkap as nama_investor, i.kecamatan as kecamatan_investor, i.alamat_investor
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
@@ -210,9 +211,47 @@ if ($role === 'master') {
                                             <?= !empty($out['tanggal_bergabung']) ? date('d M Y', strtotime($out['tanggal_bergabung'])) : '-' ?>
                                         </td>
                                         <td>
-                                            <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i>Aktif
-                                            </span>
+                                            <?php 
+                                            $todayMD = date('Y-m-d');
+                                            $jtMD = !empty($out['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($out['tgl_jatuh_tempo'])) : null;
+                                            $daysRemainingMD = $jtMD ? (int)((strtotime($jtMD) - strtotime($todayMD)) / 86400) : 999;
+                                            $isExpiredMD = ($jtMD && $todayMD > $jtMD);
+                                            $isNearExpiryMD = ($jtMD && !$isExpiredMD && $daysRemainingMD <= 7);
+                                            $isPendingRenewMD = (($out['status'] ?? '') === 'pending' && ($out['tipe_request'] ?? '') === 'perpanjangan');
+                                            $isPendingNewMD = (($out['status'] ?? '') === 'pending' && ($out['tipe_request'] ?? '') !== 'perpanjangan');
+                                            $isRejectRenewMD = (($out['status'] ?? '') === 'reject' && ($out['tipe_request'] ?? '') === 'perpanjangan');
+                                            $isRejectNewMD = (($out['status'] ?? '') === 'reject' && ($out['tipe_request'] ?? '') !== 'perpanjangan');
+                                            ?>
+
+                                            <?php if ($isPendingRenewMD) : ?>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-clock-rotate-left me-1"></i>Pending Perpanjangan
+                                                </span>
+                                            <?php elseif ($isPendingNewMD) : ?>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-regular fa-clock me-1"></i>Pending Pendaftaran
+                                                </span>
+                                            <?php elseif ($isRejectRenewMD) : ?>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-circle-xmark me-1"></i>Perpanjangan Ditolak
+                                                </span>
+                                            <?php elseif ($isRejectNewMD) : ?>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-circle-xmark me-1"></i>Pendaftaran Ditolak
+                                                </span>
+                                            <?php elseif ($isExpiredMD) : ?>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired
+                                                </span>
+                                            <?php elseif ($isNearExpiryMD) : ?>
+                                                <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i>Aktif (H-<?= $daysRemainingMD; ?>)
+                                                </span>
+                                            <?php else : ?>
+                                                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                    <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i>Aktif
+                                                </span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>

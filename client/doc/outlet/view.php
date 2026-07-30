@@ -14,6 +14,7 @@ if ($role === 'master') {
     // -------------------------------------------------------------
     $listMasterOutlets = $db->query("
         SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
+               o.status, o.tgl_jatuh_tempo, o.tipe_request,
                u_inv.nama_lengkap as nama_investor, i.kecamatan as kecamatan_investor, i.alamat_investor, u_out.username as username_outlet
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
@@ -115,9 +116,47 @@ if ($role === 'master') {
                                                 <?= !empty($row['tanggal_bergabung']) ? date('d M Y', strtotime($row['tanggal_bergabung'])) : '-' ?>
                                             </td>
                                             <td>
-                                                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                    <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i>Aktif
-                                                </span>
+                                                <?php 
+                                                $todayM = date('Y-m-d');
+                                                $jtM = !empty($row['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($row['tgl_jatuh_tempo'])) : null;
+                                                $daysRemainingM = $jtM ? (int)((strtotime($jtM) - strtotime($todayM)) / 86400) : 999;
+                                                $isExpiredM = ($jtM && $todayM > $jtM);
+                                                $isNearExpiryM = ($jtM && !$isExpiredM && $daysRemainingM <= 7);
+                                                $isPendingRenewM = (($row['status'] ?? '') === 'pending' && ($row['tipe_request'] ?? '') === 'perpanjangan');
+                                                $isPendingNewM = (($row['status'] ?? '') === 'pending' && ($row['tipe_request'] ?? '') !== 'perpanjangan');
+                                                $isRejectRenewM = (($row['status'] ?? '') === 'reject' && ($row['tipe_request'] ?? '') === 'perpanjangan');
+                                                $isRejectNewM = (($row['status'] ?? '') === 'reject' && ($row['tipe_request'] ?? '') !== 'perpanjangan');
+                                                ?>
+
+                                                <?php if ($isPendingRenewM) : ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Pending Perpanjangan
+                                                    </span>
+                                                <?php elseif ($isPendingNewM) : ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-regular fa-clock me-1"></i>Pending Pendaftaran
+                                                    </span>
+                                                <?php elseif ($isRejectRenewM) : ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-circle-xmark me-1"></i>Perpanjangan Ditolak
+                                                    </span>
+                                                <?php elseif ($isRejectNewM) : ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-circle-xmark me-1"></i>Pendaftaran Ditolak
+                                                    </span>
+                                                <?php elseif ($isExpiredM) : ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired
+                                                    </span>
+                                                <?php elseif ($isNearExpiryM) : ?>
+                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i>Aktif (H-<?= $daysRemainingM; ?>)
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i>Aktif
+                                                    </span>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
