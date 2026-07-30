@@ -237,12 +237,15 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
     color: #ffffff !important;
 }
 
-/* Override padding bawah main-content agar footer naik mendekati card form */
+/* Override layout agar footer naik mendekati card form (bukan nempel di dasar viewport) */
+/* main.js mengeset min-height: windowHeight-70px secara dinamis, harus ditimpa */
 .main-content {
     padding-bottom: 0px !important;
+    min-height: auto !important;
 }
 .footer {
-    margin-top: 8px !important;
+    position: relative !important;
+    margin-top: 12px !important;
 }
 #paneInputOmzet {
     padding-top: 8px;
