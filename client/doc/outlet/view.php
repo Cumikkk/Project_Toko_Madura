@@ -13,7 +13,7 @@ if ($role === 'master') {
     // CLIENT OUTLET VIEW UNTUK MASTER (LIST OUTLET MONITORING)
     // -------------------------------------------------------------
     $listMasterOutlets = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
+        SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request) as tanggal_bergabung,
                u_inv.nama_lengkap as nama_investor, i.kecamatan as kecamatan_investor, i.alamat_investor, u_out.username as username_outlet
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
@@ -262,7 +262,7 @@ $sqlOutlets = "
         o.nominal_biaya,
         o.bukti_pembayaran,
         o.alasan_penolakan,
-        o.tanggal_bergabung,
+        COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request) as tanggal_bergabung,
         o.id_users,
         u.username
     FROM outlet o

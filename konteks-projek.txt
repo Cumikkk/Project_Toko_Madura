@@ -101,3 +101,4 @@ CREATE TABLE pengaturan_sistem (
 - Portal Admin Outlet dilengkapi 4 tab: Outlet Aktif, Expired / Non-Aktif, Request Masuk (Pending), dan Request Ditolak (Reject).
 - Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
 - Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.
+- Memperbaiki pengisian dan pemanggilan `tanggal_bergabung` pada Portal Client & Admin dengan fallback `COALESCE(tanggal_bergabung, tanggal_disetujui, tanggal_request)`.
