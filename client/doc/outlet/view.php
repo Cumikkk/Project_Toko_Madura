@@ -90,13 +90,12 @@ if ($role === 'master') {
                                             <td class="ps-3 fw-bold text-body-secondary"><?= $no++; ?></td>
                                             <td>
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($row['nama_outlet']); ?></div>
-                                                <div class="d-flex align-items-center gap-1 mt-1">
-                                                    <span class="badge bg-light text-body-secondary border" style="font-size: 10px;"><i class="fa-light fa-location-dot me-1 text-success"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'Kecamatan N/A') ?></span>
-                                                    <button type="button" class="btn btn-sm btn-outline-success btn-detail-alamat-outlet rounded-pill px-2 py-0" style="font-size: 10px;"
+                                                <div class="mt-1">
+                                                    <button type="button" class="btn btn-xs btn-outline-success btn-detail-alamat-outlet rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 10.5px;"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>"
                                                             data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?: '-') ?>"
                                                             data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>">
-                                                        Detail Alamat
+                                                        <i class="fa-solid fa-location-dot me-1"></i>Detail Alamat
                                                     </button>
                                                 </div>
                                             </td>
@@ -129,12 +128,12 @@ if ($role === 'master') {
                                                 ?>
 
                                                 <?php if ($isPendingRenewM) : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Pending Perpanjangan
+                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-clock-rotate-left me-1 text-warning"></i>Pending Perpanjangan
                                                     </span>
                                                 <?php elseif ($isPendingNewM) : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                        <i class="fa-regular fa-clock me-1"></i>Pending Pendaftaran
+                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-regular fa-clock me-1 text-warning"></i>Pending Pendaftaran
                                                     </span>
                                                 <?php elseif ($isRejectRenewM) : ?>
                                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
@@ -537,20 +536,13 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <div class="d-flex align-items-center justify-content-center gap-2.5 flex-nowrap">
-                                                    <span class="badge bg-body-tertiary text-body-emphasis border px-2.5 py-1.5 rounded-2 fw-semibold" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><?= htmlspecialchars($row['kecamatan'] ?: ($row['alamat_outlet'] ?: '-')); ?>
-                                                    </span>
-                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                        <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-2.5 py-1 btn-detail-alamat" 
-                                                            data-nama="<?= htmlspecialchars($row['nama_outlet']); ?>"
-                                                            data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-'); ?>"
-                                                            data-alamat="<?= htmlspecialchars($row['alamat_outlet']); ?>"
-                                                            style="font-size: 10.5px; font-weight: 700;">
-                                                            <i class="fa-solid fa-circle-info me-1"></i>Detail
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
+                                                <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-3 py-1.5 btn-detail-alamat shadow-xs fw-bold" 
+                                                    data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    style="font-size: 11px;">
+                                                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>Detail Alamat
+                                                </button>
                                             </td>
                                             <td>
                                                 <?php 
@@ -563,25 +555,35 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                 $isPendingNew = (($row['status'] ?? '') === 'pending' && ($row['tipe_request'] ?? '') !== 'perpanjangan');
                                                 ?>
 
-                                                <?php if ($isPendingRenewal) : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pembayaran Perpanjangan Admin">
-                                                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Menunggu Verifikasi Perpanjangan
-                                                    </span>
-                                                <?php elseif ($isPendingNew) : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pendaftaran Admin">
-                                                        <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Pendaftaran
-                                                    </span>
+                                                <?php if ($isPendingRenewal || $isPendingNew) : ?>
+                                                    <?php 
+                                                    $tglPengajuanFormatted = !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : (!empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) . ' WIB' : '-');
+                                                    $buktiUrl = !empty($row['bukti_pembayaran']) ? (SystemInfo::app('CLIENT_URL') . '/' . $row['bukti_pembayaran']) : '';
+                                                    ?>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 185px;">
+                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="<?= $isPendingRenewal ? 'fa-solid fa-clock-rotate-left' : 'fa-regular fa-clock'; ?> me-2 text-warning" style="margin-right: 6px !important;"></i><?= $isPendingRenewal ? 'Verifikasi Perpanjangan' : 'Verifikasi Pendaftaran'; ?>
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark border-warning py-1 px-3 rounded-pill btn-detail-pending fw-bold w-100 text-center shadow-xs mt-1"
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                            data-tipe="<?= $isPendingRenewal ? 'Perpanjangan Langganan' : 'Pendaftaran Baru'; ?>"
+                                                            data-waktu="<?= htmlspecialchars($tglPengajuanFormatted, ENT_QUOTES, 'UTF-8'); ?>"
+                                                            data-bukti="<?= htmlspecialchars($buktiUrl, ENT_QUOTES, 'UTF-8'); ?>"
+                                                            style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-circle-info me-2 text-warning" style="margin-right: 6px !important;"></i>Detail Pengajuan
+                                                        </button>
+                                                    </div>
                                                 <?php elseif (($row['status'] ?? '') === 'reject') : ?>
                                                     <?php $isRejectRenew = (($row['tipe_request'] ?? '') === 'perpanjangan'); ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1">
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold">
-                                                            <i class="fa-solid fa-circle-xmark me-1"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-circle-xmark me-2" style="margin-right: 6px !important;"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
                                                         </span>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger py-0.5 px-2.5 rounded-pill btn-cek-alasan shadow-xs"
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill btn-cek-alasan fw-bold w-100 text-center shadow-xs mt-1"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?: 'Tidak ada catatan alasan dari admin.', ENT_QUOTES, 'UTF-8'); ?>"
-                                                            style="font-size: 10.5px; font-weight: 700;">
-                                                            <i class="fa-solid fa-circle-exclamation me-1"></i>Cek Alasan
+                                                            style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-circle-exclamation me-2" style="margin-right: 6px !important;"></i>Cek Alasan
                                                         </button>
                                                     </div>
                                                 <?php elseif ($isExpired) : ?>
@@ -1393,7 +1395,7 @@ $(document).ready(function() {
                     $('#det_alamat').text(res.data.alamat_outlet || '-');
                     if (res.data.bukti_pembayaran) {
                         let fileUrl = '<?= SystemInfo::app("CLIENT_URL"); ?>/' + res.data.bukti_pembayaran;
-                        $('#det_bukti_container').html('<a href="' + fileUrl + '" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 text-decoration-none"><i class="fa-solid fa-file-arrow-down me-1"></i> Lihat Bukti Bayar</a>');
+                        $('#det_bukti_container').html('<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-preview-image-lightbox" data-src="' + fileUrl + '" data-title="Bukti Pembayaran - ' + res.data.nama_outlet + '"><i class="fa-solid fa-expand me-1.5"></i> Lihat Bukti Bayar</button>');
                     } else {
                         $('#det_bukti_container').text('-');
                     }
@@ -1469,25 +1471,36 @@ $(document).ready(function() {
         const alamat = $(this).data('alamat');
 
         Swal.fire({
-            title: `<i class="fa-solid fa-location-dot text-danger me-2"></i>Alamat Lengkap Toko`,
+            title: `<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-location-dot me-2"></i>Detail Alamat Toko</div>`,
             html: `
-                <div class="text-start bg-body-tertiary p-3 rounded-3 border">
-                    <div class="mb-2">
-                        <small class="text-body-secondary fw-semibold d-block">Nama Outlet:</small>
-                        <strong class="text-body-emphasis">${nama}</strong>
+                <div class="text-start bg-light p-4 rounded-4 border border-secondary-subtle mt-3 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Outlet
+                        </span>
+                        <strong class="text-dark fs-6 ms-2 text-end">${nama}</strong>
                     </div>
-                    <div class="mb-2">
-                        <small class="text-body-secondary fw-semibold d-block">Kecamatan:</small>
-                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-2 fw-bold">${kec}</span>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-map-pin text-danger me-2 fs-6"></i>Kecamatan
+                        </span>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold ms-2" style="font-size: 12px;">${kec}</span>
                     </div>
                     <div>
-                        <small class="text-body-secondary fw-semibold d-block">Alamat Lengkap Toko:</small>
-                        <p class="mb-0 text-body-emphasis lh-sm fw-semibold">${alamat}</p>
+                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-house-chimney text-danger me-2 fs-6"></i>Alamat Lengkap Toko
+                        </div>
+                        <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
+                            ${alamat}
+                        </div>
                     </div>
                 </div>
             `,
             confirmButtonText: 'Tutup',
-            confirmButtonColor: '#7D0A0A'
+            confirmButtonColor: '#7D0A0A',
+            customClass: {
+                popup: 'rounded-4'
+            }
         });
     });
 
@@ -1541,7 +1554,7 @@ $(document).ready(function() {
         });
     });
 
-    // Handle Click Trigger Perpanjang dari Modal Detail (Opsi B)
+    // Handle Click Trigger Perpanjang dari Modal Detail
     $(document).on('click', '.btn-trigger-perpanjang', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
@@ -1556,7 +1569,7 @@ $(document).ready(function() {
         }, 400);
     });
 
-    // Handle Click Trigger Ajukan Ulang Pembayaran dari Modal Detail (Opsi B)
+    // Handle Click Trigger Ajukan Ulang Pembayaran dari Modal Detail
     $(document).on('click', '.btn-trigger-ajukan-ulang', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
@@ -1623,21 +1636,152 @@ $(document).ready(function() {
         const alasan = $(this).data('alasan');
 
         Swal.fire({
-            title: '<div class="text-danger fw-extrabold fs-5"><i class="fa-solid fa-circle-xmark me-2"></i>Alasan Penolakan Outlet</div>',
+            title: '<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-circle-xmark me-2"></i>Alasan Penolakan Outlet</div>',
             html: `
-                <div class="text-start p-3 bg-light rounded-3 border border-danger-subtle mt-2 mb-1">
-                    <div class="text-secondary small fw-bold mb-1">Nama Toko:</div>
-                    <div class="fw-bold text-dark mb-3 fs-6">${nama}</div>
-                    <div class="text-secondary small fw-bold mb-1"><i class="fa-solid fa-comment-dots text-danger me-1"></i>Catatan Alasan Admin:</div>
-                    <div class="p-2.5 bg-white rounded-3 border border-danger-subtle text-danger fw-semibold" style="font-size: 13.5px; line-height: 1.5; white-space: pre-wrap;">
-                        "${alasan}"
+                <div class="text-start p-4 bg-light rounded-4 border border-danger-subtle mt-3 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Toko
+                        </span>
+                        <span class="fw-bold text-dark fs-6 ms-2 text-end">${nama}</span>
+                    </div>
+                    <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-comment-dots text-danger me-2 fs-6"></i>Catatan Alasan Admin
+                    </div>
+                    <div class="p-3 bg-white rounded-3 border border-danger-subtle text-danger fw-semibold shadow-xs" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
+                        ${alasan}
                     </div>
                 </div>
             `,
             confirmButtonText: 'Tutup',
-            confirmButtonColor: '#6c757d',
+            confirmButtonColor: '#7D0A0A',
             customClass: {
                 popup: 'rounded-4'
+            }
+        });
+    });
+
+    // 7. Detail Pengajuan Pending Outlet (SweetAlert2)
+    $(document).on('click', '.btn-detail-pending', function() {
+        const nama  = $(this).data('nama');
+        const tipe  = $(this).data('tipe');
+        const waktu = $(this).data('waktu');
+        const bukti = $(this).data('bukti');
+
+        let buktiContent = '';
+        if (bukti) {
+            let isImg = (bukti.match(/\.(jpeg|jpg|gif|png|webp)$/i));
+            if (isImg) {
+                buktiContent = `
+                    <div class="mt-2 text-center">
+                        <div class="d-inline-block btn-preview-image-lightbox" data-src="${bukti}" data-title="Bukti Pembayaran - ${nama}" style="cursor: pointer;">
+                            <img src="${bukti}" class="img-fluid rounded-3 border border-secondary-subtle shadow-xs mb-1" style="max-height: 180px; object-fit: contain;" title="Klik untuk perbesar gambar">
+                            <div class="small text-danger fw-bold mt-1" style="font-size: 11px;">
+                                <i class="fa-solid fa-expand me-1"></i>Klik gambar untuk memperbesar
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                buktiContent = `
+                    <div class="mt-2 text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3.5 py-1.5 fw-bold btn-preview-image-lightbox" data-src="${bukti}" data-title="Dokumen Bukti Pembayaran - ${nama}" style="font-size: 12px;">
+                            <i class="fa-solid fa-file-arrow-down me-1.5"></i>Lihat Dokumen Bukti Pembayaran
+                        </button>
+                    </div>
+                `;
+            }
+        } else {
+            buktiContent = `
+                <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-secondary fw-semibold text-center" style="font-size: 12.5px;">
+                    Belum ada lampiran bukti pembayaran.
+                </div>
+            `;
+        }
+
+        Swal.fire({
+            title: '<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-circle-info me-2"></i>Detail Pengajuan Outlet</div>',
+            html: `
+                <div class="text-start p-4 bg-light rounded-4 border border-secondary-subtle mt-3 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Toko
+                        </span>
+                        <span class="fw-bold text-dark fs-6 ms-2 text-end">${nama}</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-tag text-danger me-2 fs-6"></i>Jenis Pengajuan
+                        </span>
+                        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1.5 rounded-pill fw-bold ms-2" style="font-size: 11px;">${tipe}</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-regular fa-clock text-danger me-2 fs-6"></i>Waktu Pendaftaran
+                        </span>
+                        <span class="fw-bold text-dark font-monospace small ms-2 text-end">${waktu}</span>
+                    </div>
+                    <div>
+                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-receipt text-danger me-2 fs-6"></i>Bukti Pembayaran
+                        </div>
+                        ${buktiContent}
+                    </div>
+                </div>
+            `,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#7D0A0A',
+            customClass: {
+                popup: 'rounded-4'
+            }
+        });
+    });
+
+    // 8. Global In-Page Lightbox Image Preview with Top-Right Close (X) Button
+    $(document).on('click', '.btn-preview-image-lightbox', function(e) {
+        e.preventDefault();
+        const imgUrl = $(this).data('src');
+        const titleText = $(this).data('title') || 'Bukti Pembayaran';
+
+        if (!imgUrl) return;
+
+        Swal.fire({
+            html: `
+                <div class="position-relative w-100 text-center" style="background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+                    <!-- Tombol X di pojok kanan atas -->
+                    <button onclick="Swal.close();"
+                        style="position: absolute; top: 10px; right: 10px; z-index: 9999;
+                               width: 36px; height: 36px; border-radius: 50%;
+                               background: #dc3545; border: 2px solid #fff;
+                               color: #fff; font-size: 18px; font-weight: bold;
+                               line-height: 1; cursor: pointer;
+                               display: flex; align-items: center; justify-content: center;
+                               box-shadow: 0 2px 8px rgba(0,0,0,0.5);"
+                        title="Tutup">&times;</button>
+
+                    <div class="px-3 pt-3 pb-1 text-truncate" style="color: #aaa; font-size: 12px; font-weight: 600; letter-spacing: 0.4px; padding-right: 50px !important;">
+                        <i class="fa-solid fa-image me-1" style="color: #ffc107;"></i>${titleText}
+                    </div>
+
+                    <div style="padding: 8px 12px; max-height: 78vh; display: flex; align-items: center; justify-content: center;">
+                        <img src="${imgUrl}" style="max-height: 75vh; max-width: 100%; object-fit: contain; border-radius: 8px;" alt="Bukti Pembayaran">
+                    </div>
+
+                    <div style="padding: 8px 12px 12px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #333;">
+                        <span style="font-size: 11px; color: #888;"><i class="fa-solid fa-circle-info me-1" style="color: #ffc107;"></i>Tekan <b style='color:#ccc'>ESC</b> atau tombol <b style='color:#ccc'>✕</b> untuk keluar</span>
+                        <a href="${imgUrl}" download style="font-size: 11px; color: #ccc; text-decoration: none; padding: 3px 10px; border: 1px solid #555; border-radius: 20px;">
+                            <i class="fa-solid fa-download me-1"></i>Unduh
+                        </a>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: false,
+            background: 'transparent',
+            width: '90%',
+            padding: 0,
+            customClass: {
+                popup: 'p-0 bg-transparent border-0 shadow-none'
             }
         });
     });
