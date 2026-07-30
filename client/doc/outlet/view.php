@@ -588,21 +588,9 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                         </button>
                                                     </div>
                                                 <?php elseif ($isExpired) : ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px; min-height: 54px;">
                                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
                                                             <i class="fa-solid fa-triangle-exclamation me-1.5"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
-                                                        </span>
-                                                        <button type="button" class="btn btn-sm btn-danger py-1 px-2 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-0.5"
-                                                            data-id="<?= $row['id_outlet']; ?>"
-                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                            style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-rotate-right me-1.5"></i>Perpanjang Langganan
-                                                        </button>
-                                                    </div>
-                                                <?php elseif ($isNearExpiry) : ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px;">
-                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
-                                                            <i class="fa-solid fa-triangle-exclamation me-1.5 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
                                                         </span>
                                                         <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-0.5"
                                                             data-id="<?= $row['id_outlet']; ?>"
@@ -611,9 +599,21 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                             <i class="fa-solid fa-rotate-right me-1.5"></i>Perpanjang Langganan
                                                         </button>
                                                     </div>
+                                                <?php elseif ($isNearExpiry) : ?>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1 mx-auto" style="width: 175px; min-height: 54px;">
+                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-triangle-exclamation me-1.5 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark border-warning py-1 px-2 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-0.5"
+                                                            data-id="<?= $row['id_outlet']; ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                            style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-rotate-right me-1.5 text-warning"></i>Perpanjang Awal
+                                                        </button>
+                                                    </div>
                                                 <?php else : ?>
-                                                    <div class="d-flex flex-column align-items-center justify-content-center mx-auto" style="width: 175px;">
-                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;" title="Langganan Aktif">
+                                                    <div class="d-flex flex-column align-items-center justify-content-center py-1 mx-auto" style="width: 175px; min-height: 54px;">
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs my-auto" style="font-size: 11px; letter-spacing: 0.2px;" title="Langganan Aktif">
                                                             <i class="fa-solid fa-circle me-1.5 text-success" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
                                                         </span>
                                                     </div>
