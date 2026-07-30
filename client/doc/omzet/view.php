@@ -485,24 +485,12 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                     </div>
                 </div>
             </div>
-            <?php endif; ?></div>
+            <?php endif; ?>
 
             <!-- ========================================================================= -->
             <!-- TAB 2: RIWAYAT & REKAP BAGI HASIL PERIODE -->
             <!-- ========================================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'riwayat') ? 'show active' : ''; ?>" id="paneRiwayatOmzet" role="tabpanel">
-                
-                <!-- FILTER BAR (KHUSUS HANYA DI TAMPILKAN PADA TAB RIWAYAT) -->
-                <div class="card border border-body-subtle shadow-sm mb-4" style="border-radius: 16px;">
-                    <div class="card-body p-3">
-                        <form id="filterFormOmzet" method="GET" class="w-100">
-                            <input type="hidden" name="tab" value="riwayat">
-
-                            <div class="row g-2 align-items-center">
-                                <div class="col-12 col-md-auto d-none d-md-block">
-                                    <span class="text-body-secondary small fw-bold"><i class="fa-solid fa-filter me-1 text-danger"></i>Filter Data:</span>
-                                </div>
-                                
                 <?php 
                     // Aturan Potongan 10% Diterapkan Setiap Hari (10% Per Hari)
                     $isDeductionActive = true;
