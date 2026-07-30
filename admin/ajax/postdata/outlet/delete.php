@@ -26,7 +26,7 @@ if ($idOutlet <= 0) {
     exit;
 }
 
-$resOutlet = $db->query("SELECT id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+$resOutlet = $db->query("SELECT id_users, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
 if (!$resOutlet || $resOutlet->num_rows == 0) {
     JsonResponse([
         'code'      => 200,
@@ -36,7 +36,9 @@ if (!$resOutlet || $resOutlet->num_rows == 0) {
     ]);
     exit;
 }
-$userId = intval($resOutlet->fetch_assoc()['id_users']);
+$rowOutlet = $resOutlet->fetch_assoc();
+$userId = intval($rowOutlet['id_users'] ?? 0);
+$buktiPembayaran = trim($rowOutlet['bukti_pembayaran'] ?? '');
 
 $db->begin_transaction();
 try {
@@ -47,6 +49,18 @@ try {
     // 3. Hapus akun kasir di users
     if ($userId > 0) {
         $db->query("DELETE FROM users WHERE id_users = {$userId}");
+    }
+
+    // 4. Hapus fisik file bukti_pembayaran dari server jika ada
+    if (!empty($buktiPembayaran)) {
+        $path1 = WEB_ROOT . '/' . $buktiPembayaran;
+        $path2 = CRM_ROOT . '/' . $buktiPembayaran;
+        if (file_exists($path1)) {
+            @unlink($path1);
+        }
+        if (file_exists($path2)) {
+            @unlink($path2);
+        }
     }
 
     $db->commit();

@@ -197,13 +197,14 @@ try {
         $idOutlet = (int)($_POST['id_outlet'] ?? 0);
 
         // Verify ownership
-        $resCheck = $db->query("SELECT id_users, nama_outlet FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
+        $resCheck = $db->query("SELECT id_users, nama_outlet, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
         if (!$resCheck || $resCheck->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Outlet tidak ditemukan atau Anda tidak memiliki akses.']);
         }
         $row = $resCheck->fetch_assoc();
         $associatedUserId = (int)$row['id_users'];
         $namaOutlet = $row['nama_outlet'];
+        $buktiPembayaran = trim($row['bukti_pembayaran'] ?? '');
 
         // Delete associated omzet reports first
         $db->query("DELETE FROM laporan_omzet WHERE id_outlet = {$idOutlet}");
@@ -213,6 +214,18 @@ try {
 
         // Delete from users table
         $db->query("DELETE FROM users WHERE id_users = {$associatedUserId}");
+
+        // Delete physical proof of payment file from server if exists
+        if (!empty($buktiPembayaran)) {
+            $path1 = WEB_ROOT . '/' . $buktiPembayaran;
+            $path2 = CRM_ROOT . '/' . $buktiPembayaran;
+            if (file_exists($path1)) {
+                @unlink($path1);
+            }
+            if (file_exists($path2)) {
+                @unlink($path2);
+            }
+        }
 
         JsonResponse(['success' => true, 'message' => 'Outlet "' . htmlspecialchars($namaOutlet) . '" berhasil dihapus!']);
     }

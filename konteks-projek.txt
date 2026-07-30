@@ -102,3 +102,4 @@ CREATE TABLE pengaturan_sistem (
 - Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
 - Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.
 - Memperbaiki pengisian dan pemanggilan `tanggal_bergabung` pada Portal Client & Admin dengan fallback `COALESCE(tanggal_bergabung, tanggal_disetujui, tanggal_request)`.
+- Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.
