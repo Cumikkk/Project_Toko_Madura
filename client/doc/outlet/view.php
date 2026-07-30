@@ -580,6 +580,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                             <i class="fa-solid fa-circle-xmark me-2" style="margin-right: 6px !important;"></i><?= $isRejectRenew ? 'Perpanjangan Ditolak' : 'Pendaftaran Ditolak'; ?>
                                                         </span>
                                                         <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill btn-cek-alasan fw-bold w-100 text-center shadow-xs mt-1"
+                                                            data-id="<?= htmlspecialchars($row['id_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                             data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?: 'Tidak ada catatan alasan dari admin.', ENT_QUOTES, 'UTF-8'); ?>"
                                                             style="font-size: 11px; letter-spacing: 0.2px;">
@@ -970,47 +971,63 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 <!-- MODAL: PERPANJANG LANGGANAN OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalPerpanjangOutlet" tabindex="-1" aria-labelledby="modalPerpanjangOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
-                    <i class="fa-solid fa-rotate-right me-2 text-danger"></i>Perpanjang Langganan Outlet
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
+            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                <h6 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
+                    <i class="fa-solid fa-rotate-right me-1.5 text-danger"></i>Perpanjang Langganan Outlet
+                </h6>
+                <button type="button" class="btn-close" style="font-size: 0.8rem;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formPerpanjangOutlet" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" id="renew_action" value="request_perpanjangan">
                 <input type="hidden" name="id_outlet" id="renew_id_outlet" value="">
-                <div class="modal-body p-4">
-                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <i class="fa-solid fa-store text-danger fs-5"></i>
-                            <strong class="text-body-emphasis fs-6" id="renew_nama_outlet">-</strong>
+                <div class="modal-body p-3">
+                    <!-- Section Alasan Penolakan (khusus Ajukan Ulang) -->
+                    <div id="renew_alasan_container" class="d-none">
+                        <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-2 mb-2">
+                            <div class="d-flex align-items-center gap-2 mb-1 text-danger" style="font-size: 13px;">
+                                <i class="fa-solid fa-circle-xmark fs-6"></i>
+                                <strong class="fw-bold">Alasan Penolakan Admin:</strong>
+                            </div>
+                            <div class="p-2 bg-white text-dark rounded-3 border border-danger-subtle fw-semibold mt-2" id="renew_alasan_text" style="font-size: 12px; line-height: 1.5; word-break: break-word;">
+                                -
+                            </div>
                         </div>
-                        <p class="small text-body-secondary mb-0">Biaya Langganan Perpanjangan: <strong class="text-danger">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></strong> / bulan</p>
+                        <div class="text-center my-2 text-body-emphasis fw-bold" style="font-size: 11.5px;">
+                            Silahkan isi form di bawah ini untuk mengajukan ulang
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-2 mb-2">
+                        <div class="d-flex align-items-center gap-2 mb-1" style="font-size: 13px;">
+                            <i class="fa-solid fa-store text-danger fs-6"></i>
+                            <strong class="text-body-emphasis fw-bold" id="renew_nama_outlet">-</strong>
+                        </div>
+                        <p class="small text-body-secondary mb-0" style="font-size: 11.5px;">Biaya Langganan: <strong class="text-danger">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></strong> / bln</p>
                     </div>
 
                     <!-- Informasi Rekening Bank Admin -->
-                    <div class="card border border-body-subtle bg-body-tertiary rounded-3 p-3 mb-3">
-                        <small class="text-body-secondary d-block fw-semibold mb-1"><i class="fa-solid fa-building-columns me-1 text-primary"></i> Rekening Transfer Perpanjangan:</small>
+                    <div class="border border-body-subtle bg-body-tertiary rounded-3 p-2 mb-2">
+                        <small class="text-body-secondary d-block fw-semibold mb-1" style="font-size: 11px;"><i class="fa-solid fa-building-columns me-1 text-primary"></i> Rekening Transfer:</small>
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <span class="fw-bold text-body-emphasis fs-6 d-block"><?= htmlspecialchars($bankNama); ?> - <?= htmlspecialchars($bankNoRek); ?></span>
-                                <small class="text-body-secondary">a.n. <?= htmlspecialchars($bankAtasNama); ?></small>
+                                <span class="fw-bold text-body-emphasis d-block" style="font-size: 13px;"><?= htmlspecialchars($bankNama); ?> - <?= htmlspecialchars($bankNoRek); ?></span>
+                                <small class="text-body-secondary" style="font-size: 11px;">a.n. <?= htmlspecialchars($bankAtasNama); ?></small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Upload Bukti Transfer Perpanjangan Baru</label>
-                        <input type="file" name="bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf" required>
-                        <div class="form-text small">Harap unggah foto resi/bukti transfer yang jelas (Format: JPG, PNG, PDF).</div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold text-body-secondary required" style="font-size: 11.5px; margin-bottom: 4px;">Upload Bukti Transfer Pembayaran</label>
+                        <input type="file" name="bukti_pembayaran" class="form-control form-control-sm rounded-3" accept="image/*,.pdf" required>
+                        <div class="form-text mt-1 text-body-secondary" style="font-size: 10.5px;">Format: JPG, PNG, PDF yang terbaca jelas.</div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger text-white fw-bold rounded-pill px-4" id="btnSubmitRenew">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Request Perpanjangan
+                <div class="modal-footer border-0 pt-0 pb-3 px-3">
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-sm btn-danger text-white fw-bold rounded-pill px-3" id="btnSubmitRenew">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Request
                     </button>
                 </div>
             </form>
@@ -1425,7 +1442,7 @@ $(document).ready(function() {
                             <div class="alert alert-danger border-0 shadow-sm rounded-3 p-3 mb-3 text-center">
                                 <i class="fa-solid fa-circle-xmark text-danger fs-4 mb-1"></i>
                                 <div class="fw-bold text-danger mb-2">${titleReject}</div>
-                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1 btn-trigger-ajukan-ulang" data-id="${res.data.id_outlet}" data-nama="${res.data.nama_outlet}">
+                                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1 btn-trigger-ajukan-ulang" data-id="${res.data.id_outlet}" data-nama="${res.data.nama_outlet}" data-alasan="${res.data.alasan_penolakan || 'Tidak ada catatan alasan dari admin.'}">
                                     <i class="fa-solid fa-paper-plane me-1"></i> ${btnReject}
                                 </button>
                             </div>`;
@@ -1558,6 +1575,7 @@ $(document).ready(function() {
     $(document).on('click', '.btn-trigger-perpanjang', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
+        $('#renew_alasan_container').addClass('d-none');
         $('#modalDetailOutlet').modal('hide');
         setTimeout(function() {
             $('#renew_action').val('request_perpanjangan');
@@ -1573,12 +1591,15 @@ $(document).ready(function() {
     $(document).on('click', '.btn-trigger-ajukan-ulang', function() {
         let id = $(this).data('id');
         let nama = $(this).data('nama');
+        let alasan = $(this).data('alasan');
         $('#modalDetailOutlet').modal('hide');
         setTimeout(function() {
             $('#renew_action').val('ajukan_ulang');
             $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet');
             $('#renew_id_outlet').val(id);
             $('#renew_nama_outlet').text(nama);
+            $('#renew_alasan_text').text(alasan || 'Tidak ada catatan alasan dari admin.');
+            $('#renew_alasan_container').removeClass('d-none');
             $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
             $('#modalPerpanjangOutlet').modal('show');
         }, 400);
@@ -1630,35 +1651,20 @@ $(document).ready(function() {
         });
     });
 
-    // 6. Cek Alasan Penolakan Outlet (SweetAlert2)
+    // 6. Cek Alasan Penolakan Outlet & Ajukan Ulang
     $(document).on('click', '.btn-cek-alasan', function() {
+        const id = $(this).data('id');
         const nama = $(this).data('nama');
         const alasan = $(this).data('alasan');
 
-        Swal.fire({
-            title: '<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-circle-xmark me-2"></i>Alasan Penolakan Outlet</div>',
-            html: `
-                <div class="text-start p-4 bg-light rounded-4 border border-danger-subtle mt-3 mb-1 shadow-sm">
-                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
-                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
-                            <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Toko
-                        </span>
-                        <span class="fw-bold text-dark fs-6 ms-2 text-end">${nama}</span>
-                    </div>
-                    <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-comment-dots text-danger me-2 fs-6"></i>Catatan Alasan Admin
-                    </div>
-                    <div class="p-3 bg-white rounded-3 border border-danger-subtle text-danger fw-semibold shadow-xs" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
-                        ${alasan}
-                    </div>
-                </div>
-            `,
-            confirmButtonText: 'Tutup',
-            confirmButtonColor: '#7D0A0A',
-            customClass: {
-                popup: 'rounded-4'
-            }
-        });
+        $('#renew_action').val('ajukan_ulang');
+        $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet');
+        $('#renew_id_outlet').val(id);
+        $('#renew_nama_outlet').text(nama);
+        $('#renew_alasan_text').text(alasan || 'Tidak ada catatan alasan dari admin.');
+        $('#renew_alasan_container').removeClass('d-none');
+        $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
+        $('#modalPerpanjangOutlet').modal('show');
     });
 
     // 7. Detail Pengajuan Pending Outlet (SweetAlert2)
