@@ -752,9 +752,11 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                 <!-- Compact Footer Distance -->
                 <div class="pb-2"></div>
 
-            </div></div>
+            </div>
+            <!-- /TAB 2 PANE END -->
 
         </div>
+        <!-- /TAB CONTENT END -->
 
     <?php endif; ?>
 </div>
