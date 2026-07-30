@@ -106,4 +106,5 @@ CREATE TABLE pengaturan_sistem (
 - Menambahkan kolom `tipe_request ENUM('baru', 'perpanjangan')` pada tabel outlet untuk membedakan pendaftaran baru vs perpanjangan langganan bulanan di Portal Admin & Client.
 - Mengimplementasikan Fitur Perpanjangan Langganan & Ajukan Ulang Pembayaran (Opsi B) di Portal Client Investor (`client/doc/outlet/view.php` & `action.php`): Teks Notifikasi Penolakan dan Tombol Aksi dibedakan secara presisi ("Pendaftaran Baru Ditolak Admin" vs "Perpanjangan Langganan Ditolak Admin").
 - Menyelaraskan tampilan monitoring status outlet pada Portal Client Master (`client/doc/outlet/view.php` & `dashboard/view.php`) agar menampilkan status real-time dinamis (Aktif, Expired, Pending, Reject).
+- Mengubah default tema portal client saat pertama kali login menjadi Tema Terang (Light Mode / `MBR_THEME = 0`) pada `config/models/User.php`.
 - Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.
