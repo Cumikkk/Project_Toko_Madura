@@ -17,7 +17,7 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, o.alamat_outlet, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, o.alamat_outlet, o.persentase_potongan, u.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN investor i ON o.id_investor = i.id_investor
     LEFT JOIN users u ON i.id_users = u.id_users
@@ -90,12 +90,14 @@ $resOmzet = $db->query($sqlOmzet);
 
 $laporanList = [];
 $totalOmzet = 0;
+$totalNominalPotongan = 0;
 $totalHariInput = 0;
 
 if ($resOmzet) {
     while ($row = $resOmzet->fetch_assoc()) {
         $laporanList[] = $row;
         $totalOmzet += (float)$row['omzet'];
+        $totalNominalPotongan += (float)($row['nominal_potongan'] ?? 0);
     }
 }
 $totalHariInput = count($laporanList);
@@ -320,14 +322,14 @@ ob_start();
     </table>
 
     <?php 
-        $potonganGlobal = 10.00;
-        $pot10Pdf  = round($totalOmzet * ($potonganGlobal / 100), 2);
+        $potonganGlobal = (float)($outlet['persentase_potongan'] ?? 10.00);
+        $pot10Pdf  = ($totalNominalPotongan > 0) ? $totalNominalPotongan : round($totalOmzet * ($potonganGlobal / 100), 2);
         $hakInvPdf = round($pot10Pdf * 0.50, 2);
         $hakOutPdf = round($pot10Pdf * 0.50, 2);
         $totalAkhirOutletPdf = ($totalOmzet - $pot10Pdf) + $hakOutPdf;
     ?>
 
-    <!-- Summary Box Bagi Hasil (10% Potongan -> 50% Investor : 50% Outlet) -->
+    <!-- Summary Box Bagi Hasil (Potongan -> 50% Investor : 50% Outlet) -->
     <table class="meta-box" style="margin-bottom: 25px; border: 1px solid #cbd5e1;">
         <tr style="background-color: #f8fafc;">
             <td colspan="2" style="font-weight: bold; font-size: 12px; color: #7D0A0A; border-bottom: 1px solid #e2e8f0; padding: 8px 12px;">
@@ -342,7 +344,7 @@ ob_start();
                         <td class="meta-value">: Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label" style="color: #dc2626;">Nominal Potongan 10%</td>
+                        <td class="meta-label" style="color: #dc2626;">Nominal Potongan <?= number_format($potonganGlobal, 0); ?>%</td>
                         <td class="meta-value" style="color: #dc2626;">: Rp <?= number_format($pot10Pdf, 0, ',', '.'); ?></td>
                     </tr>
                 </table>
@@ -350,11 +352,11 @@ ob_start();
             <td style="width: 50%;">
                 <table style="width: 100%;">
                     <tr>
-                        <td class="meta-label" style="color: #16a34a;">Hak Investor (50% dari 10%)</td>
+                        <td class="meta-label" style="color: #16a34a;">Hak Investor (50% dari <?= number_format($potonganGlobal, 0); ?>%)</td>
                         <td class="meta-value" style="color: #16a34a;">: Rp <?= number_format($hakInvPdf, 0, ',', '.'); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label" style="color: #d97706;">Hak Outlet (50% dari 10%)</td>
+                        <td class="meta-label" style="color: #d97706;">Hak Outlet (50% dari <?= number_format($potonganGlobal, 0); ?>%)</td>
                         <td class="meta-value" style="color: #d97706;">: Rp <?= number_format($hakOutPdf, 0, ',', '.'); ?></td>
                     </tr>
                 </table>

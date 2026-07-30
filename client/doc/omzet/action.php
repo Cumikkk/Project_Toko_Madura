@@ -31,12 +31,8 @@ try {
     $outlet = $resOutlet->fetch_assoc();
     $idOutlet = (int)$outlet['id_outlet'];
 
-    // 3. Fetch Global Discount Percentage from pengaturan_sistem
-    $resGlobal = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'potongan_global' LIMIT 1");
-    $presentaseGlobal = 10.00; // Default fallback 10%
-    if ($resGlobal && $rowGlobal = $resGlobal->fetch_assoc()) {
-        $presentaseGlobal = (float)$rowGlobal['nilai'];
-    }
+    // 3. Fetch Discount Percentage directly from Outlet record (set during registration)
+    $presentaseGlobal = isset($outlet['persentase_potongan']) ? (float)$outlet['persentase_potongan'] : 10.00;
 
     $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
@@ -101,9 +97,9 @@ try {
         $isLastDayInDb = ($chkLastDayInDb && $chkLastDayInDb->num_rows > 0);
 
         if ($isLastDayInput || $isLastDayInDb) {
-            $appliedPercent = $presentaseGlobal; // 10.00%
+            $appliedPercent = $presentaseGlobal;
             $nominalPotongan = round($omzet * ($appliedPercent / 100), 2);
-            $noteMsg = ' (Potongan 10% aktif diproses karena menginput di tanggal akhir bulan ' . $tglLastDayStr . ')';
+            $noteMsg = ' (Potongan ' . number_format($presentaseGlobal, 0) . '% aktif diproses karena menginput di tanggal akhir bulan ' . $tglLastDayStr . ')';
 
             // Apply 10% deduction to all entries in this month
             $db->query("UPDATE laporan_omzet SET presentase_potongan = {$presentaseGlobal}, nominal_potongan = ROUND(omzet * ({$presentaseGlobal} / 100), 2) WHERE id_outlet = {$idOutlet} AND DATE_FORMAT(periode_laporan, '%Y-%m') = '{$entryYM}'");
@@ -136,6 +132,7 @@ try {
                 'potongan' => $nominalPotongan,
                 'bersih' => $bersihOutlet,
                 'presentase' => $appliedPercent,
+                'persentase_potongan' => number_format($presentaseGlobal, 0),
                 'periode_str' => $namaBulanTahun
             ]
         ]);

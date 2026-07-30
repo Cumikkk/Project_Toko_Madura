@@ -257,6 +257,7 @@ $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
+        o.kecamatan,
         o.alamat_outlet,
         o.status,
         o.nominal_biaya,
@@ -347,12 +348,43 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
     }
 }
 
-/* Clean Styling for Wizard Modal */
+/* Precise Vertical Alignment for Wizard Modal Labels & Input Placeholders */
+#modalTambahOutlet .form-label.required::after,
+#modalTambahOutlet label.required::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
 #modalTambahOutlet .form-label {
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 12px;
+    margin-top: 18px !important;
+    margin-bottom: 5px !important;
+    display: block !important;
+    font-weight: 700 !important;
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+    overflow: visible !important;
+    white-space: normal !important;
     color: var(--bs-body-color);
+}
+#modalTambahOutlet #stepSection1 > .row > div:first-child .form-label:first-child,
+#modalTambahOutlet #stepSection2 > .row > div:first-child .form-label:first-child {
+    margin-top: 4px !important;
+}
+#modalTambahOutlet .form-control,
+#modalTambahOutlet .input-group-text {
+    font-size: 12px !important;
+    padding: 7px 12px !important;
+    height: 38px !important;
+    line-height: 1.5 !important;
+    border-radius: 8px !important;
+}
+#modalTambahOutlet .input-group .form-control.rounded-start-3 {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+#modalTambahOutlet .input-group .input-group-text {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }
 </style>
 
@@ -437,7 +469,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                     <th>Nama Outlet</th>
                                     <th>Username Akun</th>
                                     <th>Waktu Pendaftaran</th>
-                                    <th>Alamat Outlet</th>
+                                    <th class="text-center">Alamat Outlet</th>
                                     <th>Status</th>
                                     <th class="text-center pe-3" style="width: 140px;">Aksi</th>
                                 </tr>
@@ -463,8 +495,21 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                     <?= !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : '-'; ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <small class="text-body-secondary"><?= htmlspecialchars($row['alamat_outlet'] ?: '-'); ?></small>
+                                            <td class="text-center">
+                                                <div class="d-flex align-items-center justify-content-center gap-2.5 flex-nowrap">
+                                                    <span class="badge bg-body-tertiary text-body-emphasis border px-2.5 py-1.5 rounded-2 fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-location-dot text-danger me-1"></i><?= htmlspecialchars($row['kecamatan'] ?: ($row['alamat_outlet'] ?: '-')); ?>
+                                                    </span>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-2.5 py-1 btn-detail-alamat" 
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet']); ?>"
+                                                            data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-'); ?>"
+                                                            data-alamat="<?= htmlspecialchars($row['alamat_outlet']); ?>"
+                                                            style="font-size: 10.5px; font-weight: 700;">
+                                                            <i class="fa-solid fa-circle-info me-1"></i>Detail
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
                                             <td>
                                                 <?php if (($row['status'] ?? 'active') === 'pending') : ?>
@@ -472,9 +517,17 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                         <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Admin
                                                     </span>
                                                 <?php elseif (($row['status'] ?? 'active') === 'reject') : ?>
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="<?= htmlspecialchars($row['alasan_penolakan'] ?? 'Pembayaran Ditolak Admin') ?>">
-                                                        <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
-                                                    </span>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-1.5 py-1">
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold">
+                                                            <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-0.5 px-2.5 rounded-pill btn-cek-alasan shadow-xs"
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                            data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?: 'Tidak ada catatan alasan dari admin.', ENT_QUOTES, 'UTF-8'); ?>"
+                                                            style="font-size: 10.5px; font-weight: 700;">
+                                                            <i class="fa-solid fa-circle-exclamation me-1"></i>Cek Alasan
+                                                        </button>
+                                                    </div>
                                                 <?php else : ?>
                                                     <?php
                                                     $today = date('Y-m-d');
@@ -625,32 +678,42 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 
                             <!-- Nama Pengelola & No WhatsApp (Strict 50%-50%) -->
                             <div class="col-6">
-                                <label class="form-label text-truncate">Pengelola / Kasir</label>
-                                <input type="text" name="nama_pengelola" class="form-control rounded-3" placeholder="Budi Santoso">
+                                <label class="form-label required">Pengelola / Kasir</label>
+                                <input type="text" name="nama_pengelola" id="wizard_nama_pengelola" class="form-control rounded-3" placeholder="Budi Santoso" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label text-truncate">No. WhatsApp</label>
-                                <input type="text" name="no_hp" class="form-control rounded-3" placeholder="081234567890">
+                                <label class="form-label required">No. WhatsApp</label>
+                                <input type="text" name="no_hp" id="wizard_no_hp" class="form-control rounded-3" placeholder="081234567890" required>
                             </div>
 
                             <!-- Kecamatan & Alamat Lengkap Toko (Strict 50%-50%) -->
                             <div class="col-6">
-                                <label class="form-label required text-truncate">Kecamatan</label>
+                                <label class="form-label required">Kecamatan</label>
                                 <input type="text" name="kecamatan" id="wizard_kecamatan" class="form-control rounded-3" placeholder="Taman" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label text-truncate">Alamat Lengkap Toko</label>
-                                <input type="text" name="alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12">
+                                <label class="form-label required">Alamat Lengkap Toko</label>
+                                <input type="text" name="alamat_outlet" id="wizard_alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12" required>
                             </div>
 
                             <!-- Persentase Bagi Hasil Investor -->
                             <div class="col-12">
                                 <label class="form-label required">Persentase Bagi Hasil Investor (%)</label>
                                 <div class="input-group">
-                                    <input type="number" step="0.01" min="0" max="100" name="persentase_potongan" class="form-control rounded-start-3" value="10.00" required>
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold">%</span>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="wizard_persentase_potongan" class="form-control rounded-start-3 fw-bold" placeholder="10.00" value="10.00" required>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 28px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center btn-percent-up" onclick="stepPercentUp()" style="font-size: 9px; line-height: 1;" title="Tambah Persen (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center btn-percent-down" onclick="stepPercentDown()" style="font-size: 9px; line-height: 1;" title="Kurangi Persen (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Default 10.00% potongan investor.</div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Gunakan tombol ▲ / ▼ di sebelah kanan atau ketik langsung persentase potongan investor.</div>
                             </div>
                         </div>
                     </div>
@@ -666,14 +729,14 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <div class="row g-3">
                             <!-- Username & Password Kasir (Strict 50%-50%) -->
                             <div class="col-6">
-                                <label class="form-label required text-truncate">Username Login Kasir</label>
+                                <label class="form-label required">Username Login Kasir</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
                                     <input type="text" name="username" id="wizard_username" class="form-control rounded-end-3 border-start-0 ps-1" placeholder="outlet_sidoarjo" required>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label required text-truncate">Password Login Kasir</label>
+                                <label class="form-label required">Password Login Kasir</label>
                                 <input type="password" name="password" id="wizard_password" class="form-control rounded-3" placeholder="Password akun" required>
                             </div>
 
@@ -693,7 +756,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                             <!-- Upload Bukti Pembayaran -->
                             <div class="col-12">
                                 <label class="form-label required">Upload Bukti Transfer Pembayaran</label>
-                                <input type="file" name="bukti_pembayaran" id="wizard_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf">
+                                <input type="file" name="bukti_pembayaran" id="wizard_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf" required>
                                 <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Format: JPG, PNG, WEBP, atau PDF (Max 5MB).</div>
                             </div>
 
@@ -940,29 +1003,88 @@ $(document).ready(function() {
         }
     });
 
+    // Up & Down Spinner Functions for Persentase Bagi Hasil Investor
+    window.stepPercentUp = function() {
+        let el = $('#wizard_persentase_potongan');
+        let val = parseFloat(el.val()) || 0;
+        if (val < 100) {
+            val = Math.min(100, val + 1);
+            el.val(val.toFixed(2));
+        }
+    };
+
+    window.stepPercentDown = function() {
+        let el = $('#wizard_persentase_potongan');
+        let val = parseFloat(el.val()) || 0;
+        if (val > 0) {
+            val = Math.max(0, val - 1);
+            el.val(val.toFixed(2));
+        }
+    };
+
     // 0. Wizard Navigation Function for Modal Tambah Outlet (2 Sesi)
     window.goToWizardStep = function(step) {
         if (step === 2) {
-            // Validate Step 1 Required Fields (Nama Outlet & Kecamatan)
+            // Validate ALL Step 1 Required Fields
             const nama = $('#wizard_nama_outlet').val().trim();
+            const pengelola = $('#wizard_nama_pengelola').val().trim();
+            const noHp = $('#wizard_no_hp').val().trim();
             const kec = $('#wizard_kecamatan').val().trim();
+            const alamat = $('#wizard_alamat_outlet').val().trim();
+            const potongan = $('#wizard_persentase_potongan').val().trim();
 
             if (!nama) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Data Belum Lengkap',
+                    title: 'Form Belum Lengkap',
                     text: 'Harap isi Nama Outlet Toko terlebih dahulu.',
                     confirmButtonColor: '#7D0A0A'
                 }).then(() => $('#wizard_nama_outlet').focus());
                 return;
             }
+            if (!pengelola) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi Nama Pengelola / Kasir terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_nama_pengelola').focus());
+                return;
+            }
+            if (!noHp) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi No. HP / WhatsApp pengelola terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_no_hp').focus());
+                return;
+            }
             if (!kec) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Data Belum Lengkap',
+                    title: 'Form Belum Lengkap',
                     text: 'Harap isi Kecamatan outlet terlebih dahulu.',
                     confirmButtonColor: '#7D0A0A'
                 }).then(() => $('#wizard_kecamatan').focus());
+                return;
+            }
+            if (!alamat) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi Alamat Lengkap Toko terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_alamat_outlet').focus());
+                return;
+            }
+            if (!potongan) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi Persentase Bagi Hasil Investor.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_persentase_potongan').focus());
                 return;
             }
 
@@ -1005,6 +1127,40 @@ $(document).ready(function() {
     // 1. Submit Form Tambah Outlet & Bukti Transfer
     $('#formTambahOutlet').on('submit', function(e) {
         e.preventDefault();
+
+        // Validate Step 2 Required Fields
+        const user = $('#wizard_username').val().trim();
+        const pass = $('#wizard_password').val().trim();
+        const fileProof = $('#wizard_bukti_pembayaran')[0].files;
+
+        if (!user) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form Belum Lengkap',
+                text: 'Harap isi Username Login Kasir terlebih dahulu.',
+                confirmButtonColor: '#7D0A0A'
+            }).then(() => $('#wizard_username').focus());
+            return;
+        }
+        if (!pass) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form Belum Lengkap',
+                text: 'Harap isi Password Login Kasir terlebih dahulu.',
+                confirmButtonColor: '#7D0A0A'
+            }).then(() => $('#wizard_password').focus());
+            return;
+        }
+        if (fileProof.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form Belum Lengkap',
+                text: 'Harap upload file Bukti Transfer Pembayaran terlebih dahulu.',
+                confirmButtonColor: '#7D0A0A'
+            }).then(() => $('#wizard_bukti_pembayaran').focus());
+            return;
+        }
+
         const form = $(this);
         const formData = new FormData(this);
         const submitBtn = form.find('button[type="submit"]');
@@ -1147,6 +1303,36 @@ $(document).ready(function() {
         });
     });
 
+    // 4.5. Show SweetAlert Detail Alamat Lengkap Toko
+    $(document).on('click', '.btn-detail-alamat', function(e) {
+        e.preventDefault();
+        const nama = $(this).data('nama');
+        const kec = $(this).data('kecamatan');
+        const alamat = $(this).data('alamat');
+
+        Swal.fire({
+            title: `<i class="fa-solid fa-location-dot text-danger me-2"></i>Alamat Lengkap Toko`,
+            html: `
+                <div class="text-start bg-body-tertiary p-3 rounded-3 border">
+                    <div class="mb-2">
+                        <small class="text-body-secondary fw-semibold d-block">Nama Outlet:</small>
+                        <strong class="text-body-emphasis">${nama}</strong>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-body-secondary fw-semibold d-block">Kecamatan:</small>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-2 fw-bold">${kec}</span>
+                    </div>
+                    <div>
+                        <small class="text-body-secondary fw-semibold d-block">Alamat Lengkap Toko:</small>
+                        <p class="mb-0 text-body-emphasis lh-sm fw-semibold">${alamat}</p>
+                    </div>
+                </div>
+            `,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#7D0A0A'
+        });
+    });
+
     // 5. Delete Outlet with SweetAlert2
     $(document).on('click', '.btn-delete-outlet', function() {
         const idOutlet = $(this).data('id');
@@ -1193,6 +1379,31 @@ $(document).ready(function() {
                         Swal.fire('Error', 'Gagal menghapus outlet.', 'error');
                     }
                 });
+            }
+        });
+    });
+
+    // 6. Cek Alasan Penolakan Outlet (SweetAlert2)
+    $(document).on('click', '.btn-cek-alasan', function() {
+        const nama = $(this).data('nama');
+        const alasan = $(this).data('alasan');
+
+        Swal.fire({
+            title: '<div class="text-danger fw-extrabold fs-5"><i class="fa-solid fa-circle-xmark me-2"></i>Alasan Penolakan Outlet</div>',
+            html: `
+                <div class="text-start p-3 bg-light rounded-3 border border-danger-subtle mt-2 mb-1">
+                    <div class="text-secondary small fw-bold mb-1">Nama Toko:</div>
+                    <div class="fw-bold text-dark mb-3 fs-6">${nama}</div>
+                    <div class="text-secondary small fw-bold mb-1"><i class="fa-solid fa-comment-dots text-danger me-1"></i>Catatan Alasan Admin:</div>
+                    <div class="p-2.5 bg-white rounded-3 border border-danger-subtle text-danger fw-semibold" style="font-size: 13.5px; line-height: 1.5; white-space: pre-wrap;">
+                        "${alasan}"
+                    </div>
+                </div>
+            `,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#6c757d',
+            customClass: {
+                popup: 'rounded-4'
             }
         });
     });

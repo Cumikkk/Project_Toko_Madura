@@ -33,7 +33,7 @@ if ($role === 'investor') {
         $persenInvestor = (float)$rowInv['persen_bagian_investor'];
     }
 } else {
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, i.persen_bagian_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, o.persentase_potongan, i.persen_bagian_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];
@@ -43,12 +43,7 @@ if ($role === 'investor') {
 }
 $persenOutletBagiHasil = 100.00 - $persenInvestor; // 50%
 
-// Get global platform deduction percentage
-$resSet = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'potongan_global' LIMIT 1");
-$potonganGlobal = 10.00;
-if ($resSet && $resSet->num_rows > 0) {
-    $potonganGlobal = (float)$resSet->fetch_assoc()['nilai'];
-}
+$potonganGlobal = (float)($rowOut['persentase_potongan'] ?? 10.00);
 
 // Filter Logic (Outlet, Rentang Tanggal, Bulan, Tahun)
 $selectedOutletId   = isset($_GET['outlet_id']) ? (int)$_GET['outlet_id'] : (isset($_GET['id_outlet']) ? (int)$_GET['id_outlet'] : (isset($_GET['outlet']) ? (int)$_GET['outlet'] : 0));
@@ -137,12 +132,13 @@ $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
+        o.persentase_potongan,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan
     ORDER BY o.id_outlet DESC
 ";
 
@@ -152,33 +148,21 @@ if ($resBagiHasil) {
     while ($row = $resBagiHasil->fetch_assoc()) {
         $omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
+        $ratePotongan = (float)($row['persentase_potongan'] ?? 10.00);
+
+        // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
+        $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
         
-        if ($selectedBulan > 0) {
-            $chkLast = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutletRow} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
-            $isLastDayDone = ($chkLast && $chkLast->num_rows > 0);
+        $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
+        $hakOutlet   = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+        $hasAnyLastDayDone = true;
 
-            if ($isLastDayDone) {
-                $hasAnyLastDayDone = true;
-                $potongan10 = round($omzet * ($potonganGlobal / 100.0), 2);
-                $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-                $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-            } else {
-                $potongan10 = 0.00;
-                $hakInvestor = 0.00;
-                $hakOutlet = 0.00;
-            }
-        } else {
-            $potongan10 = (float)$row['total_potongan_db'];
-            $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-            $hakOutlet = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
-            $isLastDayDone = true;
-        }
-
+        $row['persentase_potongan'] = $ratePotongan;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
         $row['total_bersih_outlet'] = $omzet - $potongan10;
-        $row['is_last_day_done'] = $isLastDayDone;
+        $row['is_last_day_done'] = true;
 
         $totOmzet += $omzet;
         $totPotongan10 += $potongan10;
@@ -363,7 +347,7 @@ ob_start();
                     </tr>
                     <tr>
                         <td class="meta-label">Skema Bagi Hasil</td>
-                        <td class="meta-value">: 50% Investor : 50% Outlet (Dari Potongan 10%)</td>
+                        <td class="meta-value">: 50% Investor : 50% Outlet (Dari Potongan <?= number_format($potonganGlobal, 0); ?>%)</td>
                     </tr>
                 </table>
             </td>
@@ -381,7 +365,7 @@ ob_start();
             </td>
             <td style="width: 25%; padding: 4px;">
                 <div class="summary-card" style="border-top: 3px solid #dc2626;">
-                    <div class="summary-card-title">Potongan (10%)</div>
+                    <div class="summary-card-title">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</div>
                     <div class="summary-card-val text-danger">
                         <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
                     </div>
@@ -413,7 +397,7 @@ ob_start();
                 <th class="text-center" style="width: 30px;">No</th>
                 <th style="width: 140px;">Nama Outlet</th>
                 <th class="text-end">Total Omzet (100%)</th>
-                <th class="text-end">Potongan (10%)</th>
+                <th class="text-end">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</th>
                 <th class="text-end">Hak Investor (50%)</th>
                 <th class="text-end">Hak Outlet (50%)</th>
                 <th class="text-end">Bersih Outlet Total</th>
