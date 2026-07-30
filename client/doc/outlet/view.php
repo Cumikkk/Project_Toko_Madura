@@ -588,13 +588,29 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                         </button>
                                                     </div>
                                                 <?php elseif ($isExpired) : ?>
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Telah Berakhir">
-                                                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
-                                                    </span>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-triangle-exclamation me-2"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-danger py-1 px-3 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-1"
+                                                            data-id="<?= $row['id_outlet']; ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                            style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-rotate-right me-2"></i>Perpanjang Langganan
+                                                        </button>
+                                                    </div>
                                                 <?php elseif ($isNearExpiry) : ?>
-                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Tinggal <?= $daysRemaining; ?> Hari Lagi">
-                                                        <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
-                                                    </span>
+                                                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 py-2 mx-auto" style="min-width: 155px; max-width: 175px;">
+                                                        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1.5 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-triangle-exclamation me-2 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
+                                                        </span>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 rounded-pill btn-trigger-perpanjang fw-bold w-100 text-center shadow-xs mt-1"
+                                                            data-id="<?= $row['id_outlet']; ?>"
+                                                            data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                            style="font-size: 11px; letter-spacing: 0.2px;">
+                                                            <i class="fa-solid fa-rotate-right me-2"></i>Perpanjang Langganan
+                                                        </button>
+                                                    </div>
                                                 <?php else : ?>
                                                     <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" title="Langganan Aktif">
                                                         <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
@@ -603,9 +619,6 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                             </td>
                                             <td class="text-center pe-3">
                                                 <div class="d-flex align-items-center justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-sm btn-light border text-info btn-detail-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Lihat Detail & Tindakan">
-                                                        <i class="fa-light fa-eye"></i>
-                                                    </button>
                                                     <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Edit Outlet">
                                                         <i class="fa-light fa-pen-to-square"></i>
                                                     </button>
