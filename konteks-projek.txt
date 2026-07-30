@@ -103,4 +103,5 @@ CREATE TABLE pengaturan_sistem (
 - Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.
 - Memperbaiki pemanggilan `tanggal_bergabung` pada badge header banner kanan Outlet Panel (`client/doc/omzet/view.php`).
 - Mengatur logika arsitektur: `tanggal_bergabung` diisi sekali saat approval pertama (IFNULL - permanen selamanya), sedangkan `tanggal_disetujui` akan ter-update setiap persetujuan/perpanjangan langganan berkala oleh Admin (`admin/ajax/postdata/request-outlet/accept.php`).
+- Menambahkan data dummy lengkap & realistis pada Portal Admin Outlet untuk pengujian ke-4 tab (Outlet Aktif, Expired, Request Masuk/Pending, dan Request Ditolak).
 - Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.
