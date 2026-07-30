@@ -118,6 +118,82 @@ try {
     }
 
     // =========================================================================
+    // ACTION: REQUEST PERPANJANGAN LANGGANAN OUTLET (RENEWAL)
+    // =========================================================================
+    if ($action === 'request_perpanjangan') {
+        $idOutlet = (int)($_POST['id_outlet'] ?? 0);
+        
+        // Verify ownership
+        $resCheck = $db->query("SELECT id_outlet, nama_outlet, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
+        if (!$resCheck || $resCheck->num_rows === 0) {
+            JsonResponse(['success' => false, 'message' => 'Outlet tidak ditemukan atau Anda tidak memiliki akses.']);
+        }
+        $rowOutlet = $resCheck->fetch_assoc();
+        $namaOutlet = $rowOutlet['nama_outlet'];
+
+        // Get system fee for subscription
+        $nominalBiaya = 100000.00;
+        $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
+        if ($resFee && $resFee->num_rows > 0) {
+            $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
+        }
+
+        // Handle Upload Bukti Pembayaran Perpanjangan
+        $buktiPath = '';
+        if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../uploads/bukti_pembayaran/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileExt = strtolower(pathinfo($_FILES['bukti_pembayaran']['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            if (!in_array($fileExt, $allowedExts)) {
+                JsonResponse(['success' => false, 'message' => 'Format file bukti bayar tidak didukung. Harap unggah JPG, PNG, atau PDF.']);
+            }
+
+            $newFileName = 'bukti_renew_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
+            $targetFilePath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
+                $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
+            }
+        }
+
+        if (empty($buktiPath)) {
+            JsonResponse(['success' => false, 'message' => 'Harap unggah foto / file bukti transfer pembayaran perpanjangan langganan.']);
+        }
+
+        // Unlink old payment proof if exists
+        $oldBukti = trim($rowOutlet['bukti_pembayaran'] ?? '');
+        if (!empty($oldBukti)) {
+            $path1 = __DIR__ . '/../../' . $oldBukti;
+            if (file_exists($path1)) {
+                @unlink($path1);
+            }
+        }
+
+        $escapedBukti = $db->real_escape_string($buktiPath);
+
+        // Update outlet status to pending perpanjangan
+        $sqlUpdate = "UPDATE outlet SET 
+                        status = 'pending',
+                        tipe_request = 'perpanjangan',
+                        nominal_biaya = {$nominalBiaya},
+                        bukti_pembayaran = '{$escapedBukti}',
+                        tanggal_request = NOW()
+                      WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId}";
+
+        if (!$db->query($sqlUpdate)) {
+            JsonResponse(['success' => false, 'message' => 'Gagal mengajukan perpanjangan: ' . $db->error]);
+        }
+
+        JsonResponse([
+            'success' => true,
+            'message' => 'Request perpanjangan langganan untuk outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
+        ]);
+    }
+
+    // =========================================================================
     // ACTION: GET DETAIL FOR VIEW / EDIT
     // =========================================================================
     if ($action === 'get_detail') {

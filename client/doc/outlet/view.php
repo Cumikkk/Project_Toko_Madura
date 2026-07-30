@@ -263,6 +263,8 @@ $sqlOutlets = "
         o.bukti_pembayaran,
         o.alasan_penolakan,
         o.tanggal_bergabung,
+        o.tgl_jatuh_tempo,
+        o.tipe_request,
         o.id_users,
         u.username
     FROM outlet o
@@ -467,28 +469,40 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                 <small class="text-body-secondary"><?= htmlspecialchars($row['alamat_outlet'] ?: '-'); ?></small>
                                             </td>
                                             <td>
-                                                <?php if (($row['status'] ?? 'active') === 'pending') : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pembayaran Admin">
-                                                        <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Admin
+                                                <?php 
+                                                $today = date('Y-m-d');
+                                                $jt = !empty($row['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($row['tgl_jatuh_tempo'])) : null;
+                                                $daysRemaining = $jt ? (int)((strtotime($jt) - strtotime($today)) / 86400) : 999;
+                                                $isExpired = ($jt && $today > $jt);
+                                                $isNearExpiry = ($jt && !$isExpired && $daysRemaining <= 7);
+                                                $isPendingRenewal = (($row['status'] ?? '') === 'pending' && ($row['tipe_request'] ?? '') === 'perpanjangan');
+                                                $isPendingNew = (($row['status'] ?? '') === 'pending' && ($row['tipe_request'] ?? '') !== 'perpanjangan');
+                                                ?>
+
+                                                <?php if ($isPendingRenewal) : ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pembayaran Perpanjangan Admin">
+                                                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Menunggu Verifikasi Perpanjangan
                                                     </span>
-                                                <?php elseif (($row['status'] ?? 'active') === 'reject') : ?>
+                                                <?php elseif ($isPendingNew) : ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill fw-semibold" title="Menunggu Konfirmasi Pendaftaran Admin">
+                                                        <i class="fa-regular fa-clock me-1"></i>Menunggu Verifikasi Pendaftaran
+                                                    </span>
+                                                <?php elseif (($row['status'] ?? '') === 'reject') : ?>
                                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="<?= htmlspecialchars($row['alasan_penolakan'] ?? 'Pembayaran Ditolak Admin') ?>">
                                                         <i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin
                                                     </span>
+                                                <?php elseif ($isExpired) : ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Telah Berakhir">
+                                                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
+                                                    </span>
+                                                <?php elseif ($isNearExpiry) : ?>
+                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Tinggal <?= $daysRemaining; ?> Hari Lagi">
+                                                        <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i>Aktif (H-<?= $daysRemaining; ?> Expired)
+                                                    </span>
                                                 <?php else : ?>
-                                                    <?php
-                                                    $today = date('Y-m-d');
-                                                    $jt = !empty($row['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($row['tgl_jatuh_tempo'])) : null;
-                                                    if ($jt && $today > $jt) :
-                                                    ?>
-                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill fw-semibold" title="Masa Langganan Telah Berakhir">
-                                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired (<?= date('d/m/Y', strtotime($jt)); ?>)
-                                                        </span>
-                                                    <?php else : ?>
-                                                        <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" title="Langganan Aktif">
-                                                            <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
-                                                        </span>
-                                                    <?php endif; ?>
+                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" title="Langganan Aktif">
+                                                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i>Aktif <?= $jt ? '(s.d ' . date('d/m/Y', strtotime($jt)) . ')' : ''; ?>
+                                                    </span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center pe-3">
@@ -496,6 +510,13 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                     <button type="button" class="btn btn-sm btn-light border text-info btn-detail-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Lihat Detail">
                                                         <i class="fa-light fa-eye"></i>
                                                     </button>
+                                                    
+                                                    <?php if ($isExpired || $isNearExpiry) : ?>
+                                                        <button type="button" class="btn btn-sm btn-danger rounded-3 px-2 py-1 btn-perpanjang-outlet" data-id="<?= $row['id_outlet']; ?>" data-nama="<?= htmlspecialchars($row['nama_outlet']); ?>" title="Perpanjang Langganan Outlet">
+                                                            <i class="fa-solid fa-rotate-right me-1"></i>Perpanjang
+                                                        </button>
+                                                    <?php endif; ?>
+
                                                     <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Edit Outlet">
                                                         <i class="fa-light fa-pen-to-square"></i>
                                                     </button>
@@ -840,6 +861,58 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
             <div class="modal-footer border-0 pt-0 pb-4 px-4">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: PERPANJANG LANGGANAN OUTLET (Theme Adaptive) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalPerpanjangOutlet" tabindex="-1" aria-labelledby="modalPerpanjangOutletLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
+                    <i class="fa-solid fa-rotate-right me-2 text-danger"></i>Perpanjang Langganan Outlet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formPerpanjangOutlet" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="request_perpanjangan">
+                <input type="hidden" name="id_outlet" id="renew_id_outlet" value="">
+                <div class="modal-body p-4">
+                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="fa-solid fa-store text-danger fs-5"></i>
+                            <strong class="text-body-emphasis fs-6" id="renew_nama_outlet">-</strong>
+                        </div>
+                        <p class="small text-body-secondary mb-0">Biaya Langganan Perpanjangan: <strong class="text-danger">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></strong> / bulan</p>
+                    </div>
+
+                    <!-- Informasi Rekening Bank Admin -->
+                    <div class="card border border-body-subtle bg-body-tertiary rounded-3 p-3 mb-3">
+                        <small class="text-body-secondary d-block fw-semibold mb-1"><i class="fa-solid fa-building-columns me-1 text-primary"></i> Rekening Transfer Perpanjangan:</small>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="fw-bold text-body-emphasis fs-6 d-block"><?= htmlspecialchars($bankNama); ?> - <?= htmlspecialchars($bankNoRek); ?></span>
+                                <small class="text-body-secondary">a.n. <?= htmlspecialchars($bankAtasNama); ?></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-body-secondary required">Upload Bukti Transfer Perpanjangan Baru</label>
+                        <input type="file" name="bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf" required>
+                        <div class="form-text small">Harap unggah foto resi/bukti transfer yang jelas (Format: JPG, PNG, PDF).</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger text-white fw-bold rounded-pill px-4" id="btnSubmitRenew">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Request Perpanjangan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -1192,6 +1265,61 @@ $(document).ready(function() {
                     error: function() {
                         Swal.fire('Error', 'Gagal menghapus outlet.', 'error');
                     }
+                });
+            }
+        });
+    });
+
+    // Handle Click Perpanjang Langganan Outlet Modal
+    $(document).on('click', '.btn-perpanjang-outlet', function() {
+        let id = $(this).data('id');
+        let nama = $(this).data('nama');
+        $('#renew_id_outlet').val(id);
+        $('#renew_nama_outlet').text(nama);
+        $('#modalPerpanjangOutlet').modal('show');
+    });
+
+    // Handle Form Submit Perpanjangan Langganan via AJAX
+    $('#formPerpanjangOutlet').on('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        $('#btnSubmitRenew').prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim...');
+
+        $.ajax({
+            url: ACTION_URL,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(res) {
+                $('#btnSubmitRenew').prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Request Perpanjangan');
+                if (res.success) {
+                    $('#modalPerpanjangOutlet').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: res.message,
+                        confirmButtonColor: '#7D0A0A'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: res.message,
+                        confirmButtonColor: '#7D0A0A'
+                    });
+                }
+            },
+            error: function() {
+                $('#btnSubmitRenew').prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Request Perpanjangan');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan sistem saat mengirim request perpanjangan.',
+                    confirmButtonColor: '#7D0A0A'
                 });
             }
         });
