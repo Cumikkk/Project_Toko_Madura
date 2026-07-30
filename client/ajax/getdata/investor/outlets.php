@@ -19,7 +19,7 @@ $sql = "
         o.nama_outlet,
         o.alamat_outlet,
         o.kecamatan,
-        DATE_FORMAT(COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request), '%d/%m/%Y') as tanggal_bergabung
+        DATE_FORMAT(o.tanggal_bergabung, '%d/%m/%Y') as tanggal_bergabung
     FROM outlet o
     WHERE o.id_investor = {$idInvestor}
     ORDER BY o.id_outlet DESC

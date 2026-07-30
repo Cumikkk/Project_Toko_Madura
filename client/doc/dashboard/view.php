@@ -39,7 +39,7 @@ if ($role === 'master') {
 
     // Fetch Outlets (Limit 5)
     $listOutlets = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, COALESCE(o.tanggal_bergabung, o.tanggal_disetujui, o.tanggal_request) as tanggal_bergabung,
+        SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
                u_inv.nama_lengkap as nama_investor, i.kecamatan as kecamatan_investor, i.alamat_investor
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
@@ -207,7 +207,7 @@ if ($role === 'master') {
                                             </div>
                                         </td>
                                         <td class="small text-body-secondary">
-                                            <?= (!empty($out['tanggal_bergabung']) && strtotime($out['tanggal_bergabung']) > 0) ? date('d M Y', strtotime($out['tanggal_bergabung'])) : '-' ?>
+                                            <?= !empty($out['tanggal_bergabung']) ? date('d M Y', strtotime($out['tanggal_bergabung'])) : '-' ?>
                                         </td>
                                         <td>
                                             <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
