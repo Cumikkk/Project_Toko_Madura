@@ -108,5 +108,5 @@ CREATE TABLE pengaturan_sistem (
 - Menyelaraskan tampilan monitoring status outlet pada Portal Client Master (`client/doc/outlet/view.php` & `dashboard/view.php`) agar menampilkan status real-time dinamis (Aktif, Expired, Pending, Reject).
 - Mengubah default tema portal client saat pertama kali login menjadi Tema Terang (Light Mode / `MBR_THEME = 0`) pada `config/models/User.php`.
 - Memperbarui data dummy outlet realistis dengan username singkat (`toko1` s.d `toko6`) dan password standar `123` untuk memfasilitasi 6 skenario testing lengkap (Aktif Normal, Aktif Mendekati Expired, Expired, Pending Perpanjangan, Pending Pendaftaran Baru, Pendaftaran Ditolak).
-- Berhasil menggabungkan (merge) seluruh kode dan fitur terbaru dari branch `origin/tegar1` ke dalam branch `Cumikkk`, menyelesaikan conflict pada `client/doc/omzet/view.php` & `client/doc/outlet/view.php`, serta mempertahankan tombol `btn-cek-alasan` penolakan.
+- Mengembalikan modul Portal Admin Manajemen Outlet (`admin/doc/outlet/view.php`, `accept.php`, `reject.php`) 100% menggunakan kode bersih dan stabil milikmu untuk mencegah error.
 - Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.

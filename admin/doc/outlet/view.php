@@ -361,7 +361,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>', <?= $row['id_outlet'] ?>)">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>
@@ -372,14 +372,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
                                             </td>
                                             <td class="text-center">
-                                                 <div class="d-flex justify-content-center gap-1">
-                                                     <button type="button" class="btn btn-success btn-sm btn-accept" onclick="approveOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')">
-                                                         <i class="fas fa-check me-1"></i> Setujui
-                                                     </button>
-                                                     <button type="button" class="btn btn-danger btn-sm btn-reject" onclick="rejectOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')">
-                                                         <i class="fas fa-times me-1"></i> Tolak
-                                                     </button>
-                                                 </div>
+                                                <div class="d-flex justify-content-center gap-1">
+                                                    <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
+                                                        <i class="fas fa-check me-1"></i> Setujui
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm btn-reject" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
+                                                        <i class="fas fa-times me-1"></i> Tolak
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -525,139 +525,7 @@ function initDataTable(tabKey) {
 // ============================================================
 // Switch Tab — pure display:none/block
 // ============================================================
-window.approveOutlet = function(id, nama) {
-    if (!id) {
-        Swal.fire('Error', 'ID Outlet tidak ditemukan', 'error');
-        return;
-    }
-    Swal.fire({
-        title: 'Setujui Request Outlet?',
-        text: "Persetujuan ini akan mengaktifkan outlet " + (nama || '') + " secara resmi.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Setujui (Active)',
-        cancelButtonText: 'Batal'
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Memproses...',
-                text: 'Mengaktifkan outlet...',
-                allowOutsideClick: false,
-                didOpen: function() { Swal.showLoading(); }
-            });
-
-            $.ajax({
-                url: '<?= SystemInfo::app("ADMIN_URL") ?>/ajax/post/request-outlet/accept',
-                type: 'POST',
-                data: { id_outlet: id },
-                dataType: 'json',
-                success: function(resp) {
-                    if (resp.success) {
-                        Swal.fire('Berhasil!', resp.message || 'Request outlet berhasil disetujui.', 'success').then(function() { location.reload(); });
-                    } else {
-                        Swal.fire('Gagal!', resp.message || 'Gagal mengaktifkan outlet', 'error');
-                    }
-                },
-                error: function(xhr, status, err) {
-                    $.ajax({
-                        url: './../ajax/post/request-outlet/accept',
-                        type: 'POST',
-                        data: { id_outlet: id },
-                        dataType: 'json',
-                        success: function(resp) {
-                            if (resp.success) {
-                                Swal.fire('Berhasil!', resp.message || 'Request outlet berhasil disetujui.', 'success').then(function() { location.reload(); });
-                            } else {
-                                Swal.fire('Gagal!', resp.message || 'Gagal mengaktifkan outlet', 'error');
-                            }
-                        },
-                        error: function() {
-                            Swal.fire('Error!', 'Gagal terhubung ke server (' + (err || status) + ')', 'error');
-                        }
-                    });
-                }
-            });
-        }
-    });
-};
-
-window.rejectOutlet = function(id, nama) {
-    if (!id) {
-        Swal.fire('Error', 'ID Outlet tidak ditemukan', 'error');
-        return;
-    }
-    Swal.fire({
-        title: 'Tolak Request Outlet',
-        html: '<p class="text-muted mb-2" style="font-size:14px;">Apakah Anda yakin ingin menolak request pembukaan outlet <strong class="text-dark">' + (nama || '') + '</strong>?</p>',
-        input: 'textarea',
-        inputLabel: 'Alasan Penolakan',
-        inputPlaceholder: 'Masukkan alasan penolakan untuk investor...',
-        inputAttributes: {
-            'aria-label': 'Masukkan alasan penolakan untuk investor...'
-        },
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="fas fa-times me-1"></i> Proses Penolakan',
-        cancelButtonText: 'Batal',
-        scrollbarPadding: false,
-        heightAuto: false,
-        inputValidator: function(value) {
-            if (!value || !value.trim()) {
-                return 'Alasan penolakan wajib diisi!';
-            }
-        }
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            var alasan = result.value;
-            Swal.fire({
-                title: 'Memproses...',
-                text: 'Sedang memproses penolakan request outlet',
-                allowOutsideClick: false,
-                didOpen: function() {
-                    Swal.showLoading();
-                }
-            });
-
-            $.ajax({
-                url: '<?= SystemInfo::app("ADMIN_URL") ?>/ajax/post/request-outlet/reject',
-                type: 'POST',
-                data: { id_outlet: id, alasan_penolakan: alasan, alasan: alasan },
-                dataType: 'json',
-                success: function(resp) {
-                    if (resp.success) {
-                        Swal.fire('Berhasil!', resp.message || 'Request outlet berhasil ditolak.', 'success').then(function() { location.reload(); });
-                    } else {
-                        Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
-                    }
-                },
-                error: function(xhr, status, err) {
-                    $.ajax({
-                        url: './../ajax/post/request-outlet/reject',
-                        type: 'POST',
-                        data: { id_outlet: id, alasan_penolakan: alasan, alasan: alasan },
-                        dataType: 'json',
-                        success: function(resp) {
-                            if (resp.success) {
-                                Swal.fire('Berhasil!', resp.message || 'Request outlet berhasil ditolak.', 'success').then(function() { location.reload(); });
-                            } else {
-                                Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
-                            }
-                        },
-                        error: function() {
-                            Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
-                        }
-                    });
-                }
-            });
-        }
-    });
-};
-
-function previewBukti(filePath, namaOutlet, namaInvestor, biayaLangganan, idOutlet) {
+function previewBukti(filePath, namaOutlet, namaInvestor, biayaLangganan) {
     if (!filePath) {
         Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
         return;
@@ -688,32 +556,17 @@ function previewBukti(filePath, namaOutlet, namaInvestor, biayaLangganan, idOutl
         + '</div>'
         + '</div>';
 
-    var swalOpts = {
+    Swal.fire({
         title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
         html: infoHtml
             + '<img src="' + proxyUrl + '" '
             + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
             + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
         showCloseButton: true,
+        showConfirmButton: false,
         scrollbarPadding: false,
         heightAuto: false,
         width: 640
-    };
-
-    if (idOutlet) {
-        swalOpts.showConfirmButton = true;
-        swalOpts.confirmButtonText = '<i class="fas fa-check me-1"></i> Setujui Request Outlet (Active)';
-        swalOpts.confirmButtonColor = '#28a745';
-        swalOpts.showCancelButton = true;
-        swalOpts.cancelButtonText = 'Tutup';
-    } else {
-        swalOpts.showConfirmButton = false;
-    }
-
-    Swal.fire(swalOpts).then(function(res) {
-        if (res.isConfirmed && idOutlet) {
-            approveOutlet(idOutlet, namaOutlet);
-        }
     });
 }
 
@@ -763,17 +616,88 @@ $(document).ready(function() {
         switchOutletTab('reject');
     }
 
-    // Handle Accept & Reject Request Click
+    // Handle Accept Request Click
     $(document).on('click', '.btn-accept', function() {
-        var id   = $(this).data('id') || $(this).attr('data-id');
-        var nama = $(this).data('nama') || $(this).attr('data-nama');
-        approveOutlet(id, nama);
+        var id   = $(this).data('id');
+        var nama = $(this).data('nama');
+
+        Swal.fire({
+            title: 'Setujui Request Outlet?',
+            text: "Persetujuan ini akan mengaktifkan outlet " + nama + " secara resmi.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Setujui (Active)',
+            cancelButtonText: 'Batal'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/accept", { id_outlet: id }, function(resp) {
+                    if (resp.success) {
+                        Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
+                    } else {
+                        Swal.fire('Gagal!', resp.message || 'Gagal mengaktifkan outlet', 'error');
+                    }
+                }, 'json').fail(function() {
+                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                });
+            }
+        });
     });
 
+    // Handle Reject Request Click (SweetAlert2)
     $(document).on('click', '.btn-reject', function() {
-        var id   = $(this).data('id') || $(this).attr('data-id');
-        var nama = $(this).data('nama') || $(this).attr('data-nama');
-        rejectOutlet(id, nama);
+        var id   = $(this).data('id');
+        var nama = $(this).data('nama');
+
+        Swal.fire({
+            title: 'Tolak Request Outlet',
+            html: '<p class="text-muted mb-2" style="font-size:14px;">Apakah Anda yakin ingin menolak request pembukaan outlet <strong class="text-dark">' + nama + '</strong>?</p>',
+            input: 'textarea',
+            inputLabel: 'Alasan Penolakan',
+            inputPlaceholder: 'Masukkan alasan penolakan untuk investor...',
+            inputAttributes: {
+                'aria-label': 'Masukkan alasan penolakan untuk investor...'
+            },
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-times me-1"></i> Proses Penolakan',
+            cancelButtonText: 'Batal',
+            scrollbarPadding: false,
+            heightAuto: false,
+            inputValidator: function(value) {
+                if (!value || !value.trim()) {
+                    return 'Alasan penolakan wajib diisi!';
+                }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var alasan = result.value;
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang memproses penolakan request outlet',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/reject", {
+                    id_outlet: id,
+                    alasan_penolakan: alasan
+                }, function(resp) {
+                    if (resp.success) {
+                        Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
+                    } else {
+                        Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
+                    }
+                }, 'json').fail(function() {
+                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                });
+            }
+        });
     });
 });
 
