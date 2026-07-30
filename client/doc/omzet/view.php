@@ -296,8 +296,8 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
     <?php else : ?>
 
         <?php
-            $tglJoinRaw = !empty($outlet['created_at']) ? $outlet['created_at'] : '';
-            $tglJoinFormatted = !empty($tglJoinRaw) ? (date('d', strtotime($tglJoinRaw)) . ' ' . ($bulanIndo[(int)date('n', strtotime($tglJoinRaw))] ?? '') . ' ' . date('Y', strtotime($tglJoinRaw))) : '-';
+            $tglJoinRaw = !empty($outlet['tanggal_bergabung']) ? $outlet['tanggal_bergabung'] : (!empty($outlet['tanggal_disetujui']) ? $outlet['tanggal_disetujui'] : (!empty($outlet['tanggal_request']) ? $outlet['tanggal_request'] : ''));
+            $tglJoinFormatted = (!empty($tglJoinRaw) && strtotime($tglJoinRaw) > 0) ? (date('d', strtotime($tglJoinRaw)) . ' ' . ($bulanIndo[(int)date('n', strtotime($tglJoinRaw))] ?? '') . ' ' . date('Y', strtotime($tglJoinRaw))) : '-';
             $namaInvestorStr = !empty($outlet['nama_investor']) ? $outlet['nama_investor'] : 'Investor Mitra';
             $alamatOutletStr = !empty($outlet['alamat_outlet']) ? $outlet['alamat_outlet'] : 'Alamat belum diisi';
         ?>
