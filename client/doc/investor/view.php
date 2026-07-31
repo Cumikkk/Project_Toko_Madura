@@ -7,7 +7,29 @@ $user = User::user();
 $db = Database::connect();
 $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
-// Fetch all investors for Master Owner with complete outlet status breakdown
+// Pagination setup for Master Investor view
+$limit  = 10;
+$page   = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
+
+// Count Total Investors for Master
+$resTotalInv = $db->query("SELECT COUNT(id_investor) as total FROM investor WHERE id_master = {$userId} OR id_master IS NULL");
+$totalRecords = ($resTotalInv && $rowT = $resTotalInv->fetch_assoc()) ? (int)$rowT['total'] : 0;
+$totalPages   = ceil($totalRecords / $limit);
+
+// Count Total Active Outlets for Metric Card
+$resTotalActiveOut = $db->query("
+    SELECT COUNT(o.id_outlet) as total 
+    FROM outlet o
+    JOIN investor i ON i.id_investor = o.id_investor
+    WHERE (i.id_master = {$userId} OR i.id_master IS NULL)
+      AND o.status = 'active'
+      AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
+");
+$sumOutlets = ($resTotalActiveOut && $rowAO = $resTotalActiveOut->fetch_assoc()) ? (int)$rowAO['total'] : 0;
+$sumInvestors = $totalRecords;
+
+// Fetch Paginated Investors List
 $sqlInv = "
     SELECT 
         i.id_investor,
@@ -18,28 +40,29 @@ $sqlInv = "
         i.alamat_investor,
         i.tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet,
-        SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif,
-        SUM(CASE WHEN o.status = 'active' AND o.tgl_jatuh_tempo < NOW() THEN 1 ELSE 0 END) as total_expired,
-        SUM(CASE WHEN o.status = 'pending' THEN 1 ELSE 0 END) as total_pending,
-        SUM(CASE WHEN o.status = 'reject' THEN 1 ELSE 0 END) as total_reject
+        SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
     FROM investor i
     JOIN users u ON u.id_users = i.id_users
     LEFT JOIN outlet o ON o.id_investor = i.id_investor
     WHERE i.id_master = {$userId} OR i.id_master IS NULL
     GROUP BY i.id_investor
     ORDER BY i.id_investor DESC
+    LIMIT {$limit} OFFSET {$offset}
 ";
 
 $resInvestors = $db->query($sqlInv);
 $investorList = [];
-$sumInvestors = 0;
-$sumOutlets = 0;
-
 if ($resInvestors && $resInvestors->num_rows > 0) {
     while ($row = $resInvestors->fetch_assoc()) {
         $investorList[] = $row;
-        $sumInvestors++;
-        $sumOutlets += (int)$row['total_aktif'];
+    }
+}
+
+if (!function_exists('buildInvestorPageUrl')) {
+    function buildInvestorPageUrl($p) {
+        $params = $_GET;
+        $params['page'] = $p;
+        return '?' . http_build_query($params);
     }
 }
 ?>
@@ -170,6 +193,42 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination Controls & Record Summary Footer -->
+                    <?php if ($totalRecords > 0) : ?>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
+                            <div class="small text-body-secondary fw-semibold ms-1">
+                                Menampilkan <span class="text-body-emphasis fw-bold"><?= ($totalRecords > 0) ? ($offset + 1) : 0; ?></span> - <span class="text-body-emphasis fw-bold"><?= min($offset + $limit, $totalRecords); ?></span> dari <span class="text-body-emphasis fw-bold"><?= $totalRecords; ?></span> investor terdaftar
+                            </div>
+
+                            <?php if ($totalPages > 1) : ?>
+                                <nav aria-label="Navigasi Halaman Investor">
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <!-- Previous Page -->
+                                        <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildInvestorPageUrl($page - 1); ?>">
+                                                <i class="fa-solid fa-chevron-left me-1"></i> Prev
+                                            </a>
+                                        </li>
+
+                                        <!-- Page Numbers -->
+                                        <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
+                                            <li class="page-item <?= ($p == $page) ? 'active' : ''; ?>">
+                                                <a class="page-link text-body-emphasis px-3" href="<?= buildInvestorPageUrl($p); ?>"><?= $p; ?></a>
+                                            </li>
+                                        <?php endfor; ?>
+
+                                        <!-- Next Page -->
+                                        <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildInvestorPageUrl($page + 1); ?>">
+                                                Next <i class="fa-solid fa-chevron-right ms-1"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -179,25 +238,6 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
 <!-- Modal Detail Alamat Investor & Modal Detail Outlet -->
 <script type="text/javascript">
 $(document).ready(function() {
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-investor-saya')) {
-        $('#table-investor-saya').DataTable({
-            pageLength: 10,
-            responsive: true,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                zeroRecords: "Tidak ada data investor ditemukan",
-                paginate: {
-                    first: "Pertama",
-                    last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
-                }
-            }
-        });
-    }
 
     $(document).on('click', '.btn-detail-alamat-investor', function() {
         const nama = $(this).data('nama');

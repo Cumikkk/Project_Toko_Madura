@@ -12,6 +12,19 @@ if ($role === 'master') {
     // -------------------------------------------------------------
     // CLIENT OUTLET VIEW UNTUK MASTER (LIST OUTLET MONITORING)
     // -------------------------------------------------------------
+    $limitM  = 10;
+    $pageM   = isset($_GET['page_m']) ? max(1, (int)$_GET['page_m']) : 1;
+    $offsetM = ($pageM - 1) * $limitM;
+
+    $resTotalM = $db->query("
+        SELECT COUNT(DISTINCT o.id_outlet) as total
+        FROM outlet o
+        JOIN investor i ON i.id_investor = o.id_investor
+        WHERE i.id_master = {$userId} OR i.id_master IS NULL
+    ");
+    $totalRecordsM = ($resTotalM && $rowTM = $resTotalM->fetch_assoc()) ? (int)$rowTM['total'] : 0;
+    $totalPagesM   = ceil($totalRecordsM / $limitM);
+
     $listMasterOutlets = $db->query("
         SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
                o.status, o.tgl_jatuh_tempo, o.tipe_request,
@@ -22,8 +35,17 @@ if ($role === 'master') {
         LEFT JOIN users u_out ON u_out.id_users = o.id_users
         WHERE i.id_master = {$userId} OR i.id_master IS NULL
         ORDER BY o.id_outlet DESC
+        LIMIT {$limitM} OFFSET {$offsetM}
     ");
-    $totalOutletMaster = $listMasterOutlets ? $listMasterOutlets->num_rows : 0;
+    $totalOutletMaster = $totalRecordsM;
+
+    if (!function_exists('buildMasterOutletPageUrl')) {
+        function buildMasterOutletPageUrl($p) {
+            $params = $_GET;
+            $params['page_m'] = $p;
+            return '?' . http_build_query($params);
+        }
+    }
 ?>
 
 <div class="main-content-inner py-3 py-md-4">
@@ -167,6 +189,42 @@ if ($role === 'master') {
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination Controls & Record Summary Footer -->
+                    <?php if ($totalRecordsM > 0) : ?>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
+                            <div class="small text-body-secondary fw-semibold ms-1">
+                                Menampilkan <span class="text-body-emphasis fw-bold"><?= ($totalRecordsM > 0) ? ($offsetM + 1) : 0; ?></span> - <span class="text-body-emphasis fw-bold"><?= min($offsetM + $limitM, $totalRecordsM); ?></span> dari <span class="text-body-emphasis fw-bold"><?= $totalRecordsM; ?></span> outlet terikat
+                            </div>
+
+                            <?php if ($totalPagesM > 1) : ?>
+                                <nav aria-label="Navigasi Halaman Outlet Master">
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <!-- Previous Page -->
+                                        <li class="page-item <?= ($pageM <= 1) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildMasterOutletPageUrl($pageM - 1); ?>">
+                                                <i class="fa-solid fa-chevron-left me-1"></i> Prev
+                                            </a>
+                                        </li>
+
+                                        <!-- Page Numbers -->
+                                        <?php for ($p = 1; $p <= $totalPagesM; $p++) : ?>
+                                            <li class="page-item <?= ($p == $pageM) ? 'active' : ''; ?>">
+                                                <a class="page-link text-body-emphasis px-3" href="<?= buildMasterOutletPageUrl($p); ?>"><?= $p; ?></a>
+                                            </li>
+                                        <?php endfor; ?>
+
+                                        <!-- Next Page -->
+                                        <li class="page-item <?= ($pageM >= $totalPagesM) ? 'disabled' : ''; ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildMasterOutletPageUrl($pageM + 1); ?>">
+                                                Next <i class="fa-solid fa-chevron-right ms-1"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -175,25 +233,6 @@ if ($role === 'master') {
 
 <script>
 $(document).ready(function() {
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master-outlet-sub')) {
-        $('#table-master-outlet-sub').DataTable({
-            pageLength: 10,
-            responsive: true,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                zeroRecords: "Tidak ada data outlet ditemukan",
-                paginate: {
-                    first: "Pertama",
-                    last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
-                }
-            }
-        });
-    }
 
     $(document).on('click', '.btn-detail-alamat-investor', function() {
         const nama = $(this).data('nama');
