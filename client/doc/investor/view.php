@@ -68,7 +68,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
 <!-- 2. Metrics Summary Cards -->
 <div class="row g-3 mb-4">
     <!-- Card 1: Total Investor -->
-    <div class="col-12 col-sm-6 col-lg-4">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
@@ -84,7 +84,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
     </div>
 
     <!-- Card 2: Total Seluruh Outlet -->
-    <div class="col-12 col-sm-6 col-lg-4">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
@@ -94,22 +94,6 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                 </div>
                 <div class="rounded-4 bg-primary bg-opacity-10 p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
                     <i class="fa-solid fa-store text-primary fs-4"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: Total Outlet Aktif -->
-    <div class="col-12 col-sm-6 col-lg-4">
-        <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <span class="text-body-secondary small fw-bold text-uppercase d-block mb-1">Outlet Langganan Aktif</span>
-                    <h3 class="fw-extrabold text-success mb-0"><?= number_format($sumAktif); ?></h3>
-                    <small class="text-success" style="font-size: 11.5px;"><i class="fa-solid fa-circle-check me-1"></i>Masa aktif berjalan</small>
-                </div>
-                <div class="rounded-4 bg-success bg-opacity-10 p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
-                    <i class="fa-solid fa-circle-check text-success fs-4"></i>
                 </div>
             </div>
         </div>
@@ -161,7 +145,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="badge bg-light text-body-emphasis border"><i class="fa-solid fa-location-dot me-1 text-danger"></i>Kec. <?= htmlspecialchars($inv['kecamatan'] ?: 'N/A') ?></span>
+                                        <span class="badge bg-light text-body-emphasis border"><i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A') ?></span>
                                         <button type="button" class="btn btn-sm btn-outline-danger btn-detail-alamat-investor rounded-pill px-2.5 py-0.5" style="font-size: 11px; font-weight: 600;"
                                                 data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>"
                                                 data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-') ?>"
@@ -171,30 +155,9 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex flex-column align-items-center gap-1">
-                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold fs-12">
-                                            <i class="fa-solid fa-store me-1"></i><?= $inv['total_outlet'] ?> Toko
-                                        </span>
-                                        <?php if ($inv['total_outlet'] > 0) : ?>
-                                            <div class="d-flex align-items-center gap-1 mt-0.5">
-                                                <?php if ($inv['total_aktif'] > 0) : ?>
-                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 10px;" title="Toko Aktif">
-                                                        <i class="fa-solid fa-circle-check me-1"></i><?= $inv['total_aktif'] ?> Aktif
-                                                    </span>
-                                                <?php endif; ?>
-                                                <?php if ($inv['total_expired'] > 0) : ?>
-                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5" style="font-size: 10px;" title="Toko Expired">
-                                                        <i class="fa-solid fa-triangle-exclamation me-1"></i><?= $inv['total_expired'] ?> Expired
-                                                    </span>
-                                                <?php endif; ?>
-                                                <?php if ($inv['total_pending'] > 0) : ?>
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-0.5" style="font-size: 10px;" title="Menunggu Konfirmasi">
-                                                        <i class="fa-solid fa-clock me-1"></i><?= $inv['total_pending'] ?> Pending
-                                                    </span>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold fs-12">
+                                        <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']) ?> Outlet
+                                    </span>
                                 </td>
                                 <td class="text-center small text-body-secondary">
                                     <?= !empty($inv['tanggal_bergabung']) ? date("d M Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
@@ -281,14 +244,14 @@ $(document).ready(function() {
         let namaInv = $(this).data('nama');
 
         $('#modal-investor-nama').text(namaInv);
-        $('#container-detail-outlet').html('<tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>');
+        $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>');
         $('#modalDetailOutlet').modal('show');
 
         $.get("<?= SystemInfo::app('CLIENT_URL') ?>/ajax/get/investor/outlets", { id_investor: idInv }, function(resp) {
             if (resp.success && resp.data.length > 0) {
                 let html = '';
                 $.each(resp.data, function(idx, item) {
-                    let kecText = item.kecamatan ? 'Kec. ' + item.kecamatan : '-';
+                    let kecText = item.kecamatan ? item.kecamatan : '-';
                     let alamatBtn = '';
                     if (item.alamat_outlet) {
                         let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -304,18 +267,6 @@ $(document).ready(function() {
                         `;
                     }
                     let locColHtml = `<span>${kecText}</span>${alamatBtn}`;
-
-                    let statusBadge = '';
-                    if (item.status === 'active') {
-                        statusBadge = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1"><i class="fa-solid fa-circle-check me-1"></i>Aktif</span>';
-                    } else if (item.status === 'pending') {
-                        statusBadge = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1"><i class="fa-solid fa-clock me-1"></i>Menunggu Verifikasi</span>';
-                    } else if (item.status === 'reject') {
-                        statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1"><i class="fa-solid fa-circle-xmark me-1"></i>Ditolak Admin</span>';
-                    } else {
-                        statusBadge = '<span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1">Non-Aktif</span>';
-                    }
-
                     let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tanggal_disetujui ? item.tanggal_disetujui : '-');
 
                     html += `
@@ -323,14 +274,13 @@ $(document).ready(function() {
                             <td class="text-center fw-bold text-muted">${idx + 1}</td>
                             <td><strong class="text-primary fs-6">${item.nama_outlet}</strong></td>
                             <td><small class="text-body-secondary">${locColHtml}</small></td>
-                            <td class="text-center">${statusBadge}</td>
                             <td class="text-center small text-body-secondary">${tglJoin}</td>
                         </tr>
                     `;
                 });
                 $('#container-detail-outlet').html(html);
             } else {
-                $('#container-detail-outlet').html('<tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko terdaftar.</td></tr>');
+                $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko terdaftar.</td></tr>');
             }
         }, 'json');
     });
@@ -391,12 +341,11 @@ $(document).ready(function() {
                                 <th class="text-center" style="width: 5%;">No</th>
                                 <th>Nama Outlet</th>
                                 <th>Kecamatan & Detail Alamat</th>
-                                <th class="text-center">Status Toko</th>
                                 <th class="text-center">Tanggal Join</th>
                             </tr>
                         </thead>
                         <tbody id="container-detail-outlet">
-                            <tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat data outlet...</td></tr>
+                            <tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat data outlet...</td></tr>
                         </tbody>
                     </table>
                 </div>
