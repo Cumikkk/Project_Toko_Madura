@@ -34,171 +34,174 @@ $resInvestors = $db->query($sqlInv);
 $investorList = [];
 $sumInvestors = 0;
 $sumOutlets = 0;
-$sumAktif = 0;
 
 if ($resInvestors && $resInvestors->num_rows > 0) {
     while ($row = $resInvestors->fetch_assoc()) {
         $investorList[] = $row;
         $sumInvestors++;
         $sumOutlets += (int)$row['total_outlet'];
-        $sumAktif += (int)$row['total_aktif'];
     }
 }
 ?>
 
-<!-- 1. Header Banner Card (Maroon Gradient Style) -->
-<div class="card border-0 shadow-sm mb-4 text-white overflow-hidden position-relative" style="background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%); border-radius: 16px;">
-    <div class="card-body p-4 position-relative z-1 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-white bg-opacity-15 p-3 d-flex align-items-center justify-content-center shadow-xs" style="width: 58px; height: 58px; backdrop-filter: blur(4px);">
-                <i class="fa-solid fa-users-gear text-warning fs-3"></i>
-            </div>
-            <div>
-                <h4 class="fw-extrabold text-white mb-1" style="letter-spacing: 0.3px;">Data Investor Pemodal</h4>
-                <p class="text-white-50 small mb-0">Monitoring portofolio mitra investor dan daftar toko yang berada di bawah naungan Master Owner</p>
+<div class="main-content-inner py-3 py-md-4">
+    <!-- 1. Header Banner Card (Maroon Gradient Style) -->
+    <div class="row mb-3 mb-md-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%); color: #fff;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center g-3">
+                        <div class="col-12 col-md-8">
+                            <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-crown text-warning me-1"></i> Master Access
+                            </span>
+                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor</h2>
+                            <p class="text-white-50 small mb-0">Monitoring portofolio mitra investor dan daftar toko yang berada di bawah naungan Master Owner</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-20 shadow-xs" style="backdrop-filter: blur(6px);">
-            <i class="fa-solid fa-crown text-warning me-1"></i>
-            <span class="fw-bold text-white small text-uppercase">MASTER OWNER PANEL</span>
+    </div>
+
+    <!-- 2. Metrics Summary Cards -->
+    <div class="row g-2 g-md-3 mb-4">
+        <!-- Card 1: Total Investor -->
+        <div class="col-12 col-md-6">
+            <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px; border-left: 5px solid #7D0A0A !important;">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);">
+                        <i class="fa-solid fa-user-tie fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-body-secondary small fw-semibold text-uppercase">Total Investor Mitra</div>
+                        <div class="fs-4 fw-bold text-danger mb-0"><?= number_format($sumInvestors, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Investor</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Total Seluruh Outlet -->
+        <div class="col-12 col-md-6">
+            <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px; border-left: 5px solid #0d6efd !important;">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                        <i class="fa-solid fa-store fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-body-secondary small fw-semibold text-uppercase">Total Toko / Outlet</div>
+                        <div class="fs-4 fw-bold text-primary mb-0"><?= number_format($sumOutlets, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Table Card Data Investor -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border border-body-subtle shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-body py-3 px-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle">
+                    <h5 class="fw-bold text-body-emphasis mb-0 fs-6"><i class="fa-solid fa-users me-2 text-danger"></i>Daftar Investor Mitra</h5>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1.5 fw-semibold fs-12">
+                        <i class="fa-solid fa-shield-halved me-1"></i>Master Owner View
+                    </span>
+                </div>
+                <div class="card-body p-2 p-md-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 w-100" id="table-master-investor">
+                            <thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary">
+                                <tr>
+                                    <th class="ps-3 text-center" style="width: 50px;">No</th>
+                                    <th>Nama Investor</th>
+                                    <th>Lokasi & Alamat</th>
+                                    <th class="text-center">Portofolio Outlet</th>
+                                    <th class="text-center">Tanggal Bergabung</th>
+                                    <th class="text-center" style="width: 120px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="border-0">
+                                <?php if (!empty($investorList)) : ?>
+                                    <?php $no = 1; foreach ($investorList as $inv) : ?>
+                                        <tr>
+                                            <td class="ps-3 text-center fw-bold text-body-secondary"><?= $no++ ?></td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 36px; height: 36px; font-size: 13px;">
+                                                        <?= strtoupper(substr($inv['nama_lengkap'], 0, 1)); ?>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($inv['nama_lengkap']) ?></div>
+                                                        <div class="text-body-secondary small">
+                                                            <span class="text-danger me-1"><i class="fa-solid fa-at me-0.5"></i><?= htmlspecialchars($inv['username'] ?? '-') ?></span> &bull; 
+                                                            <span class="text-success ms-1"><i class="fa-solid fa-phone me-0.5"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                    <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A') ?>
+                                                    </span>
+                                                    <button type="button" class="btn btn-xs btn-outline-danger btn-detail-alamat-investor rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 10.5px;"
+                                                            data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>"
+                                                            data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-') ?>"
+                                                            data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-') ?>">
+                                                        <i class="fa-solid fa-map-location-dot me-1"></i>Detail Alamat
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12">
+                                                    <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']) ?> Outlet
+                                                </span>
+                                            </td>
+                                            <td class="text-center small text-body-secondary">
+                                                <?= !empty($inv['tanggal_bergabung']) ? date("d M Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-xs btn-lihat-outlet rounded-pill px-3 py-1.5 shadow-xs fw-bold text-nowrap" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 11px;" data-id="<?= $inv['id_investor'] ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>">
+                                                    <i class="fa-solid fa-eye me-1"></i> Lihat Toko
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-body-secondary">
+                                            <i class="fa-solid fa-users-slash fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                                            Belum ada data investor terdaftar di sistem.
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- 2. Metrics Summary Cards -->
-<div class="row g-3 mb-4">
-    <!-- Card 1: Total Investor -->
-    <div class="col-12 col-md-6">
-        <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <span class="text-body-secondary small fw-bold text-uppercase d-block mb-1">Total Investor Mitra</span>
-                    <h3 class="fw-extrabold text-body-emphasis mb-0"><?= number_format($sumInvestors); ?></h3>
-                    <small class="text-secondary" style="font-size: 11.5px;"><i class="fa-solid fa-user-check text-success me-1"></i>Terhubung dengan Master</small>
-                </div>
-                <div class="rounded-4 bg-danger bg-opacity-10 p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
-                    <i class="fa-solid fa-user-tie text-danger fs-4"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 2: Total Seluruh Outlet -->
-    <div class="col-12 col-md-6">
-        <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <span class="text-body-secondary small fw-bold text-uppercase d-block mb-1">Total Toko / Outlet</span>
-                    <h3 class="fw-extrabold text-primary mb-0"><?= number_format($sumOutlets); ?></h3>
-                    <small class="text-secondary" style="font-size: 11.5px;"><i class="fa-solid fa-store me-1 text-primary"></i>Keseluruhan Portofolio</small>
-                </div>
-                <div class="rounded-4 bg-primary bg-opacity-10 p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
-                    <i class="fa-solid fa-store text-primary fs-4"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 3. Table Card Data Investor -->
-<div class="card border-0 shadow-sm" style="border-radius: 16px; background: var(--bs-card-bg, #fff);">
-    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <i class="fa-solid fa-users text-danger fs-5"></i>
-            <h5 class="fw-bold text-body-emphasis mb-0">Daftar Investor Mitra</h5>
-        </div>
-        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1.5 fw-semibold fs-12">
-            <i class="fa-solid fa-shield-halved me-1"></i>Master Owner View
-        </span>
-    </div>
-    <div class="card-body p-3 p-md-4">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle w-100" id="table-master-investor">
-                <thead class="bg-body-secondary text-uppercase small text-body-secondary">
-                    <tr>
-                        <th class="text-center" style="width: 5%;">No</th>
-                        <th>Nama Investor</th>
-                        <th>Lokasi & Alamat</th>
-                        <th class="text-center">Portofolio Outlet</th>
-                        <th class="text-center">Tanggal Bergabung</th>
-                        <th class="text-center" style="width: 15%;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($investorList)) : ?>
-                        <?php $no = 1; foreach ($investorList as $inv) : ?>
-                            <tr>
-                                <td class="text-center fw-bold text-body-secondary"><?= $no++ ?></td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 14px;">
-                                            <?= strtoupper(substr($inv['nama_lengkap'], 0, 1)); ?>
-                                        </div>
-                                        <div>
-                                            <strong class="text-body-emphasis fs-6 d-block mb-0"><?= htmlspecialchars($inv['nama_lengkap']) ?></strong>
-                                            <small class="text-body-secondary">
-                                                <i class="fa-solid fa-at me-1 text-danger"></i><?= htmlspecialchars($inv['username'] ?? '-') ?> &bull; 
-                                                <i class="fa-solid fa-phone ms-1 me-1 text-success"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="badge bg-light text-body-emphasis border"><i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A') ?></span>
-                                        <button type="button" class="btn btn-sm btn-outline-danger btn-detail-alamat-investor rounded-pill px-2.5 py-0.5" style="font-size: 11px; font-weight: 600;"
-                                                data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>"
-                                                data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-') ?>"
-                                                data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-') ?>">
-                                            <i class="fa-solid fa-map-location-dot me-1"></i> Detail Alamat
-                                        </button>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold fs-12">
-                                        <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']) ?> Outlet
-                                    </span>
-                                </td>
-                                <td class="text-center small text-body-secondary">
-                                    <?= !empty($inv['tanggal_bergabung']) ? date("d M Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-danger btn-sm btn-lihat-outlet rounded-pill px-3 py-1 shadow-xs fw-semibold" data-id="<?= $inv['id_investor'] ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap']) ?>">
-                                        <i class="fa-solid fa-eye me-1"></i> Lihat Toko
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-body-secondary">
-                                <i class="fa-solid fa-users-slash fs-1 text-muted opacity-50 mb-2 d-block"></i>
-                                Belum ada data investor terdaftar di sistem.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Detail Alamat Investor (SweetAlert2 Trigger & Standard Fallback) -->
+<!-- Modal Detail Alamat Investor & Modal Detail Outlet -->
 <script type="text/javascript">
 $(document).ready(function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master-investor')) {
         $('#table-master-investor').DataTable({
-            processing: true,
-            scrollX: true,
+            responsive: true,
+            autoWidth: false,
             language: {
                 search: "Cari Investor:",
                 lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ investor",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ investor",
+                infoEmpty: "Tidak ada data investor",
+                zeroRecords: "Data investor tidak ditemukan",
                 paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "Lanjut",
-                    previous: "Kembali"
+                    first: '<i class="fa-solid fa-angles-left"></i>',
+                    last: '<i class="fa-solid fa-angles-right"></i>',
+                    next: '<i class="fa-solid fa-angle-right"></i>',
+                    previous: '<i class="fa-solid fa-angle-left"></i>'
                 }
             }
         });
