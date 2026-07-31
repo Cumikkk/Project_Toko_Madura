@@ -297,16 +297,18 @@ $(document).ready(function() {
 });
 </script>
 
-<!-- Modal Detail Outlet Investor (Maroon Gradient Style - Clean Client Standard) -->
+<!-- Modal Detail Outlet Investor (Clean Client Portal Standard) -->
 <div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-            <div class="modal-header text-white px-4 py-3 border-0" style="background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);">
-                <h5 class="modal-title d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-store text-warning"></i>
-                    <span>Portofolio Toko: <span id="modal-investor-nama" class="fw-extrabold text-warning"></span></span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6">
+                        <i class="fa-solid fa-store me-2 text-danger"></i>Portofolio Toko Outlet
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;">Mitra Investor: <span id="modal-investor-nama" class="fw-bold text-danger"></span></small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
                 <div class="table-responsive">
@@ -320,13 +322,13 @@ $(document).ready(function() {
                             </tr>
                         </thead>
                         <tbody id="container-detail-outlet" class="border-0">
-                            <tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat data outlet...</td></tr>
+                            <tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="modal-footer bg-light px-4 py-2.5 border-0">
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-footer bg-body-tertiary px-4 py-2.5 border-top border-body-subtle">
+                <button type="button" class="btn btn-sm btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
