@@ -113,12 +113,12 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($outletData['persentase_potongan'] ?? '10.00'); ?>" required>
                                     <span class="input-group-text border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
-                                        <div class="d-flex flex-column h-100" style="width: 22px;">
-                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
-                                                <i class="fa-solid fa-chevron-up"></i>
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fas fa-chevron-up"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
-                                                <i class="fa-solid fa-chevron-down"></i>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(-1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fas fa-chevron-down"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -135,12 +135,12 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($defaultInvestor); ?>" required oninput="balanceAdminOutletSplit('investor')">
                                     <span class="input-group-text border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
-                                        <div class="d-flex flex-column h-100" style="width: 22px;">
-                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
-                                                <i class="fa-solid fa-chevron-up"></i>
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fas fa-chevron-up"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
-                                                <i class="fa-solid fa-chevron-down"></i>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(-1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fas fa-chevron-down"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -157,12 +157,12 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($defaultOutlet); ?>" required oninput="balanceAdminOutletSplit('outlet')">
                                     <span class="input-group-text border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
-                                        <div class="d-flex flex-column h-100" style="width: 22px;">
-                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
-                                                <i class="fa-solid fa-chevron-up"></i>
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fas fa-chevron-up"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
-                                                <i class="fa-solid fa-chevron-down"></i>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(-1)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fas fa-chevron-down"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -171,7 +171,17 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 5. ALAMAT LENGKAP -->
+                        <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Active)</label>
+                                <input type="date" class="form-control fw-bold" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
+                                    value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
+                                <small class="text-muted d-block mt-1">Ubah tanggal ini untuk memperpanjang masa langganan outlet expired agar otomatis aktif kembali tanpa buat akun baru.</small>
+                            </div>
+                        </div>
+
+                        <!-- 6. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet Lengkap</label>
