@@ -99,7 +99,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">Daftar Outlet Toko Madura</h2>
+        <h2 class="main-content-title tx-24 mg-b-5">Daftar Outlet Madura</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Outlet</li>
@@ -171,9 +171,9 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Nama Toko</th>
-                                    <th class="text-center">Pengelola Toko</th>
-                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Nama Outlet</th>
+                                    <th class="text-center">Pengelola Outlet</th>
+                                    <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Tanggal Disetujui</th>
                                     <th class="text-center">Jatuh Tempo Langganan</th>
@@ -187,15 +187,19 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum ada pengelola') ?></strong>
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
                                                 <?php if (!empty($row['no_hp_toko'])) : ?>
                                                     <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
+                                            <td class="text-center">
+                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
+                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
+                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
+                                                            title="Lihat Alamat Lengkap">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </button>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -224,17 +228,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
-                                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
+                                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
-                                                        <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Toko" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
+                                                        <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Outlet" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data toko aktif.</td></tr>
+                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data outlet aktif.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -248,9 +252,9 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Nama Toko</th>
-                                    <th class="text-center">Pengelola Toko</th>
-                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Nama Outlet</th>
+                                    <th class="text-center">Pengelola Outlet</th>
+                                    <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Tanggal Disetujui</th>
                                     <th class="text-center">Jatuh Tempo Langganan</th>
@@ -264,15 +268,19 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum ada pengelola') ?></strong>
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
                                                 <?php if (!empty($row['no_hp_toko'])) : ?>
                                                     <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
+                                            <td class="text-center">
+                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
+                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
+                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
+                                                            title="Lihat Alamat Lengkap">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </button>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -296,10 +304,10 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
-                                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Toko"><i class="fas fa-edit"></i></a>
+                                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
-                                                        <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Toko" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
+                                                        <button type="button" class="btn btn-danger btn-sm text-white btn-delete" title="Hapus Outlet" onclick="deleteOutlet(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-trash"></i></button>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -321,8 +329,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Toko</th>
-                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Pengelola Outlet</th>
+                                    <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor Pemodal</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
@@ -349,10 +357,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
+                                            <td class="text-center">
+                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
+                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
+                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
+                                                            title="Lihat Alamat Lengkap">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </button>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start">
@@ -404,8 +416,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Toko</th>
-                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Pengelola Outlet</th>
+                                    <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor Pemodal</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
@@ -433,10 +445,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
+                                            <td class="text-center">
+                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
+                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
+                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
+                                                            title="Lihat Alamat Lengkap">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </button>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start">
