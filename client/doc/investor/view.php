@@ -288,10 +288,22 @@ $(document).ready(function() {
             if (resp.success && resp.data.length > 0) {
                 let html = '';
                 $.each(resp.data, function(idx, item) {
-                    let locParts = [];
-                    if (item.kecamatan) locParts.push('Kec. ' + item.kecamatan);
-                    if (item.alamat_outlet) locParts.push(item.alamat_outlet);
-                    let locText = locParts.length > 0 ? locParts.join(' - ') : '-';
+                    let kecText = item.kecamatan ? 'Kec. ' + item.kecamatan : '-';
+                    let alamatBtn = '';
+                    if (item.alamat_outlet) {
+                        let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        let safeAlamat = String(item.alamat_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        alamatBtn = `
+                            <button type="button" class="btn btn-outline-danger btn-xs ms-1 btn-detail-alamat-outlet-item" 
+                                    data-nama="${safeNama}" 
+                                    data-kecamatan="${kecText}"
+                                    data-alamat="${safeAlamat}" 
+                                    title="Lihat Alamat Lengkap">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        `;
+                    }
+                    let locColHtml = `<span>${kecText}</span>${alamatBtn}`;
 
                     let statusBadge = '';
                     if (item.status === 'active') {
@@ -310,7 +322,7 @@ $(document).ready(function() {
                         <tr>
                             <td class="text-center fw-bold text-muted">${idx + 1}</td>
                             <td><strong class="text-primary fs-6">${item.nama_outlet}</strong></td>
-                            <td><small class="text-body-secondary"><i class="fa-solid fa-location-dot text-danger me-1"></i>${locText}</small></td>
+                            <td><small class="text-body-secondary">${locColHtml}</small></td>
                             <td class="text-center">${statusBadge}</td>
                             <td class="text-center small text-body-secondary">${tglJoin}</td>
                         </tr>
@@ -321,6 +333,41 @@ $(document).ready(function() {
                 $('#container-detail-outlet').html('<tr><td colspan="5" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko terdaftar.</td></tr>');
             }
         }, 'json');
+    });
+
+    $(document).on('click', '.btn-detail-alamat-outlet-item', function() {
+        const nama = $(this).data('nama');
+        const kec = $(this).data('kecamatan');
+        const alamat = $(this).data('alamat');
+
+        let html = `
+            <div class="text-start fs-14">
+                <div class="p-3 bg-light rounded-3 border mb-2">
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                        <span class="text-body-secondary"><i class="fa-solid fa-store text-danger me-2"></i>Nama Outlet</span>
+                        <span class="fw-bold text-dark">${nama}</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                        <span class="text-body-secondary"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Kecamatan</span>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span>
+                    </div>
+                    <div class="pt-1">
+                        <span class="text-body-secondary d-block mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i>Alamat Lengkap Outlet:</span>
+                        <div class="p-2.5 bg-white rounded border text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.5;">${alamat}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        Swal.fire({
+            title: '<div class="fw-bold text-danger fs-5"><i class="fa-solid fa-building-user me-2"></i>Detail Lokasi Outlet</div>',
+            html: html,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#7D0A0A',
+            customClass: {
+                popup: 'rounded-4'
+            }
+        });
     });
 });
 </script>
@@ -343,7 +390,7 @@ $(document).ready(function() {
                             <tr>
                                 <th class="text-center" style="width: 5%;">No</th>
                                 <th>Nama Outlet</th>
-                                <th>Lokasi Alamat</th>
+                                <th>Kecamatan & Detail Alamat</th>
                                 <th class="text-center">Status Toko</th>
                                 <th class="text-center">Tanggal Join</th>
                             </tr>
