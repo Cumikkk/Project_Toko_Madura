@@ -231,7 +231,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data toko aktif.</td></tr>
+                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data toko aktif.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -402,9 +402,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Biaya Langganan</th>
+                                    <th class="text-center">Bukti Bayar</th>
                                     <th class="text-center">Alasan Penolakan</th>
                                     <th class="text-center">Tanggal Request</th>
                                     <th class="text-center">Tanggal Ditolak</th>
+                                    <th class="text-center" style="width: 10%;">#</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -439,6 +441,15 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-end text-muted">
                                                 Rp <?= number_format($row['nominal_biaya'], 0, ',', '.') ?>
                                             </td>
+                                            <td class="text-center">
+                                                <?php if (!empty($row['bukti_pembayaran'])) : ?>
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>')">
+                                                        <i class="fas fa-image me-1"></i> Lihat Bukti
+                                                    </button>
+                                                <?php else : ?>
+                                                    <span class="badge bg-light text-dark">Belum ada</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-start">
                                                 <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i><?= htmlspecialchars($row['alasan_penolakan'] ?? 'Tidak ada catatan') ?></span>
                                             </td>
@@ -448,10 +459,15 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
                                             </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-warning btn-sm text-dark btn-edit-alasan" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Edit Alasan Penolakan">
+                                                    <i class="fas fa-edit me-1"></i> Edit
+                                                </button>
+                                            </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada request outlet yang ditolak.</td></tr>
+                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada request outlet yang ditolak.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -692,6 +708,62 @@ $(document).ready(function() {
                         Swal.fire('Berhasil!', resp.message, 'success').then(function() { location.reload(); });
                     } else {
                         Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
+                    }
+                }, 'json').fail(function() {
+                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                });
+            }
+        });
+    });
+
+    // Handle Edit Alasan Penolakan Click (SweetAlert2)
+    $(document).on('click', '.btn-edit-alasan', function() {
+        var id     = $(this).data('id');
+        var nama   = $(this).data('nama');
+        var alasan = $(this).data('alasan');
+
+        Swal.fire({
+            title: 'Edit Alasan Penolakan',
+            html: '<p class="text-muted mb-2" style="font-size:14px;">Ubah alasan penolakan untuk outlet <strong class="text-dark">' + nama + '</strong></p>',
+            input: 'textarea',
+            inputLabel: 'Alasan Penolakan',
+            inputValue: alasan,
+            inputPlaceholder: 'Masukkan alasan penolakan terbaru...',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            confirmButtonText: '<i class="fas fa-save me-1"></i> Simpan Perubahan',
+            cancelButtonColor: '#6c757d',
+            cancelButtonText: 'Batal',
+            scrollbarPadding: false,
+            heightAuto: false,
+            inputValidator: function(value) {
+                if (!value || !value.trim()) {
+                    return 'Alasan penolakan wajib diisi!';
+                }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var alasanBaru = result.value;
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang memperbarui alasan penolakan',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/update-reject-reason", {
+                    id_outlet: id,
+                    alasan_penolakan: alasanBaru
+                }, function(resp) {
+                    if (resp.success) {
+                        Swal.fire('Berhasil!', resp.message, 'success').then(function() {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal!', resp.message || 'Gagal memperbarui alasan penolakan', 'error');
                     }
                 }, 'json').fail(function() {
                     Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
