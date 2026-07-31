@@ -74,7 +74,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                         <i class="fa-solid fa-user-tie fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary small fw-semibold">Total Investor Mitra</div>
+                        <div class="text-body-secondary small fw-semibold">Total Investor</div>
                         <div class="fs-4 fw-bold text-danger mb-0"><?= number_format($sumInvestors, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Investor</span></div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                         <i class="fa-solid fa-store fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary small fw-semibold">Total Toko / Outlet</div>
+                        <div class="text-body-secondary small fw-semibold">Total Outlet</div>
                         <div class="fs-4 fw-bold text-success mb-0"><?= number_format($sumOutlets, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span></div>
                     </div>
                 </div>
