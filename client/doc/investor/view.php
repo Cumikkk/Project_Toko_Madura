@@ -304,7 +304,7 @@ $(document).ready(function() {
             <div class="modal-header text-white px-4 py-3 border-0" style="background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);">
                 <h5 class="modal-title d-flex align-items-center gap-2">
                     <i class="fa-solid fa-store text-warning"></i>
-                    <span>Portofolio Toko Outlet: <span id="modal-investor-nama" class="fw-extrabold text-warning"></span></span>
+                    <span>Portofolio Toko: <span id="modal-investor-nama" class="fw-extrabold text-warning"></span></span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
