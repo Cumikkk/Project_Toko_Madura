@@ -61,10 +61,10 @@ $investorList = $db->query("
         <!-- KIRI: INFORMASI OUTLET & FINANSIAL -->
         <div class="col-lg-6 mb-3">
             <div class="card custom-card h-100 mb-0">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">
-                        <i class="fa fa-building text-primary me-2"></i>Informasi Utama & Finansial Outlet
-                    </h5>
+                <div class="card-header">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5 class="card-title">Informasi Utama & Finansial Outlet</h5>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -140,10 +140,10 @@ $investorList = $db->query("
         <!-- KANAN: AKUN AKSES PENGELOLA OUTLET -->
         <div class="col-lg-6 mb-3">
             <div class="card custom-card h-100 mb-0">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">
-                        <i class="fa fa-user-circle text-success me-2"></i>Akun Akses Pengelola Outlet
-                    </h5>
+                <div class="card-header">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5 class="card-title">Akun Akses Pengelola Outlet</h5>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
