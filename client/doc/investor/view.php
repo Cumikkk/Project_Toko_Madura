@@ -112,11 +112,11 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                         <table class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
-                                    <th class="ps-3" style="width: 50px;">No</th>
+                                    <th class="ps-3 text-center" style="width: 50px;">No</th>
                                     <th>Nama Investor</th>
-                                    <th>Lokasi & Alamat</th>
-                                    <th>Portofolio Outlet</th>
-                                    <th>Tanggal Bergabung</th>
+                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Portofolio Outlet</th>
+                                    <th class="text-center">Tanggal Bergabung</th>
                                     <th class="text-center" style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>
@@ -124,16 +124,15 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                                 <?php if (!empty($investorList)) : ?>
                                     <?php $no = 1; foreach ($investorList as $inv) : ?>
                                         <tr>
-                                            <td class="ps-3 fw-bold text-body-secondary"><?= $no++ ?></td>
+                                            <td class="ps-3 text-center fw-bold text-body-secondary"><?= $no++ ?></td>
                                             <td>
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($inv['nama_lengkap']) ?></div>
                                                 <div class="text-body-secondary small mt-0.5">
-                                                    <span class="text-danger me-1"><i class="fa-solid fa-at me-0.5"></i><?= htmlspecialchars($inv['username'] ?? '-') ?></span> &bull; 
-                                                    <span class="text-success ms-1"><i class="fa-solid fa-phone me-0.5"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?></span>
+                                                    <span class="text-success"><i class="fa-solid fa-phone me-1"></i><?= htmlspecialchars($inv['no_hp'] ?? '-') ?></span>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                            <td class="text-center">
+                                                <div class="d-flex align-items-center justify-content-center gap-1.5 flex-wrap">
                                                     <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
                                                         <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A') ?>
                                                     </span>
@@ -145,12 +144,12 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12">
                                                     <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']) ?> Outlet
                                                 </span>
                                             </td>
-                                            <td class="small text-body-secondary">
+                                            <td class="text-center small text-body-secondary">
                                                 <?= !empty($inv['tanggal_bergabung']) ? date("d M Y", strtotime($inv['tanggal_bergabung'])) : '-' ?>
                                             </td>
                                             <td class="text-center">
@@ -249,8 +248,8 @@ $(document).ready(function() {
                         <tr>
                             <td class="ps-3 text-center fw-bold text-muted">${idx + 1}</td>
                             <td><strong class="text-body-emphasis fs-6">${item.nama_outlet}</strong></td>
-                            <td>${locColHtml}</td>
-                            <td class="small text-body-secondary">${tglJoin}</td>
+                            <td class="text-center">${locColHtml}</td>
+                            <td class="text-center small text-body-secondary">${tglJoin}</td>
                         </tr>
                     `;
                 });
@@ -316,8 +315,8 @@ $(document).ready(function() {
                             <tr>
                                 <th class="ps-3 text-center" style="width: 50px;">No</th>
                                 <th>Nama Outlet</th>
-                                <th>Kecamatan & Detail Alamat</th>
-                                <th>Tanggal Join</th>
+                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Tanggal Join</th>
                             </tr>
                         </thead>
                         <tbody id="container-detail-outlet" class="border-0">
