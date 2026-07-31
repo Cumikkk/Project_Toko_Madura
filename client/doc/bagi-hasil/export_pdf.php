@@ -133,13 +133,14 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
-        o.persen_bagian_investor,
+        IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
+    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, inv.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 

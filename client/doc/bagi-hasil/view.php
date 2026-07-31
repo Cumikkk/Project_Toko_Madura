@@ -28,7 +28,7 @@ if ($role === 'investor') {
     }
 } else {
     // Logged in user is Outlet
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, o.persen_bagian_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor FROM outlet o LEFT JOIN investor inv ON (inv.id_investor = o.id_investor) WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];
@@ -43,6 +43,14 @@ $potonganGlobal = 10.00;
 if (!empty($outletsList[0]['persentase_potongan'])) {
     $potonganGlobal = (float)$outletsList[0]['persentase_potongan'];
 }
+
+$totOmzet = 0;
+$totPotongan10 = 0;
+$totHakInvestor = 0;
+$totHakOutlet = 0;
+$totBersihOutlet = 0;
+
+$outletsBreakdown = [];
 
 // Filter Logic (Outlet, Rentang Tanggal, Bulan, Tahun)
 $selectedOutletId   = isset($_GET['outlet_id']) ? (int)$_GET['outlet_id'] : (isset($_GET['id_outlet']) ? (int)$_GET['id_outlet'] : (isset($_GET['outlet']) ? (int)$_GET['outlet'] : 0));
@@ -158,13 +166,14 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
-        o.persen_bagian_investor,
+        IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
+    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, inv.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 

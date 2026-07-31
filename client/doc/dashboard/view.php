@@ -31,9 +31,10 @@ if ($role === 'investor') {
         SELECT 
             IFNULL(SUM(lo.omzet), 0) as total_omzet, 
             IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan,
-            IFNULL(SUM(lo.nominal_potongan * (o.persen_bagian_investor / 100.0)), 0) as total_hak_investor
+            IFNULL(SUM(lo.nominal_potongan * (IFNULL(inv.persen_bagian_investor, 50.00) / 100.0)), 0) as total_hak_investor
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
+        LEFT JOIN investor inv ON inv.id_investor = o.id_investor
         WHERE o.id_investor = {$investorId}
     ")->fetch_assoc();
 
