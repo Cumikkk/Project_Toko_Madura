@@ -92,31 +92,6 @@ $investorList = $db->query("
                                 <small class="text-muted">Pilih investor pemodal yang menaungi outlet ini.</small>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="persen_bagian_investor" class="form-label fw-bold">Bagi Hasil Investor (%)</label>
-                                <div class="input-group">
-                                    <input type="number" step="0.5" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor"
-                                        placeholder="Contoh: 50.00"
-                                        value="<?= htmlspecialchars($outletData['persen_bagian_investor'] ?? '50.00'); ?>" required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="persentase_potongan" class="form-label fw-bold">Potongan Manajemen (%)</label>
-                                <div class="input-group">
-                                    <input type="number" step="0.5" min="0" max="100" class="form-control" id="persentase_potongan" name="persentase_potongan"
-                                        placeholder="Contoh: 10.00"
-                                        value="<?= htmlspecialchars($outletData['persentase_potongan'] ?? '10.00'); ?>" required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <small class="text-muted d-block">Bagi hasil keuntungan hak Investor. Contoh: Jika diisi 60%, maka Investor menerima 60% dan Pengelola Outlet menerima 40%.</small>
-                        </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
