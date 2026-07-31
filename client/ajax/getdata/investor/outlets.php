@@ -24,6 +24,8 @@ $sql = "
         DATE_FORMAT(o.tanggal_disetujui, '%d/%m/%Y %H:%i') as tanggal_disetujui
     FROM outlet o
     WHERE o.id_investor = {$idInvestor}
+      AND o.status = 'active'
+      AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= CURRENT_DATE())
     ORDER BY o.id_outlet DESC
 ";
 

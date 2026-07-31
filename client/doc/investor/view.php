@@ -39,7 +39,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
     while ($row = $resInvestors->fetch_assoc()) {
         $investorList[] = $row;
         $sumInvestors++;
-        $sumOutlets += (int)$row['total_outlet'];
+        $sumOutlets += (int)$row['total_aktif'];
     }
 }
 ?>
@@ -66,7 +66,7 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
 
     <!-- 2. Metrics Summary Cards (Clean Border & Gradient Icons - Matching Outlet Page) -->
     <div class="row g-2 g-md-3 mb-4">
-        <!-- Card 1: Total Investor -->
+        <!-- Card 1: Total Investor Saya -->
         <div class="col-md-6 col-12">
             <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px; border-left: 5px solid #7D0A0A !important;">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
@@ -74,14 +74,14 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                         <i class="fa-solid fa-user-tie fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary small fw-semibold">Total Investor</div>
-                        <div class="fs-4 fw-bold text-danger mb-0"><?= number_format($sumInvestors, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Investor</span></div>
+                        <div class="text-body-secondary small fw-semibold">Total Investor Saya</div>
+                        <div class="fs-4 fw-bold text-danger mb-0"><?= number_format($sumInvestors, 0, ',', '.'); ?></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Card 2: Total Seluruh Outlet -->
+        <!-- Card 2: Total Outlet Aktif -->
         <div class="col-md-6 col-12">
             <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 14px; border-left: 5px solid #198754 !important;">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
@@ -97,25 +97,25 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
         </div>
     </div>
 
-    <!-- 3. Table Card Data Investor (Clean Bootstrap Table - 100% Matching Client Outlet Page) -->
+    <!-- 3. Table Card Data Investor (Clean Bootstrap Table with Pagination) -->
     <div class="row">
         <div class="col-12">
             <div class="card border border-body-subtle shadow-sm" style="border-radius: 16px;">
                 <div class="card-header bg-body py-3 px-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle">
-                    <h5 class="fw-bold text-body-emphasis mb-0 fs-6"><i class="fa-solid fa-users me-2 text-danger"></i>Daftar Investor Mitra</h5>
+                    <h5 class="fw-bold text-body-emphasis mb-0 fs-6"><i class="fa-solid fa-users me-2 text-danger"></i>Daftar Investor Saya</h5>
                     <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1.5 fw-semibold fs-12">
                         <i class="fa-solid fa-shield-halved me-1"></i>Master Owner View
                     </span>
                 </div>
                 <div class="card-body p-2 p-md-4">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0 w-100">
+                        <table id="table-investor-saya" class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3 text-center" style="width: 50px;">No</th>
                                     <th>Nama Investor</th>
                                     <th class="text-center">Kecamatan</th>
-                                    <th class="text-center">Portofolio Outlet</th>
+                                    <th class="text-center">Total Outlet</th>
                                     <th class="text-center">Tanggal Bergabung</th>
                                     <th class="text-center" style="width: 120px;">Aksi</th>
                                 </tr>
@@ -179,6 +179,26 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
 <!-- Modal Detail Alamat Investor & Modal Detail Outlet -->
 <script type="text/javascript">
 $(document).ready(function() {
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-investor-saya')) {
+        $('#table-investor-saya').DataTable({
+            pageLength: 10,
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                zeroRecords: "Tidak ada data investor ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    }
+
     $(document).on('click', '.btn-detail-alamat-investor', function() {
         const nama = $(this).data('nama');
         const kec = $(this).data('kecamatan');
@@ -214,11 +234,16 @@ $(document).ready(function() {
         });
     });
 
-    $('.btn-lihat-outlet').on('click', function() {
+    $(document).on('click', '.btn-lihat-outlet', function() {
         let idInv = $(this).data('id');
         let namaInv = $(this).data('nama');
 
         $('#modal-investor-nama').text(namaInv);
+
+        if ($.fn.DataTable && $.fn.DataTable.isDataTable('#table-modal-outlet')) {
+            $('#table-modal-outlet').DataTable().destroy();
+        }
+
         $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>');
         $('#modalDetailOutlet').modal('show');
 
@@ -254,8 +279,28 @@ $(document).ready(function() {
                     `;
                 });
                 $('#container-detail-outlet').html(html);
+
+                if ($.fn.DataTable) {
+                    $('#table-modal-outlet').DataTable({
+                        pageLength: 5,
+                        responsive: true,
+                        language: {
+                            search: "Cari:",
+                            lengthMenu: "Tampilkan _MENU_ data",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                            zeroRecords: "Tidak ada outlet aktif ditemukan",
+                            paginate: {
+                                first: "Pertama",
+                                last: "Terakhir",
+                                next: "Selanjutnya",
+                                previous: "Sebelumnya"
+                            }
+                        }
+                    });
+                }
             } else {
-                $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko terdaftar.</td></tr>');
+                $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko aktif.</td></tr>');
             }
         }, 'json');
     });
@@ -304,15 +349,14 @@ $(document).ready(function() {
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6">
-                        <i class="fa-solid fa-store me-2 text-danger"></i>Portofolio Toko Outlet
+                        <i class="fa-solid fa-store me-2 text-danger"></i>Total Outlet Investor: <span id="modal-investor-nama" class="fw-bold text-danger"></span>
                     </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Mitra Investor: <span id="modal-investor-nama" class="fw-bold text-danger"></span></small>
                 </div>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table id="table-modal-outlet" class="table table-hover align-middle mb-0 w-100">
                         <thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary">
                             <tr>
                                 <th class="ps-3 text-center" style="width: 50px;">No</th>
