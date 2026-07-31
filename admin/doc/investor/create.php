@@ -88,8 +88,8 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                             </div>
                         </div>
 
-                        <!-- BARIS 3: MASTER OWNER -->
-                        <div class="col-md-12 mb-3">
+                        <!-- BARIS 3: MASTER OWNER & KECAMATAN -->
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="id_master" class="form-label fw-bold">Master Owner</label>
                                 <select class="form-control" id="id_master" name="id_master" required>
@@ -105,19 +105,17 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                                 <small class="text-muted">Pilih Master Owner tempat investor ini dinaungi.</small>
                             </div>
                         </div>
-
-                        <!-- BARIS 4: KECAMATAN -->
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
                             </div>
                         </div>
 
-                        <!-- BARIS 5: ALAMAT INVESTOR -->
+                        <!-- BARIS 4: ALAMAT INVESTOR -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor</label>
+                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor Lengkap</label>
                                 <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
