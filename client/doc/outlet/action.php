@@ -68,6 +68,7 @@ try {
         }
         $noHp = trim($db->real_escape_string($_POST['no_hp'] ?? ''));
         $persentasePotongan = isset($_POST['persentase_potongan']) ? (float)$_POST['persentase_potongan'] : 10.00;
+        $persenBagianInvestor = isset($_POST['persen_bagian_investor']) ? (float)$_POST['persen_bagian_investor'] : 50.00;
 
         // Handle Upload Bukti Pembayaran
         $buktiPath = '';
@@ -106,7 +107,7 @@ try {
 
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persen_bagian_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
@@ -229,11 +230,16 @@ try {
         $idOutlet = (int)($_POST['id_outlet'] ?? 0);
         $namaOutlet = trim($_POST['nama_outlet'] ?? '');
         $alamatOutlet = trim($_POST['alamat_outlet'] ?? '');
+        $kecamatan = trim($_POST['kecamatan'] ?? '');
+        $persentasePotongan = (float)($_POST['persentase_potongan'] ?? 10.00);
+        $persenBagianInvestor = (float)($_POST['persen_bagian_investor'] ?? 50.00);
+        $namaPengelola = trim($_POST['nama_pengelola'] ?? '');
+        $noHp = trim($_POST['no_hp'] ?? '');
         $username = trim($_POST['username'] ?? '');
         $password = trim($_POST['password'] ?? '');
 
-        if (empty($idOutlet) || empty($namaOutlet) || empty($username)) {
-            JsonResponse(['success' => false, 'message' => 'Mohon lengkapi Nama Outlet dan Username.']);
+        if (empty($idOutlet) || empty($namaOutlet) || empty($kecamatan) || empty($alamatOutlet) || empty($namaPengelola) || empty($noHp) || empty($username)) {
+            JsonResponse(['success' => false, 'message' => 'Mohon lengkapi semua kolom wajib (Nama Outlet, Kecamatan, Alamat, Nama Pengelola, No HP, Username).']);
         }
 
         // Verify ownership
@@ -253,20 +259,40 @@ try {
         // Escape variables right before query execution
         $safeNamaOutlet = $db->real_escape_string($namaOutlet);
         $safeAlamatOutlet = $db->real_escape_string($alamatOutlet);
+        $safeKecamatan = $db->real_escape_string($kecamatan);
 
         // Update Outlet
-        $updateOutlet = $db->query("UPDATE outlet SET nama_outlet = '{$safeNamaOutlet}', alamat_outlet = '{$safeAlamatOutlet}' WHERE id_outlet = {$idOutlet}");
+        $updateOutlet = $db->query("UPDATE outlet SET 
+            nama_outlet = '{$safeNamaOutlet}', 
+            alamat_outlet = '{$safeAlamatOutlet}', 
+            kecamatan = '{$safeKecamatan}', 
+            persentase_potongan = {$persentasePotongan}, 
+            persen_bagian_investor = {$persenBagianInvestor} 
+            WHERE id_outlet = {$idOutlet}");
+            
         if (!$updateOutlet) {
             JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
         }
 
         // Update User Account
+        $safeNamaPengelola = $db->real_escape_string($namaPengelola);
+        $safeNoHp = $db->real_escape_string($noHp);
+        
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
-            $db->query("UPDATE users SET nama_lengkap = '{$safeNamaOutlet}', username = '{$safeUsername}', password = '{$escapedHash}' WHERE id_users = {$associatedUserId}");
+            $db->query("UPDATE users SET 
+                nama_lengkap = '{$safeNamaPengelola}', 
+                no_hp = '{$safeNoHp}', 
+                username = '{$safeUsername}', 
+                password = '{$escapedHash}' 
+                WHERE id_users = {$associatedUserId}");
         } else {
-            $db->query("UPDATE users SET nama_lengkap = '{$safeNamaOutlet}', username = '{$safeUsername}' WHERE id_users = {$associatedUserId}");
+            $db->query("UPDATE users SET 
+                nama_lengkap = '{$safeNamaPengelola}', 
+                no_hp = '{$safeNoHp}', 
+                username = '{$safeUsername}' 
+                WHERE id_users = {$associatedUserId}");
         }
 
         JsonResponse(['success' => true, 'message' => 'Data Outlet berhasil diperbarui!']);

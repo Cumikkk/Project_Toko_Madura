@@ -408,36 +408,9 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                     </div>
                 </div>
             </div>
-        </div>        <?php if (!$isInvestor) : ?>
-        <!-- Navigation Bar (Top Control Pills - Khusus Outlet / Kasir) -->
-        <div class="card border border-body-subtle shadow-sm mb-3 mb-md-4" style="border-radius: 16px;">
-            <div class="card-body p-2 p-md-3 d-flex align-items-center justify-content-center justify-content-sm-start">
-                <!-- Navigation Tabs (Input Omzet & Riwayat & Potongan) -->
-                <div class="custom-tab-container shadow-sm w-100 w-sm-auto">
-                    <ul class="nav nav-pills w-100" id="omzetNavTabs" role="tablist">
-                        <li class="nav-item flex-fill col-6" role="presentation">
-                            <button class="nav-link w-100 justify-content-center <?= ($activeTab !== 'riwayat') ? 'active' : ''; ?>" id="btnTabInput" data-bs-toggle="pill" data-bs-target="#paneInputOmzet" type="button" role="tab">
-                                <i class="fa-light fa-plus-circle me-1.5"></i>Input Omzet Harian
-                            </button>
-                        </li>
-                        <li class="nav-item flex-fill col-6" role="presentation">
-                            <button class="nav-link w-100 justify-content-center <?= ($activeTab === 'riwayat') ? 'active' : ''; ?>" id="btnTabRiwayat" data-bs-toggle="pill" data-bs-target="#paneRiwayatOmzet" type="button" role="tab">
-                                <i class="fa-light fa-clock-rotate-left me-1.5"></i>Riwayat &amp; Potongan
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <!-- Dynamic Content Tabs -->
-        <div class="tab-content" id="omzetTabContent">
-            
-            <?php if (!$isInvestor) : ?>
-            <!-- TAB 1: FORM INPUT OMZET HARIAN (CENTERED CLEAN LAYOUT) -->
-            <div class="tab-pane fade <?= ($activeTab !== 'riwayat') ? 'show active' : ''; ?>" id="paneInputOmzet" role="tabpanel">
-                <div class="row justify-content-center">
+        </div>        <?php if ($activeTab !== 'riwayat') : ?>
+                <!-- HALAMAN 1: FORM INPUT OMZET HARIAN -->
+                <div class="row justify-content-center mb-4">
                     <div class="col-12 col-md-10 col-lg-8 col-xl-7">
                         <div class="card border border-body-subtle shadow-sm mb-0" style="border-radius: 20px;">
                             <div class="card-body p-4 p-md-5">
@@ -499,13 +472,8 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                         </div>
                     </div>
                 </div>
-            </div>
-            <?php endif; ?>
-
-            <!-- ========================================================================= -->
-            <!-- TAB 2: RIWAYAT & REKAP BAGI HASIL PERIODE -->
-            <!-- ========================================================================= -->
-            <div class="tab-pane fade <?= ($activeTab === 'riwayat') ? 'show active' : ''; ?>" id="paneRiwayatOmzet" role="tabpanel">
+            <?php else : ?>
+                <!-- HALAMAN 2: RIWAYAT & REKAP BAGI HASIL -->
                 <?php 
                     // Aturan Potongan 10% Diterapkan Setiap Hari (10% Per Hari)
                     $isDeductionActive = true;
@@ -688,10 +656,8 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                 <div class="card border border-body-subtle shadow-sm mb-3" style="border-radius: 16px;">
                     <div class="card-body p-3 p-md-4">
                         <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 mb-3">
-                            <div class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-2 text-wrap text-start">
-                                <i class="fa-solid fa-arrows-split-up-and-left me-1"></i> Pembagian Hasil Dari Potongan <?= number_format($presentaseGlobal, 0); ?>%
-                            </div>
-                            <span class="text-body-secondary small fw-semibold">Rincian alokasi 50% Investor : 50% Outlet</span>
+                           
+                           
                         </div>
 
                         <div class="row g-3">
@@ -766,13 +732,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
 
                 <!-- Compact Footer Distance -->
                 <div class="pb-2"></div>
-
-            </div>
-            <!-- /TAB 2 PANE END -->
-
-        </div>
-        <!-- /TAB CONTENT END -->
-
+            <?php endif; ?>
     <?php endif; ?>
 </div>
 
@@ -1156,11 +1116,11 @@ $(document).ready(function() {
                                     <span class="text-body-emphasis">${dt.waktu_input || '-'}</span>
                                 </div>
                                 <div class="d-flex justify-content-between small">
-                                     <span class="text-body-secondary"><i class="fa-solid fa-scissors me-1 text-warning"></i>Potongan ${dt.persentase_potongan || '<?= number_format($presentaseGlobal, 0); ?>'}%:</span>
-                                     <span class="badge bg-danger text-white fw-bold">
-                                         Dipotong Setiap Hari
-                                     </span>
-                                 </div>
+                                      <span class="text-body-secondary"><i class="fa-solid fa-scissors me-1 text-warning"></i>Potongan ${parseFloat(dt.persentase_potongan) || '<?= (float)$presentaseGlobal; ?>'}%:</span>
+                                      <span class="badge bg-danger text-white fw-bold">
+                                          Dipotong Setiap Hari
+                                      </span>
+                                  </div>
                             </div>
                         </div>
                     `;

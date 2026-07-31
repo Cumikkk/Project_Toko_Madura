@@ -133,12 +133,13 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
+        o.persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 
@@ -149,19 +150,22 @@ if ($resBagiHasil) {
         $omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
         $ratePotongan = (float)($row['persentase_potongan'] ?? 10.00);
+        $rateInvestor = (float)($row['persen_bagian_investor'] ?? 50.00);
+        $rateOutlet = 100.00 - $rateInvestor;
 
         // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
         $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
         
-        $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-        $hakOutlet   = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+        $hakInvestor = round($potongan10 * ($rateInvestor / 100.0), 2);
+        $hakOutlet   = round($potongan10 * ($rateOutlet / 100.0), 2);
         $hasAnyLastDayDone = true;
 
         $row['persentase_potongan'] = $ratePotongan;
+        $row['persen_bagian_investor'] = $rateInvestor;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
-        $row['total_bersih_outlet'] = $omzet - $potongan10;
+        $row['total_bersih_outlet'] = ($omzet - $potongan10) + $hakOutlet;
         $row['is_last_day_done'] = true;
 
         $totOmzet += $omzet;
@@ -331,7 +335,7 @@ ob_start();
                 <table style="width: 100%;">
                     <tr>
                         <td class="meta-label">Akses Role</td>
-                        <td class="meta-value">: <?= strtoupper($role); ?> PANEL</td>
+                        <td class="meta-value">: <?= strtoupper($role); ?></td>
                     </tr>
                     <tr>
                         <td class="meta-label">Jumlah Outlet</td>
@@ -344,10 +348,6 @@ ob_start();
                     <tr>
                         <td class="meta-label">Periode Laporan</td>
                         <td class="meta-value">: <?= htmlspecialchars($periodeLabelStr); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Skema Bagi Hasil</td>
-                        <td class="meta-value">: 50% Investor : 50% Outlet (Dari Potongan <?= number_format($potonganGlobal, 0); ?>%)</td>
                     </tr>
                 </table>
             </td>
@@ -373,7 +373,7 @@ ob_start();
             </td>
             <td style="width: 25%; padding: 4px;">
                 <div class="summary-card" style="border-top: 3px solid #16a34a;">
-                    <div class="summary-card-title">Hak Investor (50%)</div>
+                    <div class="summary-card-title">Hak Investor</div>
                     <div class="summary-card-val text-success">
                         <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakInvestor, 0, ',', '.') : '-'; ?>
                     </div>
@@ -381,7 +381,7 @@ ob_start();
             </td>
             <td style="width: 25%; padding: 4px;">
                 <div class="summary-card" style="border-top: 3px solid #d97706;">
-                    <div class="summary-card-title">Hak Outlet (50%)</div>
+                    <div class="summary-card-title">Hak Outlet</div>
                     <div class="summary-card-val text-warning">
                         <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
                     </div>
@@ -397,9 +397,9 @@ ob_start();
                 <th class="text-center" style="width: 30px;">No</th>
                 <th style="width: 140px;">Nama Outlet</th>
                 <th class="text-end">Total Omzet (100%)</th>
-                <th class="text-end">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</th>
-                <th class="text-end">Hak Investor (50%)</th>
-                <th class="text-end">Hak Outlet (50%)</th>
+                <th class="text-end">Potongan Outlet</th>
+                <th class="text-end">Hak Investor</th>
+                <th class="text-end">Hak Outlet</th>
                 <th class="text-end">Bersih Outlet Total</th>
             </tr>
         </thead>
@@ -413,13 +413,13 @@ ob_start();
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                         <td class="text-end text-danger fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['potongan_10'], 0, ',', '.') : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['potongan_10'], 0, ',', '.') . ' (' . (float)$r['persentase_potongan'] . '%)' : '-'; ?>
                         </td>
                         <td class="text-end text-success fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_investor'], 0, ',', '.') : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_investor'], 0, ',', '.') . ' (' . (float)$r['persen_bagian_investor'] . '%)' : '-'; ?>
                         </td>
                         <td class="text-end text-warning fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_outlet'], 0, ',', '.') : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_outlet'], 0, ',', '.') . ' (' . (float)(100.00 - $r['persen_bagian_investor']) . '%)' : '-'; ?>
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
                     </tr>
@@ -452,23 +452,7 @@ ob_start();
         <?php endif; ?>
     </table>
 
-    <!-- Signatures -->
-    <table class="footer-table">
-        <tr>
-            <td>
-                <div>Pihak Pengelola Outlet,</div>
-                <div class="signature-space"></div>
-                <div style="font-weight: bold; text-decoration: underline;">Perwakilan Outlet Toko Madura</div>
-                <div style="font-size: 9px; color: #64748b;">Penanggung Jawab Operasional</div>
-            </td>
-            <td>
-                <div>Pihak Investor Toko Madura,</div>
-                <div class="signature-space"></div>
-                <div style="font-weight: bold; text-decoration: underline;"><?= htmlspecialchars($user['nama_lengkap'] ?? 'Investor Toko Madura'); ?></div>
-                <div style="font-size: 9px; color: #64748b;">Investor Utama</div>
-            </td>
-        </tr>
-    </table>
+
 
 </body>
 </html>
