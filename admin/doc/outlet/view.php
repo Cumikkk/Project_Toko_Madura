@@ -460,9 +460,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
                                             </td>
                                             <td class="text-center">
-                                                <button type="button" class="btn btn-warning btn-sm text-dark btn-edit-alasan" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" data-alasan="<?= htmlspecialchars($row['alasan_penolakan'] ?? '', ENT_QUOTES, 'UTF-8') ?>" title="Edit Alasan Penolakan">
-                                                    <i class="fas fa-edit me-1"></i> Edit
-                                                </button>
+                                                <div class="action d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-success btn-sm text-white btn-edit" onclick='editAlasanPenolakan(<?= $row['id_outlet'] ?>, <?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alasan_penolakan'] ?? '') ?>)' title="Edit Alasan Penolakan">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -715,19 +717,20 @@ $(document).ready(function() {
             }
         });
     });
+});
 
-    // Handle Edit Alasan Penolakan Click (SweetAlert2)
-    $(document).on('click', '.btn-edit-alasan', function() {
-        var id     = $(this).data('id');
-        var nama   = $(this).data('nama');
-        var alasan = $(this).data('alasan');
-
+// ============================================================
+// Edit Alasan Penolakan — direct function called via onclick
+// ============================================================
+function editAlasanPenolakan(id, nama, alasan) {
+    var safeNama = (nama || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Edit Alasan Penolakan',
-            html: '<p class="text-muted mb-2" style="font-size:14px;">Ubah alasan penolakan untuk outlet <strong class="text-dark">' + nama + '</strong></p>',
+            html: '<p class="text-muted mb-2" style="font-size:14px;">Ubah alasan penolakan untuk outlet <strong class="text-dark">' + safeNama + '</strong></p>',
             input: 'textarea',
             inputLabel: 'Alasan Penolakan',
-            inputValue: alasan,
+            inputValue: alasan || '',
             inputPlaceholder: 'Masukkan alasan penolakan terbaru...',
             icon: 'warning',
             showCancelButton: true,
@@ -770,8 +773,23 @@ $(document).ready(function() {
                 });
             }
         });
-    });
-});
+    } else {
+        var alasanBaru = prompt('Edit Alasan Penolakan untuk ' + nama + ':', alasan);
+        if (alasanBaru !== null && alasanBaru.trim() !== '') {
+            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/request-outlet/update-reject-reason", {
+                id_outlet: id,
+                alasan_penolakan: alasanBaru
+            }, function(resp) {
+                if (resp.success) {
+                    alert(resp.message);
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Gagal memperbarui alasan penolakan');
+                }
+            }, 'json');
+        }
+    }
+}
 
 function deleteOutlet(id, nama) {
     let alertHtml = `
