@@ -73,7 +73,7 @@ if ($role === 'master') {
 
                 <div class="card-body p-2 p-md-4">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0 w-100">
+                        <table id="table-master-outlet-sub" class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3" style="width: 50px;">No</th>
@@ -148,12 +148,12 @@ if ($role === 'master') {
                                                         <i class="fa-solid fa-triangle-exclamation me-1"></i>Expired
                                                     </span>
                                                 <?php elseif ($isNearExpiryM) : ?>
-                                                    <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i>Aktif (H-<?= $daysRemainingM; ?>)
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-clock me-1"></i>Akan Kadaluarsa (<?= $daysRemainingM ?> hari)
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i>Aktif
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
+                                                        <i class="fa-solid fa-circle-check me-1"></i>Active
                                                     </span>
                                                 <?php endif; ?>
                                             </td>
@@ -175,6 +175,26 @@ if ($role === 'master') {
 
 <script>
 $(document).ready(function() {
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master-outlet-sub')) {
+        $('#table-master-outlet-sub').DataTable({
+            pageLength: 10,
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                zeroRecords: "Tidak ada data outlet ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    }
+
     $(document).on('click', '.btn-detail-alamat-investor', function() {
         const nama = $(this).data('nama');
         const kec = $(this).data('kecamatan');
