@@ -51,23 +51,24 @@ $investorList = $db->query("
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-10 mx-auto mb-3">
-        <div class="card custom-card overflow-hidden">
-            <div class="card-header">
-                <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title"><?= $isEdit ? "Form Edit Data Outlet" : "Form Registrasi Outlet"; ?></h5>
-                </div>
-            </div>
-            <div class="card-body">
-                <form action="" method="post" id="form-create-outlet">
-                    <?php if ($isEdit) : ?>
-                        <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
-                        <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
-                    <?php endif; ?>
+<form action="" method="post" id="form-create-outlet">
+    <?php if ($isEdit) : ?>
+        <input type="hidden" name="id_outlet" value="<?= $idOutlet; ?>">
+        <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
+    <?php endif; ?>
 
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <!-- CARD 1: INFORMASI OUTLET & FINANSIAL -->
+            <div class="card custom-card overflow-hidden mb-4">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-0">
+                        <i class="fa fa-building text-primary me-2"></i>Informasi Utama & Finansial Outlet
+                    </h5>
+                </div>
+                <div class="card-body">
                     <div class="row">
-                        <!-- 1. NAMA OUTLET - INVESTOR -->
+                        <!-- BARIS 1: NAMA OUTLET & INVESTOR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Outlet</label>
@@ -78,7 +79,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="id_investor" class="form-label fw-bold">Investor Pemodal</label>
+                                <label for="id_investor" class="form-label fw-bold">Investor</label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
@@ -93,7 +94,7 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 2. BAGI HASIL INVESTOR - POTONGAN MANAJEMEN -->
+                        <!-- BARIS 2: FINANSIAL (BAGI HASIL INVESTOR & POTONGAN MANAJEMEN) -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
@@ -103,7 +104,7 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($outletData['persen_bagian_investor'] ?? '50.00'); ?>" required>
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <small class="text-muted">Set/sesuaikan persentase bagi hasil untuk investor ini.</small>
+                                <small class="text-muted">Bagi hasil keuntungan hak Investor. Contoh: Jika diisi 60%, maka Investor menerima 60% dan Pengelola Outlet menerima 40%.</small>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -119,44 +120,7 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 3. NAMA PENGELOLA OUTLET - NO HP -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Outlet (Kasir)</label>
-                                <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
-                                    placeholder="Contoh: Budi Santoso"
-                                    value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp Pengelola (Opsional)</label>
-                                <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
-                                    placeholder="Contoh: 081234567890"
-                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
-                            </div>
-                        </div>
-
-                        <!-- 4. USERNAME - PASSWORD -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_username" class="form-label fw-bold">Username Pengelola</label>
-                                <input type="text" class="form-control" id="kasir_username" name="kasir_username"
-                                    placeholder="Contoh: kasir_waru"
-                                    value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_password" class="form-label fw-bold">Password Pengelola <?= $isEdit ? "(Opsional)" : ""; ?></label>
-                                <input type="password" class="form-control" id="kasir_password" name="kasir_password"
-                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
-                                    <?= $isEdit ? '' : 'required'; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
-                            </div>
-                        </div>
-
-                        <!-- 5. KECAMATAN & ALAMAT LENGKAP -->
+                        <!-- BARIS 3: KECAMATAN & ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
@@ -172,19 +136,69 @@ $investorList = $db->query("
                                     placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
-                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary">Batal</a>
-                            <button type="submit" class="btn btn-primary" data-original-text="Submit">
-                                <?= $isEdit ? "Simpan Perubahan" : "Simpan Outlet"; ?>
-                            </button>
+            <!-- CARD 2: AKUN AKSES PENGELOLA OUTLET (KASIR) -->
+            <div class="card custom-card overflow-hidden mb-4">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-0">
+                        <i class="fa fa-user-circle text-success me-2"></i>Akun Akses Pengelola Outlet
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- BARIS 1: NAMA PENGELOLA OUTLET & NO HP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Outlet</label>
+                                <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
+                                    placeholder="Contoh: Budi Santoso"
+                                    value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
+                                    placeholder="Contoh: 081234567890"
+                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- BARIS 2: USERNAME & PASSWORD -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_username" class="form-label fw-bold">Username</label>
+                                <input type="text" class="form-control" id="kasir_username" name="kasir_username"
+                                    placeholder="Contoh: kasir_waru"
+                                    value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
+                                <input type="password" class="form-control" id="kasir_password" name="kasir_password"
+                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
+                                    <?= $isEdit ? '' : 'required'; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI -->
+            <div class="d-flex justify-content-end gap-2 mb-4">
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary px-4">Batal</a>
+                <button type="submit" class="btn btn-primary px-4" data-original-text="Submit">
+                    <i class="fas fa-save me-1"></i> <?= $isEdit ? "Simpan Perubahan" : "Simpan Outlet"; ?>
+                </button>
             </div>
         </div>
     </div>
-</div>
+</form>
 
 <script type="text/javascript">
     $(document).ready(function() {
