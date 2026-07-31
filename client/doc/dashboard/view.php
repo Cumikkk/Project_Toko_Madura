@@ -28,7 +28,10 @@ if ($role === 'investor') {
 
     $resOutletCount = $db->query("SELECT COUNT(*) as total FROM outlet WHERE id_investor = {$investorId}")->fetch_assoc()['total'] ?? 0;
     $resOmzetTot = $db->query("
-        SELECT IFNULL(SUM(lo.omzet), 0) as total_omzet, IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan
+        SELECT 
+            IFNULL(SUM(lo.omzet), 0) as total_omzet, 
+            IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan,
+            IFNULL(SUM(lo.nominal_potongan * (o.persen_bagian_investor / 100.0)), 0) as total_hak_investor
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
         WHERE o.id_investor = {$investorId}
@@ -37,7 +40,7 @@ if ($role === 'investor') {
     $totalOmzet = (float)($resOmzetTot['total_omzet'] ?? 0);
     $totalPotongan = (float)($resOmzetTot['total_potongan'] ?? 0);
     $omzetBersih = $totalOmzet - $totalPotongan;
-    $hakInvestor = $omzetBersih * ($persenInvestor / 100.0);
+    $hakInvestor = (float)($resOmzetTot['total_hak_investor'] ?? 0);
 
     $resRecent = $db->query("
         SELECT o.nama_outlet, lo.periode_laporan, lo.omzet, lo.nominal_potongan, lo.waktu_input
@@ -78,7 +81,7 @@ if ($role === 'investor') {
     <div class="col-md-4">
         <div class="card custom-card border-0 shadow-sm" style="border-radius: 16px;">
             <div class="card-body p-4">
-                <span class="text-muted fw-bold text-uppercase fs-12">Estimasi Hak Investor (<?= $persenInvestor ?>%)</span>
+                <span class="text-muted fw-bold text-uppercase fs-12">Estimasi Hak Investor</span>
                 <h2 class="fw-bold text-success mb-0 mt-1">Rp <?= number_format($hakInvestor, 0, ',', '.') ?></h2>
             </div>
         </div>

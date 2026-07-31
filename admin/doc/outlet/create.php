@@ -125,6 +125,78 @@ $investorList = $db->query("
                                     value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
                             </div>
                         </div>
+                        <?php
+                        $defaultInvestor = (float)($outletData['persen_bagian_investor'] ?? 50.00);
+                        $defaultOutlet = 100.00 - $defaultInvestor;
+                        ?>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="persentase_potongan" class="form-label fw-bold">Potongan Omzet (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persentase_potongan" name="persentase_potongan"
+                                        placeholder="Contoh: 10.00"
+                                        value="<?= htmlspecialchars($outletData['persentase_potongan'] ?? '10.00'); ?>" required>
+                                    <span class="input-group-text border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminPotongan(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted" style="font-size: 11px;">Potongan harian dari omzet kotor.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="persen_bagian_investor" class="form-label fw-bold">Hak Investor (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persen_bagian_investor" name="persen_bagian_investor"
+                                        placeholder="Contoh: 50.00"
+                                        value="<?= htmlspecialchars($defaultInvestor); ?>" required oninput="balanceAdminOutletSplit('investor')">
+                                    <span class="input-group-text border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminInvestor(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted" style="font-size: 11px;">Persentase bagi hasil investor.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="persen_bagian_outlet" class="form-label fw-bold">Hak Outlet (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persen_bagian_outlet" name="persen_bagian_outlet"
+                                        placeholder="Contoh: 50.00"
+                                        value="<?= htmlspecialchars($defaultOutlet); ?>" required oninput="balanceAdminOutletSplit('outlet')">
+                                    <span class="input-group-text border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepAdminOutlet(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted" style="font-size: 11px;">Persentase bagi hasil outlet.</small>
+                            </div>
+                        </div>
+
+                        <!-- 5. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet Lengkap</label>
@@ -203,8 +275,48 @@ $investorList = $db->query("
             let persen = selectedOption.data('persen');
             if (persen !== undefined && persen !== '') {
                 $('#persen_bagian_investor').val(persen);
+                window.balanceAdminOutletSplit('investor');
             }
         });
+
+        window.balanceAdminOutletSplit = function(source) {
+            if (source === 'investor') {
+                const invVal = parseFloat($('#persen_bagian_investor').val());
+                if (!isNaN(invVal)) {
+                    const outVal = Math.max(0, 100 - invVal);
+                    $('#persen_bagian_outlet').val(outVal.toFixed(2));
+                }
+            } else {
+                const outVal = parseFloat($('#persen_bagian_outlet').val());
+                if (!isNaN(outVal)) {
+                    const invVal = Math.max(0, 100 - outVal);
+                    $('#persen_bagian_investor').val(invVal.toFixed(2));
+                }
+            }
+        };
+
+        window.stepAdminPotongan = function(dir) {
+            let el = $('#persentase_potongan');
+            let val = parseFloat(el.val()) || 0;
+            val = Math.max(0, Math.min(100, val + dir));
+            el.val(val.toFixed(2));
+        };
+
+        window.stepAdminInvestor = function(dir) {
+            let el = $('#persen_bagian_investor');
+            let val = parseFloat(el.val()) || 0;
+            val = Math.max(0, Math.min(100, val + dir));
+            el.val(val.toFixed(2));
+            window.balanceAdminOutletSplit('investor');
+        };
+
+        window.stepAdminOutlet = function(dir) {
+            let el = $('#persen_bagian_outlet');
+            let val = parseFloat(el.val()) || 0;
+            val = Math.max(0, Math.min(100, val + dir));
+            el.val(val.toFixed(2));
+            window.balanceAdminOutletSplit('outlet');
+        };
 
         $('#form-create-outlet').on('submit', function(el) {
             el.preventDefault();

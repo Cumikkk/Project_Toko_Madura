@@ -28,7 +28,7 @@ if ($role === 'investor') {
     }
 } else {
     // Logged in user is Outlet
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, i.persen_bagian_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, o.persen_bagian_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];
@@ -158,12 +158,13 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
+        o.persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
     FROM outlet o
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 
@@ -174,18 +175,21 @@ if ($resBagiHasil) {
         $omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
         $ratePotongan = (float)($row['persentase_potongan'] ?? 10.00);
+        $rateInvestor = (float)($row['persen_bagian_investor'] ?? 50.00);
+        $rateOutlet = 100.00 - $rateInvestor;
 
         // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
         $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
         
-        $hakInvestor = round($potongan10 * ($persenInvestor / 100.0), 2);
-        $hakOutlet   = round($potongan10 * ($persenOutletBagiHasil / 100.0), 2);
+        $hakInvestor = round($potongan10 * ($rateInvestor / 100.0), 2);
+        $hakOutlet   = round($potongan10 * ($rateOutlet / 100.0), 2);
         $hasAnyLastDayDone = true;
 
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
         $totalBersihOutlet = ($omzet - $potongan10) + $hakOutlet;
 
         $row['persentase_potongan'] = $ratePotongan;
+        $row['persen_bagian_investor'] = $rateInvestor;
         $row['is_last_day_done'] = true;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
@@ -364,7 +368,7 @@ $countOutlet = count($rows);
                     </div>
                     <div class="text-white-50 small">
                         <?php if ($hasAnyLastDayDone) : ?>
-                            <i class="fa-solid fa-circle-check me-1 text-success"></i>Bagi Hasil Investor (50% dari <?= number_format($potonganGlobal, 0); ?>%) Aktif
+                           
                         <?php else : ?>
                             <i class="fa-light fa-clock me-1 text-warning"></i>Pendataan berjalan (Menunggu Tgl akhir bulan <?= $daysInMonth; ?>)
                         <?php endif; ?>
@@ -396,7 +400,7 @@ $countOutlet = count($rows);
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-potongan h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-danger text-uppercase card-stat-title-full">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</span>
+                    <span class="text-danger text-uppercase card-stat-title-full">Potongan </span>
                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-percent"></i>
                     </div>
@@ -416,11 +420,11 @@ $countOutlet = count($rows);
             </div>
         </div>
 
-        <!-- 3. Hak Investor (50%) -->
+        <!-- 3. Hak Investor -->
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-investor h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-success text-uppercase card-stat-title-full">Hak Investor (50%)</span>
+                    <span class="text-success text-uppercase card-stat-title-full">Hak Investor</span>
                     <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-hand-holding-dollar"></i>
                     </div>
@@ -440,11 +444,11 @@ $countOutlet = count($rows);
             </div>
         </div>
 
-        <!-- 4. Hak Outlet (50%) -->
+        <!-- 4. Hak Outlet -->
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-outlet h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-body-emphasis text-uppercase card-stat-title-full">Hak Outlet (50%)</span>
+                    <span class="text-body-emphasis text-uppercase card-stat-title-full">Hak Outlet</span>
                     <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-store"></i>
                     </div>
@@ -486,11 +490,11 @@ $countOutlet = count($rows);
                         <tr class="text-uppercase small text-body-secondary">
                             <th class="py-3 ps-3 text-center fw-bold" style="width: 40px;">No</th>
                             <th class="py-3 px-3 fw-bold">Nama Outlet</th>
-                            <th class="py-3 px-3 text-end fw-bold">Total Omzet (100%)</th>
-                            <th class="py-3 px-3 text-end fw-bold text-danger">Potongan Investor</th>
-                            <th class="py-3 px-3 text-end fw-bold text-success">Hak Investor (50%)</th>
-                            <th class="py-3 px-3 text-end fw-bold text-warning">Hak Outlet (50%)</th>
-                            <th class="py-3 px-3 text-end fw-bold text-body-emphasis">Bersih Outlet Total</th>
+                            <th class="py-3 px-3 text-end fw-bold" style="text-align: right !important;">Total Omzet (100%)</th>
+                            <th class="py-3 px-3 text-center fw-bold text-danger" style="text-align: center !important;">Potongan Outlet</th>
+                            <th class="py-3 px-3 text-center fw-bold text-success" style="text-align: center !important;">Hak Investor</th>
+                            <th class="py-3 px-3 text-center fw-bold text-warning" style="text-align: center !important;">Hak Outlet</th>
+                            <th class="py-3 px-3 text-end fw-bold text-body-emphasis" style="text-align: right !important;">Bersih Outlet Total</th>
                             <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px;">Aksi Detail</th>
                         </tr>
                     </thead>
@@ -506,23 +510,38 @@ $countOutlet = count($rows);
                                         </div>
                                     </td>
                                     <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-end fw-bold text-danger">
+                                    <td class="py-3 px-3 text-center fw-bold text-danger">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?>
+                                            <div class="d-flex justify-content-center align-items-center gap-1">
+                                                <span>Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></span>
+                                                <span class="badge bg-danger-subtle text-danger fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(220, 53, 69, 0.15); line-height: 1;">
+                                                    <?= (float)$r['persentase_potongan']; ?>%
+                                                </span>
+                                            </div>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Dipotong)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-end fw-extrabold text-success fs-6">
+                                    <td class="py-3 px-3 text-center fw-extrabold text-success fs-6">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?>
+                                            <div class="d-flex justify-content-center align-items-center gap-1">
+                                                <span>Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></span>
+                                                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(25, 135, 84, 0.15); line-height: 1;">
+                                                    <?= (float)$r['persen_bagian_investor']; ?>%
+                                                </span>
+                                            </div>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-end fw-extrabold text-warning fs-6">
+                                    <td class="py-3 px-3 text-center fw-extrabold text-warning fs-6">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?>
+                                            <div class="d-flex justify-content-center align-items-center gap-1">
+                                                <span>Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></span>
+                                                <span class="badge bg-warning-subtle text-warning fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.15); line-height: 1;">
+                                                    <?= (float)(100.00 - $r['persen_bagian_investor']); ?>%
+                                                </span>
+                                            </div>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
@@ -552,16 +571,16 @@ $countOutlet = count($rows);
                             <tr>
                                 <td colspan="2" class="py-3 ps-3 text-end text-body-emphasis text-uppercase">TOTAL KESELURUHAN:</td>
                                 <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
-                                <td class="py-3 px-3 text-end text-danger fs-6">
+                                <td class="py-3 px-3 text-center text-danger fs-6" style="text-align: center !important;">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
                                 </td>
                                 <!-- Highlighted ONLY Total Keseluruhan Hak Investor -->
-                                <td class="py-3 px-3 text-end text-success fs-5 bg-success-subtle bg-opacity-25" style="border: 2px solid #198754; border-radius: 8px;">
+                                <td class="py-3 px-3 text-center text-success fs-5 bg-success-subtle bg-opacity-25" style="border: 2px solid #198754; border-radius: 8px; text-align: center !important;">
                                     <span class="badge bg-success text-white px-3 py-2 fs-5 rounded-pill shadow-xs">
                                         <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakInvestor, 0, ',', '.') : 'Rp 0'; ?>
                                     </span>
                                 </td>
-                                <td class="py-3 px-3 text-end text-warning fs-5">
+                                <td class="py-3 px-3 text-center text-warning fs-5" style="text-align: center !important;">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
                                 </td>
                                 <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
@@ -631,43 +650,30 @@ $countOutlet = count($rows);
 
                     <!-- 2. Rentang Tanggal (Bebas: 1 Hari, 3 Hari, 1 Minggu, dll) -->
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold text-body-secondary mb-0">
+                                <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetTanggalFilter" style="font-size: 11px;">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Reset Tanggal
+                            </button>
+                        </div>
                         <div class="row g-2">
                             <div class="col-6">
                                 <small class="text-body-secondary d-block mb-1">Tanggal Mulai</small>
-                                <input type="date" name="tgl_mulai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglMulai); ?>">
+                                <input type="date" name="tgl_mulai" id="filterModalTglMulai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglMulai); ?>">
                             </div>
                             <div class="col-6">
                                 <small class="text-body-secondary d-block mb-1">Tanggal Selesai</small>
-                                <input type="date" name="tgl_selesai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
+                                <input type="date" name="tgl_selesai" id="filterModalTglSelesai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
                             </div>
                         </div>
-                        <div class="form-text text-body-secondary micro-text mt-1">
-                            *Bisa pilih 1 hari (samakan tgl mulai & selesai), 3 hari, 1 minggu, atau bebas.
+                        <div class="form-text text-body-secondary small mt-2">
+                            <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh akumulasi data</strong> tanpa batasan periode.
                         </div>
                     </div>
 
-                    <!-- 4. Filter Bulan & Tahun -->
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-days me-1 text-danger"></i>Filter Bulan</label>
-                            <select name="bulan" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-lines me-1 text-danger"></i>Filter Tahun</label>
-                            <select name="tahun" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                                <?php foreach ($availableYears as $yVal) : ?>
-                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>><?= $yVal; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
@@ -683,46 +689,70 @@ $countOutlet = count($rows);
 <!-- ========================================================================= -->
 <!-- MODAL: DETAIL RINCIAN OMZET HARIAN TOKO (Tgl 1 s.d. Tgl 31) -->
 <!-- ========================================================================= -->
+<style>
+#tableModalDetailHarian thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--bs-tertiary-bg, #f8fafc) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+#tableModalDetailHarian tfoot td {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background-color: var(--bs-tertiary-bg, #f8fafc) !important;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.08);
+}
+#tableModalDetailHarian tfoot td#tfootTotHakInv {
+    background-color: #d1e7dd !important;
+}
+[data-bs-theme="dark"] #tableModalDetailHarian tfoot td#tfootTotHakInv,
+.dark-theme #tableModalDetailHarian tfoot td#tfootTotHakInv {
+    background-color: #0f5132 !important;
+}
+</style>
+
 <div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel">
-                    <i class="fa-solid fa-calendar-days me-2 text-danger"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger"></span>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 680px;">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
+            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                <h6 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel" style="font-size: 14px;">
+                    <i class="fa-solid fa-calendar-days me-1.5 text-danger"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger fw-bold"></span>
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 10px;"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-3">
                 <!-- Table of Daily Omzet -->
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 w-100" id="tableModalDetailHarian">
-                        <thead class="table-group-divider bg-body-secondary small text-body-secondary text-uppercase">
+                <div class="table-responsive rounded-3 border" style="max-height: 380px;">
+                    <table class="table table-sm table-hover align-middle mb-0 w-100" id="tableModalDetailHarian" style="font-size: 11px;">
+                        <thead class="table-group-divider bg-body-secondary text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.3px;">
                             <tr>
-                                <th class="ps-3" style="width: 50px;">No</th>
-                                <th>Tanggal Laporan</th>
-                                <th class="text-end">Omzet Harian</th>
-                                <th class="text-end text-danger">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</th>
-                                <th class="text-end text-success">Hak Investor (50%)</th>
-                                <th class="text-end text-warning pe-3">Hak Outlet (50%)</th>
+                                <th class="py-2 text-center" style="width: 35px;">NO</th>
+                                <th class="py-2 text-center">TANGGAL LAPORAN</th>
+                                <th class="py-2 text-center">OMZET HARIAN</th>
+                                <th class="py-2 text-center text-danger" id="lblModalHeaderPotongan">POTONGAN</th>
+                                <th class="py-2 text-center text-success" id="lblModalHeaderHakInv">HAK INVESTOR</th>
+                                <th class="py-2 text-center text-warning" id="lblModalHeaderHakOut">HAK OUTLET</th>
                             </tr>
                         </thead>
-                        <tbody class="border-0 small">
+                        <tbody class="border-0">
                             <!-- Loaded dynamically via JS -->
                         </tbody>
-                        <tfoot class="table-group-divider bg-body-secondary small fw-bold d-none" id="tfootModalDetailHarian">
+                        <tfoot class="table-group-divider bg-body-secondary fw-bold d-none" id="tfootModalDetailHarian" style="font-size: 11px;">
                             <tr>
-                                <td colspan="2" class="py-3 ps-3 text-end text-body-emphasis text-uppercase fw-bold">TOTAL KESELURUHAN:</td>
-                                <td class="py-3 text-end text-body-emphasis fs-6 fw-extrabold" id="tfootTotOmzet">Rp 0</td>
-                                <td class="py-3 text-end text-danger fs-6 fw-extrabold" id="tfootTotPotongan">Rp 0</td>
-                                <td class="py-3 text-end text-success fs-6 fw-extrabold bg-success-subtle bg-opacity-25" id="tfootTotHakInv">Rp 0</td>
-                                <td class="py-3 text-end text-warning fs-6 fw-extrabold pe-3" id="tfootTotHakOut">Rp 0</td>
+                                <td colspan="2" class="py-2 text-center text-body-emphasis text-uppercase fw-bold">TOTAL KESELURUHAN:</td>
+                                <td class="py-2 text-center text-body-emphasis fw-extrabold" id="tfootTotOmzet">Rp 0</td>
+                                <td class="py-2 text-center text-danger fw-extrabold" id="tfootTotPotongan">Rp 0</td>
+                                <td class="py-2 text-center text-success fw-extrabold" id="tfootTotHakInv">Rp 0</td>
+                                <td class="py-2 text-center text-warning fw-extrabold" id="tfootTotHakOut">Rp 0</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-between">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-footer border-0 pt-0 pb-3 px-3 justify-content-start">
+                <button type="button" class="btn btn-light rounded-pill px-3 py-1 btn-sm" data-bs-dismiss="modal" style="font-size: 12px;">Tutup</button>
             </div>
         </div>
     </div>
@@ -735,8 +765,11 @@ $(document).ready(function() {
     const resultsBox = $('#outletSearchResultsBox');
     const hiddenInput = $('#filterModalOutletId');
     const badgeContainer = $('#selectedOutletBadgeContainer');
-    const badgeText = $('#selectedOutletBadgeText');
-    let searchTimeout = null;
+    // Reset Tanggal Filter Event
+    $('#btnResetTanggalFilter').on('click', function() {
+        $('#filterModalTglMulai').val('');
+        $('#filterModalTglSelesai').val('');
+    });
 
     // Trigger Modal Rincian Omzet Harian
     $(document).on('click', '.btn-detail-harian-outlet', function() {
@@ -777,17 +810,23 @@ $(document).ready(function() {
 
                     if (res.items && res.items.length > 0) {
                         const fmt = new Intl.NumberFormat('id-ID');
+                        
+                        // Update headers dynamically
+                        $('#lblModalHeaderPotongan').html(`Potongan (${res.rate_potongan}%)`);
+                        $('#lblModalHeaderHakInv').html(`Hak Investor (${res.persen_inv}%)`);
+                        $('#lblModalHeaderHakOut').html(`Hak Outlet (${res.persen_out}%)`);
+
                         res.items.forEach((item, idx) => {
                             tbody.append(`
                                 <tr>
-                                    <td class="ps-3 fw-bold text-body-secondary">${idx + 1}</td>
-                                    <td class="fw-bold text-body-emphasis">
+                                    <td class="text-center py-1.5 px-2 fw-bold text-body-secondary">${idx + 1}</td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-body-emphasis">
                                         <i class="fa-regular fa-calendar-day me-1 text-danger"></i>${item.tgl_formatted}
                                     </td>
-                                    <td class="text-end fw-bold text-body-emphasis">Rp ${fmt.format(item.omzet)}</td>
-                                    <td class="text-end fw-semibold text-danger">Rp ${fmt.format(item.potongan_10)}</td>
-                                    <td class="text-end fw-bold text-success">Rp ${fmt.format(item.hak_investor)}</td>
-                                    <td class="text-end fw-semibold text-warning pe-3">Rp ${fmt.format(item.hak_outlet)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-body-emphasis">Rp ${fmt.format(item.omzet)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-semibold text-danger">Rp ${fmt.format(item.potongan_10)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-success">Rp ${fmt.format(item.hak_investor)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-semibold text-warning">Rp ${fmt.format(item.hak_outlet)}</td>
                                 </tr>
                             `);
                         });

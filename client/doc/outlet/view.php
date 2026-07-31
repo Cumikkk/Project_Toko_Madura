@@ -768,24 +768,60 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                 <input type="text" name="alamat_outlet" id="wizard_alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12" required>
                             </div>
 
-                            <!-- Persentase Bagi Hasil Investor -->
-                            <div class="col-12">
-                                <label class="form-label required">Persentase Bagi Hasil Investor (%)</label>
-                                <div class="input-group">
+                            <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar dengan Spinner) -->
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Potongan Omzet (%)</label>
+                                <div class="input-group input-group-sm">
                                     <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="wizard_persentase_potongan" class="form-control rounded-start-3 fw-bold" placeholder="10.00" value="10.00" required>
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
-                                        <div class="d-flex flex-column h-100" style="width: 28px;">
-                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center btn-percent-up" onclick="stepPercentUp()" style="font-size: 9px; line-height: 1;" title="Tambah Persen (+1%)">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepPotongan(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
                                                 <i class="fa-solid fa-chevron-up"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center btn-percent-down" onclick="stepPercentDown()" style="font-size: 9px; line-height: 1;" title="Kurangi Persen (-1%)">
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepPotongan(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
                                                 <i class="fa-solid fa-chevron-down"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Gunakan tombol ▲ / ▼ di sebelah kanan atau ketik langsung persentase potongan investor.</div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Potongan harian dari omzet.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('investor')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepInvestor(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepInvestor(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil investor.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Outlet (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="wizard_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('outlet')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepOutlet(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepOutlet(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil outlet.</div>
                             </div>
                         </div>
                     </div>
@@ -877,42 +913,124 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 <!-- MODAL: EDIT OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditOutlet" tabindex="-1" aria-labelledby="modalEditOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
+            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 14px;">
                     <i class="fa-light fa-pen-to-square me-2 text-warning"></i>Edit Data Outlet
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 10px;"></button>
             </div>
             <form id="formEditOutlet" method="POST">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id_outlet" id="edit_id_outlet" value="">
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Nama Outlet</label>
-                        <input type="text" name="nama_outlet" id="edit_nama_outlet" class="form-control rounded-3" required>
+                <div class="modal-body p-3">
+                    <!-- Sesi 1: Informasi Outlet -->
+                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-store me-1"></i> Informasi Outlet Toko
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary">Alamat Outlet</label>
-                        <textarea name="alamat_outlet" id="edit_alamat_outlet" class="form-control rounded-3" rows="2"></textarea>
-                    </div>
-                    <hr class="my-3 text-body-secondary opacity-25">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary required">Username Login Outlet</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary">@</span>
-                            <input type="text" name="username" id="edit_username" class="form-control rounded-end-3 border-start-0" required>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Nama Outlet</label>
+                            <input type="text" name="nama_outlet" id="edit_nama_outlet" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Kecamatan</label>
+                            <input type="text" name="kecamatan" id="edit_kecamatan" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Alamat Lengkap</label>
+                            <textarea name="alamat_outlet" id="edit_alamat_outlet" class="form-control form-control-sm rounded-3 fw-semibold" rows="2" required></textarea>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-body-secondary">Password Baru (Opsional)</label>
-                        <input type="password" name="password" class="form-control rounded-3" placeholder="Kosongkan jika tidak ingin mengubah password">
+
+                    <!-- Sesi 2: Skema Potongan & Bagi Hasil -->
+                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-chart-pie me-1"></i> Skema Potongan & Bagi Hasil
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Potongan Omzet</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                    <div class="d-flex flex-column h-100" style="width: 18px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(-1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Hak Investor</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required oninput="balanceEditOutletSplit('investor')">
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                    <div class="d-flex flex-column h-100" style="width: 18px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(-1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Hak Outlet</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required oninput="balanceEditOutletSplit('outlet')">
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                    <div class="d-flex flex-column h-100" style="width: 18px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(-1)" style="font-size: 7px; line-height: 1;">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sesi 3: Akun Pengelola / Kasir -->
+                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-user-gear me-1"></i> Akun Pengelola / Kasir
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Nama Pengelola / Kasir</label>
+                            <input type="text" name="nama_pengelola" id="edit_nama_pengelola" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">No. HP / WhatsApp</label>
+                            <input type="text" name="no_hp" id="edit_no_hp" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Username Login</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
+                                <input type="text" name="username" id="edit_username" class="form-control form-control-sm rounded-end-3 border-start-0 fw-semibold" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold text-body-secondary mb-1" style="font-size: 11px;">Password Baru (Opsional)</label>
+                            <input type="password" name="password" class="form-control form-control-sm rounded-3 fw-semibold" placeholder="Kosongkan jika tetap">
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-4">
+                <div class="modal-footer border-0 pt-0 pb-3 px-3 d-flex justify-content-end gap-1.5">
+                    <button type="button" class="btn btn-light rounded-pill px-3 py-1 btn-sm" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-1 btn-sm" style="font-size: 12px;">
                         <i class="fa-solid fa-floppy-disk me-1"></i> Update Outlet
                     </button>
                 </div>
@@ -1146,23 +1264,82 @@ $(document).ready(function() {
         }
     });
 
-    // Up & Down Spinner Functions for Persentase Bagi Hasil Investor
-    window.stepPercentUp = function() {
+    window.stepPotongan = function(dir) {
         let el = $('#wizard_persentase_potongan');
         let val = parseFloat(el.val()) || 0;
-        if (val < 100) {
-            val = Math.min(100, val + 1);
-            el.val(val.toFixed(2));
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+    };
+
+    window.stepInvestor = function(dir) {
+        let el = $('#wizard_persen_bagian_investor');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceOutletSplit('investor');
+    };
+
+    window.stepOutlet = function(dir) {
+        let el = $('#wizard_persen_bagian_outlet');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceOutletSplit('outlet');
+    };
+
+    window.balanceOutletSplit = function(source) {
+        if (source === 'investor') {
+            const invVal = parseFloat($('#wizard_persen_bagian_investor').val());
+            if (!isNaN(invVal)) {
+                const outVal = Math.max(0, 100 - invVal);
+                $('#wizard_persen_bagian_outlet').val(outVal.toFixed(2));
+            }
+        } else {
+            const outVal = parseFloat($('#wizard_persen_bagian_outlet').val());
+            if (!isNaN(outVal)) {
+                const invVal = Math.max(0, 100 - outVal);
+                $('#wizard_persen_bagian_investor').val(invVal.toFixed(2));
+            }
         }
     };
 
-    window.stepPercentDown = function() {
-        let el = $('#wizard_persentase_potongan');
-        let val = parseFloat(el.val()) || 0;
-        if (val > 0) {
-            val = Math.max(0, val - 1);
-            el.val(val.toFixed(2));
+    window.balanceEditOutletSplit = function(source) {
+        if (source === 'investor') {
+            const invVal = parseFloat($('#edit_persen_bagian_investor').val());
+            if (!isNaN(invVal)) {
+                const outVal = Math.max(0, 100 - invVal);
+                $('#edit_persen_bagian_outlet').val(outVal.toFixed(2));
+            }
+        } else {
+            const outVal = parseFloat($('#edit_persen_bagian_outlet').val());
+            if (!isNaN(outVal)) {
+                const invVal = Math.max(0, 100 - outVal);
+                $('#edit_persen_bagian_investor').val(invVal.toFixed(2));
+            }
         }
+    };
+
+    window.stepEditPotongan = function(dir) {
+        let el = $('#edit_persentase_potongan');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+    };
+
+    window.stepEditInvestor = function(dir) {
+        let el = $('#edit_persen_bagian_investor');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceEditOutletSplit('investor');
+    };
+
+    window.stepEditOutlet = function(dir) {
+        let el = $('#edit_persen_bagian_outlet');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceEditOutletSplit('outlet');
     };
 
     // 0. Wizard Navigation Function for Modal Tambah Outlet (2 Sesi)
@@ -1225,9 +1402,31 @@ $(document).ready(function() {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Form Belum Lengkap',
-                    text: 'Harap isi Persentase Bagi Hasil Investor.',
+                    text: 'Harap isi Persentase Potongan Omzet.',
                     confirmButtonColor: '#7D0A0A'
                 }).then(() => $('#wizard_persentase_potongan').focus());
+                return;
+            }
+
+            const persenInv = $('#wizard_persen_bagian_investor').val().trim();
+            if (!persenInv) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi Persentase Hak Investor.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_persen_bagian_investor').focus());
+                return;
+            }
+
+            const persenOut = $('#wizard_persen_bagian_outlet').val().trim();
+            if (!persenOut) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap isi Persentase Hak Outlet.',
+                    confirmButtonColor: '#7D0A0A'
+                }).then(() => $('#wizard_persen_bagian_outlet').focus());
                 return;
             }
 
@@ -1354,7 +1553,16 @@ $(document).ready(function() {
                 if (res.success) {
                     $('#edit_id_outlet').val(res.data.id_outlet);
                     $('#edit_nama_outlet').val(res.data.nama_outlet);
+                    $('#edit_kecamatan').val(res.data.kecamatan);
                     $('#edit_alamat_outlet').val(res.data.alamat_outlet);
+                    $('#edit_persentase_potongan').val(parseFloat(res.data.persentase_potongan).toFixed(2));
+                    
+                    const invPct = parseFloat(res.data.persen_bagian_investor) || 50.00;
+                    $('#edit_persen_bagian_investor').val(invPct.toFixed(2));
+                    $('#edit_persen_bagian_outlet').val((100 - invPct).toFixed(2));
+
+                    $('#edit_nama_pengelola').val(res.data.nama_lengkap);
+                    $('#edit_no_hp').val(res.data.no_hp);
                     $('#edit_username').val(res.data.username);
                     $('#modalEditOutlet').modal('show');
                 } else {

@@ -24,13 +24,23 @@ if ($action === 'get_detail_harian') {
         exit;
     }
 
-    // Fetch outlet name
-    $resOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+    // Fetch outlet details and investor split percentage
+    $resOut = $db->query("
+        SELECT o.nama_outlet, o.persentase_potongan, i.persen_bagian_investor 
+        FROM outlet o 
+        LEFT JOIN investor i ON o.id_investor = i.id_investor 
+        WHERE o.id_outlet = {$idOutlet} 
+        LIMIT 1
+    ");
     if (!$resOut || $resOut->num_rows === 0) {
         echo json_encode(['success' => false, 'message' => 'Outlet tidak ditemukan.']);
         exit;
     }
-    $namaOutlet = $resOut->fetch_assoc()['nama_outlet'];
+    $rowOutInfo = $resOut->fetch_assoc();
+    $namaOutlet = $rowOutInfo['nama_outlet'];
+    $ratePotongan = isset($rowOutInfo['persentase_potongan']) ? (float)$rowOutInfo['persentase_potongan'] : 10.00;
+    $persenInvSplit = isset($rowOutInfo['persen_bagian_investor']) ? (float)$rowOutInfo['persen_bagian_investor'] : 50.00;
+    $persenOutSplit = 100.00 - $persenInvSplit;
 
     // Determine Month and Year for full monthly daily breakdown (Tgl 1 s.d. Tgl 31)
     $reqBulan = $bulan;
@@ -75,9 +85,9 @@ if ($action === 'get_detail_harian') {
                       ($bulanIndo[(int)date('n', strtotime($row['periode_laporan']))] ?? '') . ' ' . 
                       date('Y', strtotime($row['periode_laporan']));
 
-            $pot10 = $omzet * 0.10;
-            $hakInv = $pot10 * 0.50;
-            $hakOut = $pot10 * 0.50;
+            $pot10 = round($omzet * ($ratePotongan / 100.0), 2);
+            $hakInv = round($pot10 * ($persenInvSplit / 100.0), 2);
+            $hakOut = round($pot10 * ($persenOutSplit / 100.0), 2);
             $bersihOut = $omzet - $pot10 + $hakOut;
 
             $totOmzet += $omzet;
@@ -101,6 +111,9 @@ if ($action === 'get_detail_harian') {
     echo json_encode([
         'success' => true,
         'nama_outlet' => $namaOutlet,
+        'rate_potongan' => $ratePotongan,
+        'persen_inv' => $persenInvSplit,
+        'persen_out' => $persenOutSplit,
         'items' => $items,
         'summary' => [
             'total_omzet' => $totOmzet,
