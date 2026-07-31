@@ -279,11 +279,6 @@ $(document).ready(function() {
         let namaInv = $(this).data('nama');
 
         $('#modal-investor-nama').text(namaInv);
-
-        if ($.fn.DataTable && $.fn.DataTable.isDataTable('#table-modal-outlet')) {
-            $('#table-modal-outlet').DataTable().destroy();
-        }
-
         $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>');
         $('#modalDetailOutlet').modal('show');
 
@@ -319,26 +314,6 @@ $(document).ready(function() {
                     `;
                 });
                 $('#container-detail-outlet').html(html);
-
-                if ($.fn.DataTable) {
-                    $('#table-modal-outlet').DataTable({
-                        pageLength: 5,
-                        responsive: true,
-                        language: {
-                            search: "Cari:",
-                            lengthMenu: "Tampilkan _MENU_ data",
-                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                            zeroRecords: "Tidak ada outlet aktif ditemukan",
-                            paginate: {
-                                first: "Pertama",
-                                last: "Terakhir",
-                                next: "Selanjutnya",
-                                previous: "Sebelumnya"
-                            }
-                        }
-                    });
-                }
             } else {
                 $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko aktif.</td></tr>');
             }
