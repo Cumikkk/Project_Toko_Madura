@@ -57,8 +57,10 @@ $expiredOutlets = $db->query($sqlExpired);
 
 // 4. Fetch Pending Outlets (Request Outlet)
 $sqlPending = "
-    SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+           u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
+    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
     LEFT JOIN investor inv ON inv.id_investor = o.id_investor
     LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
     WHERE o.status = 'pending'
@@ -68,8 +70,10 @@ $pendingOutlets = $db->query($sqlPending);
 
 // 5. Fetch Rejected Outlets
 $sqlReject = "
-    SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+           u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
+    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
     LEFT JOIN investor inv ON inv.id_investor = o.id_investor
     LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
     WHERE o.status = 'reject'
@@ -168,9 +172,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Toko</th>
-                                    <th class="text-center">Nama Pengelola Toko</th>
-                                    <th class="text-center">No. HP</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Pengelola Toko</th>
+                                    <th class="text-center">Lokasi & Alamat</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Tanggal Disetujui</th>
                                     <th class="text-center">Jatuh Tempo Langganan</th>
@@ -183,16 +186,16 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
-                                            <td class="text-start"><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
-                                            <td class="text-center"><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>
-                                            <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum ada pengelola') ?></strong>
+                                                <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -231,7 +234,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data toko aktif.</td></tr>
+                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data toko aktif.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -246,9 +249,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Toko</th>
-                                    <th class="text-center">Nama Pengelola Toko</th>
-                                    <th class="text-center">No. HP</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Pengelola Toko</th>
+                                    <th class="text-center">Lokasi & Alamat</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Tanggal Disetujui</th>
                                     <th class="text-center">Jatuh Tempo Langganan</th>
@@ -261,16 +263,16 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
-                                            <td class="text-start"><?= htmlspecialchars($row['pengelola_toko'] ?? '-') ?></td>
-                                            <td class="text-center"><?= htmlspecialchars($row['no_hp_toko'] ?? '-') ?></td>
-                                            <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum ada pengelola') ?></strong>
+                                                <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -304,7 +306,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data outlet expired / non-aktif.</td></tr>
+                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data outlet expired / non-aktif.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -319,8 +321,9 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
-                                    <th class="text-center">Investor</th>
+                                    <th class="text-center">Pengelola Toko</th>
+                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Investor Pemodal</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
                                     <th class="text-center">Tanggal Request</th>
@@ -340,20 +343,22 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                    <br><small class="text-muted"><i class="fas fa-phone me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end fw-bold text-success">
@@ -384,7 +389,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada request outlet pending.</td></tr>
+                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada request outlet pending.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -399,12 +404,12 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
                                     <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
-                                    <th class="text-center">Investor</th>
+                                    <th class="text-center">Pengelola Toko</th>
+                                    <th class="text-center">Lokasi & Alamat</th>
+                                    <th class="text-center">Investor Pemodal</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
                                     <th class="text-center">Alasan Penolakan</th>
-                                    <th class="text-center">Tanggal Request</th>
                                     <th class="text-center">Tanggal Ditolak</th>
                                     <th class="text-center" style="width: 10%;">#</th>
                                 </tr>
@@ -422,20 +427,22 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-start">
+                                                <strong><?= htmlspecialchars($row['kecamatan'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['alamat_outlet']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
                                                 <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                    <br><small class="text-muted"><i class="fas fa-phone me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end text-muted">
@@ -452,9 +459,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-start">
                                                 <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i><?= htmlspecialchars($row['alasan_penolakan'] ?? 'Tidak ada catatan') ?></span>
-                                            </td>
-                                            <td class="text-center">
-                                                <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
                                             </td>
                                             <td class="text-center">
                                                 <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
