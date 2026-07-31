@@ -25,6 +25,18 @@ if ($isEdit) {
     }
 }
 
+// Check if current outlet is expired or non-active/inactive
+$isExpiredOrInactive = false;
+if ($isEdit && !empty($outletData)) {
+    $st = strtolower($outletData['status'] ?? '');
+    $jt = $outletData['tgl_jatuh_tempo'] ?? '';
+    if ($st === 'inactive' || $st === 'expired') {
+        $isExpiredOrInactive = true;
+    } elseif (!empty($jt) && strtotime(date('Y-m-d', strtotime($jt))) < strtotime(date('Y-m-d'))) {
+        $isExpiredOrInactive = true;
+    }
+}
+
 $requiredPermission = $isEdit ? "update" : "create";
 if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
     $redirectUrl = SystemInfo::app('ADMIN_URL') . '/outlet/view';
@@ -171,15 +183,21 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Active)</label>
-                                <input type="date" class="form-control fw-bold" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
-                                    value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
-                                <small class="text-muted d-block mt-1">Ubah tanggal ini untuk memperpanjang masa langganan outlet expired agar otomatis aktif kembali tanpa buat akun baru.</small>
+                        <?php if ($isExpiredOrInactive) : ?>
+                            <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN - KHUSUS OUTLET EXPIRED / NON-AKTIF) -->
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group p-3 bg-warning-subtle border border-warning rounded-3">
+                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold text-dark mb-1">
+                                        <i class="fas fa-calendar-alt me-1.5 text-warning"></i>Perpanjang Tanggal Jatuh Tempo (Masa Langganan Active)
+                                    </label>
+                                    <input type="date" class="form-control fw-bold" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
+                                        value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
+                                    <small class="text-dark opacity-75 d-block mt-1">
+                                        <i class="fas fa-info-circle me-1"></i>Ubah tanggal ini ke tanggal mendatang untuk mengaktifkan kembali outlet yang kadaluarsa/non-aktif tanpa perlu membuat akun baru.
+                                    </small>
+                                </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
 
                         <!-- 6. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
