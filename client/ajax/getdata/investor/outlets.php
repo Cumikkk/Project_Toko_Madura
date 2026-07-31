@@ -19,7 +19,9 @@ $sql = "
         o.nama_outlet,
         o.alamat_outlet,
         o.kecamatan,
-        DATE_FORMAT(o.tanggal_bergabung, '%d/%m/%Y') as tanggal_bergabung
+        o.status,
+        DATE_FORMAT(o.tanggal_bergabung, '%d/%m/%Y %H:%i') as tanggal_bergabung,
+        DATE_FORMAT(o.tanggal_disetujui, '%d/%m/%Y %H:%i') as tanggal_disetujui
     FROM outlet o
     WHERE o.id_investor = {$idInvestor}
     ORDER BY o.id_outlet DESC

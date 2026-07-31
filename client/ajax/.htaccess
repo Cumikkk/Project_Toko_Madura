@@ -23,6 +23,12 @@ Options -Indexes
 	RewriteRule ^post/([^./]+)/([^./]+)/?$ appPost.php?a=$1&b=$2 [L,QSA]
 	RewriteRule ^post/([^./]+)/?$ appPost.php?a=$1 [L,QSA]
 
+    #Akses ke /ajax/get/
+    RewriteRule ^get/([^./]+)/([^./]+)/([^./]+)/([^./]+)/?$ appGet.php?a=$1&b=$2&c=$3&d=$4 [L,QSA]
+	RewriteRule ^get/([^./]+)/([^./]+)/([^./]+)/?$ appGet.php?a=$1&b=$2&c=$3 [L,QSA]
+	RewriteRule ^get/([^./]+)/([^./]+)/?$ appGet.php?a=$1&b=$2 [L,QSA]
+	RewriteRule ^get/([^./]+)/?$ appGet.php?a=$1 [L,QSA]
+
     #Akses ke /ajax/modal/
     RewriteRule ^modal/([^./]+)/([^./]+)/([^./]+)/([^./]+)/?$ appModal.php?a=$1&b=$2&c=$3&d=$4 [L,QSA]
 	RewriteRule ^modal/([^./]+)/([^./]+)/([^./]+)/?$ appModal.php?a=$1&b=$2&c=$3 [L,QSA]

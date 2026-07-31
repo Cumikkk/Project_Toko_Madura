@@ -58,14 +58,9 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                 <p class="text-white-50 small mb-0">Monitoring portofolio mitra investor dan daftar toko yang berada di bawah naungan Master Owner</p>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-warning btn-sm fw-bold rounded-pill px-3 py-2 text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahInvestor">
-                <i class="fa-solid fa-user-plus me-1"></i> Tambah Investor
-            </button>
-            <div class="d-none d-md-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-20 shadow-xs" style="backdrop-filter: blur(6px);">
-                <i class="fa-solid fa-crown text-warning me-1"></i>
-                <span class="fw-bold text-white small text-uppercase">MASTER OWNER PANEL</span>
-            </div>
+        <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-2 rounded-pill border border-white border-opacity-20 shadow-xs" style="backdrop-filter: blur(6px);">
+            <i class="fa-solid fa-crown text-warning me-1"></i>
+            <span class="fw-bold text-white small text-uppercase">MASTER OWNER PANEL</span>
         </div>
     </div>
 </div>
@@ -128,14 +123,9 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
             <i class="fa-solid fa-users text-danger fs-5"></i>
             <h5 class="fw-bold text-body-emphasis mb-0">Daftar Investor Mitra</h5>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-warning btn-sm fw-bold rounded-pill px-3 py-1.5 text-dark shadow-xs" data-bs-toggle="modal" data-bs-target="#modalTambahInvestor">
-                <i class="fa-solid fa-user-plus me-1"></i> Tambah Investor
-            </button>
-            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1.5 fw-semibold fs-12">
-                <i class="fa-solid fa-shield-halved me-1"></i>Master Owner View
-            </span>
-        </div>
+        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1.5 fw-semibold fs-12">
+            <i class="fa-solid fa-shield-halved me-1"></i>Master Owner View
+        </span>
     </div>
     <div class="card-body p-3 p-md-4">
         <div class="table-responsive">
@@ -332,42 +322,6 @@ $(document).ready(function() {
             }
         }, 'json');
     });
-
-    // AJAX Form Submit for Tambah Investor
-    $('#form-create-investor-client').on('submit', function(e) {
-        e.preventDefault();
-        let btn  = $(this).find('button[type="submit"]');
-        let data = $(this).serialize();
-
-        btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...');
-        $.post("<?= SystemInfo::app('CLIENT_URL') ?>/ajax/post/investor/create", data, function(resp) {
-            btn.prop('disabled', false).html('<i class="fa-solid fa-save me-1"></i> Simpan Investor');
-            if (resp.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: resp.message || 'Investor berhasil ditambahkan.',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    location.href = resp.data?.redirect || "<?= SystemInfo::app('CLIENT_URL') ?>/investor";
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Perhatian!',
-                    text: resp.message || 'Gagal menyimpan data investor.'
-                });
-            }
-        }, 'json').fail(function() {
-            btn.prop('disabled', false).html('<i class="fa-solid fa-save me-1"></i> Simpan Investor');
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: 'Terjadi kesalahan koneksi ke server.'
-            });
-        });
-    });
 });
 </script>
 
@@ -403,58 +357,6 @@ $(document).ready(function() {
             <div class="modal-footer bg-light px-4 py-2.5 border-0">
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tambah Investor (Maroon Gradient Style) -->
-<div class="modal fade" id="modalTambahInvestor" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-            <div class="modal-header text-white px-4 py-3 border-0" style="background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);">
-                <h5 class="modal-title d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-warning"></i>
-                    <span>Tambah Investor Baru</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="form-create-investor-client" method="post">
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="inv_nama_lengkap" class="form-label fw-bold small text-uppercase">Nama Lengkap Investor</label>
-                            <input type="text" class="form-control" id="inv_nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inv_no_hp" class="form-label fw-bold small text-uppercase">No. HP / WhatsApp (Opsional)</label>
-                            <input type="text" class="form-control" id="inv_no_hp" name="no_hp" placeholder="Contoh: 081234567890">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inv_username" class="form-label fw-bold small text-uppercase">Username</label>
-                            <input type="text" class="form-control" id="inv_username" name="username" placeholder="Contoh: investor_ahmad" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inv_password" class="form-label fw-bold small text-uppercase">Password</label>
-                            <input type="password" class="form-control" id="inv_password" name="password" placeholder="Masukkan password" required>
-                            <small class="text-muted d-block mt-1" style="font-size: 11px;">Password min. 8 karakter (huruf besar, kecil, angka).</small>
-                        </div>
-                        <div class="col-md-12">
-                            <label for="inv_kecamatan" class="form-label fw-bold small text-uppercase">Kecamatan</label>
-                            <input type="text" class="form-control" id="inv_kecamatan" name="kecamatan" placeholder="Contoh: Waru">
-                        </div>
-                        <div class="col-md-12">
-                            <label for="inv_alamat" class="form-label fw-bold small text-uppercase">Alamat Investor Lengkap</label>
-                            <textarea class="form-control" id="inv_alamat" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light px-4 py-2.5 border-0">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold" style="background-color: #7D0A0A; border-color: #7D0A0A;">
-                        <i class="fa-solid fa-save me-1"></i> Simpan Investor
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
