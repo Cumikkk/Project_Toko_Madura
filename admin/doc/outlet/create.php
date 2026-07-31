@@ -10,9 +10,11 @@ $outletData = null;
 
 if ($isEdit) {
     $resOut = $db->query("
-        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp
+        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp,
+               inv.persen_bagian_investor
         FROM outlet o
         LEFT JOIN users u ON (u.id_users = o.id_users)
+        LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
         WHERE o.id_outlet = {$idOutlet} LIMIT 1
     ");
     if ($resOut && $resOut->num_rows > 0) {
@@ -81,7 +83,7 @@ $investorList = $db->query("
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
                                         <?php while ($inv = $investorList->fetch_assoc()) : ?>
-                                            <option value="<?= $inv['id_investor']; ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
+                                            <option value="<?= $inv['id_investor']; ?>" data-persen="<?= htmlspecialchars($inv['persen_bagian_investor']); ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
                                                 <?= htmlspecialchars($inv['nama_lengkap']); ?> (Bagi Hasil: <?= number_format($inv['persen_bagian_investor'], 0); ?>%)
                                             </option>
                                         <?php endwhile; ?>
@@ -91,7 +93,21 @@ $investorList = $db->query("
                             </div>
                         </div>
 
-                        <!-- 2. NAMA PENGELOLA - NO HP -->
+                        <!-- 2. PERSENTASE BAGI HASIL INVESTOR -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor"
+                                        placeholder="Contoh: 50.00"
+                                        value="<?= htmlspecialchars($outletData['persen_bagian_investor'] ?? '50.00'); ?>" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Set atau sesuaikan persentase bagi hasil untuk investor ini (default terisi otomatis dari data investor).</small>
+                            </div>
+                        </div>
+
+                        <!-- 3. NAMA PENGELOLA - NO HP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola (Kasir)</label>
@@ -174,6 +190,15 @@ $investorList = $db->query("
 
 <script type="text/javascript">
     $(document).ready(function() {
+        // Auto populate Bagi Hasil Investor when selecting an investor
+        $('#id_investor').on('change', function() {
+            let selectedOption = $(this).find('option:selected');
+            let persen = selectedOption.data('persen');
+            if (persen !== undefined && persen !== '') {
+                $('#persen_bagian_investor').val(persen);
+            }
+        });
+
         $('#form-create-outlet').on('submit', function(el) {
             el.preventDefault();
             let button = $(this).find('button[type="submit"]'),
