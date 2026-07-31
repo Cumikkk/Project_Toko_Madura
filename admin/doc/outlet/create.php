@@ -184,17 +184,13 @@ $investorList = $db->query("
                         </div>
 
                         <?php if ($isExpiredOrInactive) : ?>
-                            <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN - KHUSUS OUTLET EXPIRED / NON-AKTIF) -->
+                            <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
                             <div class="col-md-12 mb-3">
-                                <div class="form-group p-3 bg-warning-subtle border border-warning rounded-3">
-                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold text-dark mb-1">
-                                        <i class="fas fa-calendar-alt me-1.5 text-warning"></i>Perpanjang Tanggal Jatuh Tempo (Masa Langganan Active)
-                                    </label>
-                                    <input type="date" class="form-control fw-bold" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
+                                <div class="form-group">
+                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Active)</label>
+                                    <input type="date" class="form-control" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
                                         value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
-                                    <small class="text-dark opacity-75 d-block mt-1">
-                                        <i class="fas fa-info-circle me-1"></i>Ubah tanggal ini ke tanggal mendatang untuk mengaktifkan kembali outlet yang kadaluarsa/non-aktif tanpa perlu membuat akun baru.
-                                    </small>
+                                    <small class="text-muted d-block mt-1">Ubah tanggal ini ke tanggal mendatang untuk memperpanjang masa aktif outlet tanpa perlu membuat akun baru.</small>
                                 </div>
                             </div>
                         <?php endif; ?>
