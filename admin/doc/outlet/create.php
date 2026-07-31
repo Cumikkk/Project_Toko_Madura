@@ -67,10 +67,10 @@ $investorList = $db->query("
                     <?php endif; ?>
 
                     <div class="row">
-                        <!-- 1. NAMA TOKO - INVESTOR -->
+                        <!-- 1. NAMA OUTLET - INVESTOR -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="nama_outlet" class="form-label fw-bold">Nama Toko</label>
+                                <label for="nama_outlet" class="form-label fw-bold">Nama Outlet</label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
                                     placeholder="Contoh: Toko Madura Waru"
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
@@ -78,7 +78,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="id_investor" class="form-label fw-bold">Investor</label>
+                                <label for="id_investor" class="form-label fw-bold">Investor Pemodal</label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
@@ -89,11 +89,11 @@ $investorList = $db->query("
                                         <?php endwhile; ?>
                                     <?php endif; ?>
                                 </select>
-                                <small class="text-muted">Pilih investor pemodal yang menaungi toko ini.</small>
+                                <small class="text-muted">Pilih investor pemodal yang menaungi outlet ini.</small>
                             </div>
                         </div>
 
-                        <!-- 2. PERSENTASE BAGI HASIL INVESTOR -->
+                        <!-- 2. BAGI HASIL INVESTOR - POTONGAN MANAJEMEN -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
@@ -103,54 +103,7 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($outletData['persen_bagian_investor'] ?? '50.00'); ?>" required>
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <small class="text-muted">Set atau sesuaikan persentase bagi hasil untuk investor ini (default terisi otomatis dari data investor).</small>
-                            </div>
-                        </div>
-
-                        <!-- 3. NAMA PENGELOLA - NO HP -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola (Kasir)</label>
-                                <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
-                                    placeholder="Contoh: Budi Santoso"
-                                    value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp Kasir (Opsional)</label>
-                                <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
-                                    placeholder="Contoh: 081234567890"
-                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
-                            </div>
-                        </div>
-
-                        <!-- 3. USERNAME - PASSWORD -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_username" class="form-label fw-bold">Username Kasir</label>
-                                <input type="text" class="form-control" id="kasir_username" name="kasir_username"
-                                    placeholder="Contoh: kasir_waru"
-                                    value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kasir_password" class="form-label fw-bold">Password Kasir <?= $isEdit ? "(Opsional)" : ""; ?></label>
-                                <input type="password" class="form-control" id="kasir_password" name="kasir_password"
-                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
-                                    <?= $isEdit ? '' : 'required'; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
-                            </div>
-                        </div>
-
-                        <!-- 4. KECAMATAN - PERSENTASE POTONGAN MANAGEMENT -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
-                                    placeholder="Contoh: Waru"
-                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                                <small class="text-muted">Set/sesuaikan persentase bagi hasil untuk investor ini.</small>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -162,14 +115,59 @@ $investorList = $db->query("
                                         value="<?= htmlspecialchars($outletData['persentase_potongan'] ?? '10.00'); ?>" required>
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <small class="text-muted">Persentase potongan manajemen/sistem khusus outlet ini (bukan global).</small>
+                                <small class="text-muted">Persentase potongan manajemen/sistem khusus outlet ini.</small>
                             </div>
                         </div>
 
-                        <!-- 5. ALAMAT LENGKAP -->
+                        <!-- 3. NAMA PENGELOLA OUTLET - NO HP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Outlet (Kasir)</label>
+                                <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
+                                    placeholder="Contoh: Budi Santoso"
+                                    value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp Pengelola (Opsional)</label>
+                                <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
+                                    placeholder="Contoh: 081234567890"
+                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- 4. USERNAME - PASSWORD -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_username" class="form-label fw-bold">Username Pengelola</label>
+                                <input type="text" class="form-control" id="kasir_username" name="kasir_username"
+                                    placeholder="Contoh: kasir_waru"
+                                    value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kasir_password" class="form-label fw-bold">Password Pengelola <?= $isEdit ? "(Opsional)" : ""; ?></label>
+                                <input type="password" class="form-control" id="kasir_password" name="kasir_password"
+                                    placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
+                                    <?= $isEdit ? '' : 'required'; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
+                            </div>
+                        </div>
+
+                        <!-- 5. KECAMATAN & ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet</label>
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan"
+                                    placeholder="Contoh: Waru"
+                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet Lengkap</label>
                                 <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
                                     placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>

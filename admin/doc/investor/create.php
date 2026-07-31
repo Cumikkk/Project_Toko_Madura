@@ -88,8 +88,8 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                             </div>
                         </div>
 
-                        <!-- BARIS 3: MASTER OWNER & PERSENTASE BAGI HASIL (STEP KELIPATAN 5) -->
-                        <div class="col-md-6 mb-3">
+                        <!-- BARIS 3: MASTER OWNER -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="id_master" class="form-label fw-bold">Master Owner</label>
                                 <select class="form-control" id="id_master" name="id_master" required>
@@ -103,16 +103,6 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                                     <?php endif; ?>
                                 </select>
                                 <small class="text-muted">Pilih Master Owner tempat investor ini dinaungi.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="persen_bagian_investor" class="form-label fw-bold">Persentase Bagi Hasil Investor (%)</label>
-                                <div class="input-group">
-                                    <input type="number" step="0.01" min="0" max="100" class="form-control" id="persen_bagian_investor" name="persen_bagian_investor" placeholder="Contoh: 50.00" value="<?= htmlspecialchars($investorData['persen_bagian_investor'] ?? '50.00'); ?>" required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <small class="text-muted">Bagi hasil keuntungan hak Investor. Contoh: Jika diisi 60%, maka Investor menerima 60% dan Pengelola Toko menerima 40%.</small>
                             </div>
                         </div>
 

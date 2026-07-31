@@ -107,7 +107,11 @@ if ($isEdit) {
     $idMaster = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
     // Update investor table
-    $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
+    if (isset($data['persen_bagian_investor']) && $data['persen_bagian_investor'] !== '') {
+        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
+    } else {
+        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal} WHERE id_investor = {$idInvestor}");
+    }
 
     JsonResponse([
         'code'      => 200,
