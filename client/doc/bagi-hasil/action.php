@@ -26,9 +26,8 @@ if ($action === 'get_detail_harian') {
 
     // Fetch outlet details and investor split percentage
     $resOut = $db->query("
-        SELECT o.nama_outlet, o.persentase_potongan, i.persen_bagian_investor 
+        SELECT o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor 
         FROM outlet o 
-        LEFT JOIN investor i ON o.id_investor = i.id_investor 
         WHERE o.id_outlet = {$idOutlet} 
         LIMIT 1
     ");
@@ -42,26 +41,27 @@ if ($action === 'get_detail_harian') {
     $persenInvSplit = isset($rowOutInfo['persen_bagian_investor']) ? (float)$rowOutInfo['persen_bagian_investor'] : 50.00;
     $persenOutSplit = 100.00 - $persenInvSplit;
 
-    // Determine Month and Year for full monthly daily breakdown (Tgl 1 s.d. Tgl 31)
-    $reqBulan = $bulan;
-    $reqTahun = $tahun;
+    // Build filter conditions based on passed parameters
+    $whereConds = ["l.id_outlet = {$idOutlet}"];
 
-    if ($reqBulan <= 0 && !empty($tglMulai)) {
-        $reqBulan = (int)date('n', strtotime($tglMulai));
+    if (!empty($tglMulai) && !empty($tglSelesai)) {
+        $safeMulai = $db->real_escape_string($tglMulai);
+        $safeSelesai = $db->real_escape_string($tglSelesai);
+        $whereConds[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    } elseif (!empty($tglMulai)) {
+        $safeMulai = $db->real_escape_string($tglMulai);
+        $whereConds[] = "l.periode_laporan >= '{$safeMulai}'";
+    } elseif (!empty($tglSelesai)) {
+        $safeSelesai = $db->real_escape_string($tglSelesai);
+        $whereConds[] = "l.periode_laporan <= '{$safeSelesai}'";
+    } else {
+        if ($bulan > 0) {
+            $whereConds[] = "MONTH(l.periode_laporan) = {$bulan}";
+        }
+        if ($tahun > 0) {
+            $whereConds[] = "YEAR(l.periode_laporan) = {$tahun}";
+        }
     }
-    if ($reqTahun <= 0 && !empty($tglMulai)) {
-        $reqTahun = (int)date('Y', strtotime($tglMulai));
-    }
-
-    if ($reqBulan <= 0) $reqBulan = (int)date('n');
-    if ($reqTahun <= 0) $reqTahun = (int)date('Y');
-
-    // Always fetch ALL days in the month for full daily breakdown
-    $whereConds = [
-        "l.id_outlet = {$idOutlet}",
-        "MONTH(l.periode_laporan) = {$reqBulan}",
-        "YEAR(l.periode_laporan) = {$reqTahun}"
-    ];
 
     $whereSql = implode(" AND ", $whereConds);
     $sql = "SELECT id_laporan, periode_laporan, omzet, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
