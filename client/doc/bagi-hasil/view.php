@@ -59,10 +59,6 @@ $selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']
 $selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
 $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
-if (!isset($_GET['outlet_id']) && !isset($_GET['id_outlet']) && !isset($_GET['outlet']) && !isset($_GET['tgl_mulai']) && !isset($_GET['tgl_selesai']) && !isset($_GET['bulan']) && !isset($_GET['tahun'])) {
-    $selectedBulan = (int)date('n');
-    $selectedTahun = (int)date('Y');
-}
 
 // Fetch list of outlets belonging to logged in investor
 $investorOutlets = [];
@@ -341,14 +337,6 @@ $countOutlet = count($rows);
                         <p class="text-body-secondary small mb-0">Rekapitulasi komisi investor dan hak outlet per periode</p>
                     </div>
                 </div>
-
-                <!-- Controls: Export PDF -->
-                <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-lg-auto justify-content-start justify-content-lg-end">
-                    <!-- Tombol Cetak PDF Bagi Hasil -->
-                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?outlet_id=<?= $selectedOutletId; ?>&tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold text-nowrap flex-grow-1 flex-lg-grow-0 text-center">
-                        <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF Bagi Hasil
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -487,24 +475,30 @@ $countOutlet = count($rows);
                 </h5>
                 <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan investor, serta hak investor &amp; outlet</p>
             </div>
-            <!-- Tombol Filter Utama (Menggantikan Rekap Final) -->
-            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
-                <i class="fa-solid fa-filter me-1"></i> Filter Data
-            </button>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Tombol Filter Utama -->
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
+                    <i class="fa-solid fa-filter me-1"></i> Filter Data
+                </button>
+                <!-- Tombol Cetak PDF Bagi Hasil -->
+                <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?outlet_id=<?= $selectedOutletId; ?>&tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
+                    <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
+                </a>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 w-100">
                     <thead class="table-group-divider bg-body-secondary">
                         <tr class="text-uppercase small text-body-secondary">
-                            <th class="py-3 ps-3 text-center fw-bold" style="width: 40px;">No</th>
+                            <th class="py-3 ps-3 text-center fw-bold" style="width: 40px; text-align: center !important;">No</th>
                             <th class="py-3 px-3 fw-bold">Nama Outlet</th>
-                            <th class="py-3 px-3 text-end fw-bold" style="text-align: right !important;">Total Omzet (100%)</th>
+                            <th class="py-3 px-3 text-center fw-bold" style="text-align: center !important;">Total Omzet (100%)</th>
                             <th class="py-3 px-3 text-center fw-bold text-danger" style="text-align: center !important;">Potongan Outlet</th>
                             <th class="py-3 px-3 text-center fw-bold text-success" style="text-align: center !important;">Hak Investor</th>
                             <th class="py-3 px-3 text-center fw-bold text-warning" style="text-align: center !important;">Hak Outlet</th>
-                            <th class="py-3 px-3 text-end fw-bold text-body-emphasis" style="text-align: right !important;">Bersih Outlet Total</th>
-                            <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px;">Aksi Detail</th>
+                            <th class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Bersih Outlet Total</th>
+                            <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px; text-align: center !important;">Aksi Detail</th>
                         </tr>
                     </thead>
                     <tbody class="border-0">
@@ -518,8 +512,8 @@ $countOutlet = count($rows);
                                             <?= htmlspecialchars($r['nama_outlet']); ?>
                                         </div>
                                     </td>
-                                    <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-center fw-bold text-danger">
+                                    <td class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
+                                    <td class="py-3 px-3 text-center fw-bold text-danger" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             <div class="d-flex justify-content-center align-items-center gap-1">
                                                 <span>Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></span>
@@ -531,7 +525,7 @@ $countOutlet = count($rows);
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Dipotong)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-center fw-extrabold text-success fs-6">
+                                    <td class="py-3 px-3 text-center fw-extrabold text-success fs-6" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             <div class="d-flex justify-content-center align-items-center gap-1">
                                                 <span>Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></span>
@@ -543,7 +537,7 @@ $countOutlet = count($rows);
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-center fw-extrabold text-warning fs-6">
+                                    <td class="py-3 px-3 text-center fw-extrabold text-warning fs-6" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
                                             <div class="d-flex justify-content-center align-items-center gap-1">
                                                 <span>Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></span>
@@ -555,8 +549,8 @@ $countOutlet = count($rows);
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-end fw-bold text-body-emphasis">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
-                                    <td class="py-3 px-3 text-center pe-3">
+                                    <td class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
+                                    <td class="py-3 px-3 text-center pe-3" style="text-align: center !important;">
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-detail-harian-outlet" data-id="<?= $r['id_outlet']; ?>" data-nama="<?= htmlspecialchars($r['nama_outlet']); ?>">
                                             <i class="fa-solid fa-list-check me-1"></i> Rincian Harian
                                         </button>
@@ -579,7 +573,7 @@ $countOutlet = count($rows);
                         <tfoot class="table-group-divider bg-body-secondary fw-bold">
                             <tr>
                                 <td colspan="2" class="py-3 ps-3 text-end text-body-emphasis text-uppercase">TOTAL KESELURUHAN:</td>
-                                <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
+                                <td class="py-3 px-3 text-center text-body-emphasis fs-6" style="text-align: center !important;">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
                                 <td class="py-3 px-3 text-center text-danger fs-6" style="text-align: center !important;">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
                                 </td>
@@ -592,8 +586,8 @@ $countOutlet = count($rows);
                                 <td class="py-3 px-3 text-center text-warning fs-5" style="text-align: center !important;">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
                                 </td>
-                                <td class="py-3 px-3 text-end text-body-emphasis fs-6">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
-                                <td class="py-3 px-3 text-center text-body-secondary pe-3">-</td>
+                                <td class="py-3 px-3 text-center text-body-emphasis fs-6" style="text-align: center !important;">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
+                                <td class="py-3 px-3 text-center text-body-secondary pe-3" style="text-align: center !important;">-</td>
                             </tr>
                         </tfoot>
                     <?php endif; ?>

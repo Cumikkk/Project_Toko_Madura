@@ -52,10 +52,6 @@ $selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']
 $selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
 $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
-if (!isset($_GET['outlet_id']) && !isset($_GET['id_outlet']) && !isset($_GET['outlet']) && !isset($_GET['tgl_mulai']) && !isset($_GET['tgl_selesai']) && !isset($_GET['bulan']) && !isset($_GET['tahun'])) {
-    $selectedBulan = (int)date('n');
-    $selectedTahun = (int)date('Y');
-}
 
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
