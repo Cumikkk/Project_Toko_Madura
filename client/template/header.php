@@ -37,9 +37,13 @@ $topbarTab  = $_GET['tab'] ?? '';
             <?php $role = strtolower($user['role'] ?? 'outlet'); ?>
             <div class="d-none d-lg-flex align-items-center gap-2 topbar-nav-pill-container shadow-sm">
                 <?php if ($role === 'master') : ?>
-                    <!-- Menu Master: Data Investor -->
+                    <!-- Menu 1 Master: Data Investor -->
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="topbar-nav-pill <?= ($topbarPage == 'investor' || $topbarPage == 'dashboard' || $topbarPage == 'outlet') ? 'active' : ''; ?>">
                         <i class="fa-light fa-users me-2"></i> Data Investor
+                    </a>
+                    <!-- Menu 2 Master: Komisi & Reward -->
+                    <a href="<?= SystemInfo::app('CLIENT_URL') ?>/komisi" class="topbar-nav-pill <?= ($topbarPage == 'komisi') ? 'active' : ''; ?>">
+                        <i class="fa-light fa-award me-2"></i> Komisi & Reward
                     </a>
                 <?php elseif ($role === 'investor') : ?>
                     <!-- Menu 1 Investor: Data Outlet -->
@@ -151,9 +155,13 @@ $topbarTab  = $_GET['tab'] ?? '';
 <div class="collapse d-lg-none mobile-topbar-dropdown" id="mobileTopNav">
     <div class="d-flex flex-column gap-1">
         <?php if ($role === 'master') : ?>
-            <!-- Menu Master: Data Investor -->
+            <!-- Menu 1 Master: Data Investor -->
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="mobile-topbar-link <?= ($topbarPage == 'investor' || $topbarPage == 'dashboard' || $topbarPage == 'outlet') ? 'active' : ''; ?>">
                 <i class="fa-light fa-users me-2 fs-5"></i> Data Investor
+            </a>
+            <!-- Menu 2 Master: Komisi & Reward -->
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/komisi" class="mobile-topbar-link <?= ($topbarPage == 'komisi') ? 'active' : ''; ?>">
+                <i class="fa-light fa-award me-2 fs-5"></i> Komisi & Reward
             </a>
         <?php elseif ($role === 'investor') : ?>
             <!-- Menu 1 Investor: Data Outlet -->

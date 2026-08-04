@@ -6,7 +6,7 @@ $db = Database::connect();
 
 // Fetch Master list with sub-counts
 $sqlMasters = "
-    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp,
+    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.created_at,
            COUNT(DISTINCT inv.id_investor) as total_investor,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM users u
@@ -14,7 +14,7 @@ $sqlMasters = "
     LEFT JOIN outlet o ON (o.id_investor = inv.id_investor AND o.status = 'active')
     WHERE u.role = 'master'
     GROUP BY u.id_users
-    ORDER BY u.nama_lengkap ASC
+    ORDER BY u.id_users DESC
 ";
 $masters = $db->query($sqlMasters);
 ?>
@@ -24,7 +24,8 @@ $masters = $db->query($sqlMasters);
         <h2 class="main-content-title tx-24 mg-b-5">Daftar Master Toko Madura</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Master</li>
+            <li class="breadcrumb-item">Master</li>
+            <li class="breadcrumb-item active" aria-current="page">Data Master</li>
         </ol>
     </div>
 </div>
@@ -47,10 +48,11 @@ $masters = $db->query($sqlMasters);
                         <thead>
                             <tr class="text-center">
                                 <th class="text-center" style="width: 5%;">No</th>
-                                <th class="text-center">Nama Lengkap</th>
-                                <th class="text-center">Username</th>
+                                <th class="text-center">Tanggal Bergabung</th>
+                                <th class="text-center">Nama Master</th>
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Total Investor</th>
+                                <th class="text-center">Total Outlet Active</th>
                                 <th class="text-center" style="width: 15%;">#</th>
                             </tr>
                         </thead>
@@ -59,11 +61,17 @@ $masters = $db->query($sqlMasters);
                                 <?php $no = 1; while ($row = $masters->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td class="text-start"><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
-                                        <td class="text-start"><code><?= htmlspecialchars($row['username']) ?></code></td>
+                                        <td class="text-center"><?= !empty($row['created_at']) ? date("d/m/Y H:i", strtotime($row['created_at'])) : '-' ?></td>
+                                        <td class="text-start">
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
+                                            <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
+                                        </td>
                                         <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <span class="badge bg-info fs-6"><?= number_format($row['total_investor']) ?> Investor</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko Aktif</span>
                                         </td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
@@ -79,7 +87,7 @@ $masters = $db->query($sqlMasters);
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -105,7 +113,7 @@ $(document).ready(function() {
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                 paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
             },
-            order: [[1, 'asc']]
+            order: [[1, 'desc']]
         });
     }
 });

@@ -29,7 +29,19 @@ CREATE TABLE users (
     no_hp VARCHAR(20) DEFAULT NULL,
     email VARCHAR(100) DEFAULT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('master', 'investor', 'outlet', 'programmer') NOT NULL
+    role ENUM('master', 'investor', 'outlet', 'programmer') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE komisi_master (
+    id_komisi INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_master INT(10) UNSIGNED NOT NULL,
+    tanggal_komisi DATETIME NOT NULL,
+    periode VARCHAR(100) NOT NULL,
+    nominal DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    catatan TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE CASCADE
 );
 
 CREATE TABLE investor (

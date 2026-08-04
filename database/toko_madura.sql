@@ -317,6 +317,7 @@ CREATE TABLE `users` (
   `no_hp` varchar(20) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('programmer','master','investor','outlet') NOT NULL DEFAULT 'outlet',
+  `created_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id_users`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -328,9 +329,30 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (59,'Anonymous','admin','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','programmer'),(105,'Riski Ardhika','master','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','master'),(106,'M. Fahrul Alfanani','investor','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','investor'),(109,'Budi Santoso','toko1','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet'),(110,'Ahmad Zaki','toko2','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet'),(111,'Zaka Kurniawan','toko3','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet'),(112,'Rudi Hermawan','toko4','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet'),(113,'Muhhamad Tegar Kurniawan','outlet','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet');
+INSERT INTO `users` VALUES (59,'Anonymous','admin','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','programmer','2026-07-23 12:19:52'),(105,'Riski Ardhika','master','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','master','2026-07-23 12:19:52'),(106,'M. Fahrul Alfanani','investor','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','investor','2026-07-23 12:19:52'),(109,'Budi Santoso','toko1','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(110,'Ahmad Zaki','toko2','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(111,'Zaka Kurniawan','toko3','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(112,'Rudi Hermawan','toko4','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(113,'Muhhamad Tegar Kurniawan','outlet','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `komisi_master`
+--
+
+DROP TABLE IF EXISTS `komisi_master`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `komisi_master` (
+  `id_komisi` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_master` int(10) unsigned NOT NULL,
+  `tanggal_komisi` datetime NOT NULL,
+  `periode` varchar(100) NOT NULL,
+  `nominal` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `catatan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_komisi`),
+  KEY `id_master` (`id_master`),
+  CONSTRAINT `komisi_master_ibfk_1` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
