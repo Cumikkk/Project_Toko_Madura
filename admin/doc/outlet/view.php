@@ -171,12 +171,12 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
+                                    <th class="text-center">Tanggal Disetujui</th>
+                                    <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
-                                    <th class="text-center">Tanggal Disetujui</th>
-                                    <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
@@ -185,6 +185,27 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $activeOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
+                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
+                                            <td class="text-center">
+                                                <?php
+                                                if (!empty($row['tgl_jatuh_tempo'])) {
+                                                    $jtTimestamp = strtotime($row['tgl_jatuh_tempo']);
+                                                    $todayTimestamp = strtotime(date('Y-m-d'));
+                                                    $jtDateStr = date("d/m/Y", $jtTimestamp);
+                                                    $diffDays = ceil(($jtTimestamp - $todayTimestamp) / 86400);
+
+                                                    if ($diffDays < 0) {
+                                                        echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>' . $jtDateStr . ' (Expired)</span>';
+                                                    } elseif ($diffDays <= 7) {
+                                                        echo '<span class="badge bg-warning text-dark" title="Masa langganan hampir habis"><i class="fas fa-exclamation-triangle me-1"></i>' . $jtDateStr . ' (' . ($diffDays == 0 ? 'Hari Ini' : 'Sisa ' . $diffDays . ' Hari') . ')</span>';
+                                                    } else {
+                                                        echo '<span class="badge bg-success" title="Masa langganan aktif"><i class="fas fa-clock me-1"></i>' . $jtDateStr . ' (' . $diffDays . ' Hari Lagi)</span>';
+                                                    }
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
+                                                ?>
+                                            </td>
                                             <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
@@ -208,22 +229,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php else : ?>
                                                     <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                 <?php endif; ?>
-                                            </td>
-                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
-                                            <td class="text-center">
-                                                <?php
-                                                if (!empty($row['tgl_jatuh_tempo'])) {
-                                                    $jt = date('Y-m-d', strtotime($row['tgl_jatuh_tempo']));
-                                                    $today = date('Y-m-d');
-                                                    if ($today > $jt) {
-                                                        echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-exclamation-triangle me-1"></i>' . date("d/m/Y", strtotime($jt)) . ' (Expired)</span>';
-                                                    } else {
-                                                        echo '<span class="badge bg-success"><i class="fas fa-calendar-check me-1"></i>' . date("d/m/Y", strtotime($jt)) . '</span>';
-                                                    }
-                                                } else {
-                                                    echo '<span class="text-muted">-</span>';
-                                                }
-                                                ?>
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
@@ -252,12 +257,12 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
+                                    <th class="text-center">Tanggal Disetujui</th>
+                                    <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
-                                    <th class="text-center">Tanggal Disetujui</th>
-                                    <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
@@ -266,6 +271,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $expiredOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
+                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
+                                            <td class="text-center">
+                                                <?php
+                                                if (!empty($row['tgl_jatuh_tempo'])) {
+                                                    $jtDateStr = date("d/m/Y", strtotime($row['tgl_jatuh_tempo']));
+                                                    echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>' . $jtDateStr . ' (Expired)</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-secondary">Non-Aktif</span>';
+                                                }
+                                                ?>
+                                            </td>
                                             <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
@@ -289,17 +305,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php else : ?>
                                                     <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                 <?php endif; ?>
-                                            </td>
-                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
-                                            <td class="text-center">
-                                                <?php
-                                                if (!empty($row['tgl_jatuh_tempo'])) {
-                                                    $jt = date('Y-m-d', strtotime($row['tgl_jatuh_tempo']));
-                                                    echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-exclamation-triangle me-1"></i>' . date("d/m/Y", strtotime($jt)) . ' (Expired)</span>';
-                                                } else {
-                                                    echo '<span class="badge bg-secondary">Non-Aktif</span>';
-                                                }
-                                                ?>
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
@@ -328,13 +333,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
+                                    <th class="text-center">Tanggal Request</th>
+                                    <th class="text-center">Tipe Request</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
-                                    <th class="text-center">Tanggal Request</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
@@ -343,13 +349,18 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $pendingOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
+                                            <td class="text-center">
+                                                <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
+                                                    <span class="badge bg-warning text-dark"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-info text-white"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-start">
                                                 <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
-                                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 10px;"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
-                                                <?php else : ?>
-                                                    <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
-                                                <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
@@ -386,9 +397,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
-                                            </td>
-                                            <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1">
                                                     <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
                                                         <i class="fas fa-check me-1"></i> Setujui
@@ -401,20 +409,22 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada request outlet pending.</td></tr>
+                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada request outlet pending.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- TAB 3: DITOLAK (REJECT) -->
+                <!-- TAB 4: DITOLAK (REJECT) -->
                 <div id="tab-reject" class="outlet-tab-section" style="display:none;">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-reject">
                             <thead>
                                 <tr class="text-center">
                                     <th class="text-center" style="width: 5%;">No</th>
+                                    <th class="text-center">Tanggal Ditolak</th>
+                                    <th class="text-center">Tipe Request</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
                                     <th class="text-center">Kecamatan</th>
@@ -422,7 +432,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
                                     <th class="text-center">Alasan Penolakan</th>
-                                    <th class="text-center">Tanggal Ditolak</th>
                                     <th class="text-center" style="width: 10%;">#</th>
                                 </tr>
                             </thead>
@@ -431,13 +440,18 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $rejectedOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
+                                            <td class="text-center">
+                                                <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
+                                                    <span class="badge bg-warning text-dark"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
+                                                <?php else : ?>
+                                                    <span class="badge bg-info text-white"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-start">
                                                 <strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                                <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
-                                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 10px;"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>
-                                                <?php else : ?>
-                                                    <span class="badge bg-info text-white ms-1" style="font-size: 10px;"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>
-                                                <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
@@ -477,19 +491,18 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i><?= htmlspecialchars($row['alasan_penolakan'] ?? 'Tidak ada catatan') ?></span>
                                             </td>
                                             <td class="text-center">
-                                                <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
-                                            </td>
-                                            <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-success btn-sm text-white btn-edit" onclick='editAlasanPenolakan(<?= $row['id_outlet'] ?>, <?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alasan_penolakan'] ?? '') ?>)' title="Edit Alasan Penolakan">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                    <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
+                                                        <button type="button" class="btn btn-success btn-sm text-white btn-edit" onclick='editAlasanPenolakan(<?= $row['id_outlet'] ?>, <?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alasan_penolakan'] ?? '') ?>)' title="Edit Alasan Penolakan">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else : ?>
-                                    <tr><td colspan="10" class="text-center text-muted py-4">Belum ada request outlet yang ditolak.</td></tr>
+                                    <tr><td colspan="11" class="text-center text-muted py-4">Belum ada request outlet ditolak.</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -497,9 +510,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
     </div>
 </div>
 
@@ -541,7 +551,7 @@ function initDataTable(tabKey) {
                     info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                     paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
                 },
-                order: [[0, 'asc']]
+                order: [[1, 'desc']]
             });
             dtInitialized[tabKey] = true;
 
