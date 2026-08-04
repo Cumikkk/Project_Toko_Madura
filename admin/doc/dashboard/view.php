@@ -149,10 +149,6 @@ $recentRequests = $db->query("
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endwhile; ?>
-                            <?php else : ?>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">Belum ada data omzet.</td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -229,10 +225,6 @@ $recentRequests = $db->query("
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
-                            <?php else : ?>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Belum ada request outlet.</td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -245,33 +237,46 @@ $recentRequests = $db->query("
 <script type="text/javascript">
 $(document).ready(function() {
     if ($.fn.DataTable) {
-        if (!$.fn.DataTable.isDataTable('#table-top-omzet')) {
-            $('#table-top-omzet').DataTable({
-                pageLength: 5,
-                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Semua"]],
-                language: {
-                    searchPlaceholder: 'Cari omzet...',
-                    sSearch: '',
-                    lengthMenu: '_MENU_ data',
-                    info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
-                    paginate: { first: 'Awal', last: 'Akhir', next: '<i class="fa fa-chevron-right"></i>', previous: '<i class="fa fa-chevron-left"></i>' }
-                },
-                order: [[3, 'desc']]
-            });
+        try {
+            if (!$.fn.DataTable.isDataTable('#table-top-omzet')) {
+                $('#table-top-omzet').DataTable({
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Semua"]],
+                    language: {
+                        searchPlaceholder: 'Cari omzet...',
+                        sSearch: '',
+                        lengthMenu: '_MENU_ data',
+                        info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+                        paginate: { first: 'Awal', last: 'Akhir', next: '<i class="fa fa-chevron-right"></i>', previous: '<i class="fa fa-chevron-left"></i>' },
+                        emptyTable: 'Belum ada data omzet.',
+                        zeroRecords: 'Tidak ada data omzet yang cocok.'
+                    },
+                    order: [[3, 'desc']]
+                });
+            }
+        } catch (e) {
+            console.error('Error init #table-top-omzet DataTables:', e);
         }
-        if (!$.fn.DataTable.isDataTable('#table-recent-requests')) {
-            $('#table-recent-requests').DataTable({
-                pageLength: 5,
-                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Semua"]],
-                language: {
-                    searchPlaceholder: 'Cari request...',
-                    sSearch: '',
-                    lengthMenu: '_MENU_ data',
-                    info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
-                    paginate: { first: 'Awal', last: 'Akhir', next: '<i class="fa fa-chevron-right"></i>', previous: '<i class="fa fa-chevron-left"></i>' }
-                },
-                order: [[1, 'desc']]
-            });
+
+        try {
+            if (!$.fn.DataTable.isDataTable('#table-recent-requests')) {
+                $('#table-recent-requests').DataTable({
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Semua"]],
+                    language: {
+                        searchPlaceholder: 'Cari request...',
+                        sSearch: '',
+                        lengthMenu: '_MENU_ data',
+                        info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+                        paginate: { first: 'Awal', last: 'Akhir', next: '<i class="fa fa-chevron-right"></i>', previous: '<i class="fa fa-chevron-left"></i>' },
+                        emptyTable: 'Belum ada request outlet.',
+                        zeroRecords: 'Tidak ada request outlet yang cocok.'
+                    },
+                    order: [[1, 'desc']]
+                });
+            }
+        } catch (e) {
+            console.error('Error init #table-recent-requests DataTables:', e);
         }
     }
 
