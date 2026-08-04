@@ -14,7 +14,7 @@ $masterCount   = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'm
 $investorCount = $db->query("SELECT COUNT(*) as total FROM investor")->fetch_assoc()['total'] ?? 0;
 $outletCount   = $db->query("SELECT COUNT(*) as total FROM outlet")->fetch_assoc()['total'] ?? 0;
 
-// Top 5 Outlet berdasarkan Omzet
+// Outlet berdasarkan Omzet
 $topOutlets = $db->query("
     SELECT o.id_outlet, o.nama_outlet, o.kecamatan, o.alamat_outlet, SUM(l.omzet) as total_omzet,
            u_inv.nama_lengkap as nama_investor, inv.kecamatan as kecamatan_investor, inv.alamat_investor
@@ -24,10 +24,9 @@ $topOutlets = $db->query("
     LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
     GROUP BY l.id_outlet
     ORDER BY total_omzet DESC
-    LIMIT 5
 ");
 
-// 5 Request Outlet Terbaru (Khusus Pending)
+// Request Outlet Terbaru (Khusus Pending)
 $recentRequests = $db->query("
     SELECT o.*, u_inv.nama_lengkap as nama_investor, inv.kecamatan as kecamatan_investor, inv.alamat_investor
     FROM outlet o
@@ -35,7 +34,6 @@ $recentRequests = $db->query("
     LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
     WHERE o.status = 'pending'
     ORDER BY o.id_outlet DESC
-    LIMIT 5
 ");
 ?>
 
@@ -106,7 +104,7 @@ $recentRequests = $db->query("
             </div>
             <div class="card-body d-flex flex-column flex-grow-1">
                 <div class="table-responsive flex-grow-1">
-                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-top-omzet">
                         <thead>
                             <tr class="text-center">
                                 <th class="text-center" style="width: 8%;">No</th>
@@ -151,10 +149,6 @@ $recentRequests = $db->query("
                                         <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endwhile; ?>
-                            <?php else : ?>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">Belum ada data omzet.</td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -174,13 +168,13 @@ $recentRequests = $db->query("
             </div>
             <div class="card-body d-flex flex-column flex-grow-1">
                 <div class="table-responsive flex-grow-1">
-                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0">
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-recent-requests">
                         <thead>
                             <tr class="text-center">
                                 <th class="text-center" style="width: 8%;">No</th>
+                                <th class="text-center">Tanggal Request</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Investor</th>
-                                <th class="text-center">Tanggal Request</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>
@@ -189,6 +183,9 @@ $recentRequests = $db->query("
                                 <?php $noReq = 1; while ($row = $recentRequests->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $noReq++ ?></td>
+                                        <td class="text-center">
+                                            <?= !empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) : '-' ?>
+                                        </td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             <?php if (!empty($row['kecamatan'])) : ?>
@@ -218,9 +215,6 @@ $recentRequests = $db->query("
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <?= !empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) : '-' ?>
-                                        </td>
-                                        <td class="text-center">
                                             <?php if ($row['status'] === 'pending') : ?>
                                                 <span class="badge bg-warning text-dark">Pending</span>
                                             <?php elseif ($row['status'] === 'active') : ?>
@@ -231,10 +225,6 @@ $recentRequests = $db->query("
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
-                            <?php else : ?>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Belum ada request outlet.</td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -246,6 +236,55 @@ $recentRequests = $db->query("
 
 <script type="text/javascript">
 $(document).ready(function() {
+    if ($.fn.DataTable) {
+        if (!$.fn.DataTable.isDataTable('#table-top-omzet')) {
+            $('#table-top-omzet').DataTable({
+                processing: true,
+                deferRender: true,
+                scrollX: true,
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                language: {
+                    searchPlaceholder: 'Cari omzet...',
+                    sSearch: '',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
+                    emptyTable: 'Belum ada data omzet.'
+                },
+                order: [[3, 'desc']]
+            });
+        }
+
+        if (!$.fn.DataTable.isDataTable('#table-recent-requests')) {
+            $('#table-recent-requests').DataTable({
+                processing: true,
+                deferRender: true,
+                scrollX: true,
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                language: {
+                    searchPlaceholder: 'Cari request...',
+                    sSearch: '',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
+                    emptyTable: 'Belum ada request outlet.'
+                },
+                order: [[1, 'desc']]
+            });
+        }
+
+        if ($.fn.select2) {
+            setTimeout(function() {
+                $('#table-top-omzet_wrapper .dataTables_length select, #table-recent-requests_wrapper .dataTables_length select').select2({
+                    minimumResultsForSearch: Infinity,
+                    width: 'auto'
+                });
+            }, 50);
+        }
+    }
+
     $('.btn-detail-alamat-outlet').on('click', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
@@ -269,3 +308,4 @@ $(document).ready(function() {
     });
 });
 </script>
+
