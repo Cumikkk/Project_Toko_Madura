@@ -109,8 +109,18 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                             <div class="form-group">
                                 <label for="biaya_langganan_outlet" class="form-label fw-bold">Nominal Biaya Langganan Outlet (Rp) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" step="1" min="0" class="form-control" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="100000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 100000); ?>" required>
+                                    <span class="input-group-text border-end-0">Rp</span>
+                                    <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="100000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 100000); ?>" required>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepBiayaInvestor(25000)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+Rp 25.000)">
+                                                <i class="fas fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepBiayaInvestor(-25000)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Kurangi (-Rp 25.000)">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <small class="text-muted">Tarif ini berlaku sebagai biaya langganan bulanan seluruh outlet investor ini.</small>
                             </div>
@@ -142,6 +152,13 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
 </div>
 
 <script type="text/javascript">
+    function stepBiayaInvestor(amount) {
+        let input = $('#biaya_langganan_outlet');
+        let val = parseFloat(input.val()) || 0;
+        let nextVal = Math.max(0, val + amount);
+        input.val(nextVal);
+    }
+
     $(document).ready(function() {
         $('#form-create-investor').on('submit', function(el) {
             el.preventDefault();
