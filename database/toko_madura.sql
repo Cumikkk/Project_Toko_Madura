@@ -268,7 +268,7 @@ CREATE TABLE `pengaturan_sistem` (
 
 LOCK TABLES `pengaturan_sistem` WRITE;
 /*!40000 ALTER TABLE `pengaturan_sistem` DISABLE KEYS */;
-INSERT INTO `pengaturan_sistem` VALUES (1,'potongan_global','10.00'),(2,'biaya_langganan_outlet','250000'),(3,'bank_nama','BRI'),(4,'bank_no_rekening','123-456-789'),(5,'bank_atas_nama','Anonymous');
+INSERT INTO `pengaturan_sistem` VALUES (1,'potongan_global','10.00'),(3,'bank_nama','BRI'),(4,'bank_no_rekening','123-456-789'),(5,'bank_atas_nama','Anonymous');
 /*!40000 ALTER TABLE `pengaturan_sistem` ENABLE KEYS */;
 UNLOCK TABLES;
 

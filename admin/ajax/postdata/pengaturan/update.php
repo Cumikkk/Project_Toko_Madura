@@ -8,11 +8,6 @@ $db = Database::connect();
 $type = trim($_POST['setting_type'] ?? '');
 $updates = [];
 
-if ($type === 'biaya_langganan' || isset($_POST['biaya_langganan_outlet'])) {
-    $biayaLangganan = (float)($_POST['biaya_langganan_outlet'] ?? 0);
-    $updates['biaya_langganan_outlet'] = $biayaLangganan;
-}
-
 if ($type === 'rekening_bank' || isset($_POST['bank_nama'])) {
     $bankNama     = trim($_POST['bank_nama'] ?? '');
     $bankNoRek    = trim($_POST['bank_no_rekening'] ?? '');

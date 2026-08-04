@@ -16,7 +16,6 @@ if ($res) {
 $bankNama       = $settings['bank_nama'] ?? 'BCA';
 $bankNoRek      = $settings['bank_no_rekening'] ?? '123-456-7890';
 $bankAtasNama   = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
-$biayaLangganan = (float)($settings['biaya_langganan_outlet'] ?? 100000.00);
 ?>
 
 <div class="page-header">
