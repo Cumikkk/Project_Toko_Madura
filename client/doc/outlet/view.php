@@ -308,7 +308,14 @@ if ($resSysSetting) {
         $sysSettings[$r['nama_pengaturan']] = $r['nilai'];
     }
 }
-$biayaLangganan = (float)($sysSettings['biaya_langganan_outlet'] ?? 100000.00);
+$resInvFee = $db->query("SELECT biaya_langganan_outlet FROM investor WHERE id_investor = {$investorId} LIMIT 1");
+$biayaLangganan = 100000.00;
+if ($resInvFee && $resInvFee->num_rows > 0) {
+    $rowFee = $resInvFee->fetch_assoc();
+    if (!empty($rowFee['biaya_langganan_outlet']) && (float)$rowFee['biaya_langganan_outlet'] > 0) {
+        $biayaLangganan = (float)$rowFee['biaya_langganan_outlet'];
+    }
+}
 $bankNama       = $sysSettings['bank_nama'] ?? 'BCA';
 $bankNoRek      = $sysSettings['bank_no_rekening'] ?? '123-456-7890';
 $bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';

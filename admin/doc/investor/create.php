@@ -120,6 +120,18 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                             </div>
                         </div>
 
+                        <!-- BARIS 5: BIAYA LANGGANAN OUTLET -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="biaya_langganan_outlet" class="form-label fw-bold">Nominal Biaya Langganan Outlet (Rp) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" step="1" min="0" class="form-control" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="100000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 100000); ?>" required>
+                                </div>
+                                <small class="text-muted">Tarif ini akan otomatis berlaku sebagai biaya langganan bulanan untuk seluruh outlet milik investor ini.</small>
+                            </div>
+                        </div>
+
                         <div class="col-md-12 mt-3 d-flex justify-content-end gap-2">
                             <a href="<?= SystemInfo::app('ADMIN_URL') ?>/investor/view" class="btn btn-secondary">Batal</a>
                             <button type="submit" class="btn btn-primary" data-original-text="Submit"><?= $isEdit ? "Simpan Perubahan" : "Simpan Investor"; ?></button>

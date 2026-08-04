@@ -151,6 +151,7 @@ CREATE TABLE `investor` (
   `kecamatan` varchar(100) DEFAULT NULL,
   `alamat_investor` text DEFAULT NULL,
   `persen_bagian_investor` decimal(5,2) NOT NULL DEFAULT 50.00,
+  `biaya_langganan_outlet` decimal(15,2) NOT NULL DEFAULT 100000.00,
   `persen_bagian_master` decimal(5,2) NOT NULL DEFAULT 0.00,
   `tanggal_bergabung` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id_investor`),
@@ -167,7 +168,7 @@ CREATE TABLE `investor` (
 
 LOCK TABLES `investor` WRITE;
 /*!40000 ALTER TABLE `investor` DISABLE KEYS */;
-INSERT INTO `investor` VALUES (20,106,105,'Candi','Perum Surya garden and square A21, Balun, Sidodadi, Kec. Candi, Kabupaten Sidoarjo, Jawa Timur 61271',50.00,0.00,'2026-07-31 09:05:46');
+INSERT INTO `investor` VALUES (20,106,105,'Candi','Perum Surya garden and square A21, Balun, Sidodadi, Kec. Candi, Kabupaten Sidoarjo, Jawa Timur 61271',50.00,100000.00,0.00,'2026-07-31 09:05:46');
 /*!40000 ALTER TABLE `investor` ENABLE KEYS */;
 UNLOCK TABLES;
 

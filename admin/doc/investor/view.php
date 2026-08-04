@@ -63,6 +63,7 @@ $investors = $db->query("
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Bagi Hasil (%)</th>
+                                <th class="text-center">Biaya Langganan / Outlet</th>
                                 <th class="text-center">Master Owner</th>
                                 <th class="text-center">Total Outlet Active</th>
                                 <th class="text-center">Tanggal Bergabung</th>
@@ -89,6 +90,7 @@ $investors = $db->query("
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
+                                        <td class="text-center"><span class="badge bg-light text-dark border">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</span></td>
                                         <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center"><span class="badge bg-success fs-6"><?= number_format($row['total_outlet'] ?? 0) ?> Toko</span></td>
                                         <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
@@ -148,9 +150,18 @@ $(document).ready(function() {
     $('.btn-lihat-alamat').on('click', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
+        let queryStr = encodeURIComponent(alamat);
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
         Swal.fire({
             title: 'Alamat Lengkap Investor',
-            html: '<p class="text-start mb-1"><strong>Investor:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
+            html: '<p class="text-start mb-2"><strong>Investor:</strong> ' + nama + '</p>' +
+                  '<div class="p-3 bg-light rounded text-start border">' +
+                    '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
+                    '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
+                      alamat + ' <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>' +
+                    '</a>' +
+                  '</div>' +
+                  '<small class="text-muted d-block text-start mt-2"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>',
             icon: 'info',
             confirmButtonText: 'Tutup'
         });

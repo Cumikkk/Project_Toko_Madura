@@ -518,10 +518,19 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 // Show Alamat popup – called directly via onclick (no data-attr)
 // ============================================================
 function showAlamat(nama, alamat) {
+    let queryStr = encodeURIComponent(nama + ' ' + alamat);
+    let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
     if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Alamat Lengkap Outlet',
-            html: '<p class="text-start mb-1"><strong>Outlet:</strong> ' + nama + '</p><div class="p-3 bg-light rounded text-start"><i class="fa fa-map-marker me-2 text-danger"></i>' + alamat + '</div>',
+            html: '<p class="text-start mb-2"><strong>Outlet:</strong> ' + nama + '</p>' +
+                  '<div class="p-3 bg-light rounded text-start border">' +
+                    '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
+                    '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
+                      alamat + ' <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>' +
+                    '</a>' +
+                  '</div>' +
+                  '<small class="text-muted d-block text-start mt-2"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>',
             icon: 'info',
             confirmButtonText: 'Tutup'
         });

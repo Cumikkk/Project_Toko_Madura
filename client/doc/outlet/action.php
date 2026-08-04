@@ -55,11 +55,14 @@ try {
             JsonResponse(['success' => false, 'message' => 'Username "' . htmlspecialchars($username) . '" sudah digunakan. Silakan gunakan username lain.']);
         }
 
-        // Fetch subscription fee or use posted/default Rp 500.000
-        $nominalBiaya = isset($_POST['nominal_biaya']) ? (float)$_POST['nominal_biaya'] : 500000.00;
-        $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
+        // Fetch subscription fee from investor profile
+        $nominalBiaya = 100000.00;
+        $resFee = $db->query("SELECT biaya_langganan_outlet FROM investor WHERE id_investor = {$investorId} LIMIT 1");
         if ($resFee && $resFee->num_rows > 0) {
-            $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
+            $rowFee = $resFee->fetch_assoc();
+            if (!empty($rowFee['biaya_langganan_outlet']) && (float)$rowFee['biaya_langganan_outlet'] > 0) {
+                $nominalBiaya = (float)$rowFee['biaya_langganan_outlet'];
+            }
         }
 
         $namaPengelola = trim($db->real_escape_string($_POST['nama_pengelola'] ?? ''));
@@ -133,11 +136,14 @@ try {
         $namaOutlet = $rowOutlet['nama_outlet'];
         $tipeReqNow = ($action === 'request_perpanjangan') ? 'perpanjangan' : ($rowOutlet['tipe_request'] ?: 'baru');
 
-        // Get system fee for subscription
+        // Get subscription fee from investor profile
         $nominalBiaya = 100000.00;
-        $resFee = $db->query("SELECT nilai FROM pengaturan_sistem WHERE nama_pengaturan = 'biaya_langganan_outlet' LIMIT 1");
+        $resFee = $db->query("SELECT biaya_langganan_outlet FROM investor WHERE id_investor = {$investorId} LIMIT 1");
         if ($resFee && $resFee->num_rows > 0) {
-            $nominalBiaya = (float)$resFee->fetch_assoc()['nilai'];
+            $rowFee = $resFee->fetch_assoc();
+            if (!empty($rowFee['biaya_langganan_outlet']) && (float)$rowFee['biaya_langganan_outlet'] > 0) {
+                $nominalBiaya = (float)$rowFee['biaya_langganan_outlet'];
+            }
         }
 
         // Handle Upload Bukti Pembayaran

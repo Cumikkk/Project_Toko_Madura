@@ -23,8 +23,10 @@ $password     = $data['password'] ?? '';
 $no_hp        = !empty($data['no_hp']) ? $data['no_hp'] : null;
 $kecamatan    = !empty($data['kecamatan']) ? $data['kecamatan'] : null;
 $alamat       = !empty($data['alamat_investor']) ? $data['alamat_investor'] : null;
-$persenRaw    = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
-$persen       = floatval($persenRaw);
+$persenRaw       = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
+$persen          = floatval($persenRaw);
+$biayaRaw        = str_replace(',', '.', $data['biaya_langganan_outlet'] ?? '100000');
+$biayaLangganan = floatval($biayaRaw);
 
 if (empty($nama_lengkap) || empty($username)) {
     JsonResponse([
@@ -108,9 +110,9 @@ if ($isEdit) {
 
     // Update investor table
     if (isset($data['persen_bagian_investor']) && $data['persen_bagian_investor'] !== '') {
-        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen} WHERE id_investor = {$idInvestor}");
+        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, persen_bagian_investor = {$persen}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
     } else {
-        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal} WHERE id_investor = {$idInvestor}");
+        $db->query("UPDATE investor SET id_master = {$idMaster}, kecamatan = {$kecVal}, alamat_investor = {$alamatVal}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
     }
 
     JsonResponse([
@@ -151,7 +153,7 @@ if ($isEdit) {
     $newUserId = $db->insert_id;
     $idMaster  = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    $db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$kecVal}, {$alamatVal}, {$persen}, NOW())");
+    $db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, biaya_langganan_outlet, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$kecVal}, {$alamatVal}, {$persen}, {$biayaLangganan}, NOW())");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

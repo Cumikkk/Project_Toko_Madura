@@ -38,6 +38,7 @@ CREATE TABLE investor (
     id_master INT(10) UNSIGNED NOT NULL,
     alamat_investor TEXT DEFAULT NULL,
     persen_bagian_investor DECIMAL(5,2) NOT NULL DEFAULT 50.00,
+    biaya_langganan_outlet DECIMAL(15,2) NOT NULL DEFAULT 100000.00,
     FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
     FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE RESTRICT
 );

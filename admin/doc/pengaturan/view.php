@@ -53,22 +53,8 @@ $biayaLangganan = (float)($settings['biaya_langganan_outlet'] ?? 100000.00);
                         </div>
                     </div>
 
-                    <hr class="my-4">
-
-                    <h6 class="text-primary font-weight-bold mb-3"><i class="fa fa-money me-2"></i>Biaya Langganan Bulanan Outlet</h6>
-                    <div class="row row-sm mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label font-weight-semibold">Nominal Biaya Langganan (Rp) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" step="1" min="0" name="biaya_langganan_outlet" class="form-control" value="<?= (int)$biayaLangganan ?>" placeholder="100000" required>
-                            </div>
-                            <small class="text-muted">Nominal biaya ini akan otomatis tampil di modal pendaftaran & tagihan outlet investor.</small>
-                        </div>
-                    </div>
-
                     <div class="d-flex justify-content-end mt-4">
-                        <button type="submit" class="btn btn-primary px-4"><i class="fa fa-save me-1"></i> Simpan Pengaturan</button>
+                        <button type="submit" class="btn btn-primary px-4"><i class="fa fa-save me-1"></i> Simpan Pengaturan Rekening</button>
                     </div>
                 </form>
             </div>
@@ -82,13 +68,10 @@ $biayaLangganan = (float)($settings['biaya_langganan_outlet'] ?? 100000.00);
                 <h6 class="main-content-label mb-0"><i class="fa fa-eye text-info me-2"></i>Tampilan Di Portal Investor</h6>
             </div>
             <div class="card-body">
-                <p class="text-muted small">Berikut adalah pratinjau bagaimana informasi rekening & biaya langganan tampil kepada investor saat mendaftarkan outlet:</p>
+                <p class="text-muted small">Berikut adalah pratinjau bagaimana informasi rekening bank tampil kepada investor saat mendaftarkan outlet:</p>
                 
                 <div class="p-3 bg-light rounded border border-info" style="border-radius:12px;">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <strong class="text-dark small"><i class="fa fa-receipt text-danger me-1"></i> Biaya Pendaftaran Lisensi</strong>
-                        <span class="badge bg-danger text-white rounded-pill px-2 py-1" id="preview-fee">Rp <?= number_format($biayaLangganan, 0, ',', '.') ?></span>
-                    </div>
+                    <strong class="text-dark small d-block mb-1"><i class="fa fa-university text-primary me-1"></i> Rekening Pembayaran Resmi</strong>
                     <p class="small text-muted mb-0">
                         Transfer ke <strong id="preview-bank">Bank <?= htmlspecialchars($bankNama) ?>: <?= htmlspecialchars($bankNoRek) ?></strong> a.n. <strong id="preview-an"><?= htmlspecialchars($bankAtasNama) ?></strong>.
                     </p>
