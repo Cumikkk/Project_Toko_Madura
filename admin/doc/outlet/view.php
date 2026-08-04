@@ -194,12 +194,13 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     $jtDateStr = date("d/m/Y", $jtTimestamp);
                                                     $diffDays = ceil(($jtTimestamp - $todayTimestamp) / 86400);
 
+                                                    echo '<div class="fw-bold">' . $jtDateStr . '</div>';
                                                     if ($diffDays < 0) {
-                                                        echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>' . $jtDateStr . ' (Expired)</span>';
+                                                        echo '<span class="badge bg-danger mt-1" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>Expired</span>';
                                                     } elseif ($diffDays <= 7) {
-                                                        echo '<span class="badge bg-warning text-dark" title="Masa langganan hampir habis"><i class="fas fa-exclamation-triangle me-1"></i>' . $jtDateStr . ' (' . ($diffDays == 0 ? 'Hari Ini' : 'Sisa ' . $diffDays . ' Hari') . ')</span>';
+                                                        echo '<span class="badge bg-warning text-dark mt-1" title="Masa langganan hampir habis"><i class="fas fa-exclamation-triangle me-1"></i>' . ($diffDays == 0 ? 'Hari Ini' : 'Sisa ' . $diffDays . ' Hari') . '</span>';
                                                     } else {
-                                                        echo '<span class="badge bg-success" title="Masa langganan aktif"><i class="fas fa-clock me-1"></i>' . $jtDateStr . ' (' . $diffDays . ' Hari Lagi)</span>';
+                                                        echo '<small class="text-muted d-block mt-1" style="font-size: 11px;"><i class="far fa-clock me-1 text-success"></i>(Sisa ' . $diffDays . ' Hari)</small>';
                                                     }
                                                 } else {
                                                     echo '<span class="text-muted">-</span>';
@@ -276,7 +277,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php
                                                 if (!empty($row['tgl_jatuh_tempo'])) {
                                                     $jtDateStr = date("d/m/Y", strtotime($row['tgl_jatuh_tempo']));
-                                                    echo '<span class="badge bg-danger" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>' . $jtDateStr . ' (Expired)</span>';
+                                                    echo '<div class="fw-bold">' . $jtDateStr . '</div>';
+                                                    echo '<span class="badge bg-danger mt-1" title="Masa langganan telah berakhir"><i class="fas fa-times-circle me-1"></i>Expired</span>';
                                                 } else {
                                                     echo '<span class="badge bg-secondary">Non-Aktif</span>';
                                                 }
