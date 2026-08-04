@@ -58,15 +58,14 @@ $investors = $db->query("
                         <thead>
                             <tr class="text-center">
                                 <th class="text-center" style="width: 5%;">No</th>
-                                <th class="text-center">Nama Lengkap</th>
-                                <th class="text-center">Username</th>
+                                <th class="text-center">Tanggal Bergabung</th>
+                                <th class="text-center">Nama Investor</th>
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Kecamatan</th>
-                                <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Biaya Langganan / Outlet</th>
+                                <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
                                 <th class="text-center">Total Outlet Active</th>
-                                <th class="text-center">Tanggal Bergabung</th>
                                 <th class="text-center" width="15%">#</th>
                             </tr>
                         </thead>
@@ -75,8 +74,11 @@ $investors = $db->query("
                                 <?php $no = 1; while ($row = $investors->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td class="text-start"><strong><?= htmlspecialchars($row['nama_lengkap']) ?></strong></td>
-                                        <td class="text-start"><code><?= htmlspecialchars($row['username']) ?></code></td>
+                                        <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
+                                        <td class="text-start">
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
+                                            <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
+                                        </td>
                                         <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
@@ -89,11 +91,10 @@ $investors = $db->query("
                                                 </button>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center"><span class="badge bg-light text-dark border">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</span></td>
+                                        <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center"><span class="badge bg-success fs-6"><?= number_format($row['total_outlet'] ?? 0) ?> Toko</span></td>
-                                        <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
@@ -142,7 +143,7 @@ $(document).ready(function() {
                     previous: 'Previous'
                 }
             },
-            order: [[1, 'asc']]
+            order: [[1, 'desc']]
         });
     }
 

@@ -59,39 +59,16 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                     <?php endif; ?>
                     
                     <div class="row">
-                        <!-- BARIS 1: NAMA LENGKAP & NO. HP -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Investor</label>
-                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($investorData['nama_lengkap'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
-                            </div>
+                        <!-- SECTION 1: KEMITRAAN & AKUN LOGIN -->
+                        <div class="col-12 mb-2">
+                            <h6 class="text-primary font-weight-bold"><i class="fa fa-handshake me-1"></i> Data Kemitraan & Akun Login</h6>
+                            <hr class="mt-1 mb-3">
                         </div>
 
-                        <!-- BARIS 2: USERNAME & PASSWORD -->
+                        <!-- BARIS 1: MASTER OWNER & BIAYA LANGGANAN -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="username" class="form-label fw-bold">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: investor_ahmad" value="<?= htmlspecialchars($investorData['username'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
-                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
-                            </div>
-                        </div>
-
-                        <!-- BARIS 3: MASTER OWNER & KECAMATAN -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="id_master" class="form-label fw-bold">Master Owner</label>
+                                <label for="id_master" class="form-label fw-bold">Master Owner <span class="text-danger">*</span></label>
                                 <select class="form-control" id="id_master" name="id_master" required>
                                     <option value="" disabled <?= empty($investorData['id_master']) ? 'selected' : ''; ?>>-- Pilih Master Owner --</option>
                                     <?php if ($masterList && $masterList->num_rows > 0) : ?>
@@ -107,28 +84,61 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
-                            </div>
-                        </div>
-
-                        <!-- BARIS 4: ALAMAT INVESTOR -->
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor Lengkap</label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
-                            </div>
-                        </div>
-
-                        <!-- BARIS 5: BIAYA LANGGANAN OUTLET -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
                                 <label for="biaya_langganan_outlet" class="form-label fw-bold">Nominal Biaya Langganan Outlet (Rp) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="number" step="1" min="0" class="form-control" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="100000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 100000); ?>" required>
                                 </div>
-                                <small class="text-muted">Tarif ini akan otomatis berlaku sebagai biaya langganan bulanan untuk seluruh outlet milik investor ini.</small>
+                                <small class="text-muted">Tarif ini berlaku sebagai biaya langganan bulanan seluruh outlet investor ini.</small>
+                            </div>
+                        </div>
+
+                        <!-- BARIS 2: USERNAME & PASSWORD -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="username" class="form-label fw-bold">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: investor_ahmad" value="<?= htmlspecialchars($investorData['username'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : "<span class='text-danger'>*</span>"; ?></label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
+                                <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: DATA DIRI & DOMISILI INVESTOR -->
+                        <div class="col-12 mt-3 mb-2">
+                            <h6 class="text-primary font-weight-bold"><i class="fa fa-user me-1"></i> Data Diri & Domisili Investor</h6>
+                            <hr class="mt-1 mb-3">
+                        </div>
+
+                        <!-- BARIS 3: NAMA LENGKAP & NO. HP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Investor <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($investorData['nama_lengkap'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- BARIS 4: KECAMATAN & ALAMAT LENGKAP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor Lengkap</label>
+                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
