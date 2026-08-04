@@ -37,8 +37,8 @@ $sqlList = $db->query("
     <div class="dashboard-breadcrumb mb-25">
         <div class="row align-items-center g-3">
             <div class="col-12 col-sm">
-                <h4 class="fw-bold mb-0">Komisi & Reward Master</h4>
-                <p class="text-muted mb-0 small">Rekapitulasi bonus & apresiasi dari Admin atas apresiasi kemitraan investor Anda.</p>
+                <h4 class="fw-bold mb-0">Komisi Master</h4>
+                <p class="text-muted mb-0 small">Rekapitulasi komisi & apresiasi dari Admin atas kemitraan investor Anda.</p>
             </div>
         </div>
     </div>
@@ -91,7 +91,7 @@ $sqlList = $db->query("
     <!-- Table Card -->
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-transparent border-0 p-3 pb-0">
-            <h5 class="fw-bold text-dark mb-0">Riwayat Penyerahan Komisi & Reward</h5>
+            <h5 class="fw-bold text-dark mb-0">Riwayat Penyerahan Komisi</h5>
         </div>
         <div class="card-body p-3">
             <div class="table-responsive">

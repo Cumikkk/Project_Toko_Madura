@@ -41,9 +41,9 @@ $topbarTab  = $_GET['tab'] ?? '';
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="topbar-nav-pill <?= ($topbarPage == 'investor' || $topbarPage == 'dashboard' || $topbarPage == 'outlet') ? 'active' : ''; ?>">
                         <i class="fa-light fa-users me-2"></i> Data Investor
                     </a>
-                    <!-- Menu 2 Master: Komisi & Reward -->
+                    <!-- Menu 2 Master: Komisi -->
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/komisi" class="topbar-nav-pill <?= ($topbarPage == 'komisi') ? 'active' : ''; ?>">
-                        <i class="fa-light fa-award me-2"></i> Komisi & Reward
+                        <i class="fa-light fa-award me-2"></i> Komisi
                     </a>
                 <?php elseif ($role === 'investor') : ?>
                     <!-- Menu 1 Investor: Data Outlet -->
@@ -159,9 +159,9 @@ $topbarTab  = $_GET['tab'] ?? '';
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/investor" class="mobile-topbar-link <?= ($topbarPage == 'investor' || $topbarPage == 'dashboard' || $topbarPage == 'outlet') ? 'active' : ''; ?>">
                 <i class="fa-light fa-users me-2 fs-5"></i> Data Investor
             </a>
-            <!-- Menu 2 Master: Komisi & Reward -->
+            <!-- Menu 2 Master: Komisi -->
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/komisi" class="mobile-topbar-link <?= ($topbarPage == 'komisi') ? 'active' : ''; ?>">
-                <i class="fa-light fa-award me-2 fs-5"></i> Komisi & Reward
+                <i class="fa-light fa-award me-2 fs-5"></i> Komisi
             </a>
         <?php elseif ($role === 'investor') : ?>
             <!-- Menu 1 Investor: Data Outlet -->
