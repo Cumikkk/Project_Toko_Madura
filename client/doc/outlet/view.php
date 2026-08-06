@@ -1055,25 +1055,60 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <i class="fa-solid fa-chart-pie me-1"></i> Skema Potongan & Bagi Hasil
                     </div>
                     <div class="row g-1.5 mb-2">
+                        <!-- Potongan Omzet -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Potongan Omzet</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required>
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Hak Investor -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Investor</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('investor')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Hak Outlet -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Outlet</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('outlet')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
