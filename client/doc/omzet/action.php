@@ -91,28 +91,14 @@ try {
             JsonResponse(['success' => false, 'message' => 'Omzet harian tanggal ' . $tglStr . ' sudah pernah diinput. Silakan gunakan tombol edit jika ingin mengubah.']);
         }
 
-        // Check if inputting ON the LAST DAY of the month OR if last day is already submitted
-        $isLastDayInput = ($tanggalOmzet === $lastDayOfMonth);
-        $chkLastDayInDb = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$lastDayOfMonth}' LIMIT 1");
-        $isLastDayInDb = ($chkLastDayInDb && $chkLastDayInDb->num_rows > 0);
-
-        if ($isLastDayInput || $isLastDayInDb) {
-            $appliedPercent = $presentaseGlobal;
-            $nominalPotongan = round($omzet * ($appliedPercent / 100), 2);
-            $noteMsg = ' (Potongan ' . number_format($presentaseGlobal, 0) . '% aktif diproses karena menginput di tanggal akhir bulan ' . $tglLastDayStr . ')';
-
-            // Apply 10% deduction to all entries in this month
-            $db->query("UPDATE laporan_omzet SET presentase_potongan = {$presentaseGlobal}, nominal_potongan = ROUND(omzet * ({$presentaseGlobal} / 100), 2) WHERE id_outlet = {$idOutlet} AND DATE_FORMAT(periode_laporan, '%Y-%m') = '{$entryYM}'");
-        } else {
-            // Normal day -> 0% deduction
-            $appliedPercent = 0.00;
-            $nominalPotongan = 0.00;
-            $noteMsg = ' (Omzet utuh tanpa potongan)';
-        }
+        // Apply active outlet deduction percentage and investor split to this entry
+        $appliedPercent = $presentaseGlobal;
+        $persenInvGlobal = isset($outlet['persen_bagian_investor']) ? (float)$outlet['persen_bagian_investor'] : 50.00;
+        $nominalPotongan = round($omzet * ($appliedPercent / 100.0), 2);
 
         $waktuInput = date('Y-m-d H:i:s');
 
-        $sqlInsert = "INSERT INTO laporan_omzet (id_outlet, periode_laporan, omzet, presentase_potongan, nominal_potongan, waktu_input) VALUES ({$idOutlet}, '{$escapedTanggal}', {$omzet}, {$appliedPercent}, {$nominalPotongan}, '{$waktuInput}')";
+        $sqlInsert = "INSERT INTO laporan_omzet (id_outlet, periode_laporan, omzet, presentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input) VALUES ({$idOutlet}, '{$escapedTanggal}', {$omzet}, {$appliedPercent}, {$persenInvGlobal}, {$nominalPotongan}, '{$waktuInput}')";
         
         if (!$db->query($sqlInsert)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan omzet harian: ' . $db->error]);
@@ -128,7 +114,7 @@ try {
                 'omzet_formatted' => 'Rp ' . number_format($omzet, 0, ',', '.'),
                 'tgl_formatted' => $tglStr,
                 'waktu_input' => date('d/m/Y H:i', strtotime($waktuInput)),
-                'is_last_day' => ($isLastDayInput || $isLastDayInDb),
+                'is_last_day' => ($tanggalOmzet === $lastDayOfMonth),
                 'potongan' => $nominalPotongan,
                 'bersih' => $bersihOutlet,
                 'presentase' => $appliedPercent,
@@ -177,35 +163,17 @@ try {
         }
 
         // Verify ownership
-        $resCheck = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
+        $resCheck = $db->query("SELECT id_laporan, presentase_potongan FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
         if (!$resCheck || $resCheck->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data omzet tidak ditemukan atau Anda tidak memiliki akses.']);
         }
 
         $escapedTanggal = $db->real_escape_string($tanggalOmzet);
-        $timeVal = strtotime($tanggalOmzet);
-        $entryYM = date('Y-m', $timeVal);
-        $lastDayOfMonth = date('Y-m-t', $timeVal);
-        $tglStr = date('d/m/Y', $timeVal);
+        $tglStr = date('d/m/Y', strtotime($tanggalOmzet));
 
-        // Check duplicate date for other reports
-        $chkDup = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$escapedTanggal}' AND id_laporan != {$idLaporan} LIMIT 1");
-        if ($chkDup && $chkDup->num_rows > 0) {
-            JsonResponse(['success' => false, 'message' => 'Omzet harian untuk tanggal ' . $tglStr . ' sudah pernah diinput pada data lain.']);
-        }
-
-        $isLastDayInput = ($tanggalOmzet === $lastDayOfMonth);
-        $chkLastDayInDb = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$lastDayOfMonth}' LIMIT 1");
-        $isLastDayInDb = ($chkLastDayInDb && $chkLastDayInDb->num_rows > 0);
-
-        if ($isLastDayInput || $isLastDayInDb) {
-            $appliedPercent = $presentaseGlobal;
-            $nominalPotongan = round($omzet * ($appliedPercent / 100), 2);
-            $db->query("UPDATE laporan_omzet SET presentase_potongan = {$presentaseGlobal}, nominal_potongan = ROUND(omzet * ({$presentaseGlobal} / 100), 2) WHERE id_outlet = {$idOutlet} AND DATE_FORMAT(periode_laporan, '%Y-%m') = '{$entryYM}'");
-        } else {
-            $appliedPercent = 0.00;
-            $nominalPotongan = 0.00;
-        }
+        $rowCheck = $resCheck->fetch_assoc();
+        $appliedPercent = (isset($rowCheck['presentase_potongan']) && (float)$rowCheck['presentase_potongan'] > 0) ? (float)$rowCheck['presentase_potongan'] : $presentaseGlobal;
+        $nominalPotongan = round($omzet * ($appliedPercent / 100.0), 2);
 
         $sqlUpdate = "UPDATE laporan_omzet SET periode_laporan = '{$escapedTanggal}', omzet = {$omzet}, presentase_potongan = {$appliedPercent}, nominal_potongan = {$nominalPotongan} WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet}";
         if (!$db->query($sqlUpdate)) {
