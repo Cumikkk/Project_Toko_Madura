@@ -23,7 +23,6 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 (6, 2, 4, 'module', -1, -1, '2026-07-23 12:19:52', NULL),
 (7, 1, 5, 'Outlet', -1, -1, '2026-07-23 15:47:15', '2026-07-28 01:49:08'),
 (19, 1, 12, 'data_master', -1, -1, '2026-07-28 15:00:51', '2026-08-06 06:28:54'),
-(31, 1, 19, 'biaya_langganan', -1, -1, '2026-07-29 16:31:32', NULL),
 (32, 2, 19, 'rekening_bank', -1, -1, '2026-07-29 16:31:32', NULL),
 (33, 2, 12, 'komisi', -1, -1, '2026-08-06 13:28:54', NULL)
 ON DUPLICATE KEY UPDATE `module` = VALUES(`module`), `group_id` = VALUES(`group_id`), `m_order` = VALUES(`m_order`);

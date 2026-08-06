@@ -40,7 +40,6 @@ INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `crea
 (54, 19, 'create', 'Create Master', '/master/create', '2026-07-28 15:01:00', NULL),
 (55, 19, 'update', 'Update Master', '/master/update/*', '2026-07-28 15:01:00', NULL),
 (56, 19, 'delete', 'Delete Master', '/master/delete', '2026-07-28 15:01:00', NULL),
-(84, 31, 'view', 'Biaya Langganan Setting', '/pengaturan/biaya_langganan', '2026-07-29 16:31:32', '2026-07-30 01:46:19'),
 (85, 32, 'view', 'Rekening Bank Setting', '/pengaturan/rekening_bank', '2026-07-29 16:31:32', '2026-07-30 01:46:19'),
 (86, 33, 'view', 'Daftar Komisi Master', '/master/komisi', '2026-08-06 13:29:01', '2026-08-06 06:31:57'),
 (87, 33, 'create', 'Tambah/Edit Komisi Master', '/master/komisi_create', '2026-08-06 13:29:01', NULL),

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 06 Agu 2026 pada 14.05
+-- Waktu pembuatan: 06 Agu 2026 pada 14.15
 -- Versi server: 8.4.3
 -- Versi PHP: 8.3.16
 
@@ -66,12 +66,10 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 (59, 54, -1, '2026-07-29 13:25:26', NULL),
 (59, 55, -1, '2026-07-29 13:25:26', NULL),
 (59, 56, -1, '2026-07-29 13:25:26', NULL),
-(59, 84, -1, '2026-07-29 16:31:32', NULL),
 (59, 85, -1, '2026-07-29 16:31:32', NULL),
 (59, 86, -1, '2026-08-06 13:29:01', NULL),
 (59, 87, -1, '2026-08-06 13:29:01', NULL),
 (59, 88, -1, '2026-08-06 13:29:01', NULL),
-(61, 84, -1, '2026-07-29 16:31:32', NULL),
 (61, 85, -1, '2026-07-29 16:31:32', NULL),
 (107, 1, -1, '2026-08-03 17:28:06', NULL),
 (107, 2, -1, '2026-08-03 17:28:06', NULL),
@@ -99,7 +97,6 @@ INSERT INTO `admin_authorize` (`admin_id`, `permission_id`, `status`, `created_a
 (107, 54, -1, '2026-08-03 17:28:06', NULL),
 (107, 55, -1, '2026-08-03 17:28:06', NULL),
 (107, 56, -1, '2026-08-03 17:28:06', NULL),
-(107, 84, -1, '2026-08-03 17:28:06', NULL),
 (107, 85, -1, '2026-08-03 17:28:06', NULL);
 
 -- --------------------------------------------------------
@@ -131,7 +128,6 @@ INSERT INTO `admin_module` (`id`, `m_order`, `group_id`, `module`, `status`, `vi
 (6, 2, 4, 'module', -1, -1, '2026-07-23 12:19:52', NULL),
 (7, 1, 5, 'Outlet', -1, -1, '2026-07-23 15:47:15', '2026-07-28 01:49:08'),
 (19, 1, 12, 'data_master', -1, -1, '2026-07-28 15:00:51', '2026-08-06 06:28:54'),
-(31, 1, 19, 'biaya_langganan', -1, -1, '2026-07-29 16:31:32', NULL),
 (32, 2, 19, 'rekening_bank', -1, -1, '2026-07-29 16:31:32', NULL),
 (33, 2, 12, 'komisi', -1, -1, '2026-08-06 13:28:54', NULL);
 
@@ -210,7 +206,6 @@ INSERT INTO `admin_permissions` (`id`, `module_id`, `code`, `desc`, `url`, `crea
 (54, 19, 'create', 'Create Master', '/master/create', '2026-07-28 15:01:00', NULL),
 (55, 19, 'update', 'Update Master', '/master/update/*', '2026-07-28 15:01:00', NULL),
 (56, 19, 'delete', 'Delete Master', '/master/delete', '2026-07-28 15:01:00', NULL),
-(84, 31, 'view', 'Biaya Langganan Setting', '/pengaturan/biaya_langganan', '2026-07-29 16:31:32', '2026-07-30 01:46:19'),
 (85, 32, 'view', 'Rekening Bank Setting', '/pengaturan/rekening_bank', '2026-07-29 16:31:32', '2026-07-30 01:46:19'),
 (86, 33, 'view', 'Daftar Komisi Master', '/master/komisi', '2026-08-06 13:29:01', '2026-08-06 06:31:57'),
 (87, 33, 'create', 'Tambah/Edit Komisi Master', '/master/komisi_create', '2026-08-06 13:29:01', NULL),
@@ -421,26 +416,27 @@ CREATE TABLE `users` (
   `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `no_hp` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `role` enum('programmer','master','investor','outlet') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'outlet'
+  `role` enum('programmer','master','investor','outlet') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'outlet',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `users`
 --
 
-INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`) VALUES
-(59, 'Anonymous', 'admin', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'programmer'),
-(61, 'Riski Ardhika', 'master', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'master'),
-(62, 'M. Fahrul Alfanani', 'investor', '0987654321', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'investor'),
-(97, 'Bambang Sugiono', 'toko1', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet'),
-(98, 'Hendra Wijaya', 'toko2', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet'),
-(99, 'Siti Rahmawati', 'toko3', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet'),
-(100, 'Dedi Pratama', 'toko4', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet'),
-(103, 'Agus Setiawan', 'sasas', 'sasa', '$2y$10$fW67fu8J9Q3fGM7kvDfJ1edTIaLsmzQTVm/kNiEs3sKuYIYX53.IW', 'outlet'),
-(104, 'Fajar Nugroho', 'sasa', 'asas', '$2y$10$Go6bTK.ADikKHY1ezzf/R.aCGkl4BzL6KoZDzu2GkJxS8gFQGYETi', 'outlet'),
-(105, 'Eko Prasetyo', 'cumik', '9797', '$2y$10$vTMxN4Ed0wpBlPutGXGfrejMaYc11nL.P/6oK1R1L2fesYaCCQUt2', 'outlet'),
-(106, 'Budi', 'uban', '7875787', '$2y$10$zw6OoVpuivXj1MfWZ6mKjeLPmiiQjp85LDbyE9SwKFvBkIWqRUK8S', 'outlet'),
-(107, 'oke123', 'oke123', '123', '$2y$10$xBG5kNvHNkYtnHg.xsp1MeuYMKxuWlMTrFVTWzRn5yx2mMFX/WzfK', 'programmer');
+INSERT INTO `users` (`id_users`, `nama_lengkap`, `username`, `no_hp`, `password`, `role`, `created_at`) VALUES
+(59, 'Anonymous', 'admin', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'programmer', '2026-07-23 12:19:52'),
+(61, 'Riski Ardhika', 'master', '0123456789', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'master', '2026-07-23 12:19:52'),
+(62, 'M. Fahrul Alfanani', 'investor', '0987654321', '$2y$10$bEl1pyxvEEHdLPS917gqlukvAuW0Sjo8dcebpWny4W9.f935YC59C', 'investor', '2026-07-23 12:19:52'),
+(97, 'Bambang Sugiono', 'toko1', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet', '2026-05-15 10:00:00'),
+(98, 'Hendra Wijaya', 'toko2', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet', '2026-06-02 11:00:00'),
+(99, 'Siti Rahmawati', 'toko3', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet', '2026-05-20 09:00:00'),
+(100, 'Dedi Pratama', 'toko4', '08123456789', '$2y$10$Q8cKpe6oLgNbvd6uKW/KieBficJ..tUBUaQdMobXBUQ/3PoOymQZi', 'outlet', '2026-04-10 08:00:00'),
+(103, 'Agus Setiawan', 'sasas', 'sasa', '$2y$10$fW67fu8J9Q3fGM7kvDfJ1edTIaLsmzQTVm/kNiEs3sKuYIYX53.IW', 'outlet', '2026-07-30 12:18:39'),
+(104, 'Fajar Nugroho', 'sasa', 'asas', '$2y$10$Go6bTK.ADikKHY1ezzf/R.aCGkl4BzL6KoZDzu2GkJxS8gFQGYETi', 'outlet', '2026-07-30 12:19:07'),
+(105, 'Eko Prasetyo', 'cumik', '9797', '$2y$10$vTMxN4Ed0wpBlPutGXGfrejMaYc11nL.P/6oK1R1L2fesYaCCQUt2', 'outlet', '2026-07-31 10:40:52'),
+(106, 'Budi', 'uban', '7875787', '$2y$10$zw6OoVpuivXj1MfWZ6mKjeLPmiiQjp85LDbyE9SwKFvBkIWqRUK8S', 'outlet', '2026-08-03 16:53:41'),
+(107, 'oke123', 'oke123', '123', '$2y$10$xBG5kNvHNkYtnHg.xsp1MeuYMKxuWlMTrFVTWzRn5yx2mMFX/WzfK', 'programmer', '2026-08-03 17:28:06');
 
 --
 -- Indexes for dumped tables
