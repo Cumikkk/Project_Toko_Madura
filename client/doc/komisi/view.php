@@ -148,19 +148,20 @@ if (!function_exists('buildKomisiPageUrl')) {
                                                 <?php if (!empty($km['bukti_pembayaran'])) : ?>
                                                     <?php $fileExt = strtolower(pathinfo($km['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
                                                     <?php if ($fileExt === 'pdf') : ?>
-                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3 py-1">
-                                                            <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-xs fw-semibold">
+                                                            <i class="fas fa-file-pdf me-1"></i> Dokumen PDF
                                                         </a>
                                                     <?php else : ?>
-                                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 btn-client-view-bukti-komisi" 
+                                                        <button type="button" class="btn btn-outline-primary btn-xs btn-client-view-bukti-komisi fw-semibold" 
                                                                 data-img="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" 
+                                                                data-master="<?= htmlspecialchars($user['MBR_NAME'] ?? 'Master Owner') ?>"
                                                                 data-periode="<?= htmlspecialchars($km['periode']) ?>" 
                                                                 data-nominal="Rp <?= number_format($km['nominal'], 0, ',', '.') ?>">
-                                                            <i class="fa-solid fa-image me-1"></i> Lihat Bukti
+                                                            <i class="fas fa-image me-1"></i> Bukti Bayar
                                                         </button>
                                                     <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="badge bg-body-tertiary text-body-tertiary border rounded-pill px-3 py-1 fw-normal fs-12">Tanpa Bukti</span>
+                                                    <span class="badge bg-light text-muted fw-normal">Tanpa Bukti</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start small text-body-secondary">
@@ -225,6 +226,7 @@ if (!function_exists('buildKomisiPageUrl')) {
 $(document).ready(function() {
     $(document).on('click', '.btn-client-view-bukti-komisi', function() {
         let imgUrl  = $(this).data('img');
+        let master  = $(this).data('master');
         let periode = $(this).data('periode');
         let nominal = $(this).data('nominal');
 
@@ -232,14 +234,15 @@ $(document).ready(function() {
             title: 'Bukti Pembayaran Komisi',
             html: `
                 <div class="text-start fs-14 mb-3">
-                    <p class="mb-1"><strong>Periode / Keterangan:</strong> ${periode}</p>
+                    <p class="mb-1"><strong>Master Owner:</strong> ${master}</p>
+                    <p class="mb-1"><strong>Keterangan:</strong> ${periode}</p>
                     <p class="mb-2"><strong>Nominal Komisi:</strong> <span class="badge bg-success fs-6">${nominal}</span></p>
                 </div>
                 <div class="text-center p-2 bg-light rounded border">
                     <img src="${imgUrl}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Bukti Transfer Komisi">
                 </div>
                 <div class="mt-3 text-center">
-                    <a href="${imgUrl}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-4"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Buka Gambar Penuh</a>
+                    <a href="${imgUrl}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-external-link-alt me-1"></i> Buka Gambar Penuh</a>
                 </div>
             `,
             width: '600px',
