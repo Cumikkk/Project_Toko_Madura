@@ -64,7 +64,7 @@ if ($action === 'get_detail_harian') {
     }
 
     $whereSql = implode(" AND ", $whereConds);
-    $sql = "SELECT id_laporan, periode_laporan, omzet, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
+    $sql = "SELECT id_laporan, periode_laporan, omzet, presentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
     $res = $db->query($sql);
 
     $items = [];
@@ -85,9 +85,13 @@ if ($action === 'get_detail_harian') {
                       ($bulanIndo[(int)date('n', strtotime($row['periode_laporan']))] ?? '') . ' ' . 
                       date('Y', strtotime($row['periode_laporan']));
 
-            $pot10 = round($omzet * ($ratePotongan / 100.0), 2);
-            $hakInv = round($pot10 * ($persenInvSplit / 100.0), 2);
-            $hakOut = round($pot10 * ($persenOutSplit / 100.0), 2);
+            $itemRatePot = (isset($row['presentase_potongan']) && (float)$row['presentase_potongan'] > 0) ? (float)$row['presentase_potongan'] : $ratePotongan;
+            $itemPersenInv = (isset($row['persen_bagian_investor']) && (float)$row['persen_bagian_investor'] > 0) ? (float)$row['persen_bagian_investor'] : $persenInvSplit;
+            $itemPersenOut = 100.00 - $itemPersenInv;
+
+            $pot10 = (isset($row['nominal_potongan']) && (float)$row['nominal_potongan'] > 0) ? (float)$row['nominal_potongan'] : round($omzet * ($itemRatePot / 100.0), 2);
+            $hakInv = round($pot10 * ($itemPersenInv / 100.0), 2);
+            $hakOut = round($pot10 * ($itemPersenOut / 100.0), 2);
             $bersihOut = $omzet - $pot10 + $hakOut;
 
             $totOmzet += $omzet;
@@ -100,6 +104,9 @@ if ($action === 'get_detail_harian') {
                 'tgl_raw' => $row['periode_laporan'],
                 'tgl_formatted' => $tglStr,
                 'omzet' => $omzet,
+                'rate_potongan' => $itemRatePot,
+                'persen_investor' => $itemPersenInv,
+                'persen_outlet' => $itemPersenOut,
                 'potongan_10' => $pot10,
                 'hak_investor' => $hakInv,
                 'hak_outlet' => $hakOut,
@@ -108,12 +115,19 @@ if ($action === 'get_detail_harian') {
         }
     }
 
+    $distinctPot = count(array_unique(array_column($items, 'rate_potongan')));
+    $distinctInv = count(array_unique(array_column($items, 'persen_investor')));
+
+    $ratePotHeaderStr = ($distinctPot > 1) ? 'Variatif' : ($items[0]['rate_potongan'] ?? $ratePotongan) . '%';
+    $persenInvHeaderStr = ($distinctInv > 1) ? 'Variatif' : ($items[0]['persen_investor'] ?? $persenInvSplit) . '%';
+    $persenOutHeaderStr = ($distinctInv > 1) ? 'Variatif' : ($items[0]['persen_outlet'] ?? $persenOutSplit) . '%';
+
     echo json_encode([
         'success' => true,
         'nama_outlet' => $namaOutlet,
-        'rate_potongan' => $ratePotongan,
-        'persen_inv' => $persenInvSplit,
-        'persen_out' => $persenOutSplit,
+        'rate_potongan' => $ratePotHeaderStr,
+        'persen_inv' => $persenInvHeaderStr,
+        'persen_out' => $persenOutHeaderStr,
         'items' => $items,
         'summary' => [
             'total_omzet' => $totOmzet,

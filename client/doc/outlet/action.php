@@ -280,6 +280,29 @@ try {
             JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
         }
 
+        // Apply custom percentage to specific date range if requested
+        $applyDateRange = isset($_POST['apply_date_range']) && (int)$_POST['apply_date_range'] === 1;
+        $tglMulaiSkema = trim($_POST['tgl_mulai_skema'] ?? '');
+        $tglSelesaiSkema = trim($_POST['tgl_selesai_skema'] ?? '');
+        $affectedRowsOmzet = 0;
+
+        if ($applyDateRange && !empty($tglMulaiSkema) && !empty($tglSelesaiSkema)) {
+            if ($tglMulaiSkema > $tglSelesaiSkema) {
+                JsonResponse(['success' => false, 'message' => 'Tanggal mulai skema tidak boleh lebih besar dari tanggal selesai.']);
+            }
+            $safeMulai = $db->real_escape_string($tglMulaiSkema);
+            $safeSelesai = $db->real_escape_string($tglSelesaiSkema);
+            
+            // Update existing laporan_omzet records within date range with both custom potongan and custom investor split
+            $db->query("UPDATE laporan_omzet SET 
+                presentase_potongan = {$persentasePotongan},
+                persen_bagian_investor = {$persenBagianInvestor},
+                nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
+                WHERE id_outlet = {$idOutlet} AND periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'");
+                
+            $affectedRowsOmzet = $db->affected_rows;
+        }
+
         // Update User Account
         $safeNamaPengelola = $db->real_escape_string($namaPengelola);
         $safeNoHp = $db->real_escape_string($noHp);
@@ -301,7 +324,15 @@ try {
                 WHERE id_users = {$associatedUserId}");
         }
 
-        JsonResponse(['success' => true, 'message' => 'Data Outlet berhasil diperbarui!']);
+        $successMsg = 'Data outlet berhasil diperbarui!';
+        if ($affectedRowsOmzet > 0) {
+            $tglStartFmt = date('d/m/Y', strtotime($tglMulaiSkema));
+            $tglEndFmt = date('d/m/Y', strtotime($tglSelesaiSkema));
+            $persenOutletVal = 100.00 - $persenBagianInvestor;
+            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data laporan omzet harian ({$tglStartFmt} s/d {$tglEndFmt}).";
+        }
+
+        JsonResponse(['success' => true, 'message' => $successMsg]);
     }
 
     // =========================================================================

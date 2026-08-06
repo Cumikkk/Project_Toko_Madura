@@ -88,19 +88,28 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
     $whereConditions[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
     
+    $t1 = strtotime($selectedTglMulai);
+    $t2 = strtotime($selectedTglSelesai);
+    $d1 = date('j', $t1) . ' ' . ($bulanIndo[(int)date('n', $t1)] ?? '') . ' ' . date('Y', $t1);
+    $d2 = date('j', $t2) . ' ' . ($bulanIndo[(int)date('n', $t2)] ?? '') . ' ' . date('Y', $t2);
+
     if ($selectedTglMulai === $selectedTglSelesai) {
-        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai));
+        $periodeParts[] = $d1;
     } else {
-        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai)) . ' - ' . date('d/m/Y', strtotime($selectedTglSelesai));
+        $periodeParts[] = $d1 . ' - ' . $d2;
     }
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $whereConditions[] = "l.periode_laporan >= '{$safeMulai}'";
-    $periodeParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
+    $t1 = strtotime($selectedTglMulai);
+    $d1 = date('j', $t1) . ' ' . ($bulanIndo[(int)date('n', $t1)] ?? '') . ' ' . date('Y', $t1);
+    $periodeParts[] = 'Mulai ' . $d1;
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
     $whereConditions[] = "l.periode_laporan <= '{$safeSelesai}'";
-    $periodeParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
+    $t2 = strtotime($selectedTglSelesai);
+    $d2 = date('j', $t2) . ' ' . ($bulanIndo[(int)date('n', $t2)] ?? '') . ' ' . date('Y', $t2);
+    $periodeParts[] = 'Sampai ' . $d2;
 } else {
     if ($selectedBulan > 0) {
         $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
@@ -114,8 +123,8 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
 
 $periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
 $periodeLabelStr = $periodeTitleStr;
-if (!empty($selectedOutletNama)) {
-    $periodeLabelStr .= " " . $selectedOutletNama;
+if (!empty($selectedOutletNama) && $selectedOutletId > 0) {
+    $periodeLabelStr .= " - " . $selectedOutletNama;
 }
 
 $laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
@@ -129,14 +138,19 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
-        IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor,
+        IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)) as persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
-        IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
+        IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_investor_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)))) / 100.0), 2)), 0) as total_hak_outlet_db,
+        COUNT(DISTINCT l.presentase_potongan) as count_distinct_rates,
+        MIN(l.presentase_potongan) as min_rate,
+        MAX(l.presentase_potongan) as max_rate
     FROM outlet o
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, inv.persen_bagian_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor, inv.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 
@@ -150,14 +164,26 @@ if ($resBagiHasil) {
         $rateInvestor = (float)($row['persen_bagian_investor'] ?? 50.00);
         $rateOutlet = 100.00 - $rateInvestor;
 
-        // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
-        $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
-        
-        $hakInvestor = round($potongan10 * ($rateInvestor / 100.0), 2);
-        $hakOutlet   = round($potongan10 * ($rateOutlet / 100.0), 2);
+        $countRates = (int)($row['count_distinct_rates'] ?? 0);
+        $minRate = (float)($row['min_rate'] ?? $ratePotongan);
+        $maxRate = (float)($row['max_rate'] ?? $ratePotongan);
+
+        if ($countRates > 1 && $minRate !== $maxRate) {
+            $displayRate = "Variatif (" . $minRate . "% - " . $maxRate . "%)";
+        } elseif ($minRate > 0) {
+            $displayRate = $minRate . "%";
+        } else {
+            $displayRate = $ratePotongan . "%";
+        }
+
+        // Calculations strictly match each store's custom rate and split
+        $potongan10 = (float)$row['total_potongan_db'];
+        $hakInvestor = (float)$row['total_hak_investor_db'];
+        $hakOutlet   = (float)$row['total_hak_outlet_db'];
         $hasAnyLastDayDone = true;
 
         $row['persentase_potongan'] = $ratePotongan;
+        $row['display_rate'] = $displayRate;
         $row['persen_bagian_investor'] = $rateInvestor;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
@@ -174,10 +200,6 @@ if ($resBagiHasil) {
     }
 }
 
-$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : 'Semua Bulan ') . ($selectedTahun > 0 ? $selectedTahun : '');
-if ($selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Periode';
-}
 $countOutlet = count($rows);
 
 // HTML Template for Dompdf
@@ -362,7 +384,7 @@ ob_start();
             </td>
             <td style="width: 25%; padding: 4px;">
                 <div class="summary-card" style="border-top: 3px solid #dc2626;">
-                    <div class="summary-card-title">Potongan (<?= number_format($potonganGlobal, 0); ?>%)</div>
+                    <div class="summary-card-title">Potongan Outlet</div>
                     <div class="summary-card-val text-danger">
                         <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totPotongan10, 0, ',', '.') : '-'; ?>
                     </div>
@@ -410,13 +432,13 @@ ob_start();
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                         <td class="text-end text-danger fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['potongan_10'], 0, ',', '.') . ' (' . (float)$r['persentase_potongan'] . '%)' : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['potongan_10'], 0, ',', '.') : '-'; ?>
                         </td>
                         <td class="text-end text-success fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_investor'], 0, ',', '.') . ' (' . (float)$r['persen_bagian_investor'] . '%)' : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_investor'], 0, ',', '.') : '-'; ?>
                         </td>
                         <td class="text-end text-warning fw-bold">
-                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_outlet'], 0, ',', '.') . ' (' . (float)(100.00 - $r['persen_bagian_investor']) . '%)' : '-'; ?>
+                            <?= $r['is_last_day_done'] ? 'Rp ' . number_format($r['hak_outlet'], 0, ',', '.') : '-'; ?>
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
                     </tr>

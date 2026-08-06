@@ -448,6 +448,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
         font-size: 10px !important;
         letter-spacing: 0.3px;
         line-height: 1.1;
+}
 @media (min-width: 992px) {
     .border-end-lg {
         border-right: 1px solid var(--bs-border-color, #dee2e6) !important;
@@ -573,7 +574,6 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3" style="width: 50px;">No</th>
                                     <th>Nama Outlet</th>
-                                    <th>Username Akun</th>
                                     <th>Waktu Pendaftaran</th>
                                     <th class="text-center">Alamat Outlet</th>
                                     <th>Status</th>
@@ -589,11 +589,6 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6">
                                                     <i class="fa-solid fa-store text-danger me-1"></i><?= htmlspecialchars($row['nama_outlet']); ?>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span class="text-body-secondary fw-semibold">
-                                                    <i class="fa-light fa-user me-1"></i>@<?= htmlspecialchars($row['username']); ?>
-                                                </span>
                                             </td>
                                             <td>
                                                 <span class="badge bg-body-tertiary border text-body-emphasis px-2 py-1 rounded-3 fw-semibold font-monospace small">
@@ -699,7 +694,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <tr>
-                                        <td colspan="8" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="py-4">
                                                 <i class="fa-light fa-store-slash text-body-secondary mb-3" style="font-size: 60px; opacity: 0.5;"></i>
                                                 <h5 class="fw-bold text-body-secondary mb-1">Belum Ada Outlet Terdaftar</h5>
@@ -979,124 +974,176 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 <!-- MODAL: EDIT OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditOutlet" tabindex="-1" aria-labelledby="modalEditOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
-            <div class="modal-header border-0 pb-0 pt-3 px-3">
-                <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 14px;">
-                    <i class="fa-light fa-pen-to-square me-2 text-warning"></i>Edit Data Outlet
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow bg-body" style="border-radius: 12px;">
+            <div class="modal-header border-0 pb-0 pt-2 px-2.5">
+                <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 13px;">
+                    <i class="fa-light fa-pen-to-square me-1.5 text-warning"></i>Edit Data Outlet
                 </h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 10px;"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 8.5px;"></button>
             </div>
             <form id="formEditOutlet" method="POST">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id_outlet" id="edit_id_outlet" value="">
-                <div class="modal-body p-3">
+                <div class="modal-body p-2.5" style="max-height: 80vh; overflow-y: auto;">
                     <!-- Sesi 1: Informasi Outlet -->
-                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                    <div class="fw-bold text-danger text-uppercase mb-1" style="font-size: 8px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-store me-1"></i> Informasi Outlet Toko
                     </div>
-                    <div class="row g-2 mb-3">
+                    <div class="row g-1.5 mb-2">
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Nama Outlet</label>
-                            <input type="text" name="nama_outlet" id="edit_nama_outlet" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">Nama Outlet</label>
+                            <input type="text" name="nama_outlet" id="edit_nama_outlet" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Kecamatan</label>
-                            <input type="text" name="kecamatan" id="edit_kecamatan" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">Kecamatan</label>
+                            <input type="text" name="kecamatan" id="edit_kecamatan" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Alamat Lengkap</label>
-                            <textarea name="alamat_outlet" id="edit_alamat_outlet" class="form-control form-control-sm rounded-3 fw-semibold" rows="2" required></textarea>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">Alamat Lengkap</label>
+                            <textarea name="alamat_outlet" id="edit_alamat_outlet" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" rows="1" style="font-size: 10.5px; min-height: 32px;" required></textarea>
                         </div>
                     </div>
 
+<style>
+.custom-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+.custom-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.custom-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .2s ease-in-out;
+    border-radius: 20px;
+    border: 1.5px solid #94a3b8;
+}
+.custom-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 1.5px;
+    background-color: #ffffff;
+    transition: .2s ease-in-out;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.custom-toggle-switch input:checked + .custom-toggle-slider {
+    background-color: #dc3545 !important;
+    border-color: #b02a37 !important;
+}
+.custom-toggle-switch input:checked + .custom-toggle-slider:before {
+    transform: translateX(17px);
+    background-color: #ffffff !important;
+}
+</style>
+
                     <!-- Sesi 2: Skema Potongan & Bagi Hasil -->
-                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                    <div class="fw-bold text-danger text-uppercase mt-2 mb-1" style="font-size: 8px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-chart-pie me-1"></i> Skema Potongan & Bagi Hasil
                     </div>
-                    <div class="row g-2 mb-3">
+                    <div class="row g-1.5 mb-2">
                         <div class="col-4">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Potongan Omzet</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required>
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
-                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
-                                    <div class="d-flex flex-column h-100" style="width: 18px;">
-                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-up"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(-1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Potongan Omzet</label>
+                            <div class="input-group input-group-sm" style="height: 28px;">
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
                             </div>
                         </div>
                         <div class="col-4">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Hak Investor</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required oninput="balanceEditOutletSplit('investor')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
-                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
-                                    <div class="d-flex flex-column h-100" style="width: 18px;">
-                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-up"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(-1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Investor</label>
+                            <div class="input-group input-group-sm" style="height: 28px;">
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('investor')">
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
                             </div>
                         </div>
                         <div class="col-4">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Hak Outlet</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control form-control-sm rounded-start-3 fw-bold text-center" required oninput="balanceEditOutletSplit('outlet')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 border-end-0" style="font-size: 10px;">%</span>
-                                <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
-                                    <div class="d-flex flex-column h-100" style="width: 18px;">
-                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-up"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-0.5 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(-1)" style="font-size: 7px; line-height: 1;">
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </button>
-                                    </div>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Outlet</label>
+                            <div class="input-group input-group-sm" style="height: 28px;">
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('outlet')">
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sesi 2.5: Rentang Tanggal Penyesuaian Skema (Opsional) -->
+                    <div class="p-2 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
+                        <div class="d-flex align-items-center gap-1.5">
+                            <label class="custom-toggle-switch mb-0">
+                                <input type="checkbox" id="chk_apply_date_range" name="apply_date_range" value="1">
+                                <span class="custom-toggle-slider"></span>
+                            </label>
+                            <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px;">
+                                <i class=></i> Terapkan Potongan pada Rentang Tanggal Spesifik
+                                <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1 d-none" style="font-size: 8px; padding: 1.5px 4px;">Aktif</span>
+                            </label>
+                        </div>
+                        
+                        <div id="container_edit_date_range" class="row g-1.5 mt-1.5 pt-1.5 border-top border-body-subtle d-none">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Mulai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
+                                    <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Selesai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
+                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
+                            </div>
+                            <div class="col-12 mt-1">
+                                <div class="form-text text-body-secondary mb-0" style="font-size: 9px; line-height: 1.3;">
+                                    <i class="fa-solid fa-circle-info me-1 text-primary"></i>
+                                    Potongan baru di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Sesi 3: Akun Pengelola / Kasir -->
-                    <div class="fw-bold text-danger text-uppercase mb-2" style="font-size: 9px; letter-spacing: 0.5px;">
+                    <div class="fw-bold text-danger text-uppercase mt-2 mb-1" style="font-size: 8px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-user-gear me-1"></i> Akun Pengelola / Kasir
                     </div>
-                    <div class="row g-2">
+                    <div class="row g-1.5 mb-1">
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Nama Pengelola / Kasir</label>
-                            <input type="text" name="nama_pengelola" id="edit_nama_pengelola" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">Nama Kasir</label>
+                            <input type="text" name="nama_pengelola" id="edit_nama_pengelola" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">No. HP / WhatsApp</label>
-                            <input type="text" name="no_hp" id="edit_no_hp" class="form-control form-control-sm rounded-3 fw-semibold" required>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">No. HP / WhatsApp</label>
+                            <input type="text" name="no_hp" id="edit_no_hp" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 11px;">Username Login</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
-                                <input type="text" name="username" id="edit_username" class="form-control form-control-sm rounded-end-3 border-start-0 fw-semibold" required>
+                            <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 10px;">Username Login</label>
+                            <div class="input-group input-group-sm" style="height: 28px;">
+                                <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-1.5 py-0" style="font-size: 9.5px; height: 28px;">@</span>
+                                <input type="text" name="username" id="edit_username" class="form-control form-control-sm rounded-end-3 border-start-0 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" required>
                             </div>
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary mb-1" style="font-size: 11px;">Password Baru (Opsional)</label>
-                            <input type="password" name="password" class="form-control form-control-sm rounded-3 fw-semibold" placeholder="Kosongkan jika tetap">
+                            <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 10px;">Password Baru (Opsional)</label>
+                            <input type="password" name="password" class="form-control form-control-sm rounded-3 fw-semibold py-1 px-2" style="font-size: 10.5px; height: 28px;" placeholder="Kosongkan jika tetap">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-3 px-3 d-flex justify-content-end gap-1.5">
-                    <button type="button" class="btn btn-light rounded-pill px-3 py-1 btn-sm" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-1 btn-sm" style="font-size: 12px;">
+                <div class="modal-footer border-0 pt-1 pb-2 px-2.5 d-flex justify-content-end gap-1.5">
+                    <button type="button" class="btn btn-light rounded-pill px-3 py-1 btn-sm" data-bs-dismiss="modal" style="font-size: 10.5px;">Batal</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-1 btn-sm" style="font-size: 10.5px;">
                         <i class="fa-solid fa-floppy-disk me-1"></i> Update Outlet
                     </button>
                 </div>
@@ -1136,10 +1183,6 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                     <div id="det_banner_action"></div>
 
                     <div class="list-group list-group-flush rounded-3 border border-body-subtle mb-3">
-                        <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
-                            <span class="text-body-secondary small"><i class="fa-light fa-user me-2 text-danger"></i>Username Akun Login</span>
-                            <span class="fw-bold text-body-emphasis" id="det_username">-</span>
-                        </div>
                         <div class="list-group-item bg-body d-flex justify-content-between align-items-center py-3">
                             <span class="text-body-secondary small"><i class="fa-regular fa-clock me-2 text-primary"></i>Waktu Pendaftaran</span>
                             <span class="fw-bold text-body-emphasis" id="det_created_at_full">-</span>
@@ -1606,9 +1649,29 @@ $(document).ready(function() {
         });
     });
 
+    // Toggle custom date range section in Edit Outlet Modal
+    $(document).on('change', '#chk_apply_date_range', function() {
+        if ($(this).is(':checked')) {
+            $('#container_edit_date_range').removeClass('d-none');
+            $('#lbl_date_range_status').removeClass('d-none');
+        } else {
+            $('#container_edit_date_range').addClass('d-none');
+            $('#lbl_date_range_status').addClass('d-none');
+            $('#edit_tgl_mulai_skema').val('');
+            $('#edit_tgl_selesai_skema').val('');
+        }
+    });
+
     // 2. Fetch Detail for Edit Outlet
     $(document).on('click', '.btn-edit-outlet', function() {
         const idOutlet = $(this).data('id');
+
+        // Reset custom date range fields
+        $('#chk_apply_date_range').prop('checked', false);
+        $('#container_edit_date_range').addClass('d-none');
+        $('#lbl_date_range_status').addClass('d-none');
+        $('#edit_tgl_mulai_skema').val('');
+        $('#edit_tgl_selesai_skema').val('');
         
         $.ajax({
             url: ACTION_URL,
