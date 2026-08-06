@@ -61,9 +61,9 @@ $topbarTab  = $_GET['tab'] ?? '';
                         <i class="fa-light fa-money-bill-trend-up me-2"></i> Input Omzet
                     </a>
                     
-                    <!-- Menu 2 Outlet: Riwayat & Potongan -->
+                    <!-- Menu 2 Outlet: Riwayat Omzet -->
                     <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="topbar-nav-pill <?= ($topbarPage == 'omzet' && $topbarTab == 'riwayat') || $topbarPage == 'riwayat-omzet' || $topbarPage == 'bagi-hasil' ? 'active' : ''; ?>">
-                        <i class="fa-light fa-clock-rotate-left me-2"></i> Riwayat & Potongan
+                        <i class="fa-light fa-clock-rotate-left me-2"></i> Riwayat Omzet
                     </a>
                 <?php endif; ?>
             </div>
@@ -177,9 +177,9 @@ $topbarTab  = $_GET['tab'] ?? '';
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet" class="mobile-topbar-link <?= ($topbarPage == 'omzet' && empty($topbarTab)) ? 'active' : ''; ?>">
                 <i class="fa-light fa-money-bill-trend-up me-2 fs-5"></i> Input Omzet
             </a>
-            <!-- Menu 2 Outlet: Riwayat & Potongan -->
+            <!-- Menu 2 Outlet: Riwayat Omzet -->
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/omzet?tab=riwayat" class="mobile-topbar-link <?= ($topbarPage == 'omzet' && $topbarTab == 'riwayat') || $topbarPage == 'riwayat-omzet' || $topbarPage == 'bagi-hasil' ? 'active' : ''; ?>">
-                <i class="fa-light fa-clock-rotate-left me-2 fs-5"></i> Riwayat & Potongan
+                <i class="fa-light fa-clock-rotate-left me-2 fs-5"></i> Riwayat Omzet
             </a>
         <?php endif; ?>
     </div>

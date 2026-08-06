@@ -117,22 +117,32 @@ $periodeParts = [];
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
     $whereConditions[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
     
+    $t1 = strtotime($selectedTglMulai);
+    $t2 = strtotime($selectedTglSelesai);
+    $d1 = date('j', $t1) . ' ' . ($bulanIndo[(int)date('n', $t1)] ?? '') . ' ' . date('Y', $t1);
+    $d2 = date('j', $t2) . ' ' . ($bulanIndo[(int)date('n', $t2)] ?? '') . ' ' . date('Y', $t2);
+
     if ($selectedTglMulai === $selectedTglSelesai) {
-        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai));
+        $periodeParts[] = $d1;
     } else {
-        $periodeParts[] = date('d/m/Y', strtotime($selectedTglMulai)) . ' - ' . date('d/m/Y', strtotime($selectedTglSelesai));
+        $periodeParts[] = $d1 . ' - ' . $d2;
     }
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $whereConditions[] = "l.periode_laporan >= '{$safeMulai}'";
-    $periodeParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
+    $t1 = strtotime($selectedTglMulai);
+    $d1 = date('j', $t1) . ' ' . ($bulanIndo[(int)date('n', $t1)] ?? '') . ' ' . date('Y', $t1);
+    $periodeParts[] = 'Mulai ' . $d1;
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
     $whereConditions[] = "l.periode_laporan <= '{$safeSelesai}'";
-    $periodeParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
+    $t2 = strtotime($selectedTglSelesai);
+    $d2 = date('j', $t2) . ' ' . ($bulanIndo[(int)date('n', $t2)] ?? '') . ' ' . date('Y', $t2);
+    $periodeParts[] = 'Sampai ' . $d2;
 } else {
     if ($selectedBulan > 0) {
         $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
@@ -146,8 +156,8 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
 
 $periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
 $periodeLabelStr = $periodeTitleStr;
-if (!empty($selectedOutletNama)) {
-    $periodeLabelStr .= " " . $selectedOutletNama;
+if (!empty($selectedOutletNama) && $selectedOutletId > 0) {
+    $periodeLabelStr .= " - " . $selectedOutletNama;
 }
 
 $laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
@@ -162,14 +172,19 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
-        IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor,
+        IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)) as persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
-        IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db
+        IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_investor_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)))) / 100.0), 2)), 0) as total_hak_outlet_db,
+        COUNT(DISTINCT l.presentase_potongan) as count_distinct_rates,
+        MIN(l.presentase_potongan) as min_rate,
+        MAX(l.presentase_potongan) as max_rate
     FROM outlet o
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, inv.persen_bagian_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor, inv.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 
@@ -183,17 +198,29 @@ if ($resBagiHasil) {
         $rateInvestor = (float)($row['persen_bagian_investor'] ?? 50.00);
         $rateOutlet = 100.00 - $rateInvestor;
 
-        // Potongan & Bagi Hasil berlaku SETIAP HARI (Dipotong Setiap Hari)
-        $potongan10 = ((float)$row['total_potongan_db'] > 0) ? (float)$row['total_potongan_db'] : round($omzet * ($ratePotongan / 100.0), 2);
-        
-        $hakInvestor = round($potongan10 * ($rateInvestor / 100.0), 2);
-        $hakOutlet   = round($potongan10 * ($rateOutlet / 100.0), 2);
+        $countRates = (int)($row['count_distinct_rates'] ?? 0);
+        $minRate = (float)($row['min_rate'] ?? $ratePotongan);
+        $maxRate = (float)($row['max_rate'] ?? $ratePotongan);
+
+        if ($countRates > 1 && $minRate !== $maxRate) {
+            $displayRate = "Variatif (" . $minRate . "% - " . $maxRate . "%)";
+        } elseif ($minRate > 0) {
+            $displayRate = $minRate . "%";
+        } else {
+            $displayRate = $ratePotongan . "%";
+        }
+
+        // Calculations strictly match each store's custom rate and split
+        $potongan10 = (float)$row['total_potongan_db'];
+        $hakInvestor = (float)$row['total_hak_investor_db'];
+        $hakOutlet   = (float)$row['total_hak_outlet_db'];
         $hasAnyLastDayDone = true;
 
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
         $totalBersihOutlet = ($omzet - $potongan10) + $hakOutlet;
 
         $row['persentase_potongan'] = $ratePotongan;
+        $row['display_rate'] = $displayRate;
         $row['persen_bagian_investor'] = $rateInvestor;
         $row['is_last_day_done'] = true;
         $row['potongan_10'] = $potongan10;
@@ -210,10 +237,6 @@ if ($resBagiHasil) {
     }
 }
 
-$periodeLabelStr = ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : 'Semua Bulan ') . ($selectedTahun > 0 ? $selectedTahun : '');
-if ($selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Periode';
-}
 $countOutlet = count($rows);
 ?>
 
@@ -397,7 +420,7 @@ $countOutlet = count($rows);
         <div class="col-6 col-xl-3">
             <div class="box-stat-bagi-hasil box-stat-potongan h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-danger text-uppercase card-stat-title-full">Potongan </span>
+                    <span class="text-danger text-uppercase card-stat-title-full">Potongan Outlet</span>
                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-percent"></i>
                     </div>
@@ -515,36 +538,21 @@ $countOutlet = count($rows);
                                     <td class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
                                     <td class="py-3 px-3 text-center fw-bold text-danger" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            <div class="d-flex justify-content-center align-items-center gap-1">
-                                                <span>Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></span>
-                                                <span class="badge bg-danger-subtle text-danger fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(220, 53, 69, 0.15); line-height: 1;">
-                                                    <?= (float)$r['persentase_potongan']; ?>%
-                                                </span>
-                                            </div>
+                                            <span>Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></span>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Dipotong)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-3 text-center fw-extrabold text-success fs-6" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            <div class="d-flex justify-content-center align-items-center gap-1">
-                                                <span>Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></span>
-                                                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(25, 135, 84, 0.15); line-height: 1;">
-                                                    <?= (float)$r['persen_bagian_investor']; ?>%
-                                                </span>
-                                            </div>
+                                            <span>Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></span>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-3 px-3 text-center fw-extrabold text-warning fs-6" style="text-align: center !important;">
                                         <?php if ($r['is_last_day_done']) : ?>
-                                            <div class="d-flex justify-content-center align-items-center gap-1">
-                                                <span>Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></span>
-                                                <span class="badge bg-warning-subtle text-warning fw-bold" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.15); line-height: 1;">
-                                                    <?= (float)(100.00 - $r['persen_bagian_investor']); ?>%
-                                                </span>
-                                            </div>
+                                            <span>Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></span>
                                         <?php else : ?>
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
@@ -615,7 +623,7 @@ $countOutlet = count($rows);
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/bagi-hasil">
                 <div class="modal-body p-4">
                     <?php if ($role === 'investor' && !empty($investorOutlets)) : ?>
-                        <!-- 1. Pencarian Outlet Interaktif -->
+                        <!-- 1. Pencarian Toko / Outlet Interaktif -->
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-body-secondary">
                                 <i class="fa-solid fa-store me-1 text-danger"></i>Cari & Pilih Toko / Outlet
@@ -625,18 +633,18 @@ $countOutlet = count($rows);
                             <div class="position-relative">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-body-secondary border-body-subtle text-body-secondary">
-                                        <i class="fa-light fa-magnifying-glass"></i>
+                                        <i class="fa-solid fa-magnifying-glass"></i>
                                     </span>
-                                    <input type="text" id="filterModalOutletSearch" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold shadow-none" placeholder="Ketik nama toko..." value="<?= htmlspecialchars($selectedOutletNama); ?>" autocomplete="off">
+                                    <input type="text" id="filterModalOutletSearch" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold shadow-none" placeholder="Ketik nama toko untuk mencari..." value="<?= htmlspecialchars($selectedOutletNama ?: 'Semua Toko'); ?>" autocomplete="off">
                                     <button type="button" class="btn btn-outline-secondary btn-sm" id="btnResetSelectedOutlet" title="Pilih Semua Outlet">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
 
                                 <!-- Badge Status Outlet Terpilih -->
-                                <div id="selectedOutletBadgeContainer" class="mt-2 <?= ($selectedOutletId > 0) ? '' : 'd-none'; ?>">
+                                <div id="selectedOutletBadgeContainer" class="mt-2">
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold" id="selectedOutletBadgeText">
-                                        <i class="fa-solid fa-store me-1"></i> Terpilih: <?= htmlspecialchars($selectedOutletNama ?: 'Semua Outlet'); ?>
+                                        <i class="fa-solid fa-store me-1"></i> Terpilih: <?= htmlspecialchars($selectedOutletNama ?: 'Semua Toko'); ?>
                                     </span>
                                 </div>
 
@@ -646,7 +654,7 @@ $countOutlet = count($rows);
                                 </div>
                             </div>
                             <div class="form-text text-body-secondary small mt-1">
-                                <i class="fa-solid fa-circle-info me-1 text-primary"></i>Pilih <strong>Semua Toko</strong> untuk melihat rekapitulasi akumulasi seluruh toko Anda, atau ketik nama toko untuk melihat per toko.
+                                <i class="fa-solid fa-circle-info me-1 text-primary"></i>Ketik nama toko untuk mencari, atau pilih <strong>Semua Toko</strong> untuk melihat rekapitulasi seluruh toko Anda.
                             </div>
                         </div>
                     <?php endif; ?>
@@ -663,12 +671,22 @@ $countOutlet = count($rows);
                         </div>
                         <div class="row g-2">
                             <div class="col-6">
-                                <small class="text-body-secondary d-block mb-1">Tanggal Mulai</small>
-                                <input type="date" name="tgl_mulai" id="filterModalTglMulai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglMulai); ?>">
+                                <label for="filterModalTglMulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
+                                <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                    <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                    </span>
+                                    <input type="date" name="tgl_mulai" id="filterModalTglMulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
                             </div>
                             <div class="col-6">
-                                <small class="text-body-secondary d-block mb-1">Tanggal Selesai</small>
-                                <input type="date" name="tgl_selesai" id="filterModalTglSelesai" class="form-control form-control-sm bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
+                                <label for="filterModalTglSelesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
+                                <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                    <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                    </span>
+                                    <input type="date" name="tgl_selesai" id="filterModalTglSelesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
                             </div>
                         </div>
                         <div class="form-text text-body-secondary small mt-2">
@@ -763,11 +781,22 @@ $countOutlet = count($rows);
 
 <script>
 $(document).ready(function() {
-    const investorOutlets = <?= json_encode($investorOutlets); ?>;
-    const searchInput = $('#filterModalOutletSearch');
-    const resultsBox = $('#outletSearchResultsBox');
-    const hiddenInput = $('#filterModalOutletId');
-    const badgeContainer = $('#selectedOutletBadgeContainer');
+    // Instant Datepicker Pop-up Handler when clicking icon, wrapper, or label
+    $(document).on('click', '.date-picker-wrapper', function() {
+        const input = $(this).find('input[type="date"]')[0];
+        if (input) {
+            if (typeof input.showPicker === 'function') {
+                try {
+                    input.showPicker();
+                } catch(err) {
+                    input.focus();
+                }
+            } else {
+                input.focus();
+            }
+        }
+    });
+
     // Reset Tanggal Filter Event
     $('#btnResetTanggalFilter').on('click', function() {
         $('#filterModalTglMulai').val('');
@@ -815,9 +844,9 @@ $(document).ready(function() {
                         const fmt = new Intl.NumberFormat('id-ID');
                         
                         // Update headers dynamically
-                        $('#lblModalHeaderPotongan').html(`Potongan (${res.rate_potongan}%)`);
-                        $('#lblModalHeaderHakInv').html(`Hak Investor (${res.persen_inv}%)`);
-                        $('#lblModalHeaderHakOut').html(`Hak Outlet (${res.persen_out}%)`);
+                        $('#lblModalHeaderPotongan').html(res.rate_potongan === 'Variatif' ? 'Potongan (Variatif)' : `Potongan (${res.rate_potongan})`);
+                        $('#lblModalHeaderHakInv').html(res.persen_inv === 'Variatif' ? 'Hak Investor (Variatif)' : `Hak Investor (${res.persen_inv})`);
+                        $('#lblModalHeaderHakOut').html(res.persen_out === 'Variatif' ? 'Hak Outlet (Variatif)' : `Hak Outlet (${res.persen_out})`);
 
                         res.items.forEach((item, idx) => {
                             tbody.append(`
@@ -827,9 +856,18 @@ $(document).ready(function() {
                                         <i class="fa-regular fa-calendar-day me-1 text-danger"></i>${item.tgl_formatted}
                                     </td>
                                     <td class="text-center py-1.5 px-2 fw-bold text-body-emphasis">Rp ${fmt.format(item.omzet)}</td>
-                                    <td class="text-center py-1.5 px-2 fw-semibold text-danger">Rp ${fmt.format(item.potongan_10)}</td>
-                                    <td class="text-center py-1.5 px-2 fw-bold text-success">Rp ${fmt.format(item.hak_investor)}</td>
-                                    <td class="text-center py-1.5 px-2 fw-semibold text-warning">Rp ${fmt.format(item.hak_outlet)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-semibold text-danger">
+                                        Rp ${fmt.format(item.potongan_10)}
+                                        <span class="badge bg-danger-subtle text-danger fw-bold ms-1" style="font-size: 10px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(220, 53, 69, 0.15);">${item.rate_potongan}%</span>
+                                    </td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-success">
+                                        Rp ${fmt.format(item.hak_investor)}
+                                        <span class="badge bg-success-subtle text-success fw-bold ms-1" style="font-size: 10px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(25, 135, 84, 0.15);">${item.persen_investor}%</span>
+                                    </td>
+                                    <td class="text-center py-1.5 px-2 fw-semibold text-warning">
+                                        Rp ${fmt.format(item.hak_outlet)}
+                                        <span class="badge bg-warning-subtle text-warning fw-bold ms-1" style="font-size: 10px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.2);">${item.persen_outlet}%</span>
+                                    </td>
                                 </tr>
                             `);
                         });
@@ -874,64 +912,55 @@ $(document).ready(function() {
         });
     });
 
+    // Live Search Store / Outlet Filtering Logic
+    const investorOutlets = <?= json_encode($investorOutlets); ?>;
+    const searchInput = $('#filterModalOutletSearch');
+    const resultsBox = $('#outletSearchResultsBox');
+    const hiddenInput = $('#filterModalOutletId');
+    const badgeContainer = $('#selectedOutletBadgeContainer');
+    const badgeText = $('#selectedOutletBadgeText');
+    let searchTimeout = null;
+
     function renderResults(query) {
         if (!investorOutlets || investorOutlets.length === 0) return;
 
         const cleanQuery = (query || '').trim().toLowerCase();
 
-        if (cleanQuery.length === 0) {
-            resultsBox.removeClass('d-none').empty();
-            const isAllSelected = parseInt(hiddenInput.val()) === 0;
-            resultsBox.append(`
-                <button type="button" class="list-group-item list-group-item-action ${isAllSelected ? 'bg-danger-subtle text-danger fw-bold' : 'bg-body text-body-emphasis'} small py-2.5 px-3 btn-select-outlet" data-id="0" data-name="">
-                    <i class="fa-solid fa-store me-2 ${isAllSelected ? 'text-danger' : 'text-primary'}"></i><strong>Semua Toko</strong> <span class="small text-body-secondary ms-1">(Rekap Akumulasi Seluruh Toko)</span>
-                </button>
-            `);
-            return;
-        }
+        resultsBox.removeClass('d-none').empty();
 
-        resultsBox.removeClass('d-none').html(`
-            <div class="list-group-item bg-body text-body-secondary small py-3 text-center fw-semibold border-0">
-                <i class="fa-solid fa-spinner fa-spin me-2 text-danger"></i>Mencari toko...
-            </div>
+        const isAllSelected = parseInt(hiddenInput.val()) === 0;
+        
+        // Always include "Semua Toko" option at top
+        resultsBox.append(`
+            <button type="button" class="list-group-item list-group-item-action ${isAllSelected ? 'bg-danger-subtle text-danger fw-bold' : 'bg-body text-body-emphasis'} small py-2.5 px-3 border-bottom btn-select-outlet" data-id="0" data-name="Semua Toko">
+                <i class="fa-solid fa-store me-2 ${isAllSelected ? 'text-danger' : 'text-primary'}"></i><strong>Semua Toko</strong> <span class="small text-body-secondary ms-1">(Rekap Akumulasi Seluruh Toko)</span>
+            </button>
         `);
 
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(function() {
-            resultsBox.empty();
+        const filtered = investorOutlets.filter(function(item) {
+            if (!cleanQuery || cleanQuery === 'semua toko') return true;
+            return (item.nama_outlet && item.nama_outlet.toLowerCase().includes(cleanQuery));
+        });
 
-            const isAllSelected = parseInt(hiddenInput.val()) === 0;
-            resultsBox.append(`
-                <button type="button" class="list-group-item list-group-item-action ${isAllSelected ? 'bg-danger-subtle text-danger fw-bold' : 'bg-body text-body-emphasis'} small py-2.5 px-3 border-bottom btn-select-outlet" data-id="0" data-name="">
-                    <i class="fa-solid fa-store me-2 ${isAllSelected ? 'text-danger' : 'text-primary'}"></i><strong>Semua Toko</strong> <span class="small text-body-secondary ms-1">(Rekap Akumulasi Seluruh Toko)</span>
-                </button>
-            `);
+        if (filtered.length > 0) {
+            filtered.forEach(function(item) {
+                const isSelected = parseInt(item.id_outlet) === parseInt(hiddenInput.val());
+                const activeClass = isSelected ? 'bg-danger text-white fw-bold' : 'bg-body text-body-emphasis';
+                const iconClass = isSelected ? 'text-white' : 'text-danger';
 
-            const filtered = investorOutlets.filter(function(item) {
-                return (item.nama_outlet && item.nama_outlet.toLowerCase().includes(cleanQuery)) || 
-                       (item.kode_outlet && item.kode_outlet.toLowerCase().includes(cleanQuery));
-            });
-
-            if (filtered.length > 0) {
-                filtered.forEach(function(item) {
-                    const isSelected = parseInt(item.id_outlet) === parseInt(hiddenInput.val());
-                    const activeClass = isSelected ? 'bg-danger text-white fw-bold' : 'bg-body text-body-emphasis';
-                    const iconClass = isSelected ? 'text-white' : 'text-danger';
-
-                    resultsBox.append(`
-                        <button type="button" class="list-group-item list-group-item-action ${activeClass} small py-2 px-3 btn-select-outlet" data-id="${item.id_outlet}" data-name="${item.nama_outlet}">
-                            <i class="fa-solid fa-store me-2 ${iconClass}"></i>${item.nama_outlet}
-                        </button>
-                    `);
-                });
-            } else {
                 resultsBox.append(`
-                    <div class="list-group-item bg-body text-danger small py-3 text-center fw-semibold border-0">
-                        <i class="fa-solid fa-circle-exclamation me-1"></i> Data toko tidak ditemukan
-                    </div>
+                    <button type="button" class="list-group-item list-group-item-action ${activeClass} small py-2.5 px-3 btn-select-outlet" data-id="${item.id_outlet}" data-name="${item.nama_outlet}">
+                        <i class="fa-solid fa-store me-2 ${iconClass}"></i>${item.nama_outlet}
+                    </button>
                 `);
-            }
-        }, 200);
+            });
+        } else if (cleanQuery.length > 0 && cleanQuery !== 'semua toko') {
+            resultsBox.append(`
+                <div class="list-group-item bg-body text-danger small py-3 text-center fw-semibold border-0">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> Data toko "${query}" tidak ditemukan
+                </div>
+            `);
+        }
     }
 
     searchInput.on('focus', function() {
@@ -942,31 +971,34 @@ $(document).ready(function() {
     });
 
     searchInput.on('input', function() {
-        renderResults($(this).val());
+        clearTimeout(searchTimeout);
+        const q = $(this).val();
+        searchTimeout = setTimeout(function() {
+            renderResults(q);
+        }, 150);
     });
 
     $(document).on('click', '.btn-select-outlet', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const id = parseInt($(this).data('id'));
-        const name = $(this).data('name') || '';
+        const name = $(this).data('name') || 'Semua Toko';
 
         if (isNaN(id) || id === 0) {
             hiddenInput.val(0);
             searchInput.val('Semua Toko');
-            badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
-            badgeContainer.removeClass('d-none');
+            if (badgeText.length) badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
         } else {
             hiddenInput.val(id);
             searchInput.val(name);
-            badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: ' + name);
-            badgeContainer.removeClass('d-none');
+            if (badgeText.length) badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: ' + name);
         }
+        if (badgeContainer.length) badgeContainer.removeClass('d-none');
         resultsBox.addClass('d-none');
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#filterModalOutletSearch, #outletSearchResultsBox').length) {
+        if (!$(e.target).closest('#filterModalOutletSearch, #outletSearchResultsBox, #btnResetSelectedOutlet').length) {
             resultsBox.addClass('d-none');
         }
     });
@@ -976,8 +1008,8 @@ $(document).ready(function() {
         e.stopPropagation();
         hiddenInput.val(0);
         searchInput.val('Semua Toko');
-        badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
-        badgeContainer.removeClass('d-none');
+        if (badgeText.length) badgeText.html('<i class="fa-solid fa-store me-1"></i> Terpilih: Semua Toko');
+        if (badgeContainer.length) badgeContainer.removeClass('d-none');
         resultsBox.addClass('d-none');
     });
 });

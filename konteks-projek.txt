@@ -63,6 +63,7 @@ CREATE TABLE outlet (
     kecamatan VARCHAR(100) DEFAULT NULL,
     alamat_outlet TEXT DEFAULT NULL,
     persentase_potongan DECIMAL(5,2) DEFAULT 10.00,
+    persen_bagian_investor DECIMAL(5,2) DEFAULT 50.00,
     status ENUM('pending','active','reject','inactive') NOT NULL DEFAULT 'pending',
     nominal_biaya DECIMAL(15,2) NOT NULL DEFAULT 0.00,
     bukti_pembayaran VARCHAR(255) DEFAULT NULL,
@@ -81,6 +82,7 @@ CREATE TABLE laporan_omzet (
     periode_laporan DATE NOT NULL,
     omzet DECIMAL(15,2) NOT NULL DEFAULT 0.00,
     presentase_potongan DECIMAL(5,2) NOT NULL,
+    persen_bagian_investor DECIMAL(5,2) DEFAULT NULL,
     nominal_potongan DECIMAL(15,2) NOT NULL,
     waktu_input DATETIME NOT NULL,
     FOREIGN KEY (id_outlet) REFERENCES outlet(id_outlet) ON DELETE RESTRICT,
@@ -153,3 +155,4 @@ CREATE TABLE pengaturan_sistem (
 - Menyelaraskan desain DataTables pagination pada modul client investor (`client/doc/investor/view.php`) dan client master outlet (`client/doc/outlet/view.php`) sehingga seluruh tabel master memuat paginasi modern 10 data per halaman dengan antarmuka yang seragam dan elegan. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
 - Menyelaraskan seluruh paginasi pada tampilan Master (`client/doc/investor/view.php` & `client/doc/outlet/view.php`) agar 100% menggunakan desain Paginasi Bootstrap Kustom bawaan portal client (teks info di kiri & tombol kapsul Prev/Next di kanan) sehingga tampilan antarmuka Master dan Investor benar-benar seragam dan presisi. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
 - Menghapus kontrol DataTables (Search box, dropdown Tampilkan Data, dan tombol paginasi yang terpotong) dari modal popup `Total Outlet Investor` (`client/doc/investor/view.php`) sehingga tampilan modal menjadi bersih, rapi, dan tidak berantakan. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
+- Berhasil me-merge update terbaru dari branch `origin/tegar1` ke branch `Cumikkk`: menyelaraskan fitur & tampilan portal Investor dan Outlet (laporan omzet, bagi hasil, aksi kelola outlet, dan invoice/export), serta memastikan portal Admin & Master berjalan stabil tanpa error syntax. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
