@@ -92,6 +92,16 @@ if ($idKomisi > 0) {
     // UPDATE
     $updateBukti = "";
     if (!empty($buktiPath)) {
+        // Hapus berkas bukti lama dari disk jika ada berkas baru diunggah
+        $resBkt = $db->query("SELECT bukti_pembayaran FROM komisi_master WHERE id_komisi = {$idKomisi} LIMIT 1");
+        if ($resBkt && $rowBkt = $resBkt->fetch_assoc()) {
+            $oldFile = trim($rowBkt['bukti_pembayaran'] ?? '');
+            if (!empty($oldFile) && $oldFile !== $buktiPath) {
+                @unlink(CRM_ROOT . '/' . $oldFile);
+                @unlink(WEB_ROOT . '/' . $oldFile);
+            }
+        }
+
         $buktiEsc = $db->real_escape_string($buktiPath);
         $updateBukti = ", bukti_pembayaran = '{$buktiEsc}'";
     }

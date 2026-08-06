@@ -93,7 +93,6 @@ $recentRequests = $db->query("
 
 <!-- Row Summary Tables -->
 <style>
-/* Force DataTable sorting icon on Total Omzet column to point UP */
 #table-top-omzet th.sorting_desc::after,
 #table-top-omzet th.sorting_desc::before {
     content: "\f0de" !important;
@@ -118,7 +117,7 @@ $recentRequests = $db->query("
                                 <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Investor</th>
-                                <th class="text-center">Total Omzet <i class="fa fa-arrow-up text-success ms-1" title="Omzet Tertinggi"></i></th>
+                                <th class="text-center">Total Omzet</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -154,7 +153,7 @@ $recentRequests = $db->query("
                                                 </button>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-end fw-bold text-success">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
+                                        <td class="text-end fw-bold text-success" data-order="<?= (float)$row['total_omzet'] ?>">Rp <?= number_format($row['total_omzet'], 0, ',', '.') ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php endif; ?>

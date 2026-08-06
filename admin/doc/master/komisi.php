@@ -46,7 +46,7 @@ $listKomisi = $db->query($sqlKomisi);
                                 <th class="text-center">Nama Master</th>
                                 <th class="text-center">Periode / Keterangan</th>
                                 <th class="text-center">Nominal Komisi</th>
-                                <th class="text-center">Bukti Transfer</th>
+                                <th class="text-center">Bukti Bayar</th>
                                 <th class="text-center">Catatan</th>
                                 <th class="text-center" style="width: 12%;">#</th>
                             </tr>
@@ -69,20 +69,17 @@ $listKomisi = $db->query($sqlKomisi);
                                             <?php if (!empty($row['bukti_pembayaran'])) : ?>
                                                 <?php $fileExt = strtolower(pathinfo($row['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
                                                 <?php if ($fileExt === 'pdf') : ?>
-                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-xs fw-semibold">
-                                                        <i class="fa fa-file-pdf me-1"></i> Dokumen PDF
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/image-proxy.php?file=<?= urlencode($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-sm">
+                                                        <i class="fas fa-file-pdf me-1"></i> Lihat PDF
                                                     </a>
                                                 <?php else : ?>
-                                                    <button type="button" class="btn btn-outline-primary btn-xs btn-view-bukti-komisi fw-semibold" 
-                                                            data-img="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($row['bukti_pembayaran']) ?>"
-                                                            data-master="<?= htmlspecialchars($row['nama_master']) ?>"
-                                                            data-periode="<?= htmlspecialchars($row['periode']) ?>"
-                                                            data-nominal="Rp <?= number_format($row['nominal'], 0, ',', '.') ?>">
-                                                        <i class="fa fa-image me-1"></i> Bukti Bayar
+                                                    <button type="button" class="btn btn-outline-info btn-sm" 
+                                                            onclick="previewBuktiKomisi('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_master'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['periode'], ENT_QUOTES) ?>', 'Rp <?= number_format($row['nominal'], 0, ',', '.') ?>')">
+                                                        <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php endif; ?>
                                             <?php else : ?>
-                                                <span class="badge bg-light text-muted fw-normal">Tanpa Bukti</span>
+                                                <span class="badge bg-light text-dark">Belum ada</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-start"><small><?= htmlspecialchars($row['catatan'] ?? '-') ?></small></td>
@@ -115,25 +112,78 @@ $listKomisi = $db->query($sqlKomisi);
 </div>
 
 <script type="text/javascript">
+function previewBuktiKomisi(filePath, namaMaster, periode, nominal) {
+    if (!filePath) {
+        Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
+        return;
+    }
+    var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+    var proxyUrl = adminUrl + '/image-proxy.php?file=' + encodeURIComponent(filePath);
+    var ext = filePath.split('.').pop().toLowerCase();
+    if (ext === 'pdf') {
+        window.open(proxyUrl, '_blank');
+        return;
+    }
+
+    var infoHtml = '<div class="text-start bg-light p-3 rounded mb-3" style="font-size:13.5px; border:1px solid #e9ecef;">'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-user-circle text-primary me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Master Owner:</span>'
+        + '  <span class="text-dark fw-semibold">' + (namaMaster || '-') + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-calendar-check-o text-success me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Keterangan:</span>'
+        + '  <span class="text-dark">' + (periode || '-') + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center">'
+        + '  <i class="fa fa-money text-warning me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nominal Komisi:</span>'
+        + '  <span class="text-success fw-bold">' + nominal + '</span>'
+        + '</div>'
+        + '</div>';
+
+    Swal.fire({
+        title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Komisi Master',
+        html: infoHtml
+            + '<img src="' + proxyUrl + '" '
+            + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
+        showCloseButton: true,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+        heightAuto: false,
+        width: 640
+    });
+}
+
+function deleteKomisi(id, master, nominal) {
+    Swal.fire({
+        title: 'Hapus Record Komisi?',
+        text: `Hapus komisi untuk Master ${master} sebesar ${nominal}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus!',
+        confirmButtonText: 'Ya, Hapus Komisi',
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Sedang menghapus data komisi',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/komisi", { action: 'delete', id_komisi: id }, function(resp) {
                 if (resp.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Terhapus!',
-                        text: resp.message || 'Data komisi berhasil dihapus.',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => { location.reload(); });
+                    Swal.fire('Berhasil!', resp.message, 'success').then(() => { location.reload(); });
                 } else {
-                    Swal.fire('Gagal!', resp.message || 'Gagal menghapus data komisi.', 'error');
+                    Swal.fire('Gagal!', resp.message || 'Gagal menghapus data komisi', 'error');
                 }
-            }, 'json').fail(function() {
-                Swal.fire('Error!', 'Gagal terhubung ke server.', 'error');
+            }, 'json').fail(() => {
+                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
             });
         }
     });
@@ -147,7 +197,7 @@ $(document).ready(function() {
             scrollX: true,
             lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
             language: {
-                searchPlaceholder: 'Cari komisi master...',
+                searchPlaceholder: 'Cari komisi...',
                 sSearch: '',
                 lengthMenu: 'Show _MENU_ entries',
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',

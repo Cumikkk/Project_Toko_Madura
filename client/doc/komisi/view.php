@@ -124,7 +124,7 @@ if (!function_exists('buildKomisiPageUrl')) {
                                     <th class="text-center">Tanggal Transfer</th>
                                     <th>Periode / Keterangan</th>
                                     <th class="text-center">Nominal Komisi</th>
-                                    <th class="text-center">Bukti Transfer</th>
+                                    <th class="text-center">Bukti Bayar</th>
                                     <th class="text-start">Catatan Admin</th>
                                 </tr>
                             </thead>
@@ -148,20 +148,20 @@ if (!function_exists('buildKomisiPageUrl')) {
                                                 <?php if (!empty($km['bukti_pembayaran'])) : ?>
                                                     <?php $fileExt = strtolower(pathinfo($km['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
                                                     <?php if ($fileExt === 'pdf') : ?>
-                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-xs fw-semibold">
-                                                            <i class="fas fa-file-pdf me-1"></i> Dokumen PDF
+                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-sm">
+                                                            <i class="fas fa-file-pdf me-1"></i> Lihat PDF
                                                         </a>
                                                     <?php else : ?>
-                                                        <button type="button" class="btn btn-outline-primary btn-xs btn-client-view-bukti-komisi fw-semibold" 
+                                                        <button type="button" class="btn btn-outline-info btn-sm btn-client-view-bukti-komisi" 
                                                                 data-img="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" 
                                                                 data-master="<?= htmlspecialchars($user['MBR_NAME'] ?? 'Master Owner') ?>"
                                                                 data-periode="<?= htmlspecialchars($km['periode']) ?>" 
                                                                 data-nominal="Rp <?= number_format($km['nominal'], 0, ',', '.') ?>">
-                                                            <i class="fas fa-image me-1"></i> Bukti Bayar
+                                                            <i class="fas fa-image me-1"></i> Lihat Bukti
                                                         </button>
                                                     <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="badge bg-light text-muted fw-normal">Tanpa Bukti</span>
+                                                    <span class="badge bg-light text-dark">Belum ada</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start small text-body-secondary">
@@ -230,24 +230,35 @@ $(document).ready(function() {
         let periode = $(this).data('periode');
         let nominal = $(this).data('nominal');
 
+        var infoHtml = '<div class="text-start bg-light p-3 rounded mb-3" style="font-size:13.5px; border:1px solid #e9ecef;">'
+            + '<div class="d-flex align-items-center mb-2">'
+            + '  <i class="fa fa-user-circle text-primary me-2" style="width:20px; text-align:center;"></i>'
+            + '  <span style="min-width:140px;" class="fw-bold">Master Owner:</span>'
+            + '  <span class="text-dark fw-semibold">' + (master || '-') + '</span>'
+            + '</div>'
+            + '<div class="d-flex align-items-center mb-2">'
+            + '  <i class="fa fa-calendar-check-o text-success me-2" style="width:20px; text-align:center;"></i>'
+            + '  <span style="min-width:140px;" class="fw-bold">Keterangan:</span>'
+            + '  <span class="text-dark">' + (periode || '-') + '</span>'
+            + '</div>'
+            + '<div class="d-flex align-items-center">'
+            + '  <i class="fa fa-money text-warning me-2" style="width:20px; text-align:center;"></i>'
+            + '  <span style="min-width:140px;" class="fw-bold">Nominal Komisi:</span>'
+            + '  <span class="text-success fw-bold">' + nominal + '</span>'
+            + '</div>'
+            + '</div>';
+
         Swal.fire({
-            title: 'Bukti Pembayaran Komisi',
-            html: `
-                <div class="text-start fs-14 mb-3">
-                    <p class="mb-1"><strong>Master Owner:</strong> ${master}</p>
-                    <p class="mb-1"><strong>Keterangan:</strong> ${periode}</p>
-                    <p class="mb-2"><strong>Nominal Komisi:</strong> <span class="badge bg-success fs-6">${nominal}</span></p>
-                </div>
-                <div class="text-center p-2 bg-light rounded border">
-                    <img src="${imgUrl}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Bukti Transfer Komisi">
-                </div>
-                <div class="mt-3 text-center">
-                    <a href="${imgUrl}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-external-link-alt me-1"></i> Buka Gambar Penuh</a>
-                </div>
-            `,
-            width: '600px',
+            title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Komisi Master',
+            html: infoHtml
+                + '<img src="' + imgUrl + '" '
+                + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+                + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
             showCloseButton: true,
-            showConfirmButton: false
+            showConfirmButton: false,
+            scrollbarPadding: false,
+            heightAuto: false,
+            width: 640
         });
     });
 });

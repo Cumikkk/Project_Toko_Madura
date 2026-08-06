@@ -23,17 +23,22 @@ if (!in_array($ext, $allowedExtensions)) {
     exit('File type not allowed');
 }
 
-// Hanya izinkan file dari folder uploads/bukti_pembayaran/
-if (strpos($file, 'uploads/bukti_pembayaran/') !== 0) {
+// Hanya izinkan file dari folder uploads/bukti_pembayaran/ atau uploads/bukti_komisi/
+if (strpos($file, 'uploads/bukti_pembayaran/') !== 0 && strpos($file, 'uploads/bukti_komisi/') !== 0) {
     http_response_code(403);
     exit('Access denied');
 }
 
 // dirname(__DIR__) = Project root (parent of admin/)
-// client/ ada sejajar dengan admin/
+// client/ dan admin/ ada sejajar
 $projectRoot = dirname(__DIR__);
 $filePath = $projectRoot . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR
           . str_replace('/', DIRECTORY_SEPARATOR, $file);
+
+if (!file_exists($filePath) || !is_file($filePath)) {
+    $filePath = $projectRoot . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR
+              . str_replace('/', DIRECTORY_SEPARATOR, $file);
+}
 
 if (!file_exists($filePath) || !is_file($filePath)) {
     http_response_code(404);
