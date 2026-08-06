@@ -65,7 +65,7 @@ CREATE TABLE `admin_module` (
   UNIQUE KEY `unique_module_name` (`module`) USING BTREE,
   KEY `fk_group_id` (`group_id`) USING BTREE,
   CONSTRAINT `admin_module_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `admin_module_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `admin_module` (
 
 LOCK TABLES `admin_module` WRITE;
 /*!40000 ALTER TABLE `admin_module` DISABLE KEYS */;
-INSERT INTO `admin_module` VALUES (1,1,1,'Dashboard',-1,-1,'2026-07-23 12:19:52',NULL),(2,2,2,'Investor',-1,-1,'2026-07-23 12:19:52',NULL),(4,1,3,'Admin',-1,-1,'2026-07-23 12:19:52',NULL),(5,1,4,'group',-1,-1,'2026-07-23 12:19:52',NULL),(6,2,4,'module',-1,-1,'2026-07-23 12:19:52',NULL),(7,1,5,'Outlet',-1,-1,'2026-07-23 15:47:15','2026-07-28 01:49:08'),(19,1,12,'Master',-1,-1,'2026-07-28 15:00:51',NULL),(32,2,19,'rekening_bank',-1,-1,'2026-07-29 16:31:32',NULL);
+INSERT INTO `admin_module` VALUES (1,1,1,'Dashboard',-1,-1,'2026-07-23 12:19:52',NULL),(2,2,2,'Investor',-1,-1,'2026-07-23 12:19:52',NULL),(4,1,3,'Admin',-1,-1,'2026-07-23 12:19:52',NULL),(5,1,4,'group',-1,-1,'2026-07-23 12:19:52',NULL),(6,2,4,'module',-1,-1,'2026-07-23 12:19:52',NULL),(7,1,5,'Outlet',-1,-1,'2026-07-23 15:47:15','2026-07-28 01:49:08'),(19,1,12,'data_master',-1,-1,'2026-07-28 15:00:51','2026-08-06 06:28:54'),(32,2,19,'rekening_bank',-1,-1,'2026-07-29 16:31:32',NULL),(33,2,12,'komisi',-1,-1,'2026-08-06 13:28:54',NULL);
 /*!40000 ALTER TABLE `admin_module` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `admin_module_group` (
 
 LOCK TABLES `admin_module_group` WRITE;
 /*!40000 ALTER TABLE `admin_module_group` DISABLE KEYS */;
-INSERT INTO `admin_module_group` VALUES (1,1,'Dashboard','single','ti-home sidemenu-icon menu-icon',1),(2,3,'Investor','single','fa fa-handshake-o sidemenu-icon menu-icon',1),(3,8,'Admin','single','fa fa-user-secret sidemenu-icon menu-icon',1),(4,9,'Developer','dropdown','ti-panel sidemenu-icon menu-icon',1),(5,4,'Outlet','single','fa fa-building sidemenu-icon menu-icon',1),(12,2,'Master','single','fa fa-user-circle sidemenu-icon menu-icon',1),(19,6,'Pengaturan','dropdown','fa fa-cog sidemenu-icon menu-icon',1);
+INSERT INTO `admin_module_group` VALUES (1,1,'Dashboard','single','ti-home sidemenu-icon menu-icon',1),(2,3,'Investor','single','fa fa-handshake-o sidemenu-icon menu-icon',1),(3,8,'Admin','single','fa fa-user-secret sidemenu-icon menu-icon',1),(4,9,'Developer','dropdown','ti-panel sidemenu-icon menu-icon',1),(5,4,'Outlet','single','fa fa-building sidemenu-icon menu-icon',1),(12,2,'Master','dropdown','fa fa-user-circle sidemenu-icon menu-icon',1),(19,6,'Pengaturan','dropdown','fa fa-cog sidemenu-icon menu-icon',1);
 /*!40000 ALTER TABLE `admin_module_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,7 +124,7 @@ CREATE TABLE `admin_permissions` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `fk_module_id_on_permission` (`module_id`) USING BTREE,
   CONSTRAINT `fk_module_id_on_permission` FOREIGN KEY (`module_id`) REFERENCES `admin_module` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -133,7 +133,7 @@ CREATE TABLE `admin_permissions` (
 
 LOCK TABLES `admin_permissions` WRITE;
 /*!40000 ALTER TABLE `admin_permissions` DISABLE KEYS */;
-INSERT INTO `admin_permissions` VALUES (1,1,'view','View Dashboard','/dashboard','2026-07-23 12:19:52',NULL),(2,2,'view','View Investor List','/investor/view','2026-07-23 12:19:52',NULL),(3,2,'create','Create Investor','/investor/create','2026-07-23 12:19:52',NULL),(4,2,'update','Update Investor','/investor/update/*','2026-07-23 12:19:52',NULL),(5,2,'delete','Delete Investor','/investor/delete','2026-07-23 12:19:52',NULL),(8,4,'view','View Admin List','/admin/view','2026-07-23 12:19:52',NULL),(9,4,'create','Create Admin','/admin/create','2026-07-23 12:19:52',NULL),(10,4,'update','Update Admin','/admin/update/*','2026-07-23 12:19:52',NULL),(11,4,'update.permission','Manage Admin Permission','/admin/permission/*','2026-07-23 12:19:52',NULL),(12,4,'delete','Delete Admin','/admin/delete','2026-07-23 12:19:52',NULL),(13,5,'view','View Module Group','/developer/group/view','2026-07-23 12:19:52',NULL),(14,5,'create','Create Module Group','/developer/group/create','2026-07-23 12:19:52',NULL),(15,5,'update','Update Module Group','/developer/group/update','2026-07-23 12:19:52',NULL),(16,5,'delete','Delete Module Group','/developer/group/delete','2026-07-23 12:19:52',NULL),(17,6,'view','View Module List','/developer/module/view','2026-07-23 12:19:52',NULL),(18,6,'create','Create Module','/developer/module/create','2026-07-23 12:19:52',NULL),(19,6,'update','Update Module','/developer/module/update/*','2026-07-23 12:19:52',NULL),(20,6,'delete','Delete Module','/developer/module/delete','2026-07-23 12:19:52',NULL),(37,7,'view','View Outlet List','/outlet/view','2026-07-23 15:47:15','2026-07-23 09:07:36'),(38,7,'create','Create Outlet','/outlet/create','2026-07-23 15:47:15','2026-07-23 09:07:36'),(41,7,'update','Update Outlet','/outlet/update/*','2026-07-24 10:34:29',NULL),(42,7,'delete','Delete Outlet','/outlet/delete','2026-07-24 10:34:29',NULL),(53,19,'view','View Master List','/master/view','2026-07-28 15:01:00',NULL),(54,19,'create','Create Master','/master/create','2026-07-28 15:01:00',NULL),(55,19,'update','Update Master','/master/update/*','2026-07-28 15:01:00',NULL),(56,19,'delete','Delete Master','/master/delete','2026-07-28 15:01:00',NULL),(85,32,'view','Rekening Bank Setting','/pengaturan/rekening_bank','2026-07-29 16:31:32','2026-07-30 01:46:19');
+INSERT INTO `admin_permissions` VALUES (1,1,'view','View Dashboard','/dashboard','2026-07-23 12:19:52',NULL),(2,2,'view','View Investor List','/investor/view','2026-07-23 12:19:52',NULL),(3,2,'create','Create Investor','/investor/create','2026-07-23 12:19:52',NULL),(4,2,'update','Update Investor','/investor/update/*','2026-07-23 12:19:52',NULL),(5,2,'delete','Delete Investor','/investor/delete','2026-07-23 12:19:52',NULL),(8,4,'view','View Admin List','/admin/view','2026-07-23 12:19:52',NULL),(9,4,'create','Create Admin','/admin/create','2026-07-23 12:19:52',NULL),(10,4,'update','Update Admin','/admin/update/*','2026-07-23 12:19:52',NULL),(11,4,'update.permission','Manage Admin Permission','/admin/permission/*','2026-07-23 12:19:52',NULL),(12,4,'delete','Delete Admin','/admin/delete','2026-07-23 12:19:52',NULL),(13,5,'view','View Module Group','/developer/group/view','2026-07-23 12:19:52',NULL),(14,5,'create','Create Module Group','/developer/group/create','2026-07-23 12:19:52',NULL),(15,5,'update','Update Module Group','/developer/group/update','2026-07-23 12:19:52',NULL),(16,5,'delete','Delete Module Group','/developer/group/delete','2026-07-23 12:19:52',NULL),(17,6,'view','View Module List','/developer/module/view','2026-07-23 12:19:52',NULL),(18,6,'create','Create Module','/developer/module/create','2026-07-23 12:19:52',NULL),(19,6,'update','Update Module','/developer/module/update/*','2026-07-23 12:19:52',NULL),(20,6,'delete','Delete Module','/developer/module/delete','2026-07-23 12:19:52',NULL),(37,7,'view','View Outlet List','/outlet/view','2026-07-23 15:47:15','2026-07-23 09:07:36'),(38,7,'create','Create Outlet','/outlet/create','2026-07-23 15:47:15','2026-07-23 09:07:36'),(41,7,'update','Update Outlet','/outlet/update/*','2026-07-24 10:34:29',NULL),(42,7,'delete','Delete Outlet','/outlet/delete','2026-07-24 10:34:29',NULL),(53,19,'view','View Master List','/master/view','2026-07-28 15:01:00',NULL),(54,19,'create','Create Master','/master/create','2026-07-28 15:01:00',NULL),(55,19,'update','Update Master','/master/update/*','2026-07-28 15:01:00',NULL),(56,19,'delete','Delete Master','/master/delete','2026-07-28 15:01:00',NULL),(85,32,'view','Rekening Bank Setting','/pengaturan/rekening_bank','2026-07-29 16:31:32','2026-07-30 01:46:19'),(86,33,'read','Daftar Komisi Master','/master/komisi','2026-08-06 13:29:01',NULL),(87,33,'create','Tambah/Edit Komisi Master','/master/komisi_create','2026-08-06 13:29:01',NULL),(88,33,'delete','Hapus Komisi Master','/master/komisi/delete','2026-08-06 13:29:01',NULL);
 /*!40000 ALTER TABLE `admin_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -170,6 +170,36 @@ LOCK TABLES `investor` WRITE;
 /*!40000 ALTER TABLE `investor` DISABLE KEYS */;
 INSERT INTO `investor` VALUES (20,106,105,'Candi','Perum Surya garden and square A21, Balun, Sidodadi, Kec. Candi, Kabupaten Sidoarjo, Jawa Timur 61271',50.00,100000.00,0.00,'2026-07-31 09:05:46');
 /*!40000 ALTER TABLE `investor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `komisi_master`
+--
+
+DROP TABLE IF EXISTS `komisi_master`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `komisi_master` (
+  `id_komisi` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_master` int(10) unsigned NOT NULL,
+  `tanggal_komisi` datetime NOT NULL,
+  `periode` varchar(100) NOT NULL,
+  `nominal` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `catatan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_komisi`),
+  KEY `id_master` (`id_master`),
+  CONSTRAINT `komisi_master_ibfk_1` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `komisi_master`
+--
+
+LOCK TABLES `komisi_master` WRITE;
+/*!40000 ALTER TABLE `komisi_master` DISABLE KEYS */;
+/*!40000 ALTER TABLE `komisi_master` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -332,27 +362,6 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (59,'Anonymous','admin','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','programmer','2026-07-23 12:19:52'),(105,'Riski Ardhika','master','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','master','2026-07-23 12:19:52'),(106,'M. Fahrul Alfanani','investor','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','investor','2026-07-23 12:19:52'),(109,'Budi Santoso','toko1','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(110,'Ahmad Zaki','toko2','0987654321','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(111,'Zaka Kurniawan','toko3','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(112,'Rudi Hermawan','toko4','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52'),(113,'Muhhamad Tegar Kurniawan','outlet','0123456789','$2y$10$x1.i9s95g8nVRTsoOqSsrO1jDeLiUyX6toF4f42e1cWnHYvRBPlI2','outlet','2026-07-23 12:19:52');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `komisi_master`
---
-
-DROP TABLE IF EXISTS `komisi_master`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `komisi_master` (
-  `id_komisi` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `id_master` int(10) unsigned NOT NULL,
-  `tanggal_komisi` datetime NOT NULL,
-  `periode` varchar(100) NOT NULL,
-  `nominal` decimal(15,2) NOT NULL DEFAULT 0.00,
-  `catatan` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_komisi`),
-  KEY `id_master` (`id_master`),
-  CONSTRAINT `komisi_master_ibfk_1` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -363,4 +372,4 @@ CREATE TABLE `komisi_master` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-31 14:53:39
+-- Dump completed on 2026-08-06 13:29:04
