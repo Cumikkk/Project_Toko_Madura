@@ -105,11 +105,27 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                             </div>
                         </div>
 
-                        <!-- BARIS 3: CATATAN -->
+                        <!-- BARIS 3: CATATAN & BUKTI TRANSFER -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="catatan" class="form-label fw-bold">Catatan / Pesan untuk Master (Opsional)</label>
-                                <textarea class="form-control" id="catatan" name="catatan" rows="3" placeholder="Contoh: Komisi atas apresiasi keberhasilan memperkenalkan investor baru."><?= htmlspecialchars($komisiData['catatan'] ?? ''); ?></textarea>
+                                <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Contoh: Komisi atas apresiasi keberhasilan memperkenalkan investor baru."><?= htmlspecialchars($komisiData['catatan'] ?? ''); ?></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Transfer Komisi (Opsional)</label>
+                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf">
+                                <small class="text-muted">Upload foto struk transfer / bukti bayar komisi ke Master Owner (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
+                                <?php if (!empty($komisiData['bukti_pembayaran'])) : ?>
+                                    <div class="mt-2">
+                                        <span class="text-muted fs-13">Bukti saat ini: </span>
+                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($komisiData['bukti_pembayaran']) ?>" target="_blank" class="btn btn-xs btn-outline-primary ms-1">
+                                            <i class="fas fa-external-link-alt me-1"></i> Lihat Bukti Existing
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -138,24 +154,35 @@ $(document).ready(function() {
         let btn = $('#btn-submit-komisi');
         btn.prop('disabled', true);
 
-        $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/komisi", $(this).serialize(), function(resp) {
-            btn.prop('disabled', false);
-            if (resp.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: resp.message || 'Data komisi berhasil disimpan.',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
-                });
-            } else {
-                Swal.fire('Gagal!', resp.message || 'Gagal menyimpan data komisi.', 'error');
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/komisi",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function(resp) {
+                btn.prop('disabled', false);
+                if (resp.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: resp.message || 'Data komisi berhasil disimpan.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
+                    });
+                } else {
+                    Swal.fire('Gagal!', resp.message || 'Gagal menyimpan data komisi.', 'error');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false);
+                Swal.fire('Error!', 'Gagal terhubung ke server.', 'error');
             }
-        }, 'json').fail(function() {
-            btn.prop('disabled', false);
-            Swal.fire('Error!', 'Gagal terhubung ke server.', 'error');
         });
     });
 });

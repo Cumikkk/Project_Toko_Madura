@@ -15,6 +15,15 @@ if ($action === 'delete') {
         exit;
     }
 
+    $resBkt = $db->query("SELECT bukti_pembayaran FROM komisi_master WHERE id_komisi = {$idKomisi} LIMIT 1");
+    if ($resBkt && $rowBkt = $resBkt->fetch_assoc()) {
+        $oldFile = trim($rowBkt['bukti_pembayaran'] ?? '');
+        if (!empty($oldFile)) {
+            @unlink(CRM_ROOT . '/' . $oldFile);
+            @unlink(WEB_ROOT . '/' . $oldFile);
+        }
+    }
+
     $db->query("DELETE FROM komisi_master WHERE id_komisi = {$idKomisi}");
     echo json_encode(['success' => true, 'message' => 'Data komisi master berhasil dihapus.']);
     exit;
@@ -48,24 +57,59 @@ if ($nominal <= 0) {
     exit;
 }
 
+$buktiPath = null;
+if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['bukti_pembayaran']['tmp_name'];
+    $fileName    = $_FILES['bukti_pembayaran']['name'];
+    $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+    if (in_array($fileExtension, $allowedExtensions)) {
+        $targetDirAdmin = CRM_ROOT . '/uploads/bukti_komisi/';
+        $targetDirClient = WEB_ROOT . '/uploads/bukti_komisi/';
+        if (!is_dir($targetDirAdmin)) {
+            @mkdir($targetDirAdmin, 0777, true);
+        }
+        if (!is_dir($targetDirClient)) {
+            @mkdir($targetDirClient, 0777, true);
+        }
+
+        $newFileName = 'bukti_komisi_' . time() . '_' . rand(1000, 9999) . '.' . $fileExtension;
+        $destPathAdmin = $targetDirAdmin . $newFileName;
+        $destPathClient = $targetDirClient . $newFileName;
+
+        if (move_uploaded_file($fileTmpPath, $destPathAdmin)) {
+            @copy($destPathAdmin, $destPathClient);
+            $buktiPath = 'uploads/bukti_komisi/' . $newFileName;
+        }
+    }
+}
+
 $periodeEsc = $db->real_escape_string($periode);
 $catatanEsc = $db->real_escape_string($catatan);
 
 if ($idKomisi > 0) {
     // UPDATE
+    $updateBukti = "";
+    if (!empty($buktiPath)) {
+        $buktiEsc = $db->real_escape_string($buktiPath);
+        $updateBukti = ", bukti_pembayaran = '{$buktiEsc}'";
+    }
     $sql = "UPDATE komisi_master 
             SET id_master = {$idMaster}, 
                 tanggal_komisi = '{$tanggal}', 
                 periode = '{$periodeEsc}', 
                 nominal = {$nominal}, 
-                catatan = '{$catatanEsc}' 
+                catatan = '{$catatanEsc}'
+                {$updateBukti}
             WHERE id_komisi = {$idKomisi}";
     $db->query($sql);
     echo json_encode(['success' => true, 'message' => 'Data komisi master berhasil diperbarui.']);
 } else {
     // INSERT
-    $sql = "INSERT INTO komisi_master (id_master, tanggal_komisi, periode, nominal, catatan, created_at) 
-            VALUES ({$idMaster}, '{$tanggal}', '{$periodeEsc}', {$nominal}, '{$catatanEsc}', NOW())";
+    $buktiVal = !empty($buktiPath) ? "'" . $db->real_escape_string($buktiPath) . "'" : "NULL";
+    $sql = "INSERT INTO komisi_master (id_master, tanggal_komisi, periode, nominal, catatan, bukti_pembayaran, created_at) 
+            VALUES ({$idMaster}, '{$tanggal}', '{$periodeEsc}', {$nominal}, '{$catatanEsc}', {$buktiVal}, NOW())";
     $db->query($sql);
     echo json_encode(['success' => true, 'message' => 'Data komisi master berhasil ditambahkan.']);
 }

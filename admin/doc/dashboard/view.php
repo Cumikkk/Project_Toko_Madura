@@ -92,6 +92,14 @@ $recentRequests = $db->query("
 </div>
 
 <!-- Row Summary Tables -->
+<style>
+/* Force DataTable sorting icon on Total Omzet column to point UP */
+#table-top-omzet th.sorting_desc::after,
+#table-top-omzet th.sorting_desc::before {
+    content: "\f0de" !important;
+    opacity: 0.9 !important;
+}
+</style>
 <div class="row row-sm d-flex align-items-stretch">
     <!-- OUTLET DENGAN OMZET TERTINGGI -->
     <div class="col-lg-6 mb-4 d-flex">
@@ -110,7 +118,7 @@ $recentRequests = $db->query("
                                 <th class="text-center" style="width: 8%;">No</th>
                                 <th class="text-center">Nama Outlet</th>
                                 <th class="text-center">Investor</th>
-                                <th class="text-center">Total Omzet</th>
+                                <th class="text-center">Total Omzet <i class="fa fa-arrow-up text-success ms-1" title="Omzet Tertinggi"></i></th>
                             </tr>
                         </thead>
                         <tbody>

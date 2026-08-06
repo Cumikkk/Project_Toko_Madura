@@ -124,6 +124,7 @@ if (!function_exists('buildKomisiPageUrl')) {
                                     <th class="text-center">Tanggal Transfer</th>
                                     <th>Periode / Keterangan</th>
                                     <th class="text-center">Nominal Komisi</th>
+                                    <th class="text-center">Bukti Transfer</th>
                                     <th class="text-start">Catatan Admin</th>
                                 </tr>
                             </thead>
@@ -143,6 +144,25 @@ if (!function_exists('buildKomisiPageUrl')) {
                                                     + Rp <?= number_format($km['nominal'], 0, ',', '.') ?>
                                                 </span>
                                             </td>
+                                            <td class="text-center">
+                                                <?php if (!empty($km['bukti_pembayaran'])) : ?>
+                                                    <?php $fileExt = strtolower(pathinfo($km['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
+                                                    <?php if ($fileExt === 'pdf') : ?>
+                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3 py-1">
+                                                            <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                                                        </a>
+                                                    <?php else : ?>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 btn-client-view-bukti-komisi" 
+                                                                data-img="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" 
+                                                                data-periode="<?= htmlspecialchars($km['periode']) ?>" 
+                                                                data-nominal="Rp <?= number_format($km['nominal'], 0, ',', '.') ?>">
+                                                            <i class="fa-solid fa-image me-1"></i> Lihat Bukti
+                                                        </button>
+                                                    <?php endif; ?>
+                                                <?php else : ?>
+                                                    <span class="badge bg-body-tertiary text-body-tertiary border rounded-pill px-3 py-1 fw-normal fs-12">Tanpa Bukti</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-start small text-body-secondary">
                                                 <?= htmlspecialchars($km['catatan'] ?: '-') ?>
                                             </td>
@@ -150,7 +170,7 @@ if (!function_exists('buildKomisiPageUrl')) {
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <tr>
-                                        <td colspan="5" class="text-center py-5 text-body-secondary">
+                                        <td colspan="6" class="text-center py-5 text-body-secondary">
                                             <i class="fa-solid fa-receipt fs-1 text-muted opacity-50 mb-2 d-block"></i>
                                             Belum ada riwayat penerimaan komisi master terdaftar.
                                         </td>
@@ -178,9 +198,9 @@ if (!function_exists('buildKomisiPageUrl')) {
                                         </li>
 
                                         <!-- Page Numbers -->
-                                        <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
-                                            <li class="page-item <?= ($p == $page) ? 'active' : ''; ?>">
-                                                <a class="page-link text-body-emphasis px-3" href="<?= buildKomisiPageUrl($p); ?>"><?= $p; ?></a>
+                                        <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                                            <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
+                                                <a class="page-link px-3 <?= ($i == $page) ? 'fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildKomisiPageUrl($i); ?>"><?= $i; ?></a>
                                             </li>
                                         <?php endfor; ?>
 
@@ -200,3 +220,32 @@ if (!function_exists('buildKomisiPageUrl')) {
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $(document).on('click', '.btn-client-view-bukti-komisi', function() {
+        let imgUrl  = $(this).data('img');
+        let periode = $(this).data('periode');
+        let nominal = $(this).data('nominal');
+
+        Swal.fire({
+            title: 'Bukti Pembayaran Komisi',
+            html: `
+                <div class="text-start fs-14 mb-3">
+                    <p class="mb-1"><strong>Periode / Keterangan:</strong> ${periode}</p>
+                    <p class="mb-2"><strong>Nominal Komisi:</strong> <span class="badge bg-success fs-6">${nominal}</span></p>
+                </div>
+                <div class="text-center p-2 bg-light rounded border">
+                    <img src="${imgUrl}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;" alt="Bukti Transfer Komisi">
+                </div>
+                <div class="mt-3 text-center">
+                    <a href="${imgUrl}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-4"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Buka Gambar Penuh</a>
+                </div>
+            `,
+            width: '600px',
+            showCloseButton: true,
+            showConfirmButton: false
+        });
+    });
+});
+</script>

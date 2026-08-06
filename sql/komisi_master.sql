@@ -1,5 +1,5 @@
--- Add created_at column to users table
-ALTER TABLE `users` ADD COLUMN `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP;
+-- Add created_at column to users table if not exists
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP;
 
 -- Create komisi_master table for Master Owner commission tracking
 CREATE TABLE IF NOT EXISTS `komisi_master` (
@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `komisi_master` (
   `periode` VARCHAR(100) NOT NULL,
   `nominal` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
   `catatan` TEXT DEFAULT NULL,
+  `bukti_pembayaran` VARCHAR(255) DEFAULT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   KEY `id_master` (`id_master`),
   CONSTRAINT `komisi_master_ibfk_1` FOREIGN KEY (`id_master`) REFERENCES `users` (`id_users`) ON DELETE CASCADE ON UPDATE CASCADE

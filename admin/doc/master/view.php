@@ -71,7 +71,7 @@ $masters = $db->query($sqlMasters);
                                             <span class="badge bg-info fs-6"><?= number_format($row['total_investor']) ?> Investor</span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko Aktif</span>
+                                            <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko</span>
                                         </td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">

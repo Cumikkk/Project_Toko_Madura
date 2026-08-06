@@ -46,6 +46,7 @@ $listKomisi = $db->query($sqlKomisi);
                                 <th class="text-center">Nama Master</th>
                                 <th class="text-center">Periode / Keterangan</th>
                                 <th class="text-center">Nominal Komisi</th>
+                                <th class="text-center">Bukti Transfer</th>
                                 <th class="text-center">Catatan</th>
                                 <th class="text-center" style="width: 12%;">#</th>
                             </tr>
@@ -63,6 +64,26 @@ $listKomisi = $db->query($sqlKomisi);
                                         <td class="text-start"><strong><?= htmlspecialchars($row['periode']) ?></strong></td>
                                         <td class="text-center">
                                             <span class="badge bg-success fs-6">Rp <?= number_format($row['nominal'], 0, ',', '.') ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if (!empty($row['bukti_pembayaran'])) : ?>
+                                                <?php $fileExt = strtolower(pathinfo($row['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
+                                                <?php if ($fileExt === 'pdf') : ?>
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($row['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-xs fw-semibold">
+                                                        <i class="fa fa-file-pdf me-1"></i> Dokumen PDF
+                                                    </a>
+                                                <?php else : ?>
+                                                    <button type="button" class="btn btn-outline-primary btn-xs btn-view-bukti-komisi fw-semibold" 
+                                                            data-img="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($row['bukti_pembayaran']) ?>"
+                                                            data-master="<?= htmlspecialchars($row['nama_master']) ?>"
+                                                            data-periode="<?= htmlspecialchars($row['periode']) ?>"
+                                                            data-nominal="Rp <?= number_format($row['nominal'], 0, ',', '.') ?>">
+                                                        <i class="fa fa-image me-1"></i> Bukti Bayar
+                                                    </button>
+                                                <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="badge bg-light text-muted fw-normal">Tanpa Bukti</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="text-start"><small><?= htmlspecialchars($row['catatan'] ?? '-') ?></small></td>
                                         <td class="text-center">
@@ -82,7 +103,7 @@ $listKomisi = $db->query($sqlKomisi);
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Belum ada riwayat komisi master terdaftar.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">Belum ada riwayat komisi master terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -94,13 +115,6 @@ $listKomisi = $db->query($sqlKomisi);
 </div>
 
 <script type="text/javascript">
-function deleteKomisi(id, nama, nominal) {
-    Swal.fire({
-        title: 'Hapus Data Komisi?',
-        html: `Apakah Anda yakin ingin menghapus data komisi untuk <strong>${nama}</strong> sebesar <strong>${nominal}</strong>?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Ya, Hapus!',
         cancelButtonText: 'Batal'

@@ -249,6 +249,7 @@ CREATE TABLE `komisi_master` (
   `periode` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `nominal` decimal(15,2) NOT NULL DEFAULT '0.00',
   `catatan` text COLLATE utf8mb4_general_ci,
+  `bukti_pembayaran` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
