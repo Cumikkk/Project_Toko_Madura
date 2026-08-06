@@ -1114,37 +1114,37 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                     </div>
 
                     <!-- Sesi 2.5: Rentang Tanggal Penyesuaian Skema (Opsional) -->
-                    <div class="p-2 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
-                        <div class="d-flex align-items-center gap-1.5">
-                            <label class="custom-toggle-switch mb-0">
+                    <div class="p-2.5 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <label class="custom-toggle-switch flex-shrink-0 mb-0 me-1">
                                 <input type="checkbox" id="chk_apply_date_range" name="apply_date_range" value="1">
                                 <span class="custom-toggle-slider"></span>
                             </label>
-                            <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px;">
-                                <i class=></i> Terapkan Potongan pada Rentang Tanggal Spesifik
-                                <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1 d-none" style="font-size: 8px; padding: 1.5px 4px;">Aktif</span>
+                            <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px; line-height: 1.3;">
+                                <i class="fa-solid fa-calendar-range me-1 text-danger"></i> Terapkan Skema pada Rentang Tanggal Spesifik
+                                <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1.5 d-none" style="font-size: 8px; padding: 2px 5px; border-radius: 4px;">Aktif</span>
                             </label>
                         </div>
                         
-                        <div id="container_edit_date_range" class="row g-1.5 mt-1.5 pt-1.5 border-top border-body-subtle d-none">
+                        <div id="container_edit_date_range" class="row g-2 mt-2 pt-2 border-top border-body-subtle d-none">
                             <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Mulai</label>
-                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
-                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
-                                    <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Mulai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
+                                    <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Selesai</label>
-                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
-                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
-                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Selesai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
+                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
                                 </div>
                             </div>
-                            <div class="col-12 mt-1">
-                                <div class="form-text text-body-secondary mb-0" style="font-size: 9px; line-height: 1.3;">
+                            <div class="col-12 mt-2">
+                                <div class="form-text text-body-secondary mb-0 lh-sm" style="font-size: 9px;">
                                     <i class="fa-solid fa-circle-info me-1 text-primary"></i>
-                                    Potongan baru di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
+                                    Skema potongan dan bagi hasil di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
                                 </div>
                             </div>
                         </div>
