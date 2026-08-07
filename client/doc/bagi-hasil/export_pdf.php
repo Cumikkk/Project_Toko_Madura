@@ -122,10 +122,7 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
 }
 
 $periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
-$periodeLabelStr = $periodeTitleStr;
-if (!empty($selectedOutletNama) && $selectedOutletId > 0) {
-    $periodeLabelStr .= " - " . $selectedOutletNama;
-}
+$displayNamaToko = (!empty($selectedOutletNama) && $selectedOutletId > 0) ? $selectedOutletNama : "Semua Toko";
 
 $laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
 $joinOnClause = "o.id_outlet = l.id_outlet";
@@ -366,7 +363,11 @@ ob_start();
                 <table style="width: 100%;">
                     <tr>
                         <td class="meta-label">Periode Laporan</td>
-                        <td class="meta-value">: <?= htmlspecialchars($periodeLabelStr); ?></td>
+                        <td class="meta-value">: <?= htmlspecialchars($periodeTitleStr); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">Nama Toko</td>
+                        <td class="meta-value">: <?= htmlspecialchars($displayNamaToko); ?></td>
                     </tr>
                 </table>
             </td>
