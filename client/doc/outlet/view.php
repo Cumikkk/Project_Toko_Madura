@@ -522,7 +522,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                                 <i class="fa-solid fa-user-shield me-1"></i> Investor Access
                             </span>
-                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Outlet Sub-Investor</h2>
+                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Outlet Investor</h2>
                             <p class="text-white-50 small mb-0">Kelola daftar outlet di bawah kepemilikan Anda, daftarkan akun outlet baru, dan pantau rincian omzet bulanan.</p>
                         </div>
                         <div class="col-lg-4 col-md-5 text-md-end text-start">
@@ -1386,16 +1386,11 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh data outlet</strong> tanpa batasan periode.
                     </div>
                 </div>
-                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
-                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 12px;">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Filter
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
-                            <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
-                        </button>
-                    </div>
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                    </button>
                 </div>
             </form>
         </div>
