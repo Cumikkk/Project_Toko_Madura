@@ -271,7 +271,7 @@ try {
 
         // Update Outlet (kecamatan & alamat disimpan di users)
         // Simpan alamat ke users terlebih dahulu
-        $resOutletUser = $db->query("SELECT id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+        $resOutletUser = $db->query("SELECT id_outlet, id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
         if ($resOutletUser && $rowOUser = $resOutletUser->fetch_assoc()) {
             $db->query("UPDATE users SET kecamatan = '{$safeKecamatan}', alamat = '{$safeAlamatOutlet}' WHERE id_users = " . (int)$rowOUser['id_users']);
         }
@@ -285,7 +285,7 @@ try {
             JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
         }
 
-        // Apply custom percentage to specific date range if requested
+        // Check if custom date range scheme is requested
         $applyDateRange = isset($_POST['apply_date_range']) && (int)$_POST['apply_date_range'] === 1;
         $tglMulaiSkema = trim($_POST['tgl_mulai_skema'] ?? '');
         $tglSelesaiSkema = trim($_POST['tgl_selesai_skema'] ?? '');
@@ -297,8 +297,19 @@ try {
             }
             $safeMulai = $db->real_escape_string($tglMulaiSkema);
             $safeSelesai = $db->real_escape_string($tglSelesaiSkema);
+
+            // Update basic info on outlet table WITHOUT overwriting global default rates
+            $updateOutlet = $db->query("UPDATE outlet SET 
+                nama_outlet = '{$safeNamaOutlet}', 
+                alamat_outlet = '{$safeAlamatOutlet}', 
+                kecamatan = '{$safeKecamatan}' 
+                WHERE id_outlet = {$idOutlet}");
+
+            if (!$updateOutlet) {
+                JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
+            }
             
-            // Update existing laporan_omzet records within date range with both custom potongan and custom investor split
+            // Update existing laporan_omzet records within date range ONLY
             $db->query("UPDATE laporan_omzet SET 
                 presentase_potongan = {$persentasePotongan},
                 persen_bagian_investor = {$persenBagianInvestor},
@@ -306,6 +317,19 @@ try {
                 WHERE id_outlet = {$idOutlet} AND periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'");
                 
             $affectedRowsOmzet = $db->affected_rows;
+        } else {
+            // No date range specified: Update global default rates on outlet table
+            $updateOutlet = $db->query("UPDATE outlet SET 
+                nama_outlet = '{$safeNamaOutlet}', 
+                alamat_outlet = '{$safeAlamatOutlet}', 
+                kecamatan = '{$safeKecamatan}', 
+                persentase_potongan = {$persentasePotongan}, 
+                persen_bagian_investor = {$persenBagianInvestor} 
+                WHERE id_outlet = {$idOutlet}");
+
+            if (!$updateOutlet) {
+                JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
+            }
         }
 
         // Update User Account

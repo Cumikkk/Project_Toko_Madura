@@ -42,23 +42,7 @@ try {
         7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
     ];
 
-    // Auto sync deduction percentage for months where last day is present
-    $resAllMonths = $db->query("SELECT DISTINCT DATE_FORMAT(periode_laporan, '%Y-%m') as ym FROM laporan_omzet WHERE id_outlet = {$idOutlet}");
-    if ($resAllMonths) {
-        while ($mRow = $resAllMonths->fetch_assoc()) {
-            $ym = $mRow['ym'];
-            $lastDayStr = date('Y-m-t', strtotime($ym . '-01'));
-            
-            $chkLastDayInMonth = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$lastDayStr}' LIMIT 1");
-            if ($chkLastDayInMonth && $chkLastDayInMonth->num_rows > 0) {
-                // Last day is present -> 10% applied
-                $db->query("UPDATE laporan_omzet SET presentase_potongan = {$presentaseGlobal}, nominal_potongan = ROUND(omzet * ({$presentaseGlobal} / 100), 2) WHERE id_outlet = {$idOutlet} AND DATE_FORMAT(periode_laporan, '%Y-%m') = '{$ym}'");
-            } else {
-                // Last day NOT present -> reset to 0%
-                $db->query("UPDATE laporan_omzet SET presentase_potongan = 0.00, nominal_potongan = 0.00 WHERE id_outlet = {$idOutlet} AND DATE_FORMAT(periode_laporan, '%Y-%m') = '{$ym}'");
-            }
-        }
-    }
+
 
     // =========================================================================
     // ACTION: INPUT OMZET HARIAN (ADD LAPORAN OMZET)

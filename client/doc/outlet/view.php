@@ -281,24 +281,9 @@ if ($resInv && $resInv->num_rows > 0) {
     $investorId = $db->insert_id;
 }
 
-// Filter Data Outlet Toko (Tanggal, Bulan, Tahun Dibuat)
-$selectedTgl   = isset($_GET['tgl']) && !empty($_GET['tgl']) ? trim($_GET['tgl']) : '';
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
-
-$availableYears = [];
-// Fetch distinct years of outlet registration for this investor
-$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_bergabung) as y_year FROM outlet WHERE id_investor = {$investorId} AND tanggal_bergabung IS NOT NULL ORDER BY y_year DESC");
-if ($resYears) {
-    while ($yRow = $resYears->fetch_assoc()) {
-        if (!empty($yRow['y_year'])) {
-            $availableYears[] = (int)$yRow['y_year'];
-        }
-    }
-}
-if (!in_array((int)date('Y'), $availableYears)) {
-    array_unshift($availableYears, (int)date('Y'));
-}
+// Filter Data Outlet Toko (Rentang Tanggal Pendaftaran: tgl_mulai & tgl_selesai)
+$selectedTglMulai   = isset($_GET['tgl_mulai']) && !empty($_GET['tgl_mulai']) ? trim($_GET['tgl_mulai']) : '';
+$selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']) ? trim($_GET['tgl_selesai']) : '';
 
 // Fetch system settings (fee & bank details) from pengaturan_sistem
 $sysSettings = [];
@@ -323,7 +308,17 @@ $bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 // Build WHERE clause for Outlet Registration Date & Ownership
 $whereOutletConds = ["o.id_investor = {$investorId}"];
 
-if (!empty($selectedTgl)) {
+if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereOutletConds[] = "DATE(o.tanggal_request) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+} elseif (!empty($selectedTglMulai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $whereOutletConds[] = "DATE(o.tanggal_request) >= '{$safeMulai}'";
+} elseif (!empty($selectedTglSelesai)) {
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereOutletConds[] = "DATE(o.tanggal_request) <= '{$safeSelesai}'";
+} elseif (!empty($selectedTgl)) {
     $safeTgl = $db->real_escape_string($selectedTgl);
     $whereOutletConds[] = "DATE(o.tanggal_request) = '{$safeTgl}'";
 } else {
@@ -348,59 +343,60 @@ $sqlCount = "
     {$whereOutletSql}
 ";
 $resCount = $db->query($sqlCount);
-$totalRecords = $resCount ? (int)$resCount->fetch_assoc()['total'] : 0;
-$totalPages = ($totalRecords > 0) ? (int)ceil($totalRecords / $limit) : 1;
-
-if ($page > $totalPages) {
-    $page = $totalPages;
+$totalRecords = 0;
+if ($resCount) {
+    $totalRecords = (int)$resCount->fetch_assoc()['total'];
 }
+
+$totalPages = ($totalRecords > 0) ? (int)ceil($totalRecords / $limit) : 1;
+if ($page < 1) $page = 1;
+if ($page > $totalPages) $page = $totalPages;
+
 $offset = ($page - 1) * $limit;
 
-// Fetch Outlets belonging to this Investor with Limit & Offset
+// Fetch Outlets Matching Filter with Pagination & Status
 $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
         u.kecamatan,
         u.alamat as alamat_outlet,
+        o.persentase_potongan,
+        o.persen_bagian_investor,
         o.status,
         o.nominal_biaya,
         o.bukti_pembayaran,
         o.alasan_penolakan,
         o.tanggal_request as tanggal_bergabung,
-        o.tgl_jatuh_tempo,
         o.tipe_request,
-        o.id_users,
+        o.tgl_jatuh_tempo,
+        o.tanggal_request,
+        u.nama_lengkap,
+        u.no_hp,
         u.username
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
     {$whereOutletSql}
-    ORDER BY o.id_outlet DESC
+    ORDER BY o.tanggal_request DESC, o.id_outlet DESC
     LIMIT {$limit} OFFSET {$offset}
 ";
+
 $resOutlets = $db->query($sqlOutlets);
 $outlets = [];
-
 if ($resOutlets) {
     while ($row = $resOutlets->fetch_assoc()) {
         $outlets[] = $row;
     }
 }
-$totalOutlet = $totalRecords;
 
-$periodeLabelStr = (!empty($selectedTgl) ? date('d/m/Y', strtotime($selectedTgl)) . ' ' : '') . 
-    ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : '') . 
-    ($selectedTahun > 0 ? $selectedTahun : '');
+// Total Outlets count for Investor
+$resTotalAll = $db->query("SELECT COUNT(*) as cnt FROM outlet WHERE id_investor = {$investorId}");
+$totalOutlet = $resTotalAll ? (int)$resTotalAll->fetch_assoc()['cnt'] : 0;
 
-if (empty($selectedTgl) && $selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Tanggal';
-}
-
-function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTahun) {
+function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
     $params = ['page' => $pageNum];
-    if (!empty($selectedTgl)) $params['tgl'] = $selectedTgl;
-    if ($selectedBulan > 0) $params['bulan'] = $selectedBulan;
-    if ($selectedTahun > 0) $params['tahun'] = $selectedTahun;
+    if (!empty($selectedTglMulai)) $params['tgl_mulai'] = $selectedTglMulai;
+    if (!empty($selectedTglSelesai)) $params['tgl_selesai'] = $selectedTglSelesai;
     return SystemInfo::app('CLIENT_URL') . '/outlet?' . http_build_query($params);
 }
 ?>
@@ -548,7 +544,15 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                 <!-- Header with Title & Filter Trigger Button -->
                 <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
                     <div>
-                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6"><i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar</h5>
+                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
+                            <i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar
+                            <?php if (!empty($selectedTglMulai) || !empty($selectedTglSelesai)) : ?>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2 fw-bold" style="font-size: 10px;">
+                                    <i class="fa-solid fa-calendar-range me-1"></i>
+                                    <?= !empty($selectedTglMulai) ? date('d/m/Y', strtotime($selectedTglMulai)) : 'Awal'; ?> s/d <?= !empty($selectedTglSelesai) ? date('d/m/Y', strtotime($selectedTglSelesai)) : 'Akhir'; ?>
+                                </span>
+                            <?php endif; ?>
+                        </h5>
                         <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
@@ -722,7 +726,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                     <ul class="pagination pagination-sm mb-0">
                                         <!-- Previous Page -->
                                         <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTglMulai, $selectedTglSelesai); ?>">
                                                 <i class="fa-solid fa-chevron-left me-1"></i> Prev
                                             </a>
                                         </li>
@@ -730,13 +734,13 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                         <!-- Page Numbers -->
                                         <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
                                             <li class="page-item <?= ($p === $page) ? 'active' : ''; ?>">
-                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTgl, $selectedBulan, $selectedTahun); ?>"><?= $p; ?></a>
+                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTglMulai, $selectedTglSelesai); ?>"><?= $p; ?></a>
                                             </li>
                                         <?php endfor; ?>
 
                                         <!-- Next Page -->
                                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTglMulai, $selectedTglSelesai); ?>">
                                                 Next <i class="fa-solid fa-chevron-right ms-1"></i>
                                             </a>
                                         </li>
@@ -1055,61 +1059,96 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                         <i class="fa-solid fa-chart-pie me-1"></i> Skema Potongan & Bagi Hasil
                     </div>
                     <div class="row g-1.5 mb-2">
+                        <!-- Potongan Omzet -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Potongan Omzet</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required>
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Hak Investor -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Investor</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('investor')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Hak Outlet -->
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Outlet</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('outlet')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1.5 rounded-end-3 py-0" style="font-size: 9.5px; height: 28px;">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
+                                    <div class="d-flex flex-column h-100" style="width: 20px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(1)" style="font-size: 7.5px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(-1)" style="font-size: 7.5px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Sesi 2.5: Rentang Tanggal Penyesuaian Skema (Opsional) -->
-                    <div class="p-2 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
-                        <div class="d-flex align-items-center gap-1.5">
-                            <label class="custom-toggle-switch mb-0">
+                    <div class="p-2.5 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <label class="custom-toggle-switch flex-shrink-0 mb-0 me-1">
                                 <input type="checkbox" id="chk_apply_date_range" name="apply_date_range" value="1">
                                 <span class="custom-toggle-slider"></span>
                             </label>
-                            <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px;">
-                                <i class=></i> Terapkan Potongan pada Rentang Tanggal Spesifik
-                                <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1 d-none" style="font-size: 8px; padding: 1.5px 4px;">Aktif</span>
+                            <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px; line-height: 1.3;">
+                                <i class="fa-solid fa-calendar-range me-1 text-danger"></i> Terapkan Skema pada Rentang Tanggal Spesifik
+                                <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1.5 d-none" style="font-size: 8px; padding: 2px 5px; border-radius: 4px;">Aktif</span>
                             </label>
                         </div>
                         
-                        <div id="container_edit_date_range" class="row g-1.5 mt-1.5 pt-1.5 border-top border-body-subtle d-none">
+                        <div id="container_edit_date_range" class="row g-2 mt-2 pt-2 border-top border-body-subtle d-none">
                             <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Mulai</label>
-                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
-                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
-                                    <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Mulai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
+                                    <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-0.5" style="font-size: 9px;">Tanggal Selesai</label>
-                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 26px;">
-                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-1.5" style="height: 26px;"><i class="fa-solid fa-calendar-days" style="font-size: 9px;"></i></span>
-                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1" style="font-size: 10px; height: 26px;" onclick="if(this.showPicker){this.showPicker();}">
+                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Selesai</label>
+                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
+                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
+                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
                                 </div>
                             </div>
-                            <div class="col-12 mt-1">
-                                <div class="form-text text-body-secondary mb-0" style="font-size: 9px; line-height: 1.3;">
+                            <div class="col-12 mt-2">
+                                <div class="form-text text-body-secondary mb-0 lh-sm" style="font-size: 9px;">
                                     <i class="fa-solid fa-circle-info me-1 text-primary"></i>
-                                    Potongan baru di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
+                                    Skema potongan dan bagi hasil di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
                                 </div>
                             </div>
                         </div>
@@ -1278,52 +1317,68 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL: FILTER TANGGAL PEMBUATAN OUTLET (Theme Adaptive) -->
+<!-- ========================================================================= -->
+<!-- ========================================================================= -->
+<!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalFilterOutletLabel">
-                    <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Tanggal Pendaftaran Outlet
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterOutletLabel">
+                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Rentang Tanggal Outlet
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;">Pilih tanggal mulai dan tanggal selesai pendaftaran outlet</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
                 <div class="modal-body p-4">
-                    <!-- 1. Filter Tanggal Spesifik Dibuat -->
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar me-1 text-danger"></i>Tanggal Dibuat (Hari/Bulan/Tahun)</label>
-                        <input type="date" name="tgl" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTgl); ?>" title="Filter Tanggal Dibuat">
+                    <!-- Header Label & Reset Tanggal Button (Matched with Bagi Hasil Modal) -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label small fw-bold text-body-secondary mb-0">
+                            <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetTanggalFilterOutlet" style="font-size: 11px;">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Tanggal
+                        </button>
                     </div>
 
-                    <!-- 2. Filter Bulan & Tahun Dibuat -->
                     <div class="row g-2">
+                        <!-- Tanggal Mulai -->
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-days me-1 text-danger"></i>Bulan Dibuat</label>
-                            <select name="bulan" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
+                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            </div>
                         </div>
+
+                        <!-- Tanggal Selesai -->
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-lines me-1 text-danger"></i>Tahun Dibuat</label>
-                            <select name="tahun" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                                <?php foreach ($availableYears as $yVal) : ?>
-                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>><?= $yVal; ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
+                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            </div>
                         </div>
                     </div>
+
+                    <div class="form-text text-body-secondary small mt-2">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh data outlet</strong> tanpa batasan periode.
+                    </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
-                    </button>
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
+                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 12px;">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Filter
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -1333,6 +1388,12 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 <script>
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
+
+    // Reset Tanggal Filter Event
+    $('#btnResetTanggalFilterOutlet').on('click', function() {
+        $('#filter_tgl_mulai').val('');
+        $('#filter_tgl_selesai').val('');
+    });
 
     // 0. Live Search Real-Time Filter for Outlet Table
     $('#liveSearchOutlet').on('keyup input', function() {

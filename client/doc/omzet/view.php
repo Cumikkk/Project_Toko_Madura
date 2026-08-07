@@ -605,7 +605,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     </div>
                                 </div>
                                 <h3 class="fw-extrabold text-body-emphasis mb-1 fs-3">Rp <?= number_format($totalOmzet, 0, ',', '.'); ?></h3>
-                                <p class="text-body-secondary small mb-0"><i class="fa-solid fa-circle-info me-1 text-primary"></i>Akumulasi total omzet berjalan toko</p>
+                                <p class="text-body-secondary small mb-0"><i class="fa-solid fa-circle-info me-1 text-primary"></i>Murni penjumlahan seluruh omzet harian toko</p>
                             </div>
                         </div>
                     </div>
