@@ -123,6 +123,7 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
 
 $periodeTitleStr = !empty($periodeParts) ? implode(" ", $periodeParts) : "Semua Periode";
 $displayNamaToko = (!empty($selectedOutletNama) && $selectedOutletId > 0) ? $selectedOutletNama : "Semua Toko";
+$periodeLabelStr = $periodeTitleStr;
 
 $laporanJoinConds = array_filter($whereConditions, fn($c) => strpos($c, 'o.') === false);
 $joinOnClause = "o.id_outlet = l.id_outlet";
