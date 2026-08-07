@@ -281,24 +281,9 @@ if ($resInv && $resInv->num_rows > 0) {
     $investorId = $db->insert_id;
 }
 
-// Filter Data Outlet Toko (Tanggal, Bulan, Tahun Dibuat)
-$selectedTgl   = isset($_GET['tgl']) && !empty($_GET['tgl']) ? trim($_GET['tgl']) : '';
-$selectedBulan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
-$selectedTahun = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
-
-$availableYears = [];
-// Fetch distinct years of outlet registration for this investor
-$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_bergabung) as y_year FROM outlet WHERE id_investor = {$investorId} AND tanggal_bergabung IS NOT NULL ORDER BY y_year DESC");
-if ($resYears) {
-    while ($yRow = $resYears->fetch_assoc()) {
-        if (!empty($yRow['y_year'])) {
-            $availableYears[] = (int)$yRow['y_year'];
-        }
-    }
-}
-if (!in_array((int)date('Y'), $availableYears)) {
-    array_unshift($availableYears, (int)date('Y'));
-}
+// Filter Data Outlet Toko (Rentang Tanggal Pendaftaran: tgl_mulai & tgl_selesai)
+$selectedTglMulai   = isset($_GET['tgl_mulai']) && !empty($_GET['tgl_mulai']) ? trim($_GET['tgl_mulai']) : '';
+$selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']) ? trim($_GET['tgl_selesai']) : '';
 
 // Fetch system settings (fee & bank details) from pengaturan_sistem
 $sysSettings = [];
@@ -323,16 +308,16 @@ $bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 // Build WHERE clause for Outlet Registration Date & Ownership
 $whereOutletConds = ["o.id_investor = {$investorId}"];
 
-if (!empty($selectedTgl)) {
-    $safeTgl = $db->real_escape_string($selectedTgl);
-    $whereOutletConds[] = "DATE(o.tanggal_bergabung) = '{$safeTgl}'";
-} else {
-    if ($selectedBulan > 0) {
-        $whereOutletConds[] = "MONTH(o.tanggal_bergabung) = {$selectedBulan}";
-    }
-    if ($selectedTahun > 0) {
-        $whereOutletConds[] = "YEAR(o.tanggal_bergabung) = {$selectedTahun}";
-    }
+if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereOutletConds[] = "DATE(o.tanggal_bergabung) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+} elseif (!empty($selectedTglMulai)) {
+    $safeMulai = $db->real_escape_string($selectedTglMulai);
+    $whereOutletConds[] = "DATE(o.tanggal_bergabung) >= '{$safeMulai}'";
+} elseif (!empty($selectedTglSelesai)) {
+    $safeSelesai = $db->real_escape_string($selectedTglSelesai);
+    $whereOutletConds[] = "DATE(o.tanggal_bergabung) <= '{$safeSelesai}'";
 }
 $whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);
 
@@ -348,59 +333,68 @@ $sqlCount = "
     {$whereOutletSql}
 ";
 $resCount = $db->query($sqlCount);
-$totalRecords = $resCount ? (int)$resCount->fetch_assoc()['total'] : 0;
-$totalPages = ($totalRecords > 0) ? (int)ceil($totalRecords / $limit) : 1;
-
-if ($page > $totalPages) {
-    $page = $totalPages;
+$totalRecords = 0;
+if ($resCount) {
+    $totalRecords = (int)$resCount->fetch_assoc()['total'];
 }
+
+$totalPages = ($totalRecords > 0) ? (int)ceil($totalRecords / $limit) : 1;
+if ($page < 1) $page = 1;
+if ($page > $totalPages) $page = $totalPages;
+
 $offset = ($page - 1) * $limit;
 
-// Fetch Outlets belonging to this Investor with Limit & Offset
+// Fetch Outlets Matching Filter with Pagination & Status
 $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
         o.kecamatan,
         o.alamat_outlet,
-        o.status,
-        o.nominal_biaya,
-        o.bukti_pembayaran,
-        o.alasan_penolakan,
+        o.persentase_potongan,
+        o.persen_bagian_investor,
         o.tanggal_bergabung,
-        o.tgl_jatuh_tempo,
-        o.tipe_request,
-        o.id_users,
-        u.username
+        u.nama_lengkap,
+        u.no_hp,
+        u.username,
+        req.status,
+        req.tipe_request,
+        req.tgl_jatuh_tempo,
+        req.alasan_penolakan,
+        req.bukti_pembayaran,
+        req.tanggal_request
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
+    LEFT JOIN (
+        SELECT r1.*
+        FROM request_perpanjangan r1
+        INNER JOIN (
+            SELECT id_outlet, MAX(id_request) as max_id
+            FROM request_perpanjangan
+            GROUP BY id_outlet
+        ) r2 ON r1.id_request = r2.max_id
+    ) req ON o.id_outlet = req.id_outlet
     {$whereOutletSql}
-    ORDER BY o.id_outlet DESC
+    ORDER BY o.tanggal_bergabung DESC, o.id_outlet DESC
     LIMIT {$limit} OFFSET {$offset}
 ";
+
 $resOutlets = $db->query($sqlOutlets);
 $outlets = [];
-
 if ($resOutlets) {
     while ($row = $resOutlets->fetch_assoc()) {
         $outlets[] = $row;
     }
 }
-$totalOutlet = $totalRecords;
 
-$periodeLabelStr = (!empty($selectedTgl) ? date('d/m/Y', strtotime($selectedTgl)) . ' ' : '') . 
-    ($selectedBulan > 0 ? ($bulanIndo[$selectedBulan] ?? '') . ' ' : '') . 
-    ($selectedTahun > 0 ? $selectedTahun : '');
+// Total Outlets count for Investor
+$resTotalAll = $db->query("SELECT COUNT(*) as cnt FROM outlet WHERE id_investor = {$investorId}");
+$totalOutlet = $resTotalAll ? (int)$resTotalAll->fetch_assoc()['cnt'] : 0;
 
-if (empty($selectedTgl) && $selectedBulan === 0 && $selectedTahun === 0) {
-    $periodeLabelStr = 'Semua Tanggal';
-}
-
-function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTahun) {
+function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
     $params = ['page' => $pageNum];
-    if (!empty($selectedTgl)) $params['tgl'] = $selectedTgl;
-    if ($selectedBulan > 0) $params['bulan'] = $selectedBulan;
-    if ($selectedTahun > 0) $params['tahun'] = $selectedTahun;
+    if (!empty($selectedTglMulai)) $params['tgl_mulai'] = $selectedTglMulai;
+    if (!empty($selectedTglSelesai)) $params['tgl_selesai'] = $selectedTglSelesai;
     return SystemInfo::app('CLIENT_URL') . '/outlet?' . http_build_query($params);
 }
 ?>
@@ -548,7 +542,15 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                 <!-- Header with Title & Filter Trigger Button -->
                 <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
                     <div>
-                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6"><i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar</h5>
+                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
+                            <i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar
+                            <?php if (!empty($selectedTglMulai) || !empty($selectedTglSelesai)) : ?>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2 fw-bold" style="font-size: 10px;">
+                                    <i class="fa-solid fa-calendar-range me-1"></i>
+                                    <?= !empty($selectedTglMulai) ? date('d/m/Y', strtotime($selectedTglMulai)) : 'Awal'; ?> s/d <?= !empty($selectedTglSelesai) ? date('d/m/Y', strtotime($selectedTglSelesai)) : 'Akhir'; ?>
+                                </span>
+                            <?php endif; ?>
+                        </h5>
                         <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
@@ -722,7 +724,7 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                     <ul class="pagination pagination-sm mb-0">
                                         <!-- Previous Page -->
                                         <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTglMulai, $selectedTglSelesai); ?>">
                                                 <i class="fa-solid fa-chevron-left me-1"></i> Prev
                                             </a>
                                         </li>
@@ -730,13 +732,13 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
                                         <!-- Page Numbers -->
                                         <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
                                             <li class="page-item <?= ($p === $page) ? 'active' : ''; ?>">
-                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTgl, $selectedBulan, $selectedTahun); ?>"><?= $p; ?></a>
+                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTglMulai, $selectedTglSelesai); ?>"><?= $p; ?></a>
                                             </li>
                                         <?php endfor; ?>
 
                                         <!-- Next Page -->
                                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTgl, $selectedBulan, $selectedTahun); ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTglMulai, $selectedTglSelesai); ?>">
                                                 Next <i class="fa-solid fa-chevron-right ms-1"></i>
                                             </a>
                                         </li>
@@ -1313,52 +1315,62 @@ function buildOutletPageUrl($pageNum, $selectedTgl, $selectedBulan, $selectedTah
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL: FILTER TANGGAL PEMBUATAN OUTLET (Theme Adaptive) -->
+<!-- ========================================================================= -->
+<!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-body-emphasis" id="modalFilterOutletLabel">
-                    <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Tanggal Pendaftaran Outlet
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterOutletLabel">
+                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Rentang Tanggal Outlet
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;">Pilih tanggal mulai dan tanggal selesai pendaftaran outlet</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
                 <div class="modal-body p-4">
-                    <!-- 1. Filter Tanggal Spesifik Dibuat -->
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar me-1 text-danger"></i>Tanggal Dibuat (Hari/Bulan/Tahun)</label>
-                        <input type="date" name="tgl" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($selectedTgl); ?>" title="Filter Tanggal Dibuat">
+                    <div class="row g-3">
+                        <!-- Tanggal Mulai -->
+                        <div class="col-6">
+                            <label for="filter_tgl_mulai" class="form-label fw-bold small text-body-secondary mb-1" style="font-size: 11px;">
+                                <i class="fa-regular fa-calendar-days me-1 text-danger"></i>Tanggal Mulai
+                            </label>
+                            <div class="input-group date-picker-wrapper cursor-pointer">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger px-2"><i class="fa-solid fa-calendar-day" style="font-size: 11px;"></i></span>
+                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" style="font-size: 12px;" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            </div>
+                        </div>
+
+                        <!-- Tanggal Selesai -->
+                        <div class="col-6">
+                            <label for="filter_tgl_selesai" class="form-label fw-bold small text-body-secondary mb-1" style="font-size: 11px;">
+                                <i class="fa-regular fa-calendar-days me-1 text-danger"></i>Tanggal Selesai
+                            </label>
+                            <div class="input-group date-picker-wrapper cursor-pointer">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger px-2"><i class="fa-solid fa-calendar-day" style="font-size: 11px;"></i></span>
+                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" style="font-size: 12px;" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 2. Filter Bulan & Tahun Dibuat -->
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-days me-1 text-danger"></i>Bulan Dibuat</label>
-                            <select name="bulan" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedBulan === 0) ? 'selected' : ''; ?>>Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan === $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-body-secondary"><i class="fa-regular fa-calendar-lines me-1 text-danger"></i>Tahun Dibuat</label>
-                            <select name="tahun" class="form-select bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0" <?= ($selectedTahun === 0) ? 'selected' : ''; ?>>Semua Tahun</option>
-                                <?php foreach ($availableYears as $yVal) : ?>
-                                    <option value="<?= $yVal; ?>" <?= ($selectedTahun === $yVal) ? 'selected' : ''; ?>><?= $yVal; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                    <div class="form-text text-body-secondary mt-3 mb-0" style="font-size: 11px;">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>
+                        Filter ini akan menyaring outlet terdaftar berdasarkan rentang tanggal pendaftarannya.
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
-                    </button>
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
+                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 12px;">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Filter
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
