@@ -502,6 +502,8 @@ $(document).ready(function() {
         const nama = $(this).data('nama');
         const kec = $(this).data('kecamatan');
         const alamat = $(this).data('alamat');
+        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
 
         let html = `
             <div class="text-start fs-14">
@@ -516,7 +518,12 @@ $(document).ready(function() {
                     </div>
                     <div class="pt-1">
                         <span class="text-body-secondary d-block mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i>Alamat Lengkap Outlet:</span>
-                        <div class="p-2.5 bg-white rounded border text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.5;">${alamat}</div>
+                        <div class="p-2.5 bg-white rounded border text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.5;">
+                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">
+                                ${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
+                            </a>
+                            <small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
+                        </div>
                     </div>
                 </div>
             </div>

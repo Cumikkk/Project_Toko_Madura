@@ -251,9 +251,11 @@ $(document).ready(function() {
         const nama = $(this).data('nama');
         const kec = $(this).data('kecamatan');
         const alamat = $(this).data('alamat');
+        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
         Swal.fire({
             title: 'Detail Alamat Investor',
-            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Investor:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><p class="fw-semibold mb-0 bg-body p-2 rounded border">${alamat}</p></div></div></div>`,
+            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Investor:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><div class="fw-semibold mb-0 bg-body p-2 rounded border"><a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i></a><small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small></div></div></div></div>`,
             icon: 'info',
             confirmButtonText: 'Tutup',
             confirmButtonColor: '#7D0A0A'
@@ -264,9 +266,11 @@ $(document).ready(function() {
         const nama = $(this).data('nama');
         const kec = $(this).data('kecamatan');
         const alamat = $(this).data('alamat');
+        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
         Swal.fire({
             title: 'Detail Alamat Outlet',
-            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Outlet:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-success-subtle text-success rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><p class="fw-semibold mb-0 bg-body p-2 rounded border">${alamat}</p></div></div></div>`,
+            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Outlet:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-success-subtle text-success rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><div class="fw-semibold mb-0 bg-body p-2 rounded border"><a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i></a><small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small></div></div></div></div>`,
             icon: 'info',
             confirmButtonText: 'Tutup',
             confirmButtonColor: '#198754'
