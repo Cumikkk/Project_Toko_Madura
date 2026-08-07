@@ -170,7 +170,7 @@ $bulanIndo = [
                         <i class="fa-solid fa-store fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Outlet Aktif Keseluruhan</div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Outlet Aktif</div>
                         <div class="fs-4 fw-extrabold text-success mb-0"><?= number_format($sumOutlets, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span></div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ $bulanIndo = [
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3 text-center" style="width: 50px;">No</th>
                                     <th>Nama Investor</th>
-                                    <th class="text-center">Kecamatan & Alamat</th>
+                                    <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Total Outlet Aktif</th>
                                     <th class="text-center">Waktu Join</th>
                                     <th class="text-center pe-3" style="width: 120px;">Aksi</th>
