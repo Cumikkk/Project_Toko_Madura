@@ -174,6 +174,27 @@ function stepKomisi(amount) {
 }
 
 $(document).ready(function() {
+    // Override & unbind any legacy template fileselect alert listeners
+    $(document).off('fileselect');
+    $(':file').off('fileselect');
+
+    // SweetAlert2 Toast Notification on file select (replacing native browser alert)
+    $('#bukti_pembayaran').on('change', function() {
+        let file = this.files && this.files[0] ? this.files[0] : null;
+        if (file) {
+            Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
+            }).fire({
+                icon: 'success',
+                title: 'File Berkas Dipilih',
+                text: file.name
+            });
+        }
+    });
     $('#form-komisi-master').on('submit', function(e) {
         e.preventDefault();
         let btn = $('#btn-submit-komisi');

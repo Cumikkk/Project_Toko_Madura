@@ -160,14 +160,14 @@ $filePermission = $adminPermissionCore->hasPermission($getAuthrorizedPermissions
         <script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/table-data.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/jquery.maskedinput/jquery.maskedinput.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js"></script>
-		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/form-elements.js"></script>
+		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/form-elements.js?v=<?= time(); ?>"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/jquery-steps/jquery.steps.min.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/spectrum-colorpicker/spectrum.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/amazeui-datetimepicker/js/amazeui.datetimepicker.min.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/plugins/accordion-Wizard-Form/jquery.accordion-wizard.min.js"></script>
-		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/form-wizard.js"></script>
+		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/form-wizard.js?v=<?= time(); ?>"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/form-layouts.js"></script>
 		<script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/sticky.js"></script>
         <script src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/js/themeColors.js"></script>
