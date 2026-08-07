@@ -10,8 +10,7 @@ $outletData = null;
 
 if ($isEdit) {
     $resOut = $db->query("
-        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp,
-               inv.persen_bagian_investor
+        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp
         FROM outlet o
         LEFT JOIN users u ON (u.id_users = o.id_users)
         LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
