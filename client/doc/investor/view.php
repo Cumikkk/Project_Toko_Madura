@@ -328,21 +328,12 @@ $bulanIndo = [
                     <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterInvestorLabel">
                         <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Data Investor
                     </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih kriteria pencarian dan periode pendaftaran investor</small>
+                    <small class="text-body-secondary" style="font-size: 11px;">Pilih periode pendaftaran investor</small>
                 </div>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/investor">
                 <div class="modal-body p-4">
-                    <!-- Search Input -->
-                    <div class="mb-3">
-                        <label for="filter_search" class="form-label small fw-bold text-body-secondary mb-1">Pencarian Nama / Username / HP</label>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-magnifying-glass"></i></span>
-                            <input type="text" name="search" id="filter_search" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" value="<?= htmlspecialchars($search); ?>" placeholder="Nama investor, username, HP, kecamatan...">
-                        </div>
-                    </div>
-
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label small fw-bold text-body-secondary mb-0">
                             <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal Pendaftaran
