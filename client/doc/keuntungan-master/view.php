@@ -27,7 +27,7 @@ $sqlKeuntungan = "
     JOIN investor i ON i.id_investor = o.id_investor
     JOIN users u_inv ON u_inv.id_users = i.id_users
     LEFT JOIN users u_out ON u_out.id_users = o.id_users
-    LEFT JOIN laporan_omzet lo ON (lo.id_outlet = o.id_outlet AND DATE_FORMAT(lo.waktu_input, '%Y-%m') = '{$periodeFilter}')
+    LEFT JOIN laporan_omzet lo ON (lo.id_outlet = o.id_outlet AND DATE_FORMAT(lo.periode_laporan, '%Y-%m') = '{$periodeFilter}')
     WHERE i.id_master = {$userId} OR i.id_master IS NULL
     GROUP BY o.id_outlet
     ORDER BY o.id_outlet DESC

@@ -98,8 +98,8 @@ if ($db->affected_rows < 1) {
 
 $newUserId = $db->insert_id;
 
-// Insert into investor table linked to master (alamat sudah di users)
-$db->query("INSERT INTO investor (id_users, id_master, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$masterUserId}, 50.00, NOW())");
+// Insert into investor table linked to master (alamat & persen_bagian_investor sudah di users/outlet)
+$db->query("INSERT INTO investor (id_users, id_master, tanggal_bergabung) VALUES ({$newUserId}, {$masterUserId}, NOW())");
 
 if ($db->affected_rows < 1) {
     JsonResponse([

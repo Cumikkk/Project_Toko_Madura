@@ -109,12 +109,8 @@ if ($isEdit) {
 
     $idMaster = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    // Update investor table (alamat sudah dipindah ke users)
-    if (isset($data['persen_bagian_investor']) && $data['persen_bagian_investor'] !== '') {
-        $db->query("UPDATE investor SET id_master = {$idMaster}, persen_bagian_investor = {$persen}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
-    } else {
-        $db->query("UPDATE investor SET id_master = {$idMaster}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
-    }
+    // Update investor table (alamat & persen_bagian_investor sudah dipindah/dihapus)
+    $db->query("UPDATE investor SET id_master = {$idMaster}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
 
     JsonResponse([
         'code'      => 200,
@@ -154,7 +150,7 @@ if ($isEdit) {
     $newUserId = $db->insert_id;
     $idMaster  = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    $db->query("INSERT INTO investor (id_users, id_master, persen_bagian_investor, biaya_langganan_outlet, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$persen}, {$biayaLangganan}, NOW())");
+    $db->query("INSERT INTO investor (id_users, id_master, biaya_langganan_outlet, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$biayaLangganan}, NOW())");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

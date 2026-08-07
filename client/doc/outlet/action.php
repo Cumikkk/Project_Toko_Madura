@@ -29,7 +29,7 @@ try {
         $investorId = (int)$resInv->fetch_assoc()['id_investor'];
     } else {
         // Auto-create investor record if not present
-        $db->query("INSERT INTO investor (id_users, id_master, persen_bagian_investor) VALUES ({$userId}, 1, 50.00)");
+        $db->query("INSERT INTO investor (id_users, id_master) VALUES ({$userId}, 1)");
         $investorId = $db->insert_id;
     }
 

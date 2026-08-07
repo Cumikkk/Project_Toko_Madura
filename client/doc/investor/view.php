@@ -79,7 +79,7 @@ if (!function_exists('buildInvestorPageUrl')) {
                                 <i class="fa-solid fa-crown text-warning me-1"></i> Master Access
                             </span>
                             <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor</h2>
-                            <p class="text-white-50 small mb-0">Memantau daftar seluruh mitra investor dan portofolio toko yang berada di bawah naungan Master Owner.</p>
+                            <p class="text-white-50 small mb-0">Memantau daftar seluruh investor dan toko yang berada di bawah naungan Master Owner.</p>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ if (!function_exists('buildInvestorPageUrl')) {
                         <i class="fa-solid fa-store fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary small fw-semibold">Total Outlet</div>
+                        <div class="text-body-secondary small fw-semibold">Total Outlet Aktif</div>
                         <div class="fs-4 fw-bold text-success mb-0"><?= number_format($sumOutlets, 0, ',', '.'); ?> <span class="fs-6 fw-normal text-body-secondary">Outlet</span></div>
                     </div>
                 </div>

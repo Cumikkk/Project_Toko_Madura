@@ -277,7 +277,7 @@ $investorId = 0;
 if ($resInv && $resInv->num_rows > 0) {
     $investorId = (int)$resInv->fetch_assoc()['id_investor'];
 } else {
-    $db->query("INSERT INTO investor (id_users, id_master, alamat_investor, persen_bagian_investor) VALUES ({$userId}, 1, 'Bangkalan', 50.00)");
+    $db->query("INSERT INTO investor (id_users, id_master) VALUES ({$userId}, 1)");
     $investorId = $db->insert_id;
 }
 
