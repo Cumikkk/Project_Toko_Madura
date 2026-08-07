@@ -29,7 +29,7 @@ try {
         $investorId = (int)$resInv->fetch_assoc()['id_investor'];
     } else {
         // Auto-create investor record if not present
-        $db->query("INSERT INTO investor (id_users, id_master, alamat_investor, persen_bagian_investor) VALUES ({$userId}, 1, 'Bangkalan', 50.00)");
+        $db->query("INSERT INTO investor (id_users, id_master, persen_bagian_investor) VALUES ({$userId}, 1, 50.00)");
         $investorId = $db->insert_id;
     }
 
@@ -110,7 +110,9 @@ try {
 
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persen_bagian_investor, nama_outlet, alamat_outlet, kecamatan, status, nominal_biaya, bukti_pembayaran, tanggal_request, tanggal_bergabung) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', '{$alamatOutlet}', '{$kecamatan}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW(), NOW())";
+        // Simpan kecamatan & alamat outlet ke tabel users
+        $db->query("UPDATE users SET kecamatan = '{$kecamatan}', alamat = '{$alamatOutlet}' WHERE id_users = {$newUserId}");
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persen_bagian_investor, nama_outlet, status, nominal_biaya, bukti_pembayaran, tanggal_request) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
@@ -267,11 +269,14 @@ try {
         $safeAlamatOutlet = $db->real_escape_string($alamatOutlet);
         $safeKecamatan = $db->real_escape_string($kecamatan);
 
-        // Update Outlet
+        // Update Outlet (kecamatan & alamat disimpan di users)
+        // Simpan alamat ke users terlebih dahulu
+        $resOutletUser = $db->query("SELECT id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+        if ($resOutletUser && $rowOUser = $resOutletUser->fetch_assoc()) {
+            $db->query("UPDATE users SET kecamatan = '{$safeKecamatan}', alamat = '{$safeAlamatOutlet}' WHERE id_users = " . (int)$rowOUser['id_users']);
+        }
         $updateOutlet = $db->query("UPDATE outlet SET 
             nama_outlet = '{$safeNamaOutlet}', 
-            alamat_outlet = '{$safeAlamatOutlet}', 
-            kecamatan = '{$safeKecamatan}', 
             persentase_potongan = {$persentasePotongan}, 
             persen_bagian_investor = {$persenBagianInvestor} 
             WHERE id_outlet = {$idOutlet}");

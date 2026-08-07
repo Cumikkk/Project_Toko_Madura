@@ -31,7 +31,7 @@ if ($resReject && $resReject->num_rows > 0) {
 
 // 2. Fetch Active Outlets (not expired)
 $sqlActive = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, inv.persen_bagian_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -44,7 +44,7 @@ $activeOutlets = $db->query($sqlActive);
 
 // 3. Fetch Expired Outlets
 $sqlExpired = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, inv.persen_bagian_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -57,7 +57,7 @@ $expiredOutlets = $db->query($sqlExpired);
 
 // 4. Fetch Pending Outlets (Request Outlet)
 $sqlPending = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -70,7 +70,7 @@ $pendingOutlets = $db->query($sqlPending);
 
 // 5. Fetch Rejected Outlets
 $sqlReject = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users

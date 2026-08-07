@@ -18,14 +18,15 @@ $sqlKeuntungan = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        o.kecamatan,
+        u_out.kecamatan,
         u_inv.nama_lengkap as nama_investor,
-        IFNULL(i.persen_bagian_master, 5.00) as persen_master,
+        5.00 as persen_master,
         IFNULL(SUM(lo.omzet), 0) as total_omzet,
         IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan
     FROM outlet o
     JOIN investor i ON i.id_investor = o.id_investor
     JOIN users u_inv ON u_inv.id_users = i.id_users
+    LEFT JOIN users u_out ON u_out.id_users = o.id_users
     LEFT JOIN laporan_omzet lo ON (lo.id_outlet = o.id_outlet AND DATE_FORMAT(lo.waktu_input, '%Y-%m') = '{$periodeFilter}')
     WHERE i.id_master = {$userId} OR i.id_master IS NULL
     GROUP BY o.id_outlet

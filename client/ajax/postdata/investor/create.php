@@ -84,8 +84,8 @@ if ($sql_check && $sql_check->num_rows > 0) {
 $hashedPass = password_hash($password, PASSWORD_BCRYPT);
 $passSafe   = $db->real_escape_string($hashedPass);
 
-// Insert into users table
-$db->query("INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, '{$passSafe}', 'investor')");
+// Insert into users table (termasuk kecamatan & alamat)
+$db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'investor')");
 
 if ($db->affected_rows < 1) {
     JsonResponse([
@@ -98,8 +98,8 @@ if ($db->affected_rows < 1) {
 
 $newUserId = $db->insert_id;
 
-// Insert into investor table linked to master
-$db->query("INSERT INTO investor (id_users, id_master, kecamatan, alamat_investor, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$masterUserId}, {$kecVal}, {$alamatVal}, 50.00, NOW())");
+// Insert into investor table linked to master (alamat sudah di users)
+$db->query("INSERT INTO investor (id_users, id_master, persen_bagian_investor, tanggal_bergabung) VALUES ({$newUserId}, {$masterUserId}, 50.00, NOW())");
 
 if ($db->affected_rows < 1) {
     JsonResponse([

@@ -52,7 +52,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                         <!-- BARIS 1: MASTER OWNER & TANGGAL TRANSFER -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="id_master" class="form-label fw-bold">Master Owner <span class="text-danger">*</span></label>
+                                <label for="id_master" class="form-label fw-bold">Master Owner</label>
                                 <select class="form-control" id="id_master" name="id_master" required>
                                     <option value="" disabled <?= empty($komisiData['id_master']) ? 'selected' : ''; ?>>-- Pilih Master Owner --</option>
                                     <?php if ($resMasters && $resMasters->num_rows > 0) : ?>
@@ -69,7 +69,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="tanggal_komisi" class="form-label fw-bold">Tanggal Transfer / Penyerahan <span class="text-danger">*</span></label>
+                                <label for="tanggal_komisi" class="form-label fw-bold">Tanggal Transfer / Penyerahan</label>
                                 <input type="datetime-local" class="form-control" id="tanggal_komisi" name="tanggal_komisi" 
                                        value="<?= !empty($komisiData['tanggal_komisi']) ? date('Y-m-d\TH:i', strtotime($komisiData['tanggal_komisi'])) : date('Y-m-d\TH:i'); ?>" required>
                             </div>
@@ -78,7 +78,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                         <!-- BARIS 2: PERIODE / KETERANGAN & NOMINAL KOMISI -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="periode" class="form-label fw-bold">Periode / Keterangan <span class="text-danger">*</span></label>
+                                <label for="periode" class="form-label fw-bold">Periode / Keterangan</label>
                                 <input type="text" class="form-control" id="periode" name="periode" placeholder="Contoh: Bonus Komisi Rekrutmen Investor Ags 2026" 
                                        value="<?= htmlspecialchars($komisiData['periode'] ?? ''); ?>" required>
                             </div>
@@ -86,7 +86,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="nominal" class="form-label fw-bold">Nominal Komisi (Rp) <span class="text-danger">*</span></label>
+                                <label for="nominal" class="form-label fw-bold">Nominal Komisi (Rp)</label>
                                 <div class="input-group">
                                     <span class="input-group-text border-end-0">Rp</span>
                                     <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="nominal" name="nominal" placeholder="500000" 
@@ -115,8 +115,8 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Transfer Komisi (Opsional)</label>
-                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf">
+                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Transfer Komisi</label>
+                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf" required>
                                 <small class="text-muted">Upload foto struk transfer / bukti bayar komisi ke Master Owner (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
                                 <?php if (!empty($komisiData['bukti_pembayaran'])) : ?>
                                     <div class="mt-2">

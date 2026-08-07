@@ -11,6 +11,8 @@ $nama_lengkap = trim($data['nama_lengkap'] ?? '');
 $username     = trim($data['username'] ?? '');
 $password     = trim($data['password'] ?? '');
 $no_hp        = !empty($data['no_hp']) ? trim($data['no_hp']) : null;
+$kecamatan    = !empty($data['kecamatan']) ? trim($data['kecamatan']) : null;
+$alamat       = !empty($data['alamat']) ? trim($data['alamat']) : null;
 
 if (empty($nama_lengkap) || empty($username)) {
     JsonResponse([
@@ -54,6 +56,8 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 $nameSafe     = $db->real_escape_string($nama_lengkap);
 $usernameSafe = $db->real_escape_string($username);
 $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
+$kecVal       = $kecamatan ? "'" . $db->real_escape_string($kecamatan) . "'" : "NULL";
+$alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
 
 if ($isEdit) {
     // 1. Edit Mode
@@ -70,9 +74,9 @@ if ($isEdit) {
     if (!empty($password)) {
         $hashedPass = password_hash($password, PASSWORD_BCRYPT);
         $passSafe   = $db->real_escape_string($hashedPass);
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
     } else {
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal} WHERE id_users = {$idUsers} AND role = 'master'");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal} WHERE id_users = {$idUsers} AND role = 'master'");
     }
 
     JsonResponse([
@@ -99,7 +103,7 @@ if ($isEdit) {
     $hashedPass = password_hash($password, PASSWORD_BCRYPT);
     $passSafe   = $db->real_escape_string($hashedPass);
 
-    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, '{$passSafe}', 'master')");
+    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'master')");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

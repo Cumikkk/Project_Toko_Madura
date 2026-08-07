@@ -36,8 +36,8 @@ $sqlInv = "
         u.nama_lengkap,
         u.username,
         u.no_hp,
-        i.kecamatan,
-        i.alamat_investor,
+        u.kecamatan,
+        u.alamat as alamat_investor,
         i.tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet,
         SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif

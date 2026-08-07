@@ -18,7 +18,7 @@ if ($loggedInLevel == 1) {
 
 // Fetch investors list with Master Owner name and active outlet counts
 $investors = $db->query("
-    SELECT i.*, u.nama_lengkap, u.username, u.no_hp,
+    SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat as alamat_investor,
            u_master.nama_lengkap as nama_master,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM investor i

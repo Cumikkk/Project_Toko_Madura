@@ -6,7 +6,7 @@ $db = Database::connect();
 
 // Fetch Master list with sub-counts
 $sqlMasters = "
-    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.created_at,
+    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat, u.created_at,
            COUNT(DISTINCT inv.id_investor) as total_investor,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM users u
@@ -63,8 +63,21 @@ $masters = $db->query($sqlMasters);
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-center"><?= !empty($row['created_at']) ? date("d/m/Y H:i", strtotime($row['created_at'])) : '-' ?></td>
                                         <td class="text-start">
-                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
-                                            <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
+                                                    <?php if (!empty($row['kecamatan'])) : ?>
+                                                        <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i>Kec. <?= htmlspecialchars($row['kecamatan']) ?></small>
+                                                    <?php else : ?>
+                                                        <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if (!empty($row['alamat'])) : ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-info rounded-circle ms-2" style="width:28px; height:28px; padding:0;" title="Lihat Alamat Lengkap" onclick="showAlamatMaster('<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['kecamatan'] ?? '-', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['alamat'], ENT_QUOTES) ?>')">
+                                                        <i class="fa fa-info"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                         <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
                                         <td class="text-center">
@@ -99,6 +112,26 @@ $masters = $db->query($sqlMasters);
 </div>
 
 <script type="text/javascript">
+function showAlamatMaster(nama, kecamatan, alamat) {
+    let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat);
+    Swal.fire({
+        title: '<i class="fa fa-map-marker text-danger me-2"></i>Alamat Master Owner',
+        html: `
+            <div class="text-start fs-14 mb-2">
+                <p class="mb-1"><strong>Nama Master:</strong> ${nama}</p>
+                <p class="mb-1"><strong>Kecamatan:</strong> ${kecamatan}</p>
+                <p class="mb-3"><strong>Alamat Lengkap:</strong><br><span class="text-dark bg-light p-2 rounded d-block border mt-1">${alamat}</span></p>
+            </div>
+            <div class="text-center mt-3">
+                <a href="${mapsUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-map-marked-alt me-1"></i> Buka Google Maps</a>
+            </div>
+        `,
+        showCloseButton: true,
+        showConfirmButton: false,
+        width: 500
+    });
+}
+
 $(document).ready(function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master')) {
         $('#table-master').DataTable({

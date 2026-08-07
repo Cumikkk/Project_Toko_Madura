@@ -68,7 +68,21 @@ if ($isEdit) {
                             </div>
                         </div>
 
-                        <!-- BARIS 2: USERNAME & PASSWORD -->
+                        <!-- BARIS 2: KECAMATAN & ALAMAT LENGKAP -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan (Opsional)</label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Bangkalan" value="<?= htmlspecialchars($masterData['kecamatan'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="alamat" class="form-label fw-bold">Alamat Lengkap Master (Opsional)</label>
+                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- BARIS 3: USERNAME & PASSWORD -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="username" class="form-label fw-bold">Username</label>

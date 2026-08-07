@@ -105,13 +105,13 @@ if ($isEdit) {
         exit;
     }
 
-    // Update kasir user
+    // Update kasir user (termasuk kecamatan & alamat)
     if (!empty($kasir_password)) {
         $hashedPass = password_hash($kasir_password, PASSWORD_BCRYPT);
         $hashSafe   = $db->real_escape_string($hashedPass);
-        $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', password = '{$hashSafe}' WHERE id_users = {$existingUser}");
+        $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', kecamatan = '{$kecamatanSafe}', alamat = '{$alamatSafe}', password = '{$hashSafe}' WHERE id_users = {$existingUser}");
     } else {
-        $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}' WHERE id_users = {$existingUser}");
+        $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', kecamatan = '{$kecamatanSafe}', alamat = '{$alamatSafe}' WHERE id_users = {$existingUser}");
     }
 
     // Update investor persen_bagian_investor if provided
@@ -127,7 +127,7 @@ if ($isEdit) {
         $tglClause = ", tgl_jatuh_tempo = '{$tglSafe}' {$statusUpdate}";
     }
 
-    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, kecamatan = '{$kecamatanSafe}', persentase_potongan = {$persentase_potongan}, alamat_outlet = '{$alamatSafe}' {$tglClause} WHERE id_outlet = {$idOutlet}");
+    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, persentase_potongan = {$persentase_potongan} {$tglClause} WHERE id_outlet = {$idOutlet}");
 
     JsonResponse([
         'code'    => 200,
@@ -154,7 +154,7 @@ if ($isEdit) {
     // 1. Insert kasir user (role = 'outlet')
     $hashedPass = password_hash($kasir_password, PASSWORD_BCRYPT);
     $hashSafe   = $db->real_escape_string($hashedPass);
-    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$kasirNama}', '{$kasirUser}', '{$kasirHp}', '{$hashSafe}', 'outlet')");
+    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat, password, role) VALUES ('{$kasirNama}', '{$kasirUser}', '{$kasirHp}', '{$kecamatanSafe}', '{$alamatSafe}', '{$hashSafe}', 'outlet')");
 
     if ($db->affected_rows < 1) {
         JsonResponse([
@@ -175,7 +175,7 @@ if ($isEdit) {
 
     // 3. Insert outlet with persentase_potongan, status, dates, and tgl_jatuh_tempo
     $tglJatuhTempoVal = !empty($tgl_jatuh_tempo) ? "'{$db->real_escape_string($tgl_jatuh_tempo)}'" : "DATE_ADD(NOW(), INTERVAL 1 MONTH)";
-    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, kecamatan, persentase_potongan, alamat_outlet, status, tanggal_request, tanggal_disetujui, tanggal_bergabung, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', '{$kecamatanSafe}', {$persentase_potongan}, '{$alamatSafe}', 'active', NOW(), NOW(), NOW(), {$tglJatuhTempoVal})");
+    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, persentase_potongan, status, tanggal_request, tanggal_disetujui, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', {$persentase_potongan}, 'active', NOW(), NOW(), {$tglJatuhTempoVal})");
 
     if ($db->affected_rows < 1) {
         // Rollback: delete the kasir user we just created

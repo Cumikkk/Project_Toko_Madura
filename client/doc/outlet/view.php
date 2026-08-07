@@ -26,9 +26,9 @@ if ($role === 'master') {
     $totalPagesM   = ceil($totalRecordsM / $limitM);
 
     $listMasterOutlets = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, o.kecamatan as kecamatan_outlet, o.alamat_outlet, o.tanggal_bergabung,
+        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan as kecamatan_outlet, u_out.alamat as alamat_outlet, o.tanggal_request as tanggal_bergabung,
                o.status, o.tgl_jatuh_tempo, o.tipe_request,
-               u_inv.nama_lengkap as nama_investor, i.kecamatan as kecamatan_investor, i.alamat_investor, u_out.username as username_outlet
+               u_inv.nama_lengkap as nama_investor, u_inv.kecamatan as kecamatan_investor, u_inv.alamat as alamat_investor, u_out.username as username_outlet
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
         JOIN users u_inv ON u_inv.id_users = i.id_users
@@ -361,13 +361,13 @@ $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        o.kecamatan,
-        o.alamat_outlet,
+        u.kecamatan,
+        u.alamat as alamat_outlet,
         o.status,
         o.nominal_biaya,
         o.bukti_pembayaran,
         o.alasan_penolakan,
-        o.tanggal_bergabung,
+        o.tanggal_request as tanggal_bergabung,
         o.tgl_jatuh_tempo,
         o.tipe_request,
         o.id_users,
