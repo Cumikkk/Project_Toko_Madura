@@ -354,26 +354,17 @@ $sqlOutlets = "
         o.persentase_potongan,
         o.persen_bagian_investor,
         o.tanggal_bergabung,
+        o.status,
+        o.tipe_request,
+        o.tgl_jatuh_tempo,
+        o.alasan_penolakan,
+        o.bukti_pembayaran,
+        o.tanggal_request,
         u.nama_lengkap,
         u.no_hp,
-        u.username,
-        req.status,
-        req.tipe_request,
-        req.tgl_jatuh_tempo,
-        req.alasan_penolakan,
-        req.bukti_pembayaran,
-        req.tanggal_request
+        u.username
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
-    LEFT JOIN (
-        SELECT r1.*
-        FROM request_perpanjangan r1
-        INNER JOIN (
-            SELECT id_outlet, MAX(id_request) as max_id
-            FROM request_perpanjangan
-            GROUP BY id_outlet
-        ) r2 ON r1.id_request = r2.max_id
-    ) req ON o.id_outlet = req.id_outlet
     {$whereOutletSql}
     ORDER BY o.tanggal_bergabung DESC, o.id_outlet DESC
     LIMIT {$limit} OFFSET {$offset}
