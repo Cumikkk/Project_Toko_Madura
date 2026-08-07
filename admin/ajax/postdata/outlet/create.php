@@ -114,11 +114,6 @@ if ($isEdit) {
         $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', kecamatan = '{$kecamatanSafe}', alamat = '{$alamatSafe}' WHERE id_users = {$existingUser}");
     }
 
-    // Update investor persen_bagian_investor if provided
-    if ($id_investor > 0) {
-        $db->query("UPDATE investor SET persen_bagian_investor = {$persen_bagian_investor} WHERE id_investor = {$id_investor}");
-    }
-
     // Update outlet and tgl_jatuh_tempo perpanjangan
     $tglClause = "";
     if (!empty($tgl_jatuh_tempo)) {
@@ -127,7 +122,7 @@ if ($isEdit) {
         $tglClause = ", tgl_jatuh_tempo = '{$tglSafe}' {$statusUpdate}";
     }
 
-    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, persentase_potongan = {$persentase_potongan} {$tglClause} WHERE id_outlet = {$idOutlet}");
+    $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, persentase_potongan = {$persentase_potongan}, persen_bagian_investor = {$persen_bagian_investor} {$tglClause} WHERE id_outlet = {$idOutlet}");
 
     JsonResponse([
         'code'    => 200,
@@ -168,14 +163,9 @@ if ($isEdit) {
 
     $newKasirId = $db->insert_id;
 
-    // 2. Update investor persen_bagian_investor if provided
-    if ($id_investor > 0) {
-        $db->query("UPDATE investor SET persen_bagian_investor = {$persen_bagian_investor} WHERE id_investor = {$id_investor}");
-    }
-
-    // 3. Insert outlet with persentase_potongan, status, dates, and tgl_jatuh_tempo
+    // 2. Insert outlet with persentase_potongan, persen_bagian_investor, status, dates, and tgl_jatuh_tempo
     $tglJatuhTempoVal = !empty($tgl_jatuh_tempo) ? "'{$db->real_escape_string($tgl_jatuh_tempo)}'" : "DATE_ADD(NOW(), INTERVAL 1 MONTH)";
-    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, persentase_potongan, status, tanggal_request, tanggal_disetujui, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', {$persentase_potongan}, 'active', NOW(), NOW(), {$tglJatuhTempoVal})");
+    $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, persentase_potongan, persen_bagian_investor, status, tanggal_request, tanggal_disetujui, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', {$persentase_potongan}, {$persen_bagian_investor}, 'active', NOW(), NOW(), {$tglJatuhTempoVal})");
 
     if ($db->affected_rows < 1) {
         // Rollback: delete the kasir user we just created

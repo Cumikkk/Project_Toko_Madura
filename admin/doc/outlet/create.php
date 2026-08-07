@@ -95,8 +95,8 @@ $investorList = $db->query("
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
                                         <?php while ($inv = $investorList->fetch_assoc()) : ?>
-                                            <option value="<?= $inv['id_investor']; ?>" data-persen="<?= htmlspecialchars($inv['persen_bagian_investor']); ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($inv['nama_lengkap']); ?> (Bagi Hasil: <?= number_format($inv['persen_bagian_investor'], 0); ?>%)
+                                            <option value="<?= $inv['id_investor']; ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($inv['nama_lengkap']); ?>
                                             </option>
                                         <?php endwhile; ?>
                                     <?php endif; ?>
