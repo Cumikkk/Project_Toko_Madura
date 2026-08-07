@@ -23,9 +23,8 @@ $dt->query("
         u.nama_lengkap as INV_NAME,
         u.username as INV_USER,
         u.no_hp as INV_HP,
-        u.email as INV_EMAIL,
-        i.alamat_investor as INV_ALAMAT,
-        i.persen_bagian_investor as INV_PERSEN,
+        u.kecamatan as INV_KECAMATAN,
+        u.alamat as INV_ALAMAT,
         u_master.nama_lengkap as MASTER_NAME,
         i.id_investor as ID_INV
     FROM investor i
@@ -42,8 +41,8 @@ $dt->edit('INV_USER', function($data) {
     return "<code>" . htmlspecialchars($data['INV_USER'] ?? '-') . "</code>";
 });
 
-$dt->edit('INV_PERSEN', function($data) {
-    return "<span class='badge bg-primary fs-6'>" . number_format($data['INV_PERSEN'] ?? 0, 2, ',', '.') . "%</span>";
+$dt->edit('INV_KECAMATAN', function($data) {
+    return htmlspecialchars($data['INV_KECAMATAN'] ?? '-');
 });
 
 $dt->edit('MASTER_NAME', function($data) {

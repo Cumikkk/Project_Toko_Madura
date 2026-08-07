@@ -63,7 +63,6 @@ $investors = $db->query("
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Biaya Langganan / Outlet</th>
-                                <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
                                 <th class="text-center">Total Outlet Aktif</th>
                                 <th class="text-center" width="15%">#</th>
@@ -92,7 +91,6 @@ $investors = $db->query("
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center"><span class="badge bg-light text-dark border">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</span></td>
-                                        <td class="text-center"><span class="badge bg-primary fs-6"><?= number_format($row['persen_bagian_investor'], 2, ',', '.') ?>%</span></td>
                                         <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
                                         <td class="text-center"><span class="badge bg-success fs-6"><?= number_format($row['total_outlet'] ?? 0) ?> Toko</span></td>
                                         <td class="text-center">
@@ -109,7 +107,7 @@ $investors = $db->query("
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="10" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
+                                    <td colspan="9" class="text-center text-muted py-4">Belum ada data investor terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

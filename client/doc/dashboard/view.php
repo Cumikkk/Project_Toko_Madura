@@ -17,13 +17,12 @@ if ($role === 'investor') {
     // -------------------------------------------------------------
     // DASHBOARD INVESTOR
     // -------------------------------------------------------------
-    $resInv = $db->query("SELECT id_investor, persen_bagian_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
+    $resInv = $db->query("SELECT id_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
     $investorId = 0;
     $persenInvestor = 50.00;
     if ($resInv && $resInv->num_rows > 0) {
         $rowInv = $resInv->fetch_assoc();
         $investorId = (int)$rowInv['id_investor'];
-        $persenInvestor = (float)$rowInv['persen_bagian_investor'];
     }
 
     $resOutletCount = $db->query("SELECT COUNT(*) as total FROM outlet WHERE id_investor = {$investorId}")->fetch_assoc()['total'] ?? 0;
@@ -31,10 +30,9 @@ if ($role === 'investor') {
         SELECT 
             IFNULL(SUM(lo.omzet), 0) as total_omzet, 
             IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan,
-            IFNULL(SUM(lo.nominal_potongan * (IFNULL(inv.persen_bagian_investor, 50.00) / 100.0)), 0) as total_hak_investor
+            IFNULL(SUM(lo.nominal_potongan * (IFNULL(o.persen_bagian_investor, 50.00) / 100.0)), 0) as total_hak_investor
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
-        LEFT JOIN investor inv ON inv.id_investor = o.id_investor
         WHERE o.id_investor = {$investorId}
     ")->fetch_assoc();
 

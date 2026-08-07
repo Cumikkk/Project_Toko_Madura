@@ -17,8 +17,9 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, o.alamat_outlet, o.persentase_potongan, IFNULL(i.persen_bagian_investor, 50.00) as persen_bagian_investor, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, u_out.alamat as alamat_outlet, o.persentase_potongan, IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor, u.nama_lengkap as nama_investor
     FROM outlet o
+    LEFT JOIN users u_out ON o.id_users = u_out.id_users
     LEFT JOIN investor i ON o.id_investor = i.id_investor
     LEFT JOIN users u ON i.id_users = u.id_users
     WHERE o.id_users = {$userId}

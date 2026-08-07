@@ -325,13 +325,13 @@ $whereOutletConds = ["o.id_investor = {$investorId}"];
 
 if (!empty($selectedTgl)) {
     $safeTgl = $db->real_escape_string($selectedTgl);
-    $whereOutletConds[] = "DATE(o.tanggal_bergabung) = '{$safeTgl}'";
+    $whereOutletConds[] = "DATE(o.tanggal_request) = '{$safeTgl}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereOutletConds[] = "MONTH(o.tanggal_bergabung) = {$selectedBulan}";
+        $whereOutletConds[] = "MONTH(o.tanggal_request) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereOutletConds[] = "YEAR(o.tanggal_bergabung) = {$selectedTahun}";
+        $whereOutletConds[] = "YEAR(o.tanggal_request) = {$selectedTahun}";
     }
 }
 $whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);

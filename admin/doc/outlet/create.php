@@ -45,7 +45,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 
 // Fetch list of Investors
 $investorList = $db->query("
-    SELECT i.id_investor, u.nama_lengkap, i.persen_bagian_investor
+    SELECT i.id_investor, u.nama_lengkap
     FROM investor i
     JOIN users u ON (u.id_users = i.id_users)
     ORDER BY u.nama_lengkap ASC

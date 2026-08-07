@@ -19,16 +19,16 @@ $persenInvestor = 50.00; // Default 50%
 $targetOutletId = 0;
 
 if ($role === 'investor') {
-    // Get Investor ID & percentage for logged in investor
-    $resInv = $db->query("SELECT id_investor, persen_bagian_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
+    // Get Investor ID for logged in investor
+    $resInv = $db->query("SELECT id_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
     if ($resInv && $resInv->num_rows > 0) {
         $rowInv = $resInv->fetch_assoc();
         $investorId = (int)$rowInv['id_investor'];
-        $persenInvestor = (float)$rowInv['persen_bagian_investor'];
+        $persenInvestor = 50.00;
     }
 } else {
     // Logged in user is Outlet
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, IFNULL(inv.persen_bagian_investor, 50.00) as persen_bagian_investor FROM outlet o LEFT JOIN investor inv ON (inv.id_investor = o.id_investor) WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];
@@ -172,11 +172,11 @@ $sqlBagiHasil = "
         o.id_outlet,
         o.nama_outlet,
         o.persentase_potongan,
-        IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)) as persen_bagian_investor,
+        IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor,
         IFNULL(SUM(l.omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db,
-        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_investor_db,
-        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, IFNULL(inv.persen_bagian_investor, 50.00)))) / 100.0), 2)), 0) as total_hak_outlet_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00)) / 100.0), 2)), 0) as total_hak_investor_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_outlet_db,
         COUNT(DISTINCT l.presentase_potongan) as count_distinct_rates,
         MIN(l.presentase_potongan) as min_rate,
         MAX(l.presentase_potongan) as max_rate
@@ -184,7 +184,7 @@ $sqlBagiHasil = "
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor, inv.persen_bagian_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
     ORDER BY o.id_outlet DESC
 ";
 

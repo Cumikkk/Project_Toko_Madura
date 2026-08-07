@@ -26,14 +26,14 @@ $persenInvestor = 50.00; // Default 50%
 $targetOutletId = 0;
 
 if ($role === 'investor') {
-    $resInv = $db->query("SELECT id_investor, persen_bagian_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
+    $resInv = $db->query("SELECT id_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
     if ($resInv && $resInv->num_rows > 0) {
         $rowInv = $resInv->fetch_assoc();
         $investorId = (int)$rowInv['id_investor'];
-        $persenInvestor = (float)$rowInv['persen_bagian_investor'];
+        $persenInvestor = 50.00;
     }
 } else {
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, o.persentase_potongan, i.persen_bagian_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, o.persentase_potongan, IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];

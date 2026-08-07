@@ -24,7 +24,7 @@ try {
     }
 
     // 2. Get Outlet Record for Logged-In User
-    $resOutlet = $db->query("SELECT o.*, i.alamat_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor WHERE o.id_users = {$userId} LIMIT 1");
+    $resOutlet = $db->query("SELECT o.*, u_inv.alamat as alamat_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON u_inv.id_users = i.id_users WHERE o.id_users = {$userId} LIMIT 1");
     if (!$resOutlet || $resOutlet->num_rows === 0) {
         JsonResponse(['success' => false, 'message' => 'Akun Anda belum terhubung dengan data outlet. Mohon hubungi Investor Anda.']);
     }

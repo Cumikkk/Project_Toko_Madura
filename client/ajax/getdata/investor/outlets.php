@@ -17,12 +17,13 @@ $sql = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        o.alamat_outlet,
-        o.kecamatan,
+        u.alamat as alamat_outlet,
+        u.kecamatan,
         o.status,
-        DATE_FORMAT(o.tanggal_bergabung, '%d/%m/%Y %H:%i') as tanggal_bergabung,
+        DATE_FORMAT(o.tanggal_request, '%d/%m/%Y %H:%i') as tanggal_bergabung,
         DATE_FORMAT(o.tanggal_disetujui, '%d/%m/%Y %H:%i') as tanggal_disetujui
     FROM outlet o
+    JOIN users u ON o.id_users = u.id_users
     WHERE o.id_investor = {$idInvestor}
       AND o.status = 'active'
       AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= CURRENT_DATE())
