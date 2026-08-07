@@ -140,6 +140,31 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
     </div>
 </div>
 
+<style>
+/* Custom Symmetrical Styling for File Input */
+#bukti_pembayaran.form-control {
+    padding: 0.375rem 0.75rem !important;
+    height: 38px !important;
+    line-height: 1.5 !important;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+}
+#bukti_pembayaran.form-control::file-selector-button {
+    height: 38px;
+    margin: -0.375rem 0.75rem -0.375rem -0.75rem;
+    border: none;
+    border-right: 1px solid var(--bs-border-color, #ced4da);
+    background-color: #e9ecef;
+    padding: 0 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+</style>
+
 <script type="text/javascript">
 function stepKomisi(amount) {
     let input = $('#nominal');
@@ -166,15 +191,8 @@ $(document).ready(function() {
             success: function(resp) {
                 btn.prop('disabled', false);
                 if (resp.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: resp.message || 'Data komisi berhasil disimpan.',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
-                    });
+                    // Direct redirect without notification modal
+                    location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
                 } else {
                     Swal.fire('Gagal!', resp.message || 'Gagal menyimpan data komisi.', 'error');
                 }

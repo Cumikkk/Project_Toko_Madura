@@ -66,20 +66,14 @@ if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] =
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
     if (in_array($fileExtension, $allowedExtensions)) {
         $targetDirAdmin = CRM_ROOT . '/uploads/bukti_komisi/';
-        $targetDirClient = WEB_ROOT . '/uploads/bukti_komisi/';
         if (!is_dir($targetDirAdmin)) {
             @mkdir($targetDirAdmin, 0777, true);
-        }
-        if (!is_dir($targetDirClient)) {
-            @mkdir($targetDirClient, 0777, true);
         }
 
         $newFileName = 'bukti_komisi_' . time() . '_' . rand(1000, 9999) . '.' . $fileExtension;
         $destPathAdmin = $targetDirAdmin . $newFileName;
-        $destPathClient = $targetDirClient . $newFileName;
 
         if (move_uploaded_file($fileTmpPath, $destPathAdmin)) {
-            @copy($destPathAdmin, $destPathClient);
             $buktiPath = 'uploads/bukti_komisi/' . $newFileName;
         }
     }
