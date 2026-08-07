@@ -1307,6 +1307,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
+<!-- ========================================================================= -->
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
@@ -1323,33 +1324,38 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
                 <div class="modal-body p-4">
-                    <div class="row g-3">
+                    <!-- Header Label & Reset Tanggal Button (Matched with Bagi Hasil Modal) -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label small fw-bold text-body-secondary mb-0">
+                            <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetTanggalFilterOutlet" style="font-size: 11px;">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Tanggal
+                        </button>
+                    </div>
+
+                    <div class="row g-2">
                         <!-- Tanggal Mulai -->
                         <div class="col-6">
-                            <label for="filter_tgl_mulai" class="form-label fw-bold small text-body-secondary mb-1" style="font-size: 11px;">
-                                <i class="fa-regular fa-calendar-days me-1 text-danger"></i>Tanggal Mulai
-                            </label>
-                            <div class="input-group date-picker-wrapper cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger px-2"><i class="fa-solid fa-calendar-day" style="font-size: 11px;"></i></span>
-                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" style="font-size: 12px;" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
+                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
                             </div>
                         </div>
 
                         <!-- Tanggal Selesai -->
                         <div class="col-6">
-                            <label for="filter_tgl_selesai" class="form-label fw-bold small text-body-secondary mb-1" style="font-size: 11px;">
-                                <i class="fa-regular fa-calendar-days me-1 text-danger"></i>Tanggal Selesai
-                            </label>
-                            <div class="input-group date-picker-wrapper cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger px-2"><i class="fa-solid fa-calendar-day" style="font-size: 11px;"></i></span>
-                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold" style="font-size: 12px;" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
+                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-text text-body-secondary mt-3 mb-0" style="font-size: 11px;">
-                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>
-                        Filter ini akan menyaring outlet terdaftar berdasarkan rentang tanggal pendaftarannya.
+                    <div class="form-text text-body-secondary small mt-2">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh data outlet</strong> tanpa batasan periode.
                     </div>
                 </div>
                 <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
@@ -1371,6 +1377,12 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <script>
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
+
+    // Reset Tanggal Filter Event
+    $('#btnResetTanggalFilterOutlet').on('click', function() {
+        $('#filter_tgl_mulai').val('');
+        $('#filter_tgl_selesai').val('');
+    });
 
     // 0. Live Search Real-Time Filter for Outlet Table
     $('#liveSearchOutlet').on('keyup input', function() {
