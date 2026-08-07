@@ -233,8 +233,6 @@ $bulanIndo = [
                                             <td>
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($inv['nama_lengkap']); ?></div>
                                                 <div class="text-body-secondary small mt-0.5">
-                                                    <span><?= htmlspecialchars($inv['username']); ?></span>
-                                                    <span class="mx-1">•</span>
                                                     <span class="text-success"><i class="fa-solid fa-phone me-1"></i><?= htmlspecialchars($inv['no_hp'] ?? '-'); ?></span>
                                                 </div>
                                             </td>
