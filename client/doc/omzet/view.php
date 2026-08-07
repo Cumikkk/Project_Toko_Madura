@@ -418,23 +418,17 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     <input type="hidden" name="action" value="add">
                                     <input type="hidden" name="id_outlet" value="<?= (int)($outlet['id_outlet'] ?? 0); ?>">
 
-                                     <!-- Tanggal Omzet (Terkunci Hari Ini / Cannot pick date) -->
+                                     <!-- Tanggal Omzet (Hari Ini / Readonly) -->
                                      <div class="mb-4">
                                          <label class="form-label fw-bold text-body-emphasis small text-uppercase">
                                              <i class="fa-light fa-calendar-day me-1 text-danger"></i>Tanggal Omzet <span class="text-danger">*</span>
                                          </label>
                                          <div class="input-group input-group-lg">
                                              <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
-                                                 <i class="fa-solid fa-calendar-check fs-5"></i>
+                                                 <i class="fa-solid fa-calendar-days fs-5"></i>
                                              </span>
                                              <input type="hidden" name="periode_laporan" id="periode_laporan" value="<?= date('Y-m-d'); ?>">
-                                             <input type="text" class="form-control border-body-subtle bg-body-tertiary text-body-emphasis fw-bold" value="<?= date('d/m/Y'); ?> (Hari Ini)" readonly disabled style="cursor: not-allowed;">
-                                             <span class="input-group-text bg-body-tertiary border-body-subtle small text-body-secondary" style="font-size: 12px;">
-                                                 <i class="fa-solid fa-lock me-1 text-secondary"></i>Terkunci (Hari Ini)
-                                             </span>
-                                         </div>
-                                         <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">
-                                             <i class="fa-solid fa-circle-info me-1 text-primary"></i>Penginputan omzet harian dikunci khusus untuk transaksi pada hari ini saja (<?= date('d/m/Y'); ?>).
+                                             <input type="text" class="form-control border-body-subtle bg-body-tertiary text-body-emphasis fw-bold" value="<?= date('d/m/Y'); ?>" readonly disabled style="cursor: not-allowed;">
                                          </div>
                                      </div>
 
