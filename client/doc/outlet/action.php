@@ -213,7 +213,7 @@ try {
     // =========================================================================
     if ($action === 'get_detail') {
         $idOutlet = (int)($_GET['id_outlet'] ?? 0);
-        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.no_hp FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
+        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.no_hp, u.kecamatan, u.alamat as alamat_outlet FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
         if (!$resDetail || $resDetail->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data outlet tidak ditemukan.']);
         }
@@ -268,22 +268,8 @@ try {
         $safeNamaOutlet = $db->real_escape_string($namaOutlet);
         $safeAlamatOutlet = $db->real_escape_string($alamatOutlet);
         $safeKecamatan = $db->real_escape_string($kecamatan);
-
-        // Update Outlet (kecamatan & alamat disimpan di users)
-        // Simpan alamat ke users terlebih dahulu
-        $resOutletUser = $db->query("SELECT id_outlet, id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
-        if ($resOutletUser && $rowOUser = $resOutletUser->fetch_assoc()) {
-            $db->query("UPDATE users SET kecamatan = '{$safeKecamatan}', alamat = '{$safeAlamatOutlet}' WHERE id_users = " . (int)$rowOUser['id_users']);
-        }
-        $updateOutlet = $db->query("UPDATE outlet SET 
-            nama_outlet = '{$safeNamaOutlet}', 
-            persentase_potongan = {$persentasePotongan}, 
-            persen_bagian_investor = {$persenBagianInvestor} 
-            WHERE id_outlet = {$idOutlet}");
-            
-        if (!$updateOutlet) {
-            JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
-        }
+        $safeNamaPengelola = $db->real_escape_string($namaPengelola);
+        $safeNoHp = $db->real_escape_string($noHp);
 
         // Check if custom date range scheme is requested
         $applyDateRange = isset($_POST['apply_date_range']) && (int)$_POST['apply_date_range'] === 1;
@@ -300,9 +286,7 @@ try {
 
             // Update basic info on outlet table WITHOUT overwriting global default rates
             $updateOutlet = $db->query("UPDATE outlet SET 
-                nama_outlet = '{$safeNamaOutlet}', 
-                alamat_outlet = '{$safeAlamatOutlet}', 
-                kecamatan = '{$safeKecamatan}' 
+                nama_outlet = '{$safeNamaOutlet}' 
                 WHERE id_outlet = {$idOutlet}");
 
             if (!$updateOutlet) {
@@ -318,11 +302,9 @@ try {
                 
             $affectedRowsOmzet = $db->affected_rows;
         } else {
-            // No date range specified: Update global default rates on outlet table
+            // No date range specified: Update default rates on outlet table AND ALL records in laporan_omzet for this outlet
             $updateOutlet = $db->query("UPDATE outlet SET 
                 nama_outlet = '{$safeNamaOutlet}', 
-                alamat_outlet = '{$safeAlamatOutlet}', 
-                kecamatan = '{$safeKecamatan}', 
                 persentase_potongan = {$persentasePotongan}, 
                 persen_bagian_investor = {$persenBagianInvestor} 
                 WHERE id_outlet = {$idOutlet}");
@@ -330,16 +312,24 @@ try {
             if (!$updateOutlet) {
                 JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
             }
+
+            // Apply new percentage rates to ALL historical omzet records for this outlet
+            $db->query("UPDATE laporan_omzet SET 
+                presentase_potongan = {$persentasePotongan},
+                persen_bagian_investor = {$persenBagianInvestor},
+                nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
+                WHERE id_outlet = {$idOutlet}");
+
+            $affectedRowsOmzet = $db->affected_rows;
         }
 
-        // Update User Account
-        $safeNamaPengelola = $db->real_escape_string($namaPengelola);
-        $safeNoHp = $db->real_escape_string($noHp);
-        
+        // Update User Account (kecamatan & alamat stored in users table)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
+                kecamatan = '{$safeKecamatan}',
+                alamat = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}', 
@@ -347,6 +337,8 @@ try {
                 WHERE id_users = {$associatedUserId}");
         } else {
             $db->query("UPDATE users SET 
+                kecamatan = '{$safeKecamatan}',
+                alamat = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}' 
@@ -354,11 +346,14 @@ try {
         }
 
         $successMsg = 'Data outlet berhasil diperbarui!';
-        if ($affectedRowsOmzet > 0) {
+        if ($applyDateRange && $affectedRowsOmzet > 0) {
             $tglStartFmt = date('d/m/Y', strtotime($tglMulaiSkema));
             $tglEndFmt = date('d/m/Y', strtotime($tglSelesaiSkema));
             $persenOutletVal = 100.00 - $persenBagianInvestor;
-            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data laporan omzet harian ({$tglStartFmt} s/d {$tglEndFmt}).";
+            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data omzet periode {$tglStartFmt} s/d {$tglEndFmt}.";
+        } elseif ($affectedRowsOmzet > 0) {
+            $persenOutletVal = 100.00 - $persenBagianInvestor;
+            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada seluruh ({$affectedRowsOmzet}) data omzet toko.";
         }
 
         JsonResponse(['success' => true, 'message' => $successMsg]);

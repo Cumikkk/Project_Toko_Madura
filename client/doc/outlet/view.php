@@ -705,9 +705,6 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                                     <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Edit Outlet">
                                                         <i class="fa-light fa-pen-to-square"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-light border text-danger btn-delete-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" data-nama="<?= htmlspecialchars($row['nama_outlet']); ?>" title="Hapus Outlet">
-                                                        <i class="fa-light fa-trash-can"></i>
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
