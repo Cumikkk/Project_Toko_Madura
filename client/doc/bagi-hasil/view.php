@@ -177,9 +177,9 @@ $sqlBagiHasil = "
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db,
         IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00)) / 100.0), 2)), 0) as total_hak_investor_db,
         IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_outlet_db,
-        COUNT(DISTINCT l.presentase_potongan) as count_distinct_rates,
-        MIN(l.presentase_potongan) as min_rate,
-        MAX(l.presentase_potongan) as max_rate
+        COUNT(DISTINCT l.persentase_potongan) as count_distinct_rates,
+        MIN(l.persentase_potongan) as min_rate,
+        MAX(l.persentase_potongan) as max_rate
     FROM outlet o
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}

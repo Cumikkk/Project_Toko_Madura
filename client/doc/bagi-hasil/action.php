@@ -64,7 +64,7 @@ if ($action === 'get_detail_harian') {
     }
 
     $whereSql = implode(" AND ", $whereConds);
-    $sql = "SELECT id_laporan, periode_laporan, omzet, presentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
+    $sql = "SELECT id_laporan, periode_laporan, omzet, persentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
     $res = $db->query($sql);
 
     $items = [];
@@ -85,7 +85,7 @@ if ($action === 'get_detail_harian') {
                       ($bulanIndo[(int)date('n', strtotime($row['periode_laporan']))] ?? '') . ' ' . 
                       date('Y', strtotime($row['periode_laporan']));
 
-            $itemRatePot = (isset($row['presentase_potongan']) && (float)$row['presentase_potongan'] > 0) ? (float)$row['presentase_potongan'] : $ratePotongan;
+            $itemRatePot = (isset($row['persentase_potongan']) && (float)$row['persentase_potongan'] > 0) ? (float)$row['persentase_potongan'] : $ratePotongan;
             $itemPersenInv = (isset($row['persen_bagian_investor']) && (float)$row['persen_bagian_investor'] > 0) ? (float)$row['persen_bagian_investor'] : $persenInvSplit;
             $itemPersenOut = 100.00 - $itemPersenInv;
 

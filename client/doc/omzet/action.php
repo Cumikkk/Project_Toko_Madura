@@ -82,7 +82,7 @@ try {
 
         $waktuInput = date('Y-m-d H:i:s');
 
-        $sqlInsert = "INSERT INTO laporan_omzet (id_outlet, periode_laporan, omzet, presentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input) VALUES ({$idOutlet}, '{$escapedTanggal}', {$omzet}, {$appliedPercent}, {$persenInvGlobal}, {$nominalPotongan}, '{$waktuInput}')";
+        $sqlInsert = "INSERT INTO laporan_omzet (id_outlet, periode_laporan, omzet, persentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input) VALUES ({$idOutlet}, '{$escapedTanggal}', {$omzet}, {$appliedPercent}, {$persenInvGlobal}, {$nominalPotongan}, '{$waktuInput}')";
         
         if (!$db->query($sqlInsert)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan omzet harian: ' . $db->error]);
@@ -147,7 +147,7 @@ try {
         }
 
         // Verify ownership
-        $resCheck = $db->query("SELECT id_laporan, presentase_potongan FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
+        $resCheck = $db->query("SELECT id_laporan, persentase_potongan FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
         if (!$resCheck || $resCheck->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data omzet tidak ditemukan atau Anda tidak memiliki akses.']);
         }
@@ -156,10 +156,10 @@ try {
         $tglStr = date('d/m/Y', strtotime($tanggalOmzet));
 
         $rowCheck = $resCheck->fetch_assoc();
-        $appliedPercent = (isset($rowCheck['presentase_potongan']) && (float)$rowCheck['presentase_potongan'] > 0) ? (float)$rowCheck['presentase_potongan'] : $presentaseGlobal;
+        $appliedPercent = (isset($rowCheck['persentase_potongan']) && (float)$rowCheck['persentase_potongan'] > 0) ? (float)$rowCheck['persentase_potongan'] : $presentaseGlobal;
         $nominalPotongan = round($omzet * ($appliedPercent / 100.0), 2);
 
-        $sqlUpdate = "UPDATE laporan_omzet SET periode_laporan = '{$escapedTanggal}', omzet = {$omzet}, presentase_potongan = {$appliedPercent}, nominal_potongan = {$nominalPotongan} WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet}";
+        $sqlUpdate = "UPDATE laporan_omzet SET periode_laporan = '{$escapedTanggal}', omzet = {$omzet}, persentase_potongan = {$appliedPercent}, nominal_potongan = {$nominalPotongan} WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet}";
         if (!$db->query($sqlUpdate)) {
             JsonResponse(['success' => false, 'message' => 'Gagal memperbarui omzet harian: ' . $db->error]);
         }
