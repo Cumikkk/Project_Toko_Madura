@@ -302,7 +302,7 @@ try {
                 
             $affectedRowsOmzet = $db->affected_rows;
         } else {
-            // No date range specified: Update global default rates on outlet table
+            // No date range specified: Update default rates on outlet table AND ALL records in laporan_omzet for this outlet
             $updateOutlet = $db->query("UPDATE outlet SET 
                 nama_outlet = '{$safeNamaOutlet}', 
                 persentase_potongan = {$persentasePotongan}, 
@@ -312,6 +312,15 @@ try {
             if (!$updateOutlet) {
                 JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
             }
+
+            // Apply new percentage rates to ALL historical omzet records for this outlet
+            $db->query("UPDATE laporan_omzet SET 
+                presentase_potongan = {$persentasePotongan},
+                persen_bagian_investor = {$persenBagianInvestor},
+                nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
+                WHERE id_outlet = {$idOutlet}");
+
+            $affectedRowsOmzet = $db->affected_rows;
         }
 
         // Update User Account (kecamatan & alamat stored in users table)
@@ -337,11 +346,14 @@ try {
         }
 
         $successMsg = 'Data outlet berhasil diperbarui!';
-        if ($affectedRowsOmzet > 0) {
+        if ($applyDateRange && $affectedRowsOmzet > 0) {
             $tglStartFmt = date('d/m/Y', strtotime($tglMulaiSkema));
             $tglEndFmt = date('d/m/Y', strtotime($tglSelesaiSkema));
             $persenOutletVal = 100.00 - $persenBagianInvestor;
-            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data laporan omzet harian ({$tglStartFmt} s/d {$tglEndFmt}).";
+            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data omzet periode {$tglStartFmt} s/d {$tglEndFmt}.";
+        } elseif ($affectedRowsOmzet > 0) {
+            $persenOutletVal = 100.00 - $persenBagianInvestor;
+            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada seluruh ({$affectedRowsOmzet}) data omzet toko.";
         }
 
         JsonResponse(['success' => true, 'message' => $successMsg]);
