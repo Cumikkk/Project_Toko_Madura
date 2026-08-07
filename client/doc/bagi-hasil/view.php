@@ -40,7 +40,7 @@ $persenOutletBagiHasil = 100.00 - $persenInvestor; // 50%
 
 // Get outlet deduction percentage dynamically from outlet table
 $potonganGlobal = 10.00;
-if (!empty($outletsList[0]['persentase_potongan'])) {
+if (isset($outletsList) && is_array($outletsList) && !empty($outletsList[0]['persentase_potongan'])) {
     $potonganGlobal = (float)$outletsList[0]['persentase_potongan'];
 }
 

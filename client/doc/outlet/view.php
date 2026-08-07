@@ -281,9 +281,12 @@ if ($resInv && $resInv->num_rows > 0) {
     $investorId = $db->insert_id;
 }
 
-// Filter Data Outlet Toko (Rentang Tanggal Pendaftaran: tgl_mulai & tgl_selesai)
+// Filter Data Outlet Toko (Rentang Tanggal Pendaftaran: tgl_mulai & tgl_selesai, atau tgl, bulan, tahun)
 $selectedTglMulai   = isset($_GET['tgl_mulai']) && !empty($_GET['tgl_mulai']) ? trim($_GET['tgl_mulai']) : '';
 $selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']) ? trim($_GET['tgl_selesai']) : '';
+$selectedTgl        = isset($_GET['tgl']) && !empty($_GET['tgl']) ? trim($_GET['tgl']) : '';
+$selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
+$selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
 // Fetch system settings (fee & bank details) from pengaturan_sistem
 $sysSettings = [];
