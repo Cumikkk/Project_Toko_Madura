@@ -303,16 +303,18 @@ $bulanIndo = [
                                                     <i class="fa-solid fa-store text-danger me-1"></i><?= htmlspecialchars($row['nama_outlet']) ?>
                                                 </div>
                                                 <div class="text-body-secondary small mt-0.5 d-flex align-items-center gap-1.5 flex-wrap">
-                                                    <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan'] ?: 'N/A') ?>
-                                                    </span>
                                                     <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                        <button type="button" class="btn btn-xs btn-outline-danger btn-detail-alamat-outlet rounded-pill px-2 py-0.5 shadow-xs fw-bold" style="font-size: 10px;"
-                                                                data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>"
-                                                                data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
-                                                                data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8') ?>">
-                                                            <i class="fa-solid fa-map-location-dot me-1"></i>Detail Alamat
-                                                        </button>
+                                                        <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs" style="font-size: 11px; cursor: pointer;"
+                                                              data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>"
+                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
+                                                              data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
+                                                              title="Klik untuk lihat detail alamat">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan'] ?: 'N/A') ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan'] ?: 'N/A') ?>
+                                                        </span>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>

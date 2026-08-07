@@ -239,20 +239,20 @@ $bulanIndo = [
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <div class="d-flex align-items-center justify-content-center gap-1.5 flex-wrap">
-                                                    <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
-                                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A'); ?>
-                                                    </span>
-                                                    <?php if (!empty($inv['alamat_investor'])) : ?>
-                                                        <button type="button" class="btn btn-xs btn-outline-danger btn-detail-alamat-investor rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 10.5px;"
-                                                                data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                                data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
-                                                                data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>">
-                                                            <i class="fa-solid fa-map-location-dot me-1"></i>Detail Alamat
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </td>
+                                                 <?php if (!empty($inv['alamat_investor'])) : ?>
+                                                     <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs" style="font-size: 11px; cursor: pointer;"
+                                                           data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           title="Klik untuk lihat detail alamat">
+                                                         <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A'); ?>
+                                                     </span>
+                                                 <?php else : ?>
+                                                     <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
+                                                         <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A'); ?>
+                                                     </span>
+                                                 <?php endif; ?>
+                                             </td>
                                             <td class="text-center">
                                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12">
                                                     <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']); ?> Outlet
@@ -503,21 +503,12 @@ $(document).ready(function() {
                 let html = '';
                 $.each(resp.data, function(idx, item) {
                     let kecText = item.kecamatan ? item.kecamatan : '-';
-                    let alamatBtn = '';
-                    if (item.alamat_outlet) {
-                        let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        let safeAlamat = String(item.alamat_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        alamatBtn = `
-                            <button type="button" class="btn btn-xs btn-outline-danger btn-detail-alamat-outlet-item rounded-pill px-2.5 py-1 shadow-xs fw-bold ms-1" 
-                                    style="font-size: 10.5px;"
-                                    data-nama="${safeNama}" 
-                                    data-kecamatan="${kecText}"
-                                    data-alamat="${safeAlamat}">
-                                <i class="fa-solid fa-map-location-dot me-1"></i>Detail Alamat
-                            </button>
-                        `;
-                    }
-                    let locColHtml = `<span class="badge bg-light text-body-secondary border me-1" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>${alamatBtn}`;
+                    let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    let safeKec = String(kecText).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    let locColHtml = item.alamat_outlet ? 
+                        `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" data-nama="${safeNama}" data-kecamatan="${safeKec}" data-alamat="${safeAlamat}" title="Klik untuk lihat detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>` :
+                        `<span class="badge bg-light text-body-secondary border" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>`;
                     let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tanggal_disetujui ? item.tanggal_disetujui : '-');
 
                     html += `

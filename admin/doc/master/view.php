@@ -69,14 +69,16 @@ $masters = $db->query($sqlMasters);
                                         </td>
                                         <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
                                         <td class="text-center">
-                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
-                                            <?php if (!empty($row['alamat'])) : ?>
-                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
-                                                        data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
-                                                        data-alamat="<?= htmlspecialchars($row['alamat']) ?>" 
-                                                        title="Lihat Alamat Lengkap">
-                                                    <i class="fa fa-info-circle"></i>
-                                                </button>
+                                            <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
+                                                <?php if (!empty($row['alamat'])) : ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat="<?= htmlspecialchars($row['alamat']) ?>" title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">

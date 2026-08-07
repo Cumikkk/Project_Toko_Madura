@@ -113,24 +113,37 @@ if ($role === 'master') {
                                             <td>
                                                 <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($row['nama_outlet']); ?></div>
                                                 <div class="mt-1">
-                                                    <button type="button" class="btn btn-xs btn-outline-success btn-detail-alamat-outlet rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 10.5px;"
-                                                            data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>"
-                                                            data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?: '-') ?>"
-                                                            data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>">
-                                                        <i class="fa-solid fa-location-dot me-1"></i>Detail Alamat
-                                                    </button>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs cursor-pointer" style="font-size: 11px; cursor: pointer;"
+                                                              data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>"
+                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?: '-') ?>"
+                                                              data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>"
+                                                              title="Klik untuk lihat detail alamat">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'N/A') ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'N/A') ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                             <td>
                                                 <span class="fw-semibold text-body-emphasis"><?= htmlspecialchars($row['nama_investor']) ?></span>
-                                                <div class="d-flex align-items-center gap-1 mt-1">
-                                                    <span class="badge bg-light text-body-secondary border" style="font-size: 10px;"><i class="fa-light fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?></span>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-detail-alamat-investor rounded-pill px-2 py-0" style="font-size: 10px;"
-                                                            data-nama="<?= htmlspecialchars($row['nama_investor']) ?>"
-                                                            data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?: '-') ?>"
-                                                            data-alamat="<?= htmlspecialchars($row['alamat_investor'] ?: '-') ?>">
-                                                        Detail Alamat
-                                                    </button>
+                                                <div class="mt-1">
+                                                    <?php if (!empty($row['alamat_investor'])) : ?>
+                                                        <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs cursor-pointer" style="font-size: 10px; cursor: pointer;"
+                                                              data-nama="<?= htmlspecialchars($row['nama_investor']) ?>"
+                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?: '-') ?>"
+                                                              data-alamat="<?= htmlspecialchars($row['alamat_investor'] ?: '-') ?>"
+                                                              title="Klik untuk lihat detail alamat">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="badge bg-light text-body-secondary border" style="font-size: 10px;">
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                             <td class="small text-body-secondary">
