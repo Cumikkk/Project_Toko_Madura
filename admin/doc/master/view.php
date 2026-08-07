@@ -51,6 +51,7 @@ $masters = $db->query($sqlMasters);
                                 <th class="text-center">Tanggal Bergabung</th>
                                 <th class="text-center">Nama Master</th>
                                 <th class="text-center">No. HP</th>
+                                <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Total Investor</th>
                                 <th class="text-center">Total Outlet Active</th>
                                 <th class="text-center" style="width: 15%;">#</th>
@@ -63,23 +64,21 @@ $masters = $db->query($sqlMasters);
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-center"><?= !empty($row['created_at']) ? date("d/m/Y H:i", strtotime($row['created_at'])) : '-' ?></td>
                                         <td class="text-start">
-                                            <div class="d-flex align-items-center justify-content-between">
-                                                <div>
-                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
-                                                    <?php if (!empty($row['kecamatan'])) : ?>
-                                                        <br><small class="text-muted"><i class="fa fa-map-marker text-danger me-1"></i>Kec. <?= htmlspecialchars($row['kecamatan']) ?></small>
-                                                    <?php else : ?>
-                                                        <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <?php if (!empty($row['alamat'])) : ?>
-                                                    <button type="button" class="btn btn-sm btn-outline-info rounded-circle ms-2" style="width:28px; height:28px; padding:0;" title="Lihat Alamat Lengkap" onclick="showAlamatMaster('<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['kecamatan'] ?? '-', ENT_QUOTES) ?>', '<?= htmlspecialchars($row['alamat'], ENT_QUOTES) ?>')">
-                                                        <i class="fa fa-info"></i>
-                                                    </button>
-                                                <?php endif; ?>
-                                            </div>
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_lengkap']) ?></strong>
+                                            <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username']) ?></code></small>
                                         </td>
                                         <td class="text-center"><?= htmlspecialchars($row['no_hp'] ?? '-') ?></td>
+                                        <td class="text-center">
+                                            <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                            <?php if (!empty($row['alamat'])) : ?>
+                                                <button type="button" class="btn btn-outline-info btn-xs ms-1 btn-lihat-alamat" 
+                                                        data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
+                                                        data-alamat="<?= htmlspecialchars($row['alamat']) ?>" 
+                                                        title="Lihat Alamat Lengkap">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="text-center">
                                             <span class="badge bg-info fs-6"><?= number_format($row['total_investor']) ?> Investor</span>
                                         </td>
@@ -100,7 +99,7 @@ $masters = $db->query($sqlMasters);
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data Master terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -112,27 +111,28 @@ $masters = $db->query($sqlMasters);
 </div>
 
 <script type="text/javascript">
-function showAlamatMaster(nama, kecamatan, alamat) {
-    let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat);
-    Swal.fire({
-        title: '<i class="fa fa-map-marker text-danger me-2"></i>Alamat Master Owner',
-        html: `
-            <div class="text-start fs-14 mb-2">
-                <p class="mb-1"><strong>Nama Master:</strong> ${nama}</p>
-                <p class="mb-1"><strong>Kecamatan:</strong> ${kecamatan}</p>
-                <p class="mb-3"><strong>Alamat Lengkap:</strong><br><span class="text-dark bg-light p-2 rounded d-block border mt-1">${alamat}</span></p>
-            </div>
-            <div class="text-center mt-3">
-                <a href="${mapsUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-map-marked-alt me-1"></i> Buka Google Maps</a>
-            </div>
-        `,
-        showCloseButton: true,
-        showConfirmButton: false,
-        width: 500
-    });
-}
-
 $(document).ready(function() {
+    // Modal popup detail alamat master
+    $(document).on('click', '.btn-lihat-alamat', function() {
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        let queryStr = encodeURIComponent(nama + ' ' + alamat);
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+        Swal.fire({
+            title: 'Alamat Lengkap Master Owner',
+            html: '<p class="text-start mb-2"><strong>Master Owner:</strong> ' + nama + '</p>' +
+                  '<div class="p-3 bg-light rounded text-start border">' +
+                    '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
+                    '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
+                      alamat + ' <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>' +
+                    '</a>' +
+                  '</div>' +
+                  '<small class="text-muted d-block text-start mt-2"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>',
+            icon: 'info',
+            confirmButtonText: 'Tutup'
+        });
+    });
+
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master')) {
         $('#table-master').DataTable({
             processing: true,
