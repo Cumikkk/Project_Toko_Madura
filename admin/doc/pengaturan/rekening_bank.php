@@ -51,7 +51,7 @@ $bankAtasNama = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label font-weight-semibold">Atas Nama Rekening <span class="text-danger">*</span></label>
+                        <label class="form-label font-weight-semibold">Atas Nama <span class="text-danger">*</span></label>
                         <input type="text" name="bank_atas_nama" class="form-control" value="<?= htmlspecialchars($bankAtasNama, ENT_QUOTES) ?>" placeholder="Contoh: Toko Madura Pusat" required>
                     </div>
 
@@ -72,7 +72,7 @@ $bankAtasNama = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
                 </div>
             </div>
             <div class="card-body">
-                <p class="text-muted small mb-2">Informasi rekening ini akan ditampilkan pada instruksi transfer pendaftaran outlet di portal investor:</p>
+                <p class="text-muted small mb-2">Informasi rekening ini akan ditampilkan pada saat investor melakukan pendaftaran atau perpanjangan outlet:</p>
                 <div class="p-3 bg-light rounded border" style="border-radius:10px;">
                     <p class="small text-dark mb-0">
                         Transfer ke <strong>Bank <?= htmlspecialchars($bankNama) ?>: <?= htmlspecialchars($bankNoRek) ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama) ?></strong>.

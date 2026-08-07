@@ -75,14 +75,14 @@ $investorList = $db->query("
             <div class="card custom-card h-100 mb-0">
                 <div class="card-header">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title">Informasi Utama & Finansial Outlet</h5>
+                        <h5 class="card-title">Informasi Outlet</h5>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="nama_outlet" class="form-label fw-bold">Nama Outlet</label>
+                                <label for="nama_outlet" class="form-label fw-bold">Nama Outlet <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
                                     placeholder="Contoh: Toko Madura Waru"
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
@@ -90,7 +90,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="id_investor" class="form-label fw-bold">Investor</label>
+                                <label for="id_investor" class="form-label fw-bold">Investor <span class="text-danger">*</span></label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
@@ -101,15 +101,15 @@ $investorList = $db->query("
                                         <?php endwhile; ?>
                                     <?php endif; ?>
                                 </select>
-                                <small class="text-muted">Pilih investor pemodal yang menaungi outlet ini.</small>
+                                <small class="text-muted">Pilih investor yang menaungi outlet ini.</small>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan"
                                     placeholder="Contoh: Waru"
-                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>">
+                                    value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <?php
@@ -118,7 +118,7 @@ $investorList = $db->query("
                         ?>
                         <div class="col-md-4 mb-3">
                             <div class="form-group">
-                                <label for="persentase_potongan" class="form-label fw-bold">Potongan Omzet (%)</label>
+                                <label for="persentase_potongan" class="form-label fw-bold">Potongan Omzet (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persentase_potongan" name="persentase_potongan"
                                         placeholder="Contoh: 10.00"
@@ -140,7 +140,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="form-group">
-                                <label for="persen_bagian_investor" class="form-label fw-bold">Hak Investor (%)</label>
+                                <label for="persen_bagian_investor" class="form-label fw-bold">Hak Investor (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persen_bagian_investor" name="persen_bagian_investor"
                                         placeholder="Contoh: 50.00"
@@ -157,12 +157,12 @@ $investorList = $db->query("
                                         </div>
                                     </div>
                                 </div>
-                                <small class="text-muted" style="font-size: 11px;">Persentase bagi hasil investor.</small>
+                                <small class="text-muted" style="font-size: 11px;">Hak Investor.</small>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="form-group">
-                                <label for="persen_bagian_outlet" class="form-label fw-bold">Hak Outlet (%)</label>
+                                <label for="persen_bagian_outlet" class="form-label fw-bold">Hak Outlet (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persen_bagian_outlet" name="persen_bagian_outlet"
                                         placeholder="Contoh: 50.00"
@@ -179,7 +179,7 @@ $investorList = $db->query("
                                         </div>
                                     </div>
                                 </div>
-                                <small class="text-muted" style="font-size: 11px;">Persentase bagi hasil outlet.</small>
+                                <small class="text-muted" style="font-size: 11px;">Hak outlet.</small>
                             </div>
                         </div>
 
@@ -187,10 +187,10 @@ $investorList = $db->query("
                             <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
                             <div class="col-md-12 mb-3">
                                 <div class="form-group">
-                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Active)</label>
+                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Aktif)</label>
                                     <input type="date" class="form-control" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
                                         value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
-                                    <small class="text-muted d-block mt-1">Ubah tanggal ini ke tanggal mendatang untuk memperpanjang masa aktif outlet tanpa perlu membuat akun baru.</small>
+                                    <small class="text-muted d-block mt-1">Ubah tanggal ini ke tanggal mendatang untuk memperpanjang masa aktif outlet tanpa perlu membuat akun baru lagi.</small>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -198,7 +198,7 @@ $investorList = $db->query("
                         <!-- 6. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Outlet Lengkap</label>
+                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
                                     placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
@@ -213,14 +213,14 @@ $investorList = $db->query("
             <div class="card custom-card h-100 mb-0">
                 <div class="card-header">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="card-title">Akun Akses Pengelola Outlet</h5>
+                        <h5 class="card-title">Akun Pengelola Outlet</h5>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Outlet</label>
+                                <label for="kasir_nama" class="form-label fw-bold">Nama Pengelola Outlet <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="kasir_nama" name="kasir_nama"
                                     placeholder="Contoh: Budi Santoso"
                                     value="<?= htmlspecialchars($outletData['kasir_nama'] ?? ''); ?>" required>
@@ -228,15 +228,15 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
+                                <label for="kasir_no_hp" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="kasir_no_hp" name="kasir_no_hp"
                                     placeholder="Contoh: 081234567890"
-                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>">
+                                    value="<?= htmlspecialchars($outletData['kasir_no_hp'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="kasir_username" class="form-label fw-bold">Username</label>
+                                <label for="kasir_username" class="form-label fw-bold">Username <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="kasir_username" name="kasir_username"
                                     placeholder="Contoh: kasir_waru"
                                     value="<?= htmlspecialchars($outletData['kasir_username'] ?? ''); ?>" required>
@@ -244,7 +244,7 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="kasir_password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
+                                <label for="kasir_password" class="form-label fw-bold">Password <?= $isEdit ? '(Opsional)' : '<span class="text-danger">*</span>'; ?></label>
                                 <input type="password" class="form-control" id="kasir_password" name="kasir_password"
                                     placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>"
                                     <?= $isEdit ? '' : 'required'; ?>>

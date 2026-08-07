@@ -53,7 +53,7 @@ $masters = $db->query($sqlMasters);
                                 <th class="text-center">No. HP</th>
                                 <th class="text-center">Kecamatan</th>
                                 <th class="text-center">Total Investor</th>
-                                <th class="text-center">Total Outlet Active</th>
+                                <th class="text-center">Total Outlet Aktif</th>
                                 <th class="text-center" style="width: 15%;">#</th>
                             </tr>
                         </thead>

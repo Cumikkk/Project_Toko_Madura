@@ -1,4 +1,5 @@
 <?php
+
 use Config\Core\Database;
 use Config\Core\SystemInfo;
 
@@ -57,7 +58,7 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                     <?php if ($isEdit) : ?>
                         <input type="hidden" name="id_investor" value="<?= $idInvestor; ?>">
                     <?php endif; ?>
-                    
+
                     <div class="row">
                         <!-- BARIS 1: NAMA LENGKAP & NO. HP -->
                         <div class="col-md-6 mb-3">
@@ -68,8 +69,8 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>">
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($investorData['no_hp'] ?? ''); ?>" required>
                             </div>
                         </div>
 
@@ -82,7 +83,7 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : "<span class='text-danger'>*</span>"; ?></label>
+                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? '(Opsional)' : '<span class="text-danger">*</span>'; ?></label>
                                 <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
@@ -129,14 +130,14 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                         <!-- BARIS 4: KECAMATAN & ALAMAT LENGKAP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Waru" value="<?= htmlspecialchars($investorData['kecamatan'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="alamat_investor" class="form-label fw-bold">Alamat Investor Lengkap</label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
+                                <label for="alamat_investor" class="form-label fw-bold">Alamat Lengkap Investor <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo" required><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
@@ -162,9 +163,9 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
     $(document).ready(function() {
         $('#form-create-investor').on('submit', function(el) {
             el.preventDefault();
-            let button = $(this).find('button[type="submit"]'), 
+            let button = $(this).find('button[type="submit"]'),
                 data = $(this).serialize();
-                
+
             button.addClass('loading').prop('disabled', true);
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/investor/create", data, (resp) => {
                 button.removeClass('loading').prop('disabled', false);

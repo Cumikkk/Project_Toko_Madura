@@ -65,7 +65,7 @@ $investors = $db->query("
                                 <th class="text-center">Biaya Langganan / Outlet</th>
                                 <th class="text-center">Bagi Hasil (%)</th>
                                 <th class="text-center">Master Owner</th>
-                                <th class="text-center">Total Outlet Active</th>
+                                <th class="text-center">Total Outlet Aktif</th>
                                 <th class="text-center" width="15%">#</th>
                             </tr>
                         </thead>

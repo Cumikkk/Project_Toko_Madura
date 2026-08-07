@@ -685,7 +685,7 @@ $(document).ready(function() {
             showCancelButton: true,
             confirmButtonColor: '#28a745',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Setujui (Active)',
+            confirmButtonText: 'Ya, Setujui (Aktif)',
             cancelButtonText: 'Batal'
         }).then(function(result) {
             if (result.isConfirmed) {

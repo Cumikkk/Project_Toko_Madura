@@ -32,21 +32,21 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                         <!-- BARIS 1: NAMA LENGKAP ADMIN & NO. HP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="add-fullname" class="form-label fw-bold">Nama Lengkap Admin</label>
+                                <label for="add-fullname" class="form-label fw-bold">Nama Lengkap Admin <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="add-fullname" name="add-fullname" placeholder="Contoh: Fahrul Alfanani" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="add-phone" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="add-phone" name="add-phone" placeholder="Contoh: 081234567890">
+                                <label for="add-phone" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="add-phone" name="add-phone" placeholder="Contoh: 081234567890" required>
                             </div>
                         </div>
 
                         <!-- BARIS 2: ROLE & USERNAME -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="add-level" class="form-label fw-bold">Role</label>
+                                <label for="add-level" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
                                 <select name="add-level" id="add-level" class="form-control" required>
                                     <option value="1" selected>Admin (Programmer)</option>
                                 </select>
@@ -54,7 +54,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="add-username" class="form-label fw-bold">Username</label>
+                                <label for="add-username" class="form-label fw-bold">Username <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="add-username" name="add-username" placeholder="Contoh: admin_fahrul" required>
                             </div>
                         </div>
@@ -62,7 +62,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                         <!-- BARIS 3: PASSWORD -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="add-password" class="form-label fw-bold">Password</label>
+                                <label for="add-password" class="form-label fw-bold">Password <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" id="add-password" name="add-password" placeholder="Masukkan password login" required>
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>

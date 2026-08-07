@@ -57,41 +57,41 @@ if ($isEdit) {
                         <!-- BARIS 1: NAMA LENGKAP & NO. HP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Master</label>
+                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap Master <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" placeholder="Contoh: Haji Ahmad Madura" value="<?= htmlspecialchars($masterData['nama_lengkap'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp (Opsional)</label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($masterData['no_hp'] ?? ''); ?>">
+                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($masterData['no_hp'] ?? ''); ?>" required>
                             </div>
                         </div>
 
                         <!-- BARIS 2: KECAMATAN & ALAMAT LENGKAP -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan (Opsional)</label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Bangkalan" value="<?= htmlspecialchars($masterData['kecamatan'] ?? ''); ?>">
+                                <label for="kecamatan" class="form-label fw-bold">Kecamatan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Bangkalan" value="<?= htmlspecialchars($masterData['kecamatan'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="alamat" class="form-label fw-bold">Alamat Lengkap Master (Opsional)</label>
-                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat'] ?? ''); ?>">
+                                <label for="alamat" class="form-label fw-bold">Alamat Lengkap Master <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat'] ?? ''); ?>" required>
                             </div>
                         </div>
 
                         <!-- BARIS 3: USERNAME & PASSWORD -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="username" class="form-label fw-bold">Username</label>
+                                <label for="username" class="form-label fw-bold">Username <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="username" name="username" placeholder="Contoh: master_ahmad" value="<?= htmlspecialchars($masterData['username'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? "(Opsional)" : ""; ?></label>
+                                <label for="password" class="form-label fw-bold">Password <?= $isEdit ? '(Opsional)' : '<span class="text-danger">*</span>'; ?></label>
                                 <input type="password" class="form-control" id="password" name="password" placeholder="<?= $isEdit ? 'Biarkan kosong jika tidak diubah' : 'Masukkan password login'; ?>" <?= $isEdit ? "" : "required"; ?>>
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
