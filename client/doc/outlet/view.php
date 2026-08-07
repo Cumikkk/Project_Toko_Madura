@@ -643,7 +643,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                                 <?php if ($isPendingRenewal || $isPendingNew) : ?>
                                                     <?php 
                                                     $tglPengajuanFormatted = !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : (!empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) . ' WIB' : '-');
-                                                    $buktiUrl = !empty($row['bukti_pembayaran']) ? (SystemInfo::app('CLIENT_URL') . '/' . $row['bukti_pembayaran']) : '';
+                                                    $buktiUrl = !empty($row['bukti_pembayaran']) ? (SystemInfo::app('CLIENT_URL') . '/image-proxy.php?file=' . urlencode($row['bukti_pembayaran'])) : '';
                                                     ?>
                                                     <div class="d-flex flex-column align-items-center justify-content-center py-2 mx-auto" style="width: 170px; min-height: 56px; gap: 6px;">
                                                         <span class="badge bg-warning-subtle text-dark border border-warning px-2.5 py-1 rounded-pill fw-bold w-100 text-center shadow-xs" style="font-size: 10.5px; letter-spacing: 0.1px;">

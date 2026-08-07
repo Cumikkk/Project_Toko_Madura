@@ -234,14 +234,17 @@ $bulanIndo = [
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($km['bukti_pembayaran'])) : ?>
-                                                    <?php $fileExt = strtolower(pathinfo($km['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
+                                                    <?php 
+                                                    $fileExt = strtolower(pathinfo($km['bukti_pembayaran'], PATHINFO_EXTENSION)); 
+                                                    $proxyUrl = SystemInfo::app('CLIENT_URL') . '/image-proxy.php?file=' . urlencode($km['bukti_pembayaran']);
+                                                    ?>
                                                     <?php if ($fileExt === 'pdf') : ?>
-                                                        <a href="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" target="_blank" class="btn btn-outline-info btn-xs rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 11px;">
+                                                        <a href="<?= $proxyUrl ?>" target="_blank" class="btn btn-outline-info btn-xs rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 11px;">
                                                             <i class="fa-solid fa-file-pdf me-1"></i> Lihat PDF
                                                         </a>
                                                     <?php else : ?>
                                                         <button type="button" class="btn btn-outline-info btn-xs btn-client-view-bukti-komisi rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 11px;"
-                                                                data-img="<?= SystemInfo::app('CLIENT_URL') ?>/<?= htmlspecialchars($km['bukti_pembayaran']) ?>" 
+                                                                data-img="<?= $proxyUrl ?>" 
                                                                 data-master="<?= htmlspecialchars($user['MBR_NAME'] ?? 'Master Owner') ?>"
                                                                 data-periode="<?= htmlspecialchars($km['periode']) ?>" 
                                                                 data-nominal="Rp <?= number_format($km['nominal'], 0, ',', '.') ?>">
