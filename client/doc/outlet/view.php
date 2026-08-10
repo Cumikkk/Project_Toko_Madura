@@ -779,7 +779,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: TAMBAH OUTLET (WIZARD 2 SESI - PIXEL PERFECT GRID) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahOutlet" tabindex="-1" aria-labelledby="modalTambahOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 540px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable my-4" style="max-width: 540px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             
             <!-- Modal Header -->
@@ -810,10 +810,10 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </div>
             </div>
 
-            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data">
+            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden flex-grow-1">
                 <input type="hidden" name="action" value="add">
                 
-                <div class="modal-body p-4">
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: 60vh;">
                     
                     <!-- ========================================== -->
                     <!-- SESI 1: INFORMASI IDENTITAS & ALAMAT TOKO -->
@@ -1330,7 +1330,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: AJUKAN ULANG PENDAFTARAN OUTLET (2-SESI WIZARD PRE-FILLED) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalAjukanUlangPendaftaran" tabindex="-1" aria-labelledby="modalAjukanUlangPendaftaranLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 540px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable my-4" style="max-width: 540px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             
             <!-- Modal Header -->
@@ -1361,11 +1361,11 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </div>
             </div>
 
-            <form id="formAjukanUlangPendaftaran" method="POST" enctype="multipart/form-data">
+            <form id="formAjukanUlangPendaftaran" method="POST" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden flex-grow-1">
                 <input type="hidden" name="action" value="ajukan_ulang_pendaftaran">
                 <input type="hidden" name="id_outlet" id="resubmit_id_outlet" value="">
                 
-                <div class="modal-body p-4">
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: 60vh;">
 
                     <!-- Alasan Penolakan Admin (Tampil di kedua Sesi) -->
                     <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
