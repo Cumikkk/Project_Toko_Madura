@@ -1549,6 +1549,34 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 </div>
 
 <!-- ========================================================================= -->
+<!-- MODAL: PREVIEW BUKTI TRANSFER PEMBAYARAN -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalPreviewBuktiPembayaran" tabindex="-1" aria-labelledby="modalPreviewBuktiPembayaranLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 680px; margin-top: 80px !important; margin-bottom: 40px !important;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalPreviewBuktiPembayaranLabel">
+                    <i class="fa-solid fa-file-image me-2 text-danger"></i>Pratinjau Bukti Transfer Pembayaran
+                </h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 text-center bg-dark-subtle d-flex align-items-center justify-content-center" style="min-height: 350px; max-height: 70vh; overflow-y: auto;">
+                <img id="previewBuktiImg" src="" class="img-fluid rounded-3 shadow-sm border" style="max-height: 65vh; object-fit: contain;" alt="Bukti Transfer">
+                <iframe id="previewBuktiPdf" src="" class="w-100 rounded-3 border d-none" style="height: 65vh;" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer border-top border-body-subtle py-2.5 px-4 d-flex justify-content-between">
+                <a id="previewBuktiDownload" href="" download target="_blank" class="btn btn-outline-secondary rounded-pill px-3.5 py-1.5 fw-semibold" style="font-size: 12px;">
+                    <i class="fa-solid fa-download me-1"></i> Unduh File
+                </a>
+                <button type="button" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold" data-bs-dismiss="modal" style="font-size: 12px;">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
@@ -2342,9 +2370,9 @@ $(document).ready(function() {
                         if (data.bukti_pembayaran) {
                             let oldUrl = CLIENT_URL + '/' + data.bukti_pembayaran;
                             oldBuktiHtml = `
-                                <a href="${oldUrl}" target="_blank" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5 px-3 fw-bold rounded-end-3" style="font-size: 11.5px; border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Lihat Bukti Transfer Lama">
+                                <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5 px-3 fw-bold rounded-end-3 btn-preview-bukti-lama" data-url="${oldUrl}" style="font-size: 11.5px; border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Lihat Bukti Transfer Lama">
                                     <i class="fa-solid fa-eye"></i> Lihat Bukti Lama
-                                </a>`;
+                                </button>`;
                             $('#resubmit_bukti_pembayaran').removeClass('rounded-3').addClass('rounded-start-3');
                         } else {
                             $('#resubmit_bukti_pembayaran').removeClass('rounded-start-3').addClass('rounded-3');
@@ -2362,6 +2390,26 @@ $(document).ready(function() {
             }
         });
     }
+
+    // 7. Preview Bukti Transfer Lama via Modal (Tanpa Tab Baru)
+    $(document).on('click', '.btn-preview-bukti-lama', function(e) {
+        e.preventDefault();
+        const fileUrl = $(this).data('url');
+        if (!fileUrl) return;
+
+        const ext = fileUrl.split('.').pop().toLowerCase();
+        $('#previewBuktiDownload').attr('href', fileUrl);
+
+        if (ext === 'pdf') {
+            $('#previewBuktiImg').addClass('d-none');
+            $('#previewBuktiPdf').removeClass('d-none').attr('src', fileUrl);
+        } else {
+            $('#previewBuktiPdf').addClass('d-none');
+            $('#previewBuktiImg').removeClass('d-none').attr('src', fileUrl);
+        }
+
+        $('#modalPreviewBuktiPembayaran').modal('show');
+    });
 
     // Helper balance calculation for resubmit modal
     window.balanceResubmitSplit = function(changedBy) {
