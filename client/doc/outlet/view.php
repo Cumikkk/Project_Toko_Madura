@@ -995,7 +995,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: EDIT OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditOutlet" tabindex="-1" aria-labelledby="modalEditOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 440px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 440px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 12px;">
             <div class="modal-header border-0 pb-0 pt-2 px-2.5">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 13px;">
@@ -1006,7 +1006,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
             <form id="formEditOutlet" method="POST">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id_outlet" id="edit_id_outlet" value="">
-                <div class="modal-body p-2.5" style="max-height: 80vh; overflow-y: auto;">
+                <div class="modal-body p-2.5" style="max-height: 52vh; overflow-y: auto;">
                     <!-- Sesi 1: Informasi Outlet -->
                     <div class="fw-bold text-danger text-uppercase mb-1" style="font-size: 8px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-store me-1"></i> Informasi Outlet Toko
@@ -1027,6 +1027,10 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
 
 <style>
+.modal-dialog {
+    margin-top: 85px !important;
+    margin-bottom: 40px !important;
+}
 .custom-toggle-switch {
     position: relative;
     display: inline-block;
@@ -1205,7 +1209,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: DETAIL OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-labelledby="modalDetailOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 500px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
             <div class="modal-header border-0 pb-0 pt-4 px-4">
                 <h5 class="modal-title fw-bold text-body-emphasis" id="modalDetailOutletLabel">
@@ -1213,7 +1217,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-4" style="max-height: 55vh; overflow-y: auto;">
                 <div id="detailOutletLoading" class="text-center py-4">
                     <div class="spinner-border text-danger" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -1262,7 +1266,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: PERPANJANG LANGGANAN OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalPerpanjangOutlet" tabindex="-1" aria-labelledby="modalPerpanjangOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 420px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
@@ -1582,7 +1586,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>
