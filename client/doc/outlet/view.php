@@ -1528,6 +1528,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <script>
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
+    const CLIENT_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>';
 
     // Reset Tanggal Filter Event
     $('#btnResetTanggalFilterOutlet').on('click', function() {
@@ -2190,7 +2191,7 @@ $(document).ready(function() {
 
                         let oldBuktiHtml = '';
                         if (data.bukti_pembayaran) {
-                            let oldUrl = BASE_URL + '/' + data.bukti_pembayaran;
+                            let oldUrl = CLIENT_URL + '/' + data.bukti_pembayaran;
                             oldBuktiHtml = `
                                 <div class="badge bg-secondary-subtle text-secondary border px-2.5 py-1.5 rounded-3 d-inline-flex align-items-center gap-1.5" style="font-size: 11px;">
                                     <i class="fa-solid fa-paperclip text-danger"></i>
