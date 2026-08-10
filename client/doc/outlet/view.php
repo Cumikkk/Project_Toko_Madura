@@ -805,7 +805,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     <!-- Step 2 Badge -->
                     <div id="stepTab2" class="d-flex align-items-center gap-2 fw-semibold text-body-tertiary opacity-75">
                         <span id="badgeStep2" class="badge rounded-circle bg-body-secondary text-body-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">2</span>
-                        <span style="font-size: 12px;">Akun Kasir &amp; Pembayaran</span>
+                        <span style="font-size: 12px;">Akun Outlet &amp; Pembayaran</span>
                     </div>
                 </div>
             </div>
@@ -909,24 +909,24 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- SESI 2: AKUN KASIR & INFORMASI PEMBAYARAN -->
+                    <!-- SESI 2: AKUN OUTLET & INFORMASI PEMBAYARAN -->
                     <!-- ========================================== -->
                     <div id="stepSection2" class="d-none">
                         <div class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
-                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Kasir &amp; Upload Bukti Transfer
+                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Outlet &amp; Upload Bukti Transfer
                         </div>
 
                         <div class="row g-3">
-                            <!-- Username & Password Kasir (Strict 50%-50%) -->
+                            <!-- Username & Password Outlet (Strict 50%-50%) -->
                             <div class="col-6">
-                                <label class="form-label required">Username Login Kasir</label>
+                                <label class="form-label required">Username Login Outlet</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
                                     <input type="text" name="username" id="wizard_username" class="form-control rounded-end-3 border-start-0 ps-1" placeholder="outlet_sidoarjo" required>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label required">Password Login Kasir</label>
+                                <label class="form-label required">Password Login Outlet</label>
                                 <input type="password" name="password" id="wizard_password" class="form-control rounded-3" placeholder="Password akun" required>
                             </div>
 
@@ -1612,7 +1612,7 @@ $(document).ready(function() {
             $('#footerStep2').removeClass('d-none');
 
             // Update Indicator
-            $('#modalSubtitleWizard').text('Sesi 2 dari 2: Akun Kasir & Pembayaran Lisensi');
+            $('#modalSubtitleWizard').text('Sesi 2 dari 2: Akun Outlet & Pembayaran Lisensi');
             $('#stepTab1').removeClass('text-danger').addClass('text-success');
             $('#badgeStep1').removeClass('bg-danger').addClass('bg-success').html('<i class="fa-solid fa-check"></i>');
             
@@ -1654,7 +1654,7 @@ $(document).ready(function() {
             Swal.fire({
                 icon: 'warning',
                 title: 'Form Belum Lengkap',
-                text: 'Harap isi Username Login Kasir terlebih dahulu.',
+                text: 'Harap isi Username Login Outlet terlebih dahulu.',
                 confirmButtonColor: '#7D0A0A'
             }).then(() => $('#wizard_username').focus());
             return;
@@ -1663,7 +1663,7 @@ $(document).ready(function() {
             Swal.fire({
                 icon: 'warning',
                 title: 'Form Belum Lengkap',
-                text: 'Harap isi Password Login Kasir terlebih dahulu.',
+                text: 'Harap isi Password Login Outlet terlebih dahulu.',
                 confirmButtonColor: '#7D0A0A'
             }).then(() => $('#wizard_password').focus());
             return;
