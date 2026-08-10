@@ -1512,8 +1512,10 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <!-- Upload Bukti Pembayaran -->
                             <div class="col-12">
                                 <label class="form-label">Upload Bukti Transfer Pembayaran <span class="text-body-secondary fw-normal">(Opsional jika tidak diganti)</span></label>
-                                <input type="file" name="bukti_pembayaran" id="resubmit_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf">
-                                <div id="resubmit_old_bukti_info" class="mt-2" style="font-size: 11px;"></div>
+                                <div class="input-group">
+                                    <input type="file" name="bukti_pembayaran" id="resubmit_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf">
+                                    <div id="resubmit_old_bukti_info" class="d-flex align-items-stretch"></div>
+                                </div>
                                 <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Format: JPG, PNG, WEBP, atau PDF (Max 5MB).</div>
                             </div>
                         </div>
@@ -2340,13 +2342,12 @@ $(document).ready(function() {
                         if (data.bukti_pembayaran) {
                             let oldUrl = CLIENT_URL + '/' + data.bukti_pembayaran;
                             oldBuktiHtml = `
-                                <div class="badge bg-secondary-subtle text-secondary border px-2.5 py-1.5 rounded-3 d-inline-flex align-items-center gap-1.5" style="font-size: 11px;">
-                                    <i class="fa-solid fa-paperclip text-danger"></i>
-                                    <span>Bukti Transfer Terlampir:</span>
-                                    <a href="${oldUrl}" target="_blank" class="text-danger fw-bold text-decoration-underline ms-1">
-                                        <i class="fa-solid fa-eye me-1"></i>Lihat Bukti Transfer
-                                    </a>
-                                </div>`;
+                                <a href="${oldUrl}" target="_blank" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5 px-3 fw-bold rounded-end-3" style="font-size: 11.5px; border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Lihat Bukti Transfer Lama">
+                                    <i class="fa-solid fa-eye"></i> Lihat Bukti Lama
+                                </a>`;
+                            $('#resubmit_bukti_pembayaran').removeClass('rounded-3').addClass('rounded-start-3');
+                        } else {
+                            $('#resubmit_bukti_pembayaran').removeClass('rounded-start-3').addClass('rounded-3');
                         }
                         $('#resubmit_old_bukti_info').html(oldBuktiHtml);
 
