@@ -293,6 +293,9 @@ try {
                 JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
             }
             
+            // Save schedule into skema_potongan_outlet table for future date matching
+            $db->query("INSERT INTO skema_potongan_outlet (id_outlet, tgl_mulai, tgl_selesai, persentase_potongan, persen_bagian_investor) VALUES ({$idOutlet}, '{$safeMulai}', '{$safeSelesai}', {$persentasePotongan}, {$persenBagianInvestor})");
+
             // Update existing laporan_omzet records within date range ONLY
             $db->query("UPDATE laporan_omzet SET 
                 presentase_potongan = {$persentasePotongan},
