@@ -274,34 +274,28 @@ try {
         // Check if custom date range scheme is requested
         $applyDateRange = isset($_POST['apply_date_range']) && (int)$_POST['apply_date_range'] === 1;
         $tglMulaiSkema = trim($_POST['tgl_mulai_skema'] ?? '');
-        $tglSelesaiSkema = trim($_POST['tgl_selesai_skema'] ?? '');
         $affectedRowsOmzet = 0;
 
-        if ($applyDateRange && !empty($tglMulaiSkema) && !empty($tglSelesaiSkema)) {
-            if ($tglMulaiSkema > $tglSelesaiSkema) {
-                JsonResponse(['success' => false, 'message' => 'Tanggal mulai skema tidak boleh lebih besar dari tanggal selesai.']);
-            }
+        if ($applyDateRange && !empty($tglMulaiSkema)) {
             $safeMulai = $db->real_escape_string($tglMulaiSkema);
-            $safeSelesai = $db->real_escape_string($tglSelesaiSkema);
 
-            // Update basic info on outlet table WITHOUT overwriting global default rates
+            // Update default rates on outlet table for future daily inputs
             $updateOutlet = $db->query("UPDATE outlet SET 
-                nama_outlet = '{$safeNamaOutlet}' 
+                nama_outlet = '{$safeNamaOutlet}', 
+                persentase_potongan = {$persentasePotongan}, 
+                persen_bagian_investor = {$persenBagianInvestor} 
                 WHERE id_outlet = {$idOutlet}");
 
             if (!$updateOutlet) {
                 JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
             }
             
-            // Save schedule into skema_potongan_outlet table for future date matching
-            $db->query("INSERT INTO skema_potongan_outlet (id_outlet, tgl_mulai, tgl_selesai, persentase_potongan, persen_bagian_investor) VALUES ({$idOutlet}, '{$safeMulai}', '{$safeSelesai}', {$persentasePotongan}, {$persenBagianInvestor})");
-
-            // Update existing laporan_omzet records within date range ONLY
+            // Update existing laporan_omzet records starting from Tanggal Mulai ONWARDS (>= safeMulai)
             $db->query("UPDATE laporan_omzet SET 
                 presentase_potongan = {$persentasePotongan},
                 persen_bagian_investor = {$persenBagianInvestor},
                 nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
-                WHERE id_outlet = {$idOutlet} AND periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'");
+                WHERE id_outlet = {$idOutlet} AND periode_laporan >= '{$safeMulai}'");
                 
             $affectedRowsOmzet = $db->affected_rows;
         } else {
@@ -340,10 +334,9 @@ try {
         }
 
         $persenOutletVal = 100.00 - $persenBagianInvestor;
-        if ($applyDateRange && $affectedRowsOmzet > 0) {
+        if ($applyDateRange && !empty($tglMulaiSkema)) {
             $tglStartFmt = date('d/m/Y', strtotime($tglMulaiSkema));
-            $tglEndFmt = date('d/m/Y', strtotime($tglSelesaiSkema));
-            $successMsg = "Data outlet & skema persentase (Potongan {$persentasePotongan}% | Bagi Hasil {$persenBagianInvestor}% : {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} transaksi omzet periode {$tglStartFmt} s/d {$tglEndFmt}.";
+            $successMsg = "Data outlet & skema persentase baru (Potongan {$persentasePotongan}% | Bagi Hasil {$persenBagianInvestor}% : {$persenOutletVal}%) berhasil diterapkan mulai tanggal {$tglStartFmt} ke depan ({$affectedRowsOmzet} transaksi omzet diperbarui).";
         } else {
             $successMsg = "Data outlet & skema persentase baru (Potongan {$persentasePotongan}% | Bagi Hasil Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diperbarui untuk penginputan omzet mendatang.";
         }

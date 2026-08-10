@@ -75,38 +75,9 @@ try {
             JsonResponse(['success' => false, 'message' => 'Omzet harian tanggal ' . $tglStr . ' sudah pernah diinput. Silakan gunakan tombol edit jika ingin mengubah.']);
         }
 
-        // Smart Rate Resolution: Determine percentage rate for $tanggalOmzet
-        // 1. Check if $tanggalOmzet falls within an active date range schedule in skema_potongan_outlet
-        $chkSkema = $db->query("SELECT persentase_potongan, persen_bagian_investor FROM skema_potongan_outlet WHERE id_outlet = {$idOutlet} AND '{$escapedTanggal}' BETWEEN tgl_mulai AND tgl_selesai ORDER BY id_skema DESC LIMIT 1");
-        
-        if ($chkSkema && $chkSkema->num_rows > 0) {
-            $rSkema = $chkSkema->fetch_assoc();
-            $appliedPercent = (float)$rSkema['persentase_potongan'];
-            $persenInvGlobal = (float)$rSkema['persen_bagian_investor'];
-        } else {
-            // 2. Check if a rate was already set in laporan_omzet for this exact date
-            $chkRate = $db->query("SELECT presentase_potongan, persen_bagian_investor FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$escapedTanggal}' AND presentase_potongan > 0 LIMIT 1");
-            
-            if ($chkRate && $chkRate->num_rows > 0) {
-                $rRate = $chkRate->fetch_assoc();
-                $appliedPercent = (float)$rRate['presentase_potongan'];
-                $persenInvGlobal = (float)$rRate['persen_bagian_investor'];
-            } else {
-                // 3. Check nearest preceding entry in laporan_omzet before $tanggalOmzet
-                $chkPrev = $db->query("SELECT presentase_potongan, persen_bagian_investor FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan < '{$escapedTanggal}' AND presentase_potongan > 0 ORDER BY periode_laporan DESC LIMIT 1");
-                
-                if ($chkPrev && $chkPrev->num_rows > 0) {
-                    $rPrev = $chkPrev->fetch_assoc();
-                    $appliedPercent = (float)$rPrev['presentase_potongan'];
-                    $persenInvGlobal = (float)$rPrev['persen_bagian_investor'];
-                } else {
-                    // 4. Fallback to default outlet table rates
-                    $appliedPercent = isset($outlet['persentase_potongan']) ? (float)$outlet['persentase_potongan'] : 10.00;
-                    $persenInvGlobal = isset($outlet['persen_bagian_investor']) ? (float)$outlet['persen_bagian_investor'] : 50.00;
-                }
-            }
-        }
-
+        // Apply active outlet deduction percentage and investor split to this entry
+        $appliedPercent = $presentaseGlobal;
+        $persenInvGlobal = isset($outlet['persen_bagian_investor']) ? (float)$outlet['persen_bagian_investor'] : 50.00;
         $nominalPotongan = round($omzet * ($appliedPercent / 100.0), 2);
 
         $waktuInput = date('Y-m-d H:i:s');
