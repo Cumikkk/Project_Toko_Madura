@@ -1327,24 +1327,48 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL: AJUKAN ULANG PENDAFTARAN OUTLET (FULL EDIT PRE-FILLED) -->
+<!-- MODAL: AJUKAN ULANG PENDAFTARAN OUTLET (2-SESI WIZARD PRE-FILLED) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalAjukanUlangPendaftaran" tabindex="-1" aria-labelledby="modalAjukanUlangPendaftaranLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 480px;">
-        <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
-            <div class="modal-header border-0 pb-0 pt-3 px-3">
-                <h6 class="modal-title fw-bold text-body-emphasis" id="modalAjukanUlangPendaftaranLabel">
-                    <i class="fa-solid fa-paper-plane me-1.5 text-danger"></i>Ajukan Ulang Pembayaran Outlet
-                </h6>
-                <button type="button" class="btn-close" style="font-size: 0.8rem;" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 540px;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalAjukanUlangPendaftaranLabel">
+                        <i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;" id="resubmitModalSubtitleWizard">Sesi 1 dari 2: Identitas &amp; Alamat Toko</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Step Progress Indicator Bar -->
+            <div class="px-4 py-2.5 bg-body-tertiary border-bottom border-body-subtle">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                    <!-- Step 1 Badge -->
+                    <div id="resubmitStepTab1" class="d-flex align-items-center gap-2 fw-bold text-danger">
+                        <span id="resubmitBadgeStep1" class="badge rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">1</span>
+                        <span style="font-size: 12px;">Profil &amp; Alamat Toko</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-body-tertiary" style="font-size: 10px;"></i>
+                    <!-- Step 2 Badge -->
+                    <div id="resubmitStepTab2" class="d-flex align-items-center gap-2 fw-semibold text-body-tertiary opacity-75">
+                        <span id="resubmitBadgeStep2" class="badge rounded-circle bg-body-secondary text-body-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">2</span>
+                        <span style="font-size: 12px;">Akun Outlet &amp; Pembayaran</span>
+                    </div>
+                </div>
+            </div>
+
             <form id="formAjukanUlangPendaftaran" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="ajukan_ulang_pendaftaran">
                 <input type="hidden" name="id_outlet" id="resubmit_id_outlet" value="">
                 
-                <div class="modal-body p-3" style="max-height: 80vh; overflow-y: auto;">
-                    <!-- Alasan Penolakan Admin -->
-                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-2.5 mb-3">
+                <div class="modal-body p-4">
+
+                    <!-- Alasan Penolakan Admin (Tampil di kedua Sesi) -->
+                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
                         <div class="d-flex align-items-center gap-2 mb-1 text-danger" style="font-size: 12px;">
                             <i class="fa-solid fa-circle-xmark fs-6"></i>
                             <strong class="fw-bold">Alasan Penolakan Admin:</strong>
@@ -1352,109 +1376,170 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="p-2 bg-white text-dark rounded-3 border border-danger-subtle fw-semibold mt-1" id="resubmit_alasan_text" style="font-size: 11.5px; line-height: 1.5; word-break: break-word;">
                             -
                         </div>
-                        <div class="text-body-secondary small mt-1.5" style="font-size: 10.5px;">
-                            <i class="fa-solid fa-circle-info me-1 text-primary"></i>Silakan perbaiki data di bawah ini jika diperlukan (misal koreksi alamat atau upload ulang bukti transfer baru), lalu kirim pengajuan ulang.
+                        <div class="text-body-secondary small mt-2" style="font-size: 10.5px;">
+                            <i class="fa-solid fa-circle-info me-1 text-primary"></i>Silakan perbaiki data jika diperlukan (misal koreksi alamat atau upload bukti transfer baru), lalu kirim pengajuan ulang.
                         </div>
                     </div>
+                    
+                    <!-- ========================================== -->
+                    <!-- SESI 1: INFORMASI IDENTITAS & ALAMAT TOKO -->
+                    <!-- ========================================== -->
+                    <div id="resubmitStepSection1">
+                        <div class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
+                            <i class="fa-solid fa-store me-1"></i> Sesi 1: Identitas Toko &amp; Alamat
+                        </div>
 
-                    <!-- Sesi 1: Informasi Outlet -->
-                    <div class="fw-bold text-danger text-uppercase mb-1.5" style="font-size: 9px; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-store me-1"></i> Profil &amp; Alamat Toko
-                    </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">Nama Outlet Toko</label>
-                            <input type="text" name="nama_outlet" id="resubmit_nama_outlet" class="form-control form-control-sm rounded-3 fw-semibold" style="font-size: 11px;" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">Kecamatan</label>
-                            <input type="text" name="kecamatan" id="resubmit_kecamatan" class="form-control form-control-sm rounded-3 fw-semibold" style="font-size: 11px;" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">Pengelola / Kasir</label>
-                            <input type="text" name="nama_pengelola" id="resubmit_nama_pengelola" class="form-control form-control-sm rounded-3 fw-semibold" style="font-size: 11px;" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">No. HP / WhatsApp</label>
-                            <input type="text" name="no_hp" id="resubmit_no_hp" class="form-control form-control-sm rounded-3 fw-semibold" style="font-size: 11px;" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">Alamat Lengkap Toko</label>
-                            <textarea name="alamat_outlet" id="resubmit_alamat_outlet" class="form-control form-control-sm rounded-3 fw-semibold" rows="2" style="font-size: 11px;" required></textarea>
-                        </div>
-                    </div>
+                        <div class="row g-3">
+                            <!-- Nama Outlet Toko -->
+                            <div class="col-12">
+                                <label class="form-label required">Nama Outlet Toko</label>
+                                <input type="text" name="nama_outlet" id="resubmit_nama_outlet" class="form-control rounded-3" placeholder="Contoh: Toko Madura Sidoarjo" required>
+                            </div>
 
-                    <!-- Sesi 2: Skema Persentase -->
-                    <div class="p-2.5 bg-body-tertiary border border-body-subtle rounded-3 mb-3">
-                        <label class="form-label fw-bold small text-body-emphasis mb-2 d-block text-uppercase" style="font-size: 10px;">
-                            <i class="fa-solid fa-calculator me-1 text-danger"></i>Skema Potongan Omzet &amp; Bagi Hasil
-                        </label>
-                        <div class="row g-2 align-items-center">
+                            <!-- Nama Pengelola & No WhatsApp -->
+                            <div class="col-6">
+                                <label class="form-label required">Pengelola / Kasir</label>
+                                <input type="text" name="nama_pengelola" id="resubmit_nama_pengelola" class="form-control rounded-3" placeholder="Budi Santoso" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label required">No. WhatsApp</label>
+                                <input type="text" name="no_hp" id="resubmit_no_hp" class="form-control rounded-3" placeholder="081234567890" required>
+                            </div>
+
+                            <!-- Kecamatan & Alamat Lengkap Toko -->
+                            <div class="col-6">
+                                <label class="form-label required">Kecamatan</label>
+                                <input type="text" name="kecamatan" id="resubmit_kecamatan" class="form-control rounded-3" placeholder="Taman" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label required">Alamat Lengkap Toko</label>
+                                <input type="text" name="alamat_outlet" id="resubmit_alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12" required>
+                            </div>
+
+                            <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar dengan Spinner) -->
                             <div class="col-4">
-                                <label class="form-label small text-body-secondary required mb-1" style="font-size: 9.5px;">Potongan Omzet (%)</label>
+                                <label class="form-label required" style="font-size: 11px;">Potongan Omzet (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control form-control-sm fw-bold text-center border-danger-subtle" style="font-size: 11px;" required>
-                                    <span class="input-group-text bg-danger-subtle text-danger fw-bold" style="font-size: 9.5px;">%</span>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control rounded-start-3 fw-bold" placeholder="10.00" value="10.00" required>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Potongan harian dari omzet.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil investor.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Outlet (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('outlet')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil outlet.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- SESI 2: AKUN OUTLET & INFORMASI PEMBAYARAN -->
+                    <!-- ========================================== -->
+                    <div id="resubmitStepSection2" class="d-none">
+                        <div class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
+                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Outlet &amp; Upload Bukti Transfer
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Username & Password Outlet -->
+                            <div class="col-6">
+                                <label class="form-label required">Username Login Outlet</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
+                                    <input type="text" name="username" id="resubmit_username" class="form-control rounded-end-3 border-start-0 ps-1" placeholder="outlet_sidoarjo" required>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <label class="form-label small text-body-secondary required mb-1" style="font-size: 9.5px;">Hak Investor (%)</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="resubmit_persen_bagian_investor" class="form-control form-control-sm fw-bold text-center border-primary-subtle" style="font-size: 11px;" required oninput="balanceResubmitSplit('investor')">
-                                    <span class="input-group-text bg-primary-subtle text-primary fw-bold" style="font-size: 9.5px;">%</span>
+                            <div class="col-6">
+                                <label class="form-label">Password (Opsional)</label>
+                                <input type="password" name="password" id="resubmit_password" class="form-control rounded-3" placeholder="Kosongkan jika tetap">
+                            </div>
+
+                            <!-- Payment Info Box -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3 rounded-3 shadow-xs">
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <span class="fw-bold" style="font-size: 12px;"><i class="fa-solid fa-receipt me-1"></i> Biaya Lisensi Toko</span>
+                                        <span class="badge bg-danger text-white rounded-pill px-2.5 py-1" style="font-size: 12px;">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
+                                    </div>
+                                    <p class="text-body-secondary mb-0 lh-sm" style="font-size: 11px;">
+                                        Transfer ke <strong>Bank <?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama); ?></strong>.
+                                    </p>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <label class="form-label small text-body-secondary required mb-1" style="font-size: 9.5px;">Hak Outlet (%)</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control form-control-sm fw-bold text-center border-warning-subtle" style="font-size: 11px;" required oninput="balanceResubmitSplit('outlet')">
-                                    <span class="input-group-text bg-warning-subtle text-warning-emphasis fw-bold" style="font-size: 9.5px;">%</span>
-                                </div>
+
+                            <!-- Upload Bukti Pembayaran -->
+                            <div class="col-12">
+                                <label class="form-label">Upload Bukti Transfer Pembayaran <span class="text-body-secondary fw-normal">(Opsional jika tidak diganti)</span></label>
+                                <input type="file" name="bukti_pembayaran" id="resubmit_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf">
+                                <div id="resubmit_old_bukti_info" class="mt-2" style="font-size: 11px;"></div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Format: JPG, PNG, WEBP, atau PDF (Max 5MB).</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sesi 3: Akun Outlet & Transfer -->
-                    <div class="fw-bold text-danger text-uppercase mb-1.5" style="font-size: 9px; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-key me-1"></i> Akun Login Outlet &amp; Upload Transfer
-                    </div>
-                    <div class="row g-2 mb-2">
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary required mb-1" style="font-size: 10.5px;">Username Login Outlet</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary px-2">@</span>
-                                <input type="text" name="username" id="resubmit_username" class="form-control form-control-sm fw-semibold" style="font-size: 11px;" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold text-body-secondary mb-1" style="font-size: 10.5px;">Password (Opsional)</label>
-                            <input type="password" name="password" id="resubmit_password" class="form-control form-control-sm" placeholder="Kosongkan jika tetap" style="font-size: 11px;">
-                        </div>
-                    </div>
-
-                    <!-- Info Bank & Upload Bukti Transfer -->
-                    <div class="card border-0 bg-danger-subtle text-danger-emphasis p-2.5 rounded-3 mb-2 shadow-xs">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="fw-bold"><i class="fa-solid fa-receipt me-1"></i> Biaya Lisensi Toko</small>
-                            <span class="badge bg-danger text-white fw-bold">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
-                        </div>
-                        <small style="font-size: 11px;">Transfer ke <strong><?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama); ?></strong>.</small>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 10.5px;">
-                            Upload Bukti Transfer Pembayaran <span class="text-muted fw-normal">(Opsional jika tidak diganti)</span>
-                        </label>
-                        <input type="file" name="bukti_pembayaran" id="resubmit_bukti_pembayaran" class="form-control form-control-sm rounded-3" accept="image/*,.pdf">
-                        <div id="resubmit_old_bukti_info" class="mt-1.5" style="font-size: 10.5px;"></div>
-                    </div>
                 </div>
 
-                <div class="modal-footer border-top py-2.5 px-3 d-flex justify-content-between">
-                    <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 11.5px;">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 11.5px;">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang
-                    </button>
+                <!-- Modal Footer Navigation Controls -->
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between align-items-center">
+                    <!-- Step 1 Footer Buttons -->
+                    <div id="resubmitFooterStep1" class="d-flex align-items-center justify-content-between w-100">
+                        <button type="button" class="btn btn-light rounded-pill px-3.5 py-2" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="goToResubmitWizardStep(2)">
+                            Lanjut Ke Sesi 2 <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2 Footer Buttons -->
+                    <div id="resubmitFooterStep2" class="d-flex align-items-center justify-content-between w-100 d-none">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-3.5 py-2 fw-semibold" onclick="goToResubmitWizardStep(1)">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -2139,21 +2224,81 @@ $(document).ready(function() {
         }, 400);
     });
 
-    // Helper function to open Ajukan Ulang modal (Pre-Filled with existing data)
-    function openAjukanUlangModal(idOutlet, alasanFallback) {
-        Swal.fire({
-            title: 'Memuat data...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
+    // Stepper helpers for Resubmit Modal
+    window.stepResubmitPotongan = function(dir) {
+        let el = $('#resubmit_persentase_potongan');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+    };
 
+    window.stepResubmitInvestor = function(dir) {
+        let el = $('#resubmit_persen_bagian_investor');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceResubmitSplit('investor');
+    };
+
+    window.stepResubmitOutlet = function(dir) {
+        let el = $('#resubmit_persen_bagian_outlet');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceResubmitSplit('outlet');
+    };
+
+    // Wizard Navigation for Modal Ajukan Ulang Pendaftaran (2 Sesi)
+    window.goToResubmitWizardStep = function(step) {
+        if (step === 2) {
+            const nama = $('#resubmit_nama_outlet').val().trim();
+            const pengelola = $('#resubmit_nama_pengelola').val().trim();
+            const noHp = $('#resubmit_no_hp').val().trim();
+            const kec = $('#resubmit_kecamatan').val().trim();
+            const alamat = $('#resubmit_alamat_outlet').val().trim();
+
+            if (!nama || !pengelola || !noHp || !kec || !alamat) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap lengkapi semua data Identitas & Alamat Toko terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                });
+                return;
+            }
+
+            $('#resubmitStepSection1').addClass('d-none');
+            $('#resubmitStepSection2').removeClass('d-none');
+            $('#resubmitFooterStep1').addClass('d-none');
+            $('#resubmitFooterStep2').removeClass('d-none');
+
+            $('#resubmitModalSubtitleWizard').text('Sesi 2 dari 2: Akun Outlet & Pembayaran Lisensi');
+            $('#resubmitStepTab1').removeClass('text-danger').addClass('text-success');
+            $('#resubmitBadgeStep1').removeClass('bg-danger').addClass('bg-success').html('<i class="fa-solid fa-check"></i>');
+            $('#resubmitStepTab2').removeClass('text-body-tertiary opacity-75').addClass('text-danger fw-bold');
+            $('#resubmitBadgeStep2').removeClass('bg-body-secondary text-body-secondary').addClass('bg-danger text-white shadow-xs');
+        } else {
+            $('#resubmitStepSection2').addClass('d-none');
+            $('#resubmitStepSection1').removeClass('d-none');
+            $('#resubmitFooterStep2').addClass('d-none');
+            $('#resubmitFooterStep1').removeClass('d-none');
+
+            $('#resubmitModalSubtitleWizard').text('Sesi 1 dari 2: Identitas & Alamat Toko');
+            $('#resubmitStepTab1').removeClass('text-success').addClass('text-danger');
+            $('#resubmitBadgeStep1').removeClass('bg-success').addClass('bg-danger').text('1');
+            $('#resubmitStepTab2').removeClass('text-danger fw-bold').addClass('text-body-tertiary opacity-75');
+            $('#resubmitBadgeStep2').removeClass('bg-danger text-white shadow-xs').addClass('bg-body-secondary text-body-secondary').text('2');
+        }
+    };
+
+    // Helper function to open Ajukan Ulang modal (Pre-Filled, NO FLICKER)
+    function openAjukanUlangModal(idOutlet, alasanFallback) {
         $.ajax({
             url: ACTION_URL,
             type: 'GET',
             data: { action: 'get_detail', id_outlet: idOutlet },
             dataType: 'json',
             success: function(res) {
-                Swal.close();
                 if (res.success && res.data) {
                     const data = res.data;
                     const tipeReq = data.tipe_request || 'baru';
@@ -2169,7 +2314,9 @@ $(document).ready(function() {
                         $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
                         $('#modalPerpanjangOutlet').modal('show');
                     } else {
-                        // Resubmit pendaftaran baru (FULL EDIT PRE-FILLED)
+                        // Resubmit pendaftaran baru (2-SESI WIZARD PRE-FILLED)
+                        goToResubmitWizardStep(1);
+
                         $('#resubmit_id_outlet').val(data.id_outlet);
                         $('#resubmit_alasan_text').text(data.alasan_penolakan || alasanFallback || 'Tidak ada catatan alasan dari admin.');
                         $('#resubmit_nama_outlet').val(data.nama_outlet);
@@ -2210,7 +2357,6 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                Swal.close();
                 Swal.fire('Error', 'Gagal menghubungi server untuk mengambil data outlet.', 'error');
             }
         });
