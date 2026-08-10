@@ -418,17 +418,16 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     <input type="hidden" name="action" value="add">
                                     <input type="hidden" name="id_outlet" value="<?= (int)($outlet['id_outlet'] ?? 0); ?>">
 
-                                     <!-- Tanggal Omzet (Hari Ini / Readonly) -->
+                                     <!-- Tanggal Omzet (Bebas Pilih Tanggal) -->
                                      <div class="mb-4">
-                                         <label class="form-label fw-bold text-body-emphasis small text-uppercase">
+                                         <label for="periode_laporan" class="form-label fw-bold text-body-emphasis small text-uppercase">
                                              <i class="fa-light fa-calendar-day me-1 text-danger"></i>Tanggal Omzet <span class="text-danger">*</span>
                                          </label>
-                                         <div class="input-group input-group-lg">
+                                         <div class="input-group input-group-lg date-picker-wrapper cursor-pointer">
                                              <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
                                                  <i class="fa-solid fa-calendar-days fs-5"></i>
                                              </span>
-                                             <input type="hidden" name="periode_laporan" id="periode_laporan" value="<?= date('Y-m-d'); ?>">
-                                             <input type="text" class="form-control border-body-subtle bg-body-tertiary text-body-emphasis fw-bold" value="<?= date('d/m/Y'); ?>" readonly disabled style="cursor: not-allowed;">
+                                             <input type="date" name="periode_laporan" id="periode_laporan" class="form-control border-body-subtle bg-body text-body-emphasis fw-bold cursor-pointer" value="<?= date('Y-m-d'); ?>" required onclick="if(this.showPicker){this.showPicker();}">
                                          </div>
                                      </div>
 
