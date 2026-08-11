@@ -109,6 +109,21 @@ $resInvestors = $db->query($sqlInv);
 $investorList = [];
 if ($resInvestors && $resInvestors->num_rows > 0) {
     while ($row = $resInvestors->fetch_assoc()) {
+        $invId = (int)$row['id_investor'];
+        $outlets = [];
+        $sqlOut = "SELECT o.nama_outlet, u.kecamatan, u.alamat_lengkap as alamat_outlet, 
+                          o.tgl_disetujui as tanggal_bergabung 
+                   FROM outlet o 
+                   JOIN users u ON u.id_users = o.id_users 
+                   WHERE o.id_investor = {$invId} AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
+                   ORDER BY o.id_outlet DESC";
+        $resOut = $db->query($sqlOut);
+        if ($resOut) {
+            while ($out = $resOut->fetch_assoc()) {
+                $outlets[] = $out;
+            }
+        }
+        $row['outlets_data'] = $outlets;
         $investorList[] = $row;
     }
 }
@@ -187,10 +202,10 @@ $bulanIndo = [
                     <div>
                         <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
                             <i class="fa-solid fa-users me-2 text-danger"></i>Daftar Investor Terdaftar
-                            <?php if (!empty($selectedTglMulai) || !empty($selectedTglSelesai)) : ?>
+                            <?php if ($selectedBulan > 0 || $selectedTahun > 0) : ?>
                                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2 fw-bold" style="font-size: 10px;">
                                     <i class="fa-solid fa-calendar-range me-1"></i>
-                                    <?= !empty($selectedTglMulai) ? date('d/m/Y', strtotime($selectedTglMulai)) : 'Awal'; ?> s/d <?= !empty($selectedTglSelesai) ? date('d/m/Y', strtotime($selectedTglSelesai)) : 'Akhir'; ?>
+                                    <?= $selectedBulan > 0 ? $bulanIndo[$selectedBulan] : 'Semua Bulan'; ?> <?= $selectedTahun > 0 ? $selectedTahun : ''; ?>
                                 </span>
                             <?php endif; ?>
                         </h5>
@@ -205,8 +220,8 @@ $bulanIndo = [
                             <input type="text" id="liveSearchInvestor" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" value="<?= htmlspecialchars($search); ?>" placeholder="Cari investor..." title="Live Search Nama Investor">
                         </div>
 
-                        <!-- Tombol Filter Utama (Membuka Modal Filter Data) -->
-                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterInvestor">
+                        <!-- Tombol Filter Utama -->
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" id="btnFilterInvestor">
                             <i class="fa-solid fa-filter me-1"></i> Filter Data
                         </button>
                     </div>
@@ -221,7 +236,7 @@ $bulanIndo = [
                                     <th>Nama Investor</th>
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Total Outlet Aktif</th>
-                                    <th class="text-center pe-3">Waktu Join</th>
+                                    <th class="text-center pe-3">Tanggal Bergabung</th>
                                 </tr>
                             </thead>
                             <tbody class="border-0">
@@ -251,7 +266,7 @@ $bulanIndo = [
                                                  <?php endif; ?>
                                              </td>
                                             <td class="text-center">
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12 btn-lihat-outlet shadow-sm" style="cursor: pointer;" data-id="<?= $inv['id_investor']; ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>" title="Klik untuk melihat detail outlet">
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12 btn-lihat-outlet shadow-sm" style="cursor: pointer;" data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>" data-outlets="<?= htmlspecialchars(json_encode($inv['outlets_data'] ?? []), ENT_QUOTES, 'UTF-8'); ?>" title="Klik untuk melihat detail outlet">
                                                     <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']); ?> Outlet
                                                 </span>
                                             </td>
@@ -313,118 +328,9 @@ $bulanIndo = [
     </div>
 </div>
 
-<!-- MODAL: FILTER DATA INVESTOR -->
-<div class="modal fade" id="modalFilterInvestor" tabindex="-1" aria-labelledby="modalFilterInvestorLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
-        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
-            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterInvestorLabel">
-                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Data Investor
-                    </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih periode pendaftaran investor</small>
-                </div>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/investor">
-                <div class="modal-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label small fw-bold text-body-secondary mb-0">
-                            <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal Pendaftaran
-                        </label>
-                    </div>
 
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
-                            <div class="input-group input-group-sm cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>">
-                            </div>
-                        </div>
 
-                        <div class="col-6">
-                            <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
-                            <div class="input-group input-group-sm cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Month & Year -->
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label for="filter_bulan" class="text-body-secondary small d-block mb-1">Bulan</label>
-                            <select name="bulan" id="filter_bulan" class="form-select form-select-sm bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0">Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan == $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="filter_tahun" class="text-body-secondary small d-block mb-1">Tahun</label>
-                            <select name="tahun" id="filter_tahun" class="form-select form-select-sm bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0">Semua Tahun</option>
-                                <?php foreach ($availableYears as $y) : ?>
-                                    <option value="<?= $y; ?>" <?= ($selectedTahun == $y) ? 'selected' : ''; ?>><?= $y; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
-                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/investor" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 12px;">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Filter
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 12px;">
-                            <i class="fa-solid fa-filter me-1"></i> Terapkan Filter
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Detail Outlet Investor -->
-<div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
-            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6">
-                        <i class="fa-solid fa-store me-2 text-danger"></i>Total Outlet Investor: <span id="modal-investor-nama" class="fw-bold text-danger"></span>
-                    </h6>
-                </div>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0">
-                <div class="table-responsive">
-                    <table id="table-modal-outlet" class="table table-hover align-middle mb-0 w-100">
-                        <thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary">
-                            <tr>
-                                <th class="ps-3 text-center" style="width: 50px;">No</th>
-                                <th>Nama Outlet</th>
-                                <th class="text-center">Kecamatan</th>
-                                <th class="text-center">Tanggal Join</th>
-                            </tr>
-                        </thead>
-                        <tbody id="container-detail-outlet" class="border-0">
-                            <tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer bg-body-tertiary px-4 py-2.5 border-top border-body-subtle">
-                <button type="button" class="btn btn-sm btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -435,6 +341,58 @@ $(document).ready(function() {
         $('.investor-data-row').each(function() {
             let text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    $('#btnFilterInvestor').on('click', function() {
+        let currentBulan = "<?= $selectedBulan; ?>";
+        let currentTahun = "<?= $selectedTahun; ?>";
+        let baseUrl = "<?= SystemInfo::app('CLIENT_URL'); ?>/investor";
+        
+        let html = `
+            <form id="formFilterSwal" method="GET" action="${baseUrl}" class="text-start fs-14 mt-4 px-1">
+                <div class="row g-3 m-0">
+                    <div class="col-6 ps-0">
+                        <label class="text-body-secondary small fw-bold d-block mb-1">Bulan</label>
+                        <select name="bulan" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                            <option value="0" ${currentBulan == '0' ? 'selected' : ''}>Semua Bulan</option>
+                            <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                <option value="<?= $mNum; ?>" ${currentBulan == '<?= $mNum; ?>' ? 'selected' : ''}><?= $mName; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-6 pe-0">
+                        <label class="text-body-secondary small fw-bold d-block mb-1">Tahun</label>
+                        <select name="tahun" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                            <option value="0" ${currentTahun == '0' ? 'selected' : ''}>Semua Tahun</option>
+                            <?php foreach ($availableYears as $y) : ?>
+                                <option value="<?= $y; ?>" ${currentTahun == '<?= $y; ?>' ? 'selected' : ''}><?= $y; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-body-subtle">
+                    <a href="${baseUrl}" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 13px;">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold swal-cancel-btn" style="font-size: 13px;">Batal</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 13px;">
+                            <i class="fa-solid fa-filter me-1"></i> Terapkan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+        Swal.fire({
+            title: '<div class="fw-bold text-danger fs-5 text-start"><i class="fa-solid fa-filter me-2"></i>Filter Data Investor</div><div class="text-start text-body-secondary mt-1" style="font-size: 12px; font-weight: normal;">Pilih periode pendaftaran investor berdasarkan bulan & tahun</div>',
+            html: html,
+            showConfirmButton: false,
+            customClass: { popup: 'rounded-4 p-4' },
+            didOpen: () => {
+                $('.swal-cancel-btn').on('click', () => Swal.close());
+            }
         });
     });
 
@@ -481,76 +439,65 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.btn-lihat-outlet', function() {
-        let idInv = $(this).data('id');
         let namaInv = $(this).data('nama');
+        let outlets = $(this).data('outlets');
 
-        $('#modal-investor-nama').text(namaInv);
-        $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Memuat daftar toko...</td></tr>');
-        $('#modalDetailOutlet').modal('show');
+        let html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0 w-100 text-start" style="font-size: 13.5px;">';
+        html += '<thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary"><tr><th class="ps-3 text-center" style="width: 50px;">No</th><th>Nama Outlet</th><th class="text-center">Kecamatan</th><th class="text-center">Tanggal Bergabung</th></tr></thead>';
+        html += '<tbody class="border-0">';
 
-        $.get("<?= SystemInfo::app('CLIENT_URL') ?>/ajax/get/investor/outlets", { id_investor: idInv }, function(resp) {
-            if (resp.success && resp.data.length > 0) {
-                let html = '';
-                $.each(resp.data, function(idx, item) {
-                    let kecText = item.kecamatan ? item.kecamatan : '-';
-                    let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                    let safeKec = String(kecText).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                    let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                    let locColHtml = item.alamat_outlet ? 
-                        `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" data-nama="${safeNama}" data-kecamatan="${safeKec}" data-alamat = "${safeAlamat}" title="Klik untuk lihat detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>` :
-                        `<span class="badge bg-light text-body-secondary border" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>`;
-                    let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tgl_disetujui ? item.tgl_disetujui : '-');
+        if (outlets && outlets.length > 0) {
+            $.each(outlets, function(idx, item) {
+                let kecText = item.kecamatan ? item.kecamatan : '-';
+                let safeNama = String(item.nama_outlet).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                let safeKec = String(kecText).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                let locColHtml = item.alamat_outlet ? 
+                    `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" onclick="$(this).closest('tr').next('.detail-lokasi-row').fadeToggle(200);" title="Klik untuk lihat/tutup detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText} <i class="fa-solid fa-caret-down ms-1"></i></span>` :
+                    `<span class="badge bg-light text-body-secondary border" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>`;
+                let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tgl_disetujui ? item.tgl_disetujui : '-');
+                let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((safeNama ? safeNama + ' ' : '') + safeAlamat);
 
+                html += `
+                    <tr>
+                        <td class="ps-3 text-center fw-bold text-muted">${idx + 1}</td>
+                        <td><strong class="text-body-emphasis fs-6">${safeNama}</strong></td>
+                        <td class="text-center">${locColHtml}</td>
+                        <td class="text-center small text-body-secondary">${tglJoin}</td>
+                    </tr>
+                `;
+                
+                if (item.alamat_outlet) {
                     html += `
-                        <tr>
-                            <td class="ps-3 text-center fw-bold text-muted">${idx + 1}</td>
-                            <td><strong class="text-body-emphasis fs-6">${item.nama_outlet}</strong></td>
-                            <td class="text-center">${locColHtml}</td>
-                            <td class="text-center small text-body-secondary">${tglJoin}</td>
-                        </tr>
+                    <tr class="detail-lokasi-row" style="display: none;">
+                        <td class="border-0"></td>
+                        <td colspan="3" class="py-2 pe-3 border-0">
+                            <div class="p-3 bg-white border border-danger-subtle rounded-3 shadow-sm d-flex align-items-start gap-3 text-start w-100" style="word-break: break-word;">
+                                <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                                    <i class="fa-solid fa-map-location-dot fs-6"></i>
+                                </div>
+                                <div class="flex-grow-1 text-start">
+                                    <span class="d-block text-body-secondary small fw-bold mb-1">Alamat Lengkap Outlet:</span>
+                                    <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" style="font-size: 13px;" title="Buka di Google Maps">
+                                        ${safeAlamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 10px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
                     `;
-                });
-                $('#container-detail-outlet').html(html);
-            } else {
-                $('#container-detail-outlet').html('<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko aktif.</td></tr>');
-            }
-        }, 'json');
-    });
-
-    $(document).on('click', '.btn-detail-alamat-outlet-item', function() {
-        const nama = $(this).data('nama');
-        const kec = $(this).data('kecamatan');
-        const alamat = $(this).data('alamat');
-        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
-        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
-
-        let html = `
-            <div class="text-start fs-14">
-                <div class="p-3 bg-light rounded-3 border mb-2">
-                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                        <span class="text-body-secondary"><i class="fa-solid fa-store text-danger me-2"></i>Nama Outlet</span>
-                        <span class="fw-bold text-dark">${nama}</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                        <span class="text-body-secondary"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Kecamatan</span>
-                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span>
-                    </div>
-                    <div class="pt-1">
-                        <span class="text-body-secondary d-block mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i>Alamat Lengkap Outlet:</span>
-                        <div class="p-2.5 bg-white rounded border text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.5;">
-                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">
-                                ${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
-                            </a>
-                            <small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+                }
+            });
+        } else {
+            html += '<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-2 opacity-50"></i>Investor ini belum memiliki toko aktif.</td></tr>';
+        }
+        
+        html += '</tbody></table></div>';
 
         Swal.fire({
-            title: '<div class="fw-bold text-danger fs-5"><i class="fa-solid fa-building-user me-2"></i>Detail Lokasi Outlet</div>',
+            title: `<div class="fw-bold text-danger fs-5 text-start"><i class="fa-solid fa-store me-2"></i>Total Outlet Investor: <span class="fw-bold text-danger">${namaInv}</span></div>`,
             html: html,
+            width: '800px',
             confirmButtonText: 'Tutup',
             confirmButtonColor: '#7D0A0A',
             customClass: {
@@ -558,5 +505,7 @@ $(document).ready(function() {
             }
         });
     });
+
+
 });
 </script>

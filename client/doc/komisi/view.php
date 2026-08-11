@@ -178,7 +178,7 @@ $bulanIndo = [
                             <?php elseif ($selectedBulan > 0 || $selectedTahun > 0) : ?>
                                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2 fw-bold" style="font-size: 10px;">
                                     <i class="fa-solid fa-calendar-day me-1"></i>
-                                    <?= ($selectedBulan > 0) ? $bulanIndo[$selectedBulan] : ''; ?> <?= ($selectedTahun > 0) ? $selectedTahun : ''; ?>
+                                    <?= ($selectedBulan > 0) ? $bulanIndo[$selectedBulan] : 'Semua Bulan'; ?> <?= ($selectedTahun > 0) ? $selectedTahun : ''; ?>
                                 </span>
                             <?php endif; ?>
                         </h5>
@@ -193,8 +193,8 @@ $bulanIndo = [
                             <input type="text" id="liveSearchKomisi" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" value="<?= htmlspecialchars($search); ?>" placeholder="Cari komisi..." title="Live Search Komisi">
                         </div>
 
-                        <!-- Tombol Filter Utama (Membuka Modal Filter Data) -->
-                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterKomisi">
+                        <!-- Tombol Filter Utama -->
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" id="btnFilterKomisi">
                             <i class="fa-solid fa-filter me-1"></i> Filter Data
                         </button>
                     </div>
@@ -306,82 +306,7 @@ $bulanIndo = [
     </div>
 </div>
 
-<!-- MODAL: FILTER DATA KOMISI MASTER -->
-<div class="modal fade" id="modalFilterKomisi" tabindex="-1" aria-labelledby="modalFilterKomisiLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
-        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
-            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterKomisiLabel">
-                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Data Komisi Master
-                    </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih rentang tanggal komisi</small>
-                </div>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/komisi">
-                <div class="modal-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label small fw-bold text-body-secondary mb-0">
-                            <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal Transfer
-                        </label>
-                    </div>
 
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
-                            <div class="input-group input-group-sm cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>">
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
-                            <div class="input-group input-group-sm cursor-pointer">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Month & Year -->
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label for="filter_bulan" class="text-body-secondary small d-block mb-1">Bulan</label>
-                            <select name="bulan" id="filter_bulan" class="form-select form-select-sm bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0">Semua Bulan</option>
-                                <?php foreach ($bulanIndo as $mNum => $mName) : ?>
-                                    <option value="<?= $mNum; ?>" <?= ($selectedBulan == $mNum) ? 'selected' : ''; ?>><?= $mName; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label for="filter_tahun" class="text-body-secondary small d-block mb-1">Tahun</label>
-                            <select name="tahun" id="filter_tahun" class="form-select form-select-sm bg-body border-body-subtle text-body-emphasis fw-semibold">
-                                <option value="0">Semua Tahun</option>
-                                <?php foreach ($availableYears as $y) : ?>
-                                    <option value="<?= $y; ?>" <?= ($selectedTahun == $y) ? 'selected' : ''; ?>><?= $y; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between">
-                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/komisi" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 12px;">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Filter
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 12px;">
-                            <i class="fa-solid fa-filter me-1"></i> Terapkan Filter
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script>
 $(document).ready(function() {
@@ -392,6 +317,73 @@ $(document).ready(function() {
         $('.komisi-data-row').each(function() {
             let text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    $('#btnFilterKomisi').on('click', function() {
+        let currentMulai = "<?= htmlspecialchars($selectedTglMulai); ?>";
+        let currentSelesai = "<?= htmlspecialchars($selectedTglSelesai); ?>";
+        let currentBulan = "<?= $selectedBulan; ?>";
+        let currentTahun = "<?= $selectedTahun; ?>";
+        let baseUrl = "<?= SystemInfo::app('CLIENT_URL'); ?>/komisi";
+        
+        let html = `
+            <form id="formFilterSwal" method="GET" action="${baseUrl}" class="text-start fs-14 mt-4 px-1">
+                <div class="mb-3">
+                    <label class="text-body-secondary small fw-bold d-block mb-1">Pilih Rentang Tanggal Transfer</label>
+                    <div class="row g-2 m-0">
+                        <div class="col-6 ps-0">
+                            <input type="date" name="tgl_mulai" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" value="${currentMulai}">
+                            <div style="font-size: 10px;" class="text-muted mt-1">Tanggal Mulai</div>
+                        </div>
+                        <div class="col-6 pe-0">
+                            <input type="date" name="tgl_selesai" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" value="${currentSelesai}">
+                            <div style="font-size: 10px;" class="text-muted mt-1">Tanggal Selesai</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 m-0">
+                    <div class="col-6 ps-0">
+                        <label class="text-body-secondary small fw-bold d-block mb-1">Bulan</label>
+                        <select name="bulan" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                            <option value="0" ${currentBulan == '0' ? 'selected' : ''}>Semua Bulan</option>
+                            <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                <option value="<?= $mNum; ?>" ${currentBulan == '<?= $mNum; ?>' ? 'selected' : ''}><?= $mName; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-6 pe-0">
+                        <label class="text-body-secondary small fw-bold d-block mb-1">Tahun</label>
+                        <select name="tahun" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                            <option value="0" ${currentTahun == '0' ? 'selected' : ''}>Semua Tahun</option>
+                            <?php foreach ($availableYears as $y) : ?>
+                                <option value="<?= $y; ?>" ${currentTahun == '<?= $y; ?>' ? 'selected' : ''}><?= $y; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-body-subtle">
+                    <a href="${baseUrl}" class="btn btn-light border rounded-pill px-3 py-1.5 fw-semibold text-body-secondary" style="font-size: 13px;">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold swal-cancel-btn" style="font-size: 13px;">Batal</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 13px;">
+                            <i class="fa-solid fa-filter me-1"></i> Terapkan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+        Swal.fire({
+            title: '<div class="fw-bold text-danger fs-5 text-start"><i class="fa-solid fa-filter me-2"></i>Filter Data Komisi Master</div><div class="text-start text-body-secondary mt-1" style="font-size: 12px; font-weight: normal;">Pilih rentang tanggal riwayat komisi</div>',
+            html: html,
+            showConfirmButton: false,
+            customClass: { popup: 'rounded-4 p-4' },
+            didOpen: () => {
+                $('.swal-cancel-btn').on('click', () => Swal.close());
+            }
         });
     });
 
