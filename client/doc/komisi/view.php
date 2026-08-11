@@ -207,10 +207,9 @@ $bulanIndo = [
                                 <tr class="text-uppercase small text-body-secondary">
                                     <th class="ps-3 text-center" style="width: 50px;">No</th>
                                     <th class="text-center">Tanggal Transfer</th>
-                                    <th>Periode / Keterangan</th>
+                                    <th>Catatan</th>
                                     <th class="text-center">Nominal Komisi</th>
-                                    <th class="text-center">Bukti Bayar</th>
-                                    <th class="text-start pe-3">Catatan Admin</th>
+                                    <th class="text-center pe-3">Bukti Bayar</th>
                                 </tr>
                             </thead>
                             <tbody class="border-0">
@@ -255,14 +254,11 @@ $bulanIndo = [
                                                     <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">Belum ada</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-start pe-3 small text-body-secondary">
-                                                <?= date('d/m/Y H:i', strtotime($km['tgl_transfer'])) ?> WIB
-                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <tr>
-                                        <td colspan="6" class="text-center py-5 text-body-secondary">
+                                        <td colspan="5" class="text-center py-5 text-body-secondary">
                                             <i class="fa-solid fa-receipt fs-1 text-muted opacity-50 mb-2 d-block"></i>
                                             Belum ada riwayat penerimaan komisi master terdaftar yang sesuai dengan filter.
                                         </td>

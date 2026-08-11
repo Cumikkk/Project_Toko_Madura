@@ -106,7 +106,7 @@ if ($outlet) {
     if ($resLaporan) {
         while ($row = $resLaporan->fetch_assoc()) {
             $allLaporanList[] = $row;
-            $totalOmzet += (float)$row['omzet'];
+            $totalOmzet += (float)$row['nominal_omzet'];
         }
     }
     $totalHariInput = count($allLaporanList);
@@ -507,7 +507,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     <?php if (!empty($laporanList)) : ?>
                                         <?php foreach ($laporanList as $index => $row) : ?>
                                             <?php 
-                                                $omz = (float)$row['omzet'];
+                                                $omz = (float)$row['nominal_omzet'];
                                                 $t = strtotime($row['tanggal_omzet']);
                                                 $tglStr = date('d/m/Y', $t);
                                                 $itemNo = $offset + $index + 1;

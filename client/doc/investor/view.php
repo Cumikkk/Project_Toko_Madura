@@ -221,8 +221,7 @@ $bulanIndo = [
                                     <th>Nama Investor</th>
                                     <th class="text-center">Kecamatan</th>
                                     <th class="text-center">Total Outlet Aktif</th>
-                                    <th class="text-center">Waktu Join</th>
-                                    <th class="text-center pe-3" style="width: 120px;">Aksi</th>
+                                    <th class="text-center pe-3">Waktu Join</th>
                                 </tr>
                             </thead>
                             <tbody class="border-0">
@@ -252,26 +251,21 @@ $bulanIndo = [
                                                  <?php endif; ?>
                                              </td>
                                             <td class="text-center">
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12">
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12 btn-lihat-outlet shadow-sm" style="cursor: pointer;" data-id="<?= $inv['id_investor']; ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>" title="Klik untuk melihat detail outlet">
                                                     <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']); ?> Outlet
                                                 </span>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center pe-3">
                                                 <span class="badge bg-body-tertiary border text-body-emphasis px-2.5 py-1 rounded-3 fw-semibold font-monospace small">
                                                     <i class="fa-regular fa-clock me-1 text-primary"></i>
                                                     <?= !empty($inv['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($inv['tanggal_bergabung'])) . ' WIB' : '-'; ?>
                                                 </span>
                                             </td>
-                                            <td class="text-center pe-3">
-                                                <button type="button" class="btn btn-xs btn-danger btn-lihat-outlet rounded-pill px-3 py-1.5 shadow-xs fw-bold text-nowrap" style="background-color: #7D0A0A; border-color: #7D0A0A; font-size: 11px;" data-id="<?= $inv['id_investor']; ?>" data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>">
-                                                    <i class="fa-solid fa-eye me-1"></i> Lihat Toko
-                                                </button>
-                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <tr>
-                                        <td colspan="6" class="text-center py-5 text-body-secondary">
+                                        <td colspan="5" class="text-center py-5 text-body-secondary">
                                             <i class="fa-solid fa-users-slash fs-1 text-muted opacity-50 mb-2 d-block"></i>
                                             Belum ada data investor terdaftar yang sesuai dengan filter.
                                         </td>

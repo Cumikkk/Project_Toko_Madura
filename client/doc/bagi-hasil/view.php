@@ -218,7 +218,7 @@ if ($resBagiHasil) {
         $hasAnyLastDayDone = true;
 
         // Total Pendapatan Bersih Outlet (Omzet - Hak Investor)
-        $totalBersihOutlet = ($omzet - $potongan10) + $hakOutlet;
+        $totalBersihOutlet = ($nominal_omzet - $potongan10) + $hakOutlet;
 
         $row['persentase_potongan'] = $ratePotongan;
         $row['display_rate'] = $displayRate;
@@ -229,7 +229,7 @@ if ($resBagiHasil) {
         $row['hak_outlet'] = $hakOutlet;
         $row['total_bersih_outlet'] = $totalBersihOutlet;
 
-        $totOmzet += $omzet;
+        $totOmzet += $nominal_omzet;
         $totPotongan10 += $potongan10;
         $totHakInvestor += $hakInvestor;
         $totHakOutlet += $hakOutlet;
