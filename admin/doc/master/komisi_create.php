@@ -9,7 +9,13 @@ $isEdit   = ($idKomisi > 0);
 $komisiData = null;
 
 if ($isEdit) {
-    $res = $db->query("SELECT * FROM komisi_master WHERE id_komisi = {$idKomisi} LIMIT 1");
+    $res = $db->query("
+        SELECT km.*, u.nama_lengkap as nama_master 
+        FROM komisi_master km 
+        LEFT JOIN users u ON u.id_users = km.id_master 
+        WHERE km.id_komisi = {$idKomisi} 
+        LIMIT 1
+    ");
     if ($res && $res->num_rows > 0) {
         $komisiData = $res->fetch_assoc();
     } else {
@@ -112,11 +118,19 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                                 <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf" required>
                                 <small class="text-muted">Upload foto struk transfer / bukti bayar komisi ke Master Owner (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
                                 <?php if (!empty($komisiData['bukti_pembayaran'])) : ?>
+                                    <?php $fileExt = strtolower(pathinfo($komisiData['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
                                     <div class="mt-2">
                                         <span class="text-muted fs-13">Bukti saat ini: </span>
-                                        <a href="<?= SystemInfo::app('ADMIN_URL') ?>/<?= htmlspecialchars($komisiData['bukti_pembayaran']) ?>" target="_blank" class="btn btn-xs btn-outline-primary ms-1">
-                                            <i class="fas fa-external-link-alt me-1"></i> Lihat Bukti Existing
-                                        </a>
+                                        <?php if ($fileExt === 'pdf') : ?>
+                                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/image-proxy.php?file=<?= urlencode($komisiData['bukti_pembayaran']) ?>" target="_blank" class="btn btn-xs btn-outline-primary ms-1">
+                                                <i class="fas fa-file-pdf me-1"></i> Lihat PDF
+                                            </a>
+                                        <?php else : ?>
+                                            <button type="button" class="btn btn-xs btn-outline-primary ms-1" 
+                                                    onclick="previewBuktiKomisi('<?= htmlspecialchars($komisiData['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($komisiData['nama_master'] ?? 'Unknown', ENT_QUOTES) ?>', '<?= htmlspecialchars($komisiData['catatan'] ?? '-', ENT_QUOTES) ?>', 'Rp <?= number_format($komisiData['nominal_transfer_komisi'] ?? 0, 0, ',', '.') ?>')">
+                                                <i class="fas fa-image me-1"></i> Lihat Bukti Existing
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -159,6 +173,46 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 </style>
 
 <script type="text/javascript">
+function previewBuktiKomisi(filePath, namaMaster, catatan, nominal) {
+    if (!filePath) {
+        Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
+        return;
+    }
+    var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+    var proxyUrl = adminUrl + '/image-proxy.php?file=' + encodeURIComponent(filePath);
+
+    var infoHtml = '<div class="text-start bg-light p-3 rounded mb-3" style="font-size:13.5px; border:1px solid #e9ecef;">'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-user-circle text-primary me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Master Owner:</span>'
+        + '  <span class="text-dark fw-semibold">' + (namaMaster || '-') + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-calendar-check-o text-success me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Catatan:</span>'
+        + '  <span class="text-dark">' + (catatan || '-') + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center">'
+        + '  <i class="fa fa-money text-warning me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nominal Komisi:</span>'
+        + '  <span class="text-success fw-bold">' + nominal + '</span>'
+        + '</div>'
+        + '</div>';
+
+    Swal.fire({
+        title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Komisi Master',
+        html: infoHtml
+            + '<img src="' + proxyUrl + '" '
+            + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
+        showCloseButton: true,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+        heightAuto: false,
+        width: 640
+    });
+}
+
 function stepKomisi(amount) {
     let input = $('#nominal');
     let val = parseFloat(input.val()) || 0;
