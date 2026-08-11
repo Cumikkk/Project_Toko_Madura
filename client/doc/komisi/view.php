@@ -18,7 +18,7 @@ $whereConds = ["id_master = {$masterId}"];
 
 if (!empty($search)) {
     $safeSearch = $db->real_escape_string($search);
-    $whereConds[] = "(periode LIKE '%{$safeSearch}%' OR catatan LIKE '%{$safeSearch}%' OR nominal LIKE '%{$safeSearch}%')";
+    $whereConds[] = "(catatan LIKE '%{$safeSearch}%' OR nominal_transfer_komisi LIKE '%{$safeSearch}%')";
 }
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
@@ -56,8 +56,8 @@ $offset = ($page - 1) * $limit;
 // Fetch Komisi Statistics (matching filter)
 $sqlStats = $db->query("
     SELECT 
-        IFNULL(SUM(nominal), 0) as total_komisi,
-        IFNULL(SUM(CASE WHEN MONTH(tgl_transfer) = MONTH(CURRENT_DATE()) AND YEAR(tgl_transfer) = YEAR(CURRENT_DATE()) THEN nominal ELSE 0 END), 0) as komisi_bulan_ini
+        IFNULL(SUM(nominal_transfer_komisi), 0) as total_komisi,
+        IFNULL(SUM(CASE WHEN MONTH(tgl_transfer) = MONTH(CURRENT_DATE()) AND YEAR(tgl_transfer) = YEAR(CURRENT_DATE()) THEN nominal_transfer_komisi ELSE 0 END), 0) as komisi_bulan_ini
     FROM komisi_master 
     {$whereSql}
 ");
@@ -225,11 +225,11 @@ $bulanIndo = [
                                                 </span>
                                             </td>
                                             <td>
-                                                <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($km['periode']) ?></div>
+                                                <div class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($km['catatan'] ?: '-') ?></div>
                                             </td>
                                             <td class="text-center">
                                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-bold fs-12">
-                                                    + Rp <?= number_format($km['nominal'], 0, ',', '.') ?>
+                                                    + Rp <?= number_format($km['nominal_transfer_komisi'], 0, ',', '.') ?>
                                                 </span>
                                             </td>
                                             <td class="text-center">
@@ -246,8 +246,8 @@ $bulanIndo = [
                                                         <button type="button" class="btn btn-outline-info btn-xs btn-client-view-bukti-komisi rounded-pill px-2.5 py-1 shadow-xs fw-bold" style="font-size: 11px;"
                                                                 data-img="<?= $proxyUrl ?>" 
                                                                 data-master="<?= htmlspecialchars($user['MBR_NAME'] ?? 'Master Owner') ?>"
-                                                                data-periode="<?= htmlspecialchars($km['periode']) ?>" 
-                                                                data-nominal="Rp <?= number_format($km['nominal'], 0, ',', '.') ?>">
+                                                                data-periode="<?= htmlspecialchars($km['catatan'] ?: '-') ?>" 
+                                                                data-nominal="Rp <?= number_format($km['nominal_transfer_komisi'], 0, ',', '.') ?>">
                                                             <i class="fa-solid fa-image me-1"></i> Lihat Bukti
                                                         </button>
                                                     <?php endif; ?>
@@ -256,7 +256,7 @@ $bulanIndo = [
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-start pe-3 small text-body-secondary">
-                                                <?= htmlspecialchars($km['catatan'] ?: '-') ?>
+                                                <?= date('d/m/Y H:i', strtotime($km['tgl_transfer'])) ?> WIB
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

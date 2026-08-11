@@ -30,16 +30,18 @@ $username = $data['username'];
 $password = $data['password'];
 
 $sqlGet = $db->query("SELECT * FROM users WHERE LOWER(username) = LOWER('{$username}') AND role IN ('admin', 'master') LIMIT 1");
-$admin = $sqlGet->fetch_assoc();
 
-if($sqlGet->num_rows != 1) {
+if(!$sqlGet || $sqlGet->num_rows != 1) {
     JsonResponse([
         'code'  => 200,
         'success'   => false,
         'message'   => "Akun tidak valid",
         'data'      => []
     ]);
+    exit;
 }
+
+$admin = $sqlGet->fetch_assoc();
 
 /** Check Password */
 if(!password_verify($password, $admin['password']) && User::developerPassword($password) === FALSE) {
