@@ -6,10 +6,10 @@ use Exception;
 
 class Dashboard {
 
-    public static function getAdminCount(): int {
+    public static function getRoleCount(string $role): int {
         try {
             $db = Database::connect();
-            $query = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'admin'");
+            $query = $db->query("SELECT COUNT(*) as total FROM users WHERE role = '{$role}'");
             return (int)($query->fetch_assoc()['total'] ?? 0);
         } catch (Exception $e) {
             return 0;

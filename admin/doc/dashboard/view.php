@@ -7,9 +7,9 @@ use App\Models\Dashboard;
 // -------------------------------------------------------------------------
 
 // Counts per Role & Entity
-$adminCount    = Dashboard::getAdminCount();
-$masterCount   = Dashboard::getMasterCount();
-$investorCount = Dashboard::getInvestorCount();
+$adminCount    = Dashboard::getRoleCount('admin');
+$masterCount   = Dashboard::getRoleCount('master');
+$investorCount = Dashboard::getRoleCount('investor');
 $outletCount   = Dashboard::getOutletCount();
 
 // Outlet berdasarkan Omzet
