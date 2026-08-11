@@ -78,7 +78,7 @@ if ($isEdit) {
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="alamat" class="form-label fw-bold">Alamat Lengkap Master <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat'] ?? ''); ?>" required>
+                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat_lengkap'] ?? ''); ?>" required>
                             </div>
                         </div>
 

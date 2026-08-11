@@ -107,7 +107,6 @@ $recentRequests = $db->query("
             <div class="card-header">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="card-title">Outlet dengan Omzet Tertinggi</h5>
-                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard" class="btn btn-primary btn-sm"><i class="fas fa-list me-1"></i> Lihat Semua</a>
                 </div>
             </div>
             <div class="card-body d-flex flex-column flex-grow-1">

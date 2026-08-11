@@ -75,22 +75,15 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                             </div>
                         </div>
 
-                        <!-- BARIS 2: PERIODE / KETERANGAN & NOMINAL KOMISI -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="periode" class="form-label fw-bold">Periode / Keterangan <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="periode" name="periode" placeholder="Contoh: Bonus Komisi Rekrutmen Investor Ags 2026" 
-                                       value="<?= htmlspecialchars($komisiData['periode'] ?? ''); ?>" required>
-                            </div>
-                        </div>
+                        <!-- BARIS 2: NOMINAL KOMISI -->
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="nominal" class="form-label fw-bold">Nominal Komisi (Rp) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text border-end-0">Rp</span>
                                     <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="nominal" name="nominal" placeholder="500000" 
-                                           value="<?= (int)($komisiData['nominal'] ?? 500000); ?>" required>
+                                           value="<?= (int)($komisiData['nominal_transfer_komisi'] ?? 500000); ?>" required>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
                                             <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepKomisi(50000)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+Rp 50.000)">
