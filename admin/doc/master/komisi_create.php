@@ -82,7 +82,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                                 <label for="nominal" class="form-label fw-bold">Nominal Komisi (Rp) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text border-end-0">Rp</span>
-                                    <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="nominal" name="nominal" placeholder="500000" 
+                                    <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="nominal" name="nominal_transfer_komisi" placeholder="500000" 
                                            value="<?= (int)($komisiData['nominal_transfer_komisi'] ?? 500000); ?>" required>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -101,8 +101,8 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                         <!-- BARIS 3: CATATAN & BUKTI TRANSFER -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="catatan" class="form-label fw-bold">Catatan / Pesan untuk Master (Opsional)</label>
-                                <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Contoh: Komisi atas apresiasi keberhasilan memperkenalkan investor baru."><?= htmlspecialchars($komisiData['catatan'] ?? ''); ?></textarea>
+                                <label for="catatan" class="form-label fw-bold">Catatan / Pesan untuk Master <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Contoh: Komisi atas apresiasi keberhasilan memperkenalkan investor baru." required><?= htmlspecialchars($komisiData['catatan'] ?? ''); ?></textarea>
                             </div>
                         </div>
 

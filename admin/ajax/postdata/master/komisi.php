@@ -47,7 +47,10 @@ if (empty($tanggal)) {
     $tanggal = date('Y-m-d H:i:s', strtotime($tanggal));
 }
 
-
+if (empty($catatan)) {
+    echo json_encode(['success' => false, 'message' => 'Harap isi catatan komisi!']);
+    exit;
+}
 if ($nominal <= 0) {
     echo json_encode(['success' => false, 'message' => 'Nominal komisi harus lebih besar dari Rp 0!']);
     exit;
