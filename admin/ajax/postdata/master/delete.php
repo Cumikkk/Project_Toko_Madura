@@ -48,7 +48,6 @@ try {
                 }
             }
 
-            $db->query("DELETE FROM rekap_bagi_hasil WHERE id_investor = {$invId}");
             $db->query("DELETE FROM investor WHERE id_investor = {$invId}");
             if ($invUserId > 0) {
                 $db->query("DELETE FROM users WHERE id_users = {$invUserId}");

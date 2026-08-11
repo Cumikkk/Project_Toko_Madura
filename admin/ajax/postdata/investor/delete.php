@@ -54,9 +54,6 @@ try {
         }
     }
 
-    // 2. Hapus rekap bagi hasil investor ini
-    $db->query("DELETE FROM rekap_bagi_hasil WHERE id_investor = {$idInvestor}");
-
     // 3. Hapus data investor
     $db->query("DELETE FROM investor WHERE id_investor = {$idInvestor}");
 
