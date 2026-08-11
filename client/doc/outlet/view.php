@@ -779,7 +779,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: TAMBAH OUTLET (WIZARD 2 SESI - PIXEL PERFECT GRID) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahOutlet" tabindex="-1" aria-labelledby="modalTambahOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 540px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             
             <!-- Modal Header -->
@@ -805,15 +805,15 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     <!-- Step 2 Badge -->
                     <div id="stepTab2" class="d-flex align-items-center gap-2 fw-semibold text-body-tertiary opacity-75">
                         <span id="badgeStep2" class="badge rounded-circle bg-body-secondary text-body-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">2</span>
-                        <span style="font-size: 12px;">Akun Kasir &amp; Pembayaran</span>
+                        <span style="font-size: 12px;">Akun Outlet &amp; Pembayaran</span>
                     </div>
                 </div>
             </div>
 
-            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data">
+            <form id="formTambahOutlet" method="POST" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden flex-grow-1">
                 <input type="hidden" name="action" value="add">
                 
-                <div class="modal-body p-4">
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: 52vh;">
                     
                     <!-- ========================================== -->
                     <!-- SESI 1: INFORMASI IDENTITAS & ALAMAT TOKO -->
@@ -909,24 +909,24 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- SESI 2: AKUN KASIR & INFORMASI PEMBAYARAN -->
+                    <!-- SESI 2: AKUN OUTLET & INFORMASI PEMBAYARAN -->
                     <!-- ========================================== -->
                     <div id="stepSection2" class="d-none">
                         <div class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
-                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Kasir &amp; Upload Bukti Transfer
+                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Outlet &amp; Upload Bukti Transfer
                         </div>
 
                         <div class="row g-3">
-                            <!-- Username & Password Kasir (Strict 50%-50%) -->
+                            <!-- Username & Password Outlet (Strict 50%-50%) -->
                             <div class="col-6">
-                                <label class="form-label required">Username Login Kasir</label>
+                                <label class="form-label required">Username Login Outlet</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
                                     <input type="text" name="username" id="wizard_username" class="form-control rounded-end-3 border-start-0 ps-1" placeholder="outlet_sidoarjo" required>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label class="form-label required">Password Login Kasir</label>
+                                <label class="form-label required">Password Login Outlet</label>
                                 <input type="password" name="password" id="wizard_password" class="form-control rounded-3" placeholder="Password akun" required>
                             </div>
 
@@ -995,7 +995,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: EDIT OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditOutlet" tabindex="-1" aria-labelledby="modalEditOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 440px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 440px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 12px;">
             <div class="modal-header border-0 pb-0 pt-2 px-2.5">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 13px;">
@@ -1006,7 +1006,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
             <form id="formEditOutlet" method="POST">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id_outlet" id="edit_id_outlet" value="">
-                <div class="modal-body p-2.5" style="max-height: 80vh; overflow-y: auto;">
+                <div class="modal-body p-2.5" style="max-height: 52vh; overflow-y: auto;">
                     <!-- Sesi 1: Informasi Outlet -->
                     <div class="fw-bold text-danger text-uppercase mb-1" style="font-size: 8px; letter-spacing: 0.5px;">
                         <i class="fa-solid fa-store me-1"></i> Informasi Outlet Toko
@@ -1027,6 +1027,10 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
 
 <style>
+.modal-dialog {
+    margin-top: 85px !important;
+    margin-bottom: 40px !important;
+}
 .custom-toggle-switch {
     position: relative;
     display: inline-block;
@@ -1134,7 +1138,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         </div>
                     </div>
 
-                    <!-- Sesi 2.5: Rentang Tanggal Penyesuaian Skema (Opsional) -->
+                    <!-- Sesi 2.5: Tanggal Mulai Penyesuaian Skema (Opsional) -->
                     <div class="p-2.5 mb-2 rounded-3 bg-body-tertiary border border-body-subtle">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <label class="custom-toggle-switch flex-shrink-0 mb-0 me-1">
@@ -1142,30 +1146,23 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                 <span class="custom-toggle-slider"></span>
                             </label>
                             <label class="form-check-label fw-bold text-body-emphasis mb-0 cursor-pointer" for="chk_apply_date_range" style="font-size: 10px; line-height: 1.3;">
-                                <i class="fa-solid fa-calendar-range me-1 text-danger"></i> Terapkan Skema pada Rentang Tanggal Spesifik
+                                <i class="fa-solid fa-calendar-day me-1 text-danger"></i> Terapkan Skema Mulai Tanggal Spesifik
                                 <span id="lbl_date_range_status" class="badge bg-danger text-white ms-1.5 d-none" style="font-size: 8px; padding: 2px 5px; border-radius: 4px;">Aktif</span>
                             </label>
                         </div>
                         
                         <div id="container_edit_date_range" class="row g-2 mt-2 pt-2 border-top border-body-subtle d-none">
-                            <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Mulai</label>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Mulai Berlaku Skema <span class="text-danger">*</span></label>
                                 <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
                                     <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
                                     <input type="date" name="tgl_mulai_skema" id="edit_tgl_mulai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold text-body-secondary mb-1 d-block" style="font-size: 9.5px; margin-bottom: 4px;">Tanggal Selesai</label>
-                                <div class="input-group input-group-sm date-picker-wrapper cursor-pointer" style="height: 28px;">
-                                    <span class="input-group-text bg-body border-body-subtle text-danger py-0 px-2" style="height: 28px;"><i class="fa-solid fa-calendar-days" style="font-size: 10px;"></i></span>
-                                    <input type="date" name="tgl_selesai_skema" id="edit_tgl_selesai_skema" class="form-control form-control-sm bg-body fw-bold py-0 px-1.5 text-body-emphasis" style="font-size: 10.5px; height: 28px;" onclick="if(this.showPicker){this.showPicker();}">
-                                </div>
-                            </div>
-                            <div class="col-12 mt-2">
+                            <div class="col-12 mt-1.5">
                                 <div class="form-text text-body-secondary mb-0 lh-sm" style="font-size: 9px;">
                                     <i class="fa-solid fa-circle-info me-1 text-primary"></i>
-                                    Skema potongan dan bagi hasil di atas akan diterapkan khusus untuk laporan omzet harian pada rentang tanggal yang ditentukan.
+                                    Skema potongan dan bagi hasil di atas akan diterapkan untuk transaksi laporan omzet harian mulai tanggal yang ditentukan ke depan.
                                 </div>
                             </div>
                         </div>
@@ -1212,7 +1209,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: DETAIL OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-labelledby="modalDetailOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 500px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
             <div class="modal-header border-0 pb-0 pt-4 px-4">
                 <h5 class="modal-title fw-bold text-body-emphasis" id="modalDetailOutletLabel">
@@ -1220,7 +1217,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-4" style="max-height: 55vh; overflow-y: auto;">
                 <div id="detailOutletLoading" class="text-center py-4">
                     <div class="spinner-border text-danger" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -1269,7 +1266,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: PERPANJANG LANGGANAN OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalPerpanjangOutlet" tabindex="-1" aria-labelledby="modalPerpanjangOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 420px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
@@ -1334,12 +1331,262 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 </div>
 
 <!-- ========================================================================= -->
+<!-- MODAL: AJUKAN ULANG PENDAFTARAN OUTLET (2-SESI WIZARD PRE-FILLED) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalAjukanUlangPendaftaran" tabindex="-1" aria-labelledby="modalAjukanUlangPendaftaranLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px; margin-top: 85px !important; margin-bottom: 40px !important;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalAjukanUlangPendaftaranLabel">
+                        <i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;" id="resubmitModalSubtitleWizard">Sesi 1 dari 2: Identitas &amp; Alamat Toko</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Step Progress Indicator Bar -->
+            <div class="px-4 py-2.5 bg-body-tertiary border-bottom border-body-subtle">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                    <!-- Step 1 Badge -->
+                    <div id="resubmitStepTab1" class="d-flex align-items-center gap-2 fw-bold text-danger">
+                        <span id="resubmitBadgeStep1" class="badge rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">1</span>
+                        <span style="font-size: 12px;">Profil &amp; Alamat Toko</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-body-tertiary" style="font-size: 10px;"></i>
+                    <!-- Step 2 Badge -->
+                    <div id="resubmitStepTab2" class="d-flex align-items-center gap-2 fw-semibold text-body-tertiary opacity-75">
+                        <span id="resubmitBadgeStep2" class="badge rounded-circle bg-body-secondary text-body-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">2</span>
+                        <span style="font-size: 12px;">Akun Outlet &amp; Pembayaran</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="formAjukanUlangPendaftaran" method="POST" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden flex-grow-1">
+                <input type="hidden" name="action" value="ajukan_ulang_pendaftaran">
+                <input type="hidden" name="id_outlet" id="resubmit_id_outlet" value="">
+                
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: 52vh;">
+
+                    <!-- Alasan Penolakan Admin (Tampil di kedua Sesi) -->
+                    <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 p-3 mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-1 text-danger" style="font-size: 12px;">
+                            <i class="fa-solid fa-circle-xmark fs-6"></i>
+                            <strong class="fw-bold">Alasan Penolakan Admin:</strong>
+                        </div>
+                        <div class="p-2 bg-white text-dark rounded-3 border border-danger-subtle fw-semibold mt-1" id="resubmit_alasan_text" style="font-size: 11.5px; line-height: 1.5; word-break: break-word;">
+                            -
+                        </div>
+                        <div class="text-body-secondary small mt-2" style="font-size: 10.5px;">
+                            <i class="fa-solid fa-circle-info me-1 text-primary"></i>Silakan perbaiki data jika diperlukan (misal koreksi alamat atau upload bukti transfer baru), lalu kirim pengajuan ulang.
+                        </div>
+                    </div>
+                    
+                    <!-- ========================================== -->
+                    <!-- SESI 1: INFORMASI IDENTITAS & ALAMAT TOKO -->
+                    <!-- ========================================== -->
+                    <div id="resubmitStepSection1">
+                        <div class="badge bg-danger-subtle text-danger fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
+                            <i class="fa-solid fa-store me-1"></i> Sesi 1: Identitas Toko &amp; Alamat
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Nama Outlet Toko -->
+                            <div class="col-12">
+                                <label class="form-label required">Nama Outlet Toko</label>
+                                <input type="text" name="nama_outlet" id="resubmit_nama_outlet" class="form-control rounded-3" placeholder="Contoh: Toko Madura Sidoarjo" required>
+                            </div>
+
+                            <!-- Nama Pengelola & No WhatsApp -->
+                            <div class="col-6">
+                                <label class="form-label required">Pengelola / Kasir</label>
+                                <input type="text" name="nama_pengelola" id="resubmit_nama_pengelola" class="form-control rounded-3" placeholder="Budi Santoso" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label required">No. WhatsApp</label>
+                                <input type="text" name="no_hp" id="resubmit_no_hp" class="form-control rounded-3" placeholder="081234567890" required>
+                            </div>
+
+                            <!-- Kecamatan & Alamat Lengkap Toko -->
+                            <div class="col-6">
+                                <label class="form-label required">Kecamatan</label>
+                                <input type="text" name="kecamatan" id="resubmit_kecamatan" class="form-control rounded-3" placeholder="Taman" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label required">Alamat Lengkap Toko</label>
+                                <input type="text" name="alamat_outlet" id="resubmit_alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12" required>
+                            </div>
+
+                            <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar dengan Spinner) -->
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Potongan Omzet (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control rounded-start-3 fw-bold" placeholder="10.00" value="10.00" required>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Potongan harian dari omzet.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil investor.</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label required" style="font-size: 11px;">Hak Outlet (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('outlet')">
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
+                                        <div class="d-flex flex-column h-100" style="width: 22px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(-1)" style="font-size: 8px; line-height: 1; padding: 2px;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 9.5px;">Porsi bagi hasil outlet.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- SESI 2: AKUN OUTLET & INFORMASI PEMBAYARAN -->
+                    <!-- ========================================== -->
+                    <div id="resubmitStepSection2" class="d-none">
+                        <div class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1 mb-3 text-uppercase" style="font-size: 10px;">
+                            <i class="fa-solid fa-key me-1"></i> Sesi 2: Akun Outlet &amp; Upload Bukti Transfer
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Username & Password Outlet -->
+                            <div class="col-6">
+                                <label class="form-label required">Username Login Outlet</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary border-end-0 text-body-secondary px-2">@</span>
+                                    <input type="text" name="username" id="resubmit_username" class="form-control rounded-end-3 border-start-0 ps-1" placeholder="outlet_sidoarjo" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Password (Opsional)</label>
+                                <input type="password" name="password" id="resubmit_password" class="form-control rounded-3" placeholder="Kosongkan jika tetap">
+                            </div>
+
+                            <!-- Payment Info Box -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-danger-subtle text-danger-emphasis p-3 rounded-3 shadow-xs">
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <span class="fw-bold" style="font-size: 12px;"><i class="fa-solid fa-receipt me-1"></i> Biaya Lisensi Toko</span>
+                                        <span class="badge bg-danger text-white rounded-pill px-2.5 py-1" style="font-size: 12px;">Rp <?= number_format($biayaLangganan, 0, ',', '.'); ?></span>
+                                    </div>
+                                    <p class="text-body-secondary mb-0 lh-sm" style="font-size: 11px;">
+                                        Transfer ke <strong>Bank <?= htmlspecialchars($bankNama); ?>: <?= htmlspecialchars($bankNoRek); ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama); ?></strong>.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Upload Bukti Pembayaran -->
+                            <div class="col-12">
+                                <label class="form-label">Upload Bukti Transfer Pembayaran <span class="text-body-secondary fw-normal">(Opsional jika tidak diganti)</span></label>
+                                <div class="input-group">
+                                    <input type="file" name="bukti_pembayaran" id="resubmit_bukti_pembayaran" class="form-control rounded-3" accept="image/*,.pdf">
+                                    <div id="resubmit_old_bukti_info" class="d-flex align-items-stretch"></div>
+                                </div>
+                                <div class="form-text text-body-secondary mt-1" style="font-size: 11px;">Format: JPG, PNG, WEBP, atau PDF (Max 5MB).</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer Navigation Controls -->
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between align-items-center">
+                    <!-- Step 1 Footer Buttons -->
+                    <div id="resubmitFooterStep1" class="d-flex align-items-center justify-content-between w-100">
+                        <button type="button" class="btn btn-light rounded-pill px-3.5 py-2" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="goToResubmitWizardStep(2)">
+                            Lanjut Ke Sesi 2 <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2 Footer Buttons -->
+                    <div id="resubmitFooterStep2" class="d-flex align-items-center justify-content-between w-100 d-none">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-3.5 py-2 fw-semibold" onclick="goToResubmitWizardStep(1)">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Kembali
+                        </button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: PREVIEW BUKTI TRANSFER PEMBAYARAN -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalPreviewBuktiPembayaran" tabindex="-1" aria-labelledby="modalPreviewBuktiPembayaranLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 680px; margin-top: 80px !important; margin-bottom: 40px !important;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalPreviewBuktiPembayaranLabel">
+                    <i class="fa-solid fa-file-image me-2 text-danger"></i>Pratinjau Bukti Transfer Pembayaran
+                </h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 text-center bg-dark-subtle d-flex align-items-center justify-content-center" style="min-height: 350px; max-height: 70vh; overflow-y: auto;">
+                <img id="previewBuktiImg" src="" class="img-fluid rounded-3 shadow-sm border" style="max-height: 65vh; object-fit: contain;" alt="Bukti Transfer">
+                <iframe id="previewBuktiPdf" src="" class="w-100 rounded-3 border d-none" style="height: 65vh;" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer border-top border-body-subtle py-2.5 px-4 d-flex justify-content-between">
+                <a id="previewBuktiDownload" href="" download target="_blank" class="btn btn-outline-secondary rounded-pill px-3.5 py-1.5 fw-semibold" style="font-size: 12px;">
+                    <i class="fa-solid fa-download me-1"></i> Unduh File
+                </a>
+                <button type="button" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold" data-bs-dismiss="modal" style="font-size: 12px;">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px; margin-top: 85px !important; margin-bottom: 40px !important;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>
@@ -1400,6 +1647,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <script>
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
+    const CLIENT_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>';
 
     // Reset Tanggal Filter Event
     $('#btnResetTanggalFilterOutlet').on('click', function() {
@@ -1619,7 +1867,7 @@ $(document).ready(function() {
             $('#footerStep2').removeClass('d-none');
 
             // Update Indicator
-            $('#modalSubtitleWizard').text('Sesi 2 dari 2: Akun Kasir & Pembayaran Lisensi');
+            $('#modalSubtitleWizard').text('Sesi 2 dari 2: Akun Outlet & Pembayaran Lisensi');
             $('#stepTab1').removeClass('text-danger').addClass('text-success');
             $('#badgeStep1').removeClass('bg-danger').addClass('bg-success').html('<i class="fa-solid fa-check"></i>');
             
@@ -1661,7 +1909,7 @@ $(document).ready(function() {
             Swal.fire({
                 icon: 'warning',
                 title: 'Form Belum Lengkap',
-                text: 'Harap isi Username Login Kasir terlebih dahulu.',
+                text: 'Harap isi Username Login Outlet terlebih dahulu.',
                 confirmButtonColor: '#7D0A0A'
             }).then(() => $('#wizard_username').focus());
             return;
@@ -1670,7 +1918,7 @@ $(document).ready(function() {
             Swal.fire({
                 icon: 'warning',
                 title: 'Form Belum Lengkap',
-                text: 'Harap isi Password Login Kasir terlebih dahulu.',
+                text: 'Harap isi Password Login Outlet terlebih dahulu.',
                 confirmButtonColor: '#7D0A0A'
             }).then(() => $('#wizard_password').focus());
             return;
@@ -1731,7 +1979,6 @@ $(document).ready(function() {
             $('#container_edit_date_range').addClass('d-none');
             $('#lbl_date_range_status').addClass('d-none');
             $('#edit_tgl_mulai_skema').val('');
-            $('#edit_tgl_selesai_skema').val('');
         }
     });
 
@@ -1744,7 +1991,6 @@ $(document).ready(function() {
         $('#container_edit_date_range').addClass('d-none');
         $('#lbl_date_range_status').addClass('d-none');
         $('#edit_tgl_mulai_skema').val('');
-        $('#edit_tgl_selesai_skema').val('');
         
         $.ajax({
             url: ACTION_URL,
@@ -2012,21 +2258,192 @@ $(document).ready(function() {
         }, 400);
     });
 
+    // Stepper helpers for Resubmit Modal
+    window.stepResubmitPotongan = function(dir) {
+        let el = $('#resubmit_persentase_potongan');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+    };
+
+    window.stepResubmitInvestor = function(dir) {
+        let el = $('#resubmit_persen_bagian_investor');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceResubmitSplit('investor');
+    };
+
+    window.stepResubmitOutlet = function(dir) {
+        let el = $('#resubmit_persen_bagian_outlet');
+        let val = parseFloat(el.val()) || 0;
+        val = Math.max(0, Math.min(100, val + dir));
+        el.val(val.toFixed(2));
+        window.balanceResubmitSplit('outlet');
+    };
+
+    // Wizard Navigation for Modal Ajukan Ulang Pendaftaran (2 Sesi)
+    window.goToResubmitWizardStep = function(step) {
+        if (step === 2) {
+            const nama = $('#resubmit_nama_outlet').val().trim();
+            const pengelola = $('#resubmit_nama_pengelola').val().trim();
+            const noHp = $('#resubmit_no_hp').val().trim();
+            const kec = $('#resubmit_kecamatan').val().trim();
+            const alamat = $('#resubmit_alamat_outlet').val().trim();
+
+            if (!nama || !pengelola || !noHp || !kec || !alamat) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Harap lengkapi semua data Identitas & Alamat Toko terlebih dahulu.',
+                    confirmButtonColor: '#7D0A0A'
+                });
+                return;
+            }
+
+            $('#resubmitStepSection1').addClass('d-none');
+            $('#resubmitStepSection2').removeClass('d-none');
+            $('#resubmitFooterStep1').addClass('d-none');
+            $('#resubmitFooterStep2').removeClass('d-none');
+
+            $('#resubmitModalSubtitleWizard').text('Sesi 2 dari 2: Akun Outlet & Pembayaran Lisensi');
+            $('#resubmitStepTab1').removeClass('text-danger').addClass('text-success');
+            $('#resubmitBadgeStep1').removeClass('bg-danger').addClass('bg-success').html('<i class="fa-solid fa-check"></i>');
+            $('#resubmitStepTab2').removeClass('text-body-tertiary opacity-75').addClass('text-danger fw-bold');
+            $('#resubmitBadgeStep2').removeClass('bg-body-secondary text-body-secondary').addClass('bg-danger text-white shadow-xs');
+        } else {
+            $('#resubmitStepSection2').addClass('d-none');
+            $('#resubmitStepSection1').removeClass('d-none');
+            $('#resubmitFooterStep2').addClass('d-none');
+            $('#resubmitFooterStep1').removeClass('d-none');
+
+            $('#resubmitModalSubtitleWizard').text('Sesi 1 dari 2: Identitas & Alamat Toko');
+            $('#resubmitStepTab1').removeClass('text-success').addClass('text-danger');
+            $('#resubmitBadgeStep1').removeClass('bg-success').addClass('bg-danger').text('1');
+            $('#resubmitStepTab2').removeClass('text-danger fw-bold').addClass('text-body-tertiary opacity-75');
+            $('#resubmitBadgeStep2').removeClass('bg-danger text-white shadow-xs').addClass('bg-body-secondary text-body-secondary').text('2');
+        }
+    };
+
+    // Helper function to open Ajukan Ulang modal (Pre-Filled, NO FLICKER)
+    function openAjukanUlangModal(idOutlet, alasanFallback) {
+        $.ajax({
+            url: ACTION_URL,
+            type: 'GET',
+            data: { action: 'get_detail', id_outlet: idOutlet },
+            dataType: 'json',
+            success: function(res) {
+                if (res.success && res.data) {
+                    const data = res.data;
+                    const tipeReq = data.tipe_request || 'baru';
+
+                    if (tipeReq === 'perpanjangan') {
+                        // Resubmit perpanjangan langganan
+                        $('#renew_action').val('request_perpanjangan');
+                        $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Perpanjangan Langganan');
+                        $('#renew_id_outlet').val(data.id_outlet);
+                        $('#renew_nama_outlet').text(data.nama_outlet);
+                        $('#renew_alasan_text').text(data.alasan_penolakan || alasanFallback || 'Tidak ada catatan alasan dari admin.');
+                        $('#renew_alasan_container').removeClass('d-none');
+                        $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
+                        $('#modalPerpanjangOutlet').modal('show');
+                    } else {
+                        // Resubmit pendaftaran baru (2-SESI WIZARD PRE-FILLED)
+                        goToResubmitWizardStep(1);
+
+                        $('#resubmit_id_outlet').val(data.id_outlet);
+                        $('#resubmit_alasan_text').text(data.alasan_penolakan || alasanFallback || 'Tidak ada catatan alasan dari admin.');
+                        $('#resubmit_nama_outlet').val(data.nama_outlet);
+                        $('#resubmit_kecamatan').val(data.kecamatan);
+                        $('#resubmit_nama_pengelola').val(data.nama_lengkap);
+                        $('#resubmit_no_hp').val(data.no_hp);
+                        $('#resubmit_alamat_outlet').val(data.alamat_outlet);
+                        
+                        const potVal = parseFloat(data.persentase_potongan || 10.00);
+                        const invVal = parseFloat(data.persen_bagian_investor || 50.00);
+                        const outVal = (100.00 - invVal).toFixed(2);
+                        $('#resubmit_persentase_potongan').val(potVal);
+                        $('#resubmit_persen_bagian_investor').val(invVal);
+                        $('#resubmit_persen_bagian_outlet').val(outVal);
+
+                        $('#resubmit_username').val(data.username);
+                        $('#resubmit_password').val('');
+                        $('#resubmit_bukti_pembayaran').val('');
+
+                        let oldBuktiHtml = '';
+                        if (data.bukti_pembayaran) {
+                            let oldUrl = CLIENT_URL + '/' + data.bukti_pembayaran;
+                            oldBuktiHtml = `
+                                <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1.5 px-3 fw-bold rounded-end-3 btn-preview-bukti-lama" data-url="${oldUrl}" style="font-size: 11.5px; border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Lihat Bukti Transfer Lama">
+                                    <i class="fa-solid fa-eye"></i> Lihat Bukti Lama
+                                </button>`;
+                            $('#resubmit_bukti_pembayaran').removeClass('rounded-3').addClass('rounded-start-3');
+                        } else {
+                            $('#resubmit_bukti_pembayaran').removeClass('rounded-start-3').addClass('rounded-3');
+                        }
+                        $('#resubmit_old_bukti_info').html(oldBuktiHtml);
+
+                        $('#modalAjukanUlangPendaftaran').modal('show');
+                    }
+                } else {
+                    Swal.fire('Gagal', res.message || 'Gagal memuat data outlet.', 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'Gagal menghubungi server untuk mengambil data outlet.', 'error');
+            }
+        });
+    }
+
+    // 7. Preview Bukti Transfer Lama via Modal (Tanpa Tab Baru)
+    $(document).on('click', '.btn-preview-bukti-lama', function(e) {
+        e.preventDefault();
+        const fileUrl = $(this).data('url');
+        if (!fileUrl) return;
+
+        const ext = fileUrl.split('.').pop().toLowerCase();
+        $('#previewBuktiDownload').attr('href', fileUrl);
+
+        if (ext === 'pdf') {
+            $('#previewBuktiImg').addClass('d-none');
+            $('#previewBuktiPdf').removeClass('d-none').attr('src', fileUrl);
+        } else {
+            $('#previewBuktiPdf').addClass('d-none');
+            $('#previewBuktiImg').removeClass('d-none').attr('src', fileUrl);
+        }
+
+        $('#modalPreviewBuktiPembayaran').modal('show');
+    });
+
+    // Helper balance calculation for resubmit modal
+    window.balanceResubmitSplit = function(changedBy) {
+        const invInput = $('#resubmit_persen_bagian_investor');
+        const outInput = $('#resubmit_persen_bagian_outlet');
+        let invVal = parseFloat(invInput.val()) || 0;
+        let outVal = parseFloat(outInput.val()) || 0;
+
+        if (changedBy === 'investor') {
+            if (invVal > 100) invVal = 100;
+            if (invVal < 0) invVal = 0;
+            outVal = (100 - invVal).toFixed(2);
+            invInput.val(invVal);
+            outInput.val(outVal);
+        } else {
+            if (outVal > 100) outVal = 100;
+            if (outVal < 0) outVal = 0;
+            invVal = (100 - outVal).toFixed(2);
+            outInput.val(outVal);
+            invInput.val(invVal);
+        }
+    };
+
     // Handle Click Trigger Ajukan Ulang Pembayaran dari Modal Detail
     $(document).on('click', '.btn-trigger-ajukan-ulang', function() {
         let id = $(this).data('id');
-        let nama = $(this).data('nama');
         let alasan = $(this).data('alasan');
         $('#modalDetailOutlet').modal('hide');
         setTimeout(function() {
-            $('#renew_action').val('ajukan_ulang');
-            $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet');
-            $('#renew_id_outlet').val(id);
-            $('#renew_nama_outlet').text(nama);
-            $('#renew_alasan_text').text(alasan || 'Tidak ada catatan alasan dari admin.');
-            $('#renew_alasan_container').removeClass('d-none');
-            $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
-            $('#modalPerpanjangOutlet').modal('show');
+            openAjukanUlangModal(id, alasan);
         }, 400);
     });
 
@@ -2076,20 +2493,58 @@ $(document).ready(function() {
         });
     });
 
+    // Handle Form Submit Ajukan Ulang Pendaftaran Outlet via AJAX
+    $('#formAjukanUlangPendaftaran').on('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        let submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim...');
+
+        $.ajax({
+            url: ACTION_URL,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(res) {
+                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
+                if (res.success) {
+                    $('#modalAjukanUlangPendaftaran').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengajuan Ulang Berhasil!',
+                        text: res.message,
+                        confirmButtonColor: '#7D0A0A'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: res.message,
+                        confirmButtonColor: '#7D0A0A'
+                    });
+                }
+            },
+            error: function() {
+                submitBtn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan sistem saat mengirim pengajuan ulang.',
+                    confirmButtonColor: '#7D0A0A'
+                });
+            }
+        });
+    });
+
     // 6. Cek Alasan Penolakan Outlet & Ajukan Ulang
     $(document).on('click', '.btn-cek-alasan', function() {
         const id = $(this).data('id');
-        const nama = $(this).data('nama');
         const alasan = $(this).data('alasan');
-
-        $('#renew_action').val('ajukan_ulang');
-        $('#modalPerpanjangOutletLabel').html('<i class="fa-solid fa-paper-plane me-2 text-danger"></i>Ajukan Ulang Pembayaran Outlet');
-        $('#renew_id_outlet').val(id);
-        $('#renew_nama_outlet').text(nama);
-        $('#renew_alasan_text').text(alasan || 'Tidak ada catatan alasan dari admin.');
-        $('#renew_alasan_container').removeClass('d-none');
-        $('#btnSubmitRenew').html('<i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Ulang');
-        $('#modalPerpanjangOutlet').modal('show');
+        openAjukanUlangModal(id, alasan);
     });
 
     // 7. Detail Pengajuan Pending Outlet (SweetAlert2)

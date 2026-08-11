@@ -209,6 +209,123 @@ try {
     }
 
     // =========================================================================
+    // ACTION: AJUKAN ULANG PENDAFTARAN OUTLET (FULL EDIT + OPTIONAL RE-UPLOAD PROOF)
+    // =========================================================================
+    if ($action === 'ajukan_ulang_pendaftaran') {
+        $idOutlet = (int)($_POST['id_outlet'] ?? 0);
+        $namaOutlet = trim($_POST['nama_outlet'] ?? '');
+        $alamatOutlet = trim($_POST['alamat_outlet'] ?? '');
+        $kecamatan = trim($_POST['kecamatan'] ?? '');
+        $persentasePotongan = (float)($_POST['persentase_potongan'] ?? 10.00);
+        $persenBagianInvestor = (float)($_POST['persen_bagian_investor'] ?? 50.00);
+        $namaPengelola = trim($_POST['nama_pengelola'] ?? '');
+        $noHp = trim($_POST['no_hp'] ?? '');
+        $username = trim($_POST['username'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+
+        if (empty($idOutlet) || empty($namaOutlet) || empty($kecamatan) || empty($alamatOutlet) || empty($namaPengelola) || empty($noHp) || empty($username)) {
+            JsonResponse(['success' => false, 'message' => 'Mohon lengkapi semua kolom wajib (Nama Outlet, Kecamatan, Alamat, Nama Pengelola, No HP, Username).']);
+        }
+
+        // Verify ownership
+        $resCheck = $db->query("SELECT id_outlet, id_users, nama_outlet, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
+        if (!$resCheck || $resCheck->num_rows === 0) {
+            JsonResponse(['success' => false, 'message' => 'Outlet tidak ditemukan atau Anda tidak memiliki akses.']);
+        }
+        $rowOutlet = $resCheck->fetch_assoc();
+        $associatedUserId = (int)$rowOutlet['id_users'];
+        $buktiPath = $rowOutlet['bukti_pembayaran']; // Default to existing proof
+
+        // Check if username used by another user
+        $safeUsername = $db->real_escape_string($username);
+        $chkUser = $db->query("SELECT id_users FROM users WHERE username = '{$safeUsername}' AND id_users != {$associatedUserId} LIMIT 1");
+        if ($chkUser && $chkUser->num_rows > 0) {
+            JsonResponse(['success' => false, 'message' => 'Username @' . htmlspecialchars($username) . ' sudah digunakan akun lain. Silakan gunakan username lain.']);
+        }
+
+        // Handle Optional New Bukti Pembayaran Upload
+        if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../uploads/bukti_pembayaran/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileExt = strtolower(pathinfo($_FILES['bukti_pembayaran']['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            if (!in_array($fileExt, $allowedExts)) {
+                JsonResponse(['success' => false, 'message' => 'Format file bukti bayar tidak didukung. Harap unggah JPG, PNG, atau PDF.']);
+            }
+
+            $newFileName = 'bukti_reapp_' . time() . '_' . rand(1000, 9999) . '.' . $fileExt;
+            $targetFilePath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
+                // Unlink old payment proof if exists
+                if (!empty($rowOutlet['bukti_pembayaran'])) {
+                    $oldPath = __DIR__ . '/../../' . $rowOutlet['bukti_pembayaran'];
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                }
+                $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
+            }
+        }
+
+        if (empty($buktiPath)) {
+            JsonResponse(['success' => false, 'message' => 'Harap unggah file Bukti Transfer Pembayaran.']);
+        }
+
+        $safeNamaOutlet = $db->real_escape_string($namaOutlet);
+        $safeAlamatOutlet = $db->real_escape_string($alamatOutlet);
+        $safeKecamatan = $db->real_escape_string($kecamatan);
+        $safeNamaPengelola = $db->real_escape_string($namaPengelola);
+        $safeNoHp = $db->real_escape_string($noHp);
+        $escapedBukti = $db->real_escape_string($buktiPath);
+
+        // Update outlet info and set status back to 'pending' for Admin review
+        $updateOutlet = $db->query("UPDATE outlet SET 
+            nama_outlet = '{$safeNamaOutlet}', 
+            persentase_potongan = {$persentasePotongan}, 
+            persen_bagian_investor = {$persenBagianInvestor},
+            status = 'pending',
+            tipe_request = 'baru',
+            bukti_pembayaran = '{$escapedBukti}',
+            alasan_penolakan = NULL,
+            tanggal_request = NOW()
+            WHERE id_outlet = {$idOutlet}");
+
+        if (!$updateOutlet) {
+            JsonResponse(['success' => false, 'message' => 'Gagal memperbarui data pengajuan: ' . $db->error]);
+        }
+
+        // Update User Account (kecamatan, alamat, nama_lengkap, no_hp, username, password)
+        if (!empty($password)) {
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $escapedHash = $db->real_escape_string($hashedPassword);
+            $db->query("UPDATE users SET 
+                kecamatan = '{$safeKecamatan}',
+                alamat = '{$safeAlamatOutlet}',
+                nama_lengkap = '{$safeNamaPengelola}', 
+                no_hp = '{$safeNoHp}', 
+                username = '{$safeUsername}', 
+                password = '{$escapedHash}' 
+                WHERE id_users = {$associatedUserId}");
+        } else {
+            $db->query("UPDATE users SET 
+                kecamatan = '{$safeKecamatan}',
+                alamat = '{$safeAlamatOutlet}',
+                nama_lengkap = '{$safeNamaPengelola}', 
+                no_hp = '{$safeNoHp}', 
+                username = '{$safeUsername}' 
+                WHERE id_users = {$associatedUserId}");
+        }
+
+        JsonResponse([
+            'success' => true,
+            'message' => 'Pengajuan ulang pendaftaran outlet "' . htmlspecialchars($namaOutlet) . '" berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
+        ]);
+    }
+
+    // =========================================================================
     // ACTION: GET DETAIL FOR VIEW / EDIT
     // =========================================================================
     if ($action === 'get_detail') {
@@ -274,35 +391,12 @@ try {
         // Check if custom date range scheme is requested
         $applyDateRange = isset($_POST['apply_date_range']) && (int)$_POST['apply_date_range'] === 1;
         $tglMulaiSkema = trim($_POST['tgl_mulai_skema'] ?? '');
-        $tglSelesaiSkema = trim($_POST['tgl_selesai_skema'] ?? '');
         $affectedRowsOmzet = 0;
 
-        if ($applyDateRange && !empty($tglMulaiSkema) && !empty($tglSelesaiSkema)) {
-            if ($tglMulaiSkema > $tglSelesaiSkema) {
-                JsonResponse(['success' => false, 'message' => 'Tanggal mulai skema tidak boleh lebih besar dari tanggal selesai.']);
-            }
+        if ($applyDateRange && !empty($tglMulaiSkema)) {
             $safeMulai = $db->real_escape_string($tglMulaiSkema);
-            $safeSelesai = $db->real_escape_string($tglSelesaiSkema);
 
-            // Update basic info on outlet table WITHOUT overwriting global default rates
-            $updateOutlet = $db->query("UPDATE outlet SET 
-                nama_outlet = '{$safeNamaOutlet}' 
-                WHERE id_outlet = {$idOutlet}");
-
-            if (!$updateOutlet) {
-                JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
-            }
-            
-            // Update existing laporan_omzet records within date range ONLY
-            $db->query("UPDATE laporan_omzet SET 
-                presentase_potongan = {$persentasePotongan},
-                persen_bagian_investor = {$persenBagianInvestor},
-                nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
-                WHERE id_outlet = {$idOutlet} AND periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'");
-                
-            $affectedRowsOmzet = $db->affected_rows;
-        } else {
-            // No date range specified: Update default rates on outlet table AND ALL records in laporan_omzet for this outlet
+            // Update default rates on outlet table for future daily inputs
             $updateOutlet = $db->query("UPDATE outlet SET 
                 nama_outlet = '{$safeNamaOutlet}', 
                 persentase_potongan = {$persentasePotongan}, 
@@ -312,15 +406,26 @@ try {
             if (!$updateOutlet) {
                 JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
             }
-
-            // Apply new percentage rates to ALL historical omzet records for this outlet
+            
+            // Update existing laporan_omzet records starting from Tanggal Mulai ONWARDS (>= safeMulai)
             $db->query("UPDATE laporan_omzet SET 
                 presentase_potongan = {$persentasePotongan},
                 persen_bagian_investor = {$persenBagianInvestor},
                 nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
+                WHERE id_outlet = {$idOutlet} AND periode_laporan >= '{$safeMulai}'");
+                
+            $affectedRowsOmzet = $db->affected_rows;
+        } else {
+            // No date range specified: Update active rates on outlet table for future daily inputs (preserves past historical records)
+            $updateOutlet = $db->query("UPDATE outlet SET 
+                nama_outlet = '{$safeNamaOutlet}', 
+                persentase_potongan = {$persentasePotongan}, 
+                persen_bagian_investor = {$persenBagianInvestor} 
                 WHERE id_outlet = {$idOutlet}");
 
-            $affectedRowsOmzet = $db->affected_rows;
+            if (!$updateOutlet) {
+                JsonResponse(['success' => false, 'message' => 'Gagal mengupdate data outlet: ' . $db->error]);
+            }
         }
 
         // Update User Account (kecamatan & alamat stored in users table)
@@ -345,15 +450,12 @@ try {
                 WHERE id_users = {$associatedUserId}");
         }
 
-        $successMsg = 'Data outlet berhasil diperbarui!';
-        if ($applyDateRange && $affectedRowsOmzet > 0) {
+        $persenOutletVal = 100.00 - $persenBagianInvestor;
+        if ($applyDateRange && !empty($tglMulaiSkema)) {
             $tglStartFmt = date('d/m/Y', strtotime($tglMulaiSkema));
-            $tglEndFmt = date('d/m/Y', strtotime($tglSelesaiSkema));
-            $persenOutletVal = 100.00 - $persenBagianInvestor;
-            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada {$affectedRowsOmzet} data omzet periode {$tglStartFmt} s/d {$tglEndFmt}.";
-        } elseif ($affectedRowsOmzet > 0) {
-            $persenOutletVal = 100.00 - $persenBagianInvestor;
-            $successMsg .= " Skema potongan {$persentasePotongan}% & bagi hasil (Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diterapkan pada seluruh ({$affectedRowsOmzet}) data omzet toko.";
+            $successMsg = "Data outlet & skema persentase baru (Potongan {$persentasePotongan}% | Bagi Hasil {$persenBagianInvestor}% : {$persenOutletVal}%) berhasil diterapkan mulai tanggal {$tglStartFmt} ke depan ({$affectedRowsOmzet} transaksi omzet diperbarui).";
+        } else {
+            $successMsg = "Data outlet & skema persentase baru (Potongan {$persentasePotongan}% | Bagi Hasil Investor {$persenBagianInvestor}% : Outlet {$persenOutletVal}%) berhasil diperbarui untuk penginputan omzet mendatang.";
         }
 
         JsonResponse(['success' => true, 'message' => $successMsg]);
