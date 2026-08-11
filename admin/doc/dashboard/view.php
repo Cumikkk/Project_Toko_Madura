@@ -1,41 +1,22 @@
 <?php
-use Config\Core\Database;
 use Config\Core\SystemInfo;
-
-$db = Database::connect();
+use App\Models\Dashboard;
 
 // -------------------------------------------------------------------------
 // DASHBOARD GENERAL PROGRAMMER (ADMIN PORTAL)
 // -------------------------------------------------------------------------
 
 // Counts per Role & Entity
-$adminCount    = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'admin'")->fetch_assoc()['total'] ?? 0;
-$masterCount   = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'master'")->fetch_assoc()['total'] ?? 0;
-$investorCount = $db->query("SELECT COUNT(*) as total FROM investor")->fetch_assoc()['total'] ?? 0;
-$outletCount   = $db->query("SELECT COUNT(*) as total FROM outlet")->fetch_assoc()['total'] ?? 0;
+$adminCount    = Dashboard::getAdminCount();
+$masterCount   = Dashboard::getMasterCount();
+$investorCount = Dashboard::getInvestorCount();
+$outletCount   = Dashboard::getOutletCount();
 
 // Outlet berdasarkan Omzet
-$topOutlets = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan, u_out.alamat_lengkap as alamat_outlet, SUM(l.nominal_omzet) as total_omzet,
-           u_inv.nama_lengkap as nama_investor, u_inv.kecamatan as kecamatan_investor, u_inv.alamat_lengkap as alamat_investor
-    FROM laporan_omzet l
-    JOIN outlet o ON l.id_outlet = o.id_outlet
-    LEFT JOIN users u_out ON (u_out.id_users = o.id_users)
-    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-    LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
-    GROUP BY l.id_outlet
-    ORDER BY total_omzet DESC
-");
+$topOutlets = Dashboard::getTopByOmzet();
 
 // Request Outlet Terbaru (Khusus Pending)
-$recentRequests = $db->query("
-    SELECT o.*, u_inv.nama_lengkap as nama_investor, u_inv.kecamatan as kecamatan_investor, u_inv.alamat_lengkap as alamat_investor
-    FROM outlet o
-    LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-    LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
-    WHERE o.status = 'pending'
-    ORDER BY o.id_outlet DESC
-");
+$recentRequests = Dashboard::getRecentRequests();
 ?>
 
 <div class="page-header">
