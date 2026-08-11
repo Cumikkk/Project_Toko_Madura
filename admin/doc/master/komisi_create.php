@@ -114,8 +114,8 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
-                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Transfer Komisi <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf" required>
+                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Transfer Komisi <?= $isEdit ? '(Opsional)' : '<span class="text-danger">*</span>'; ?></label>
+                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf" <?= $isEdit ? '' : 'required'; ?>>
                                 <small class="text-muted">Upload foto struk transfer / bukti bayar komisi ke Master Owner (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
                                 <?php if (!empty($komisiData['bukti_pembayaran'])) : ?>
                                     <?php $fileExt = strtolower(pathinfo($komisiData['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
@@ -128,7 +128,7 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
                                         <?php else : ?>
                                             <button type="button" class="btn btn-xs btn-outline-primary ms-1" 
                                                     onclick="previewBuktiKomisi('<?= htmlspecialchars($komisiData['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($komisiData['nama_master'] ?? 'Unknown', ENT_QUOTES) ?>', '<?= htmlspecialchars($komisiData['catatan'] ?? '-', ENT_QUOTES) ?>', 'Rp <?= number_format($komisiData['nominal_transfer_komisi'] ?? 0, 0, ',', '.') ?>')">
-                                                <i class="fas fa-image me-1"></i> Lihat Bukti Existing
+                                                <i class="fas fa-image me-1"></i> Lihat Bukti
                                             </button>
                                         <?php endif; ?>
                                     </div>
