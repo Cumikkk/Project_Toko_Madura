@@ -518,5 +518,24 @@ class User extends UserAuth {
                     'html' => '<span class="badge bg-dark">Unknown</span>'
                 ];
         }
+    }
+
+    public static function get_status(string $status = ""): array|bool {
+        try {
+            if(empty($status)) {
+                return false;
+            }
+            $db = Database::connect();
+            $status = $db->real_escape_string($status);
+            $sqlGet = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = '{$status}' LIMIT 1");
+            return $sqlGet->fetch_assoc() ?? false;       
+
+        } catch (Exception $e) {
+            if(SystemInfo::isDevelopment()) {
+                throw $e;
+            }
+
+            return false;
+        }
     } 
 }

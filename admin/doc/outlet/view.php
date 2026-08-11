@@ -1,6 +1,7 @@
 <?php
 use Config\Core\Database;
 use Config\Core\SystemInfo;
+use App\Models\User;
 
 $db = Database::connect();
 
@@ -17,17 +18,8 @@ if ($resExpired && $resExpired->num_rows > 0) {
     $expiredCount = (int)$resExpired->fetch_assoc()['total'];
 }
 
-$pendingCount = 0;
-$resPending = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'pending'");
-if ($resPending && $resPending->num_rows > 0) {
-    $pendingCount = (int)$resPending->fetch_assoc()['total'];
-}
-
-$rejectCount = 0;
-$resReject = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'reject'");
-if ($resReject && $resReject->num_rows > 0) {
-    $rejectCount = (int)$resReject->fetch_assoc()['total'];
-}
+$pendingCount = User::get_status('pending')['total'];
+$rejectCount = User::get_status('reject')['total'];
 
 // 2. Fetch Active Outlets (not expired)
 $sqlActive = "
