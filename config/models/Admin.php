@@ -15,7 +15,7 @@ class Admin extends AdminAuth {
                 $db = Database::connect();
             }
 
-            $select = $db->query("SELECT (SELECT (MAX(tb2.ADM_ID) + 1) FROM tb_admin as tb2) as ADM_ID");
+            $select = $db->query("SELECT (SELECT (MAX(id_users) + 1) FROM users) as ADM_ID");
             return $select->fetch_assoc()['ADM_ID'] ?? 0;
 
         } catch (Exception $e) {
@@ -30,15 +30,29 @@ class Admin extends AdminAuth {
                 $db = Database::connect();
             }
 
-            /** Check Database */
-            $dateNow = date("Y-m-d H:i:s");
-            $sqlCheck = $db->query("SELECT * FROM tb_admin JOIN tb_admin_role tar ON (tar.ID_ADMROLE = ADM_LEVEL) WHERE ID_ADM = {$idAdm} LIMIT 1");
-            $user = $sqlCheck->fetch_assoc(); 
+            $sqlCheck = $db->query("SELECT * FROM users WHERE id_users = {$idAdm} AND role IN ('admin', 'master') LIMIT 1");
             if($sqlCheck->num_rows != 1) {
                 return [];
             }
+            $rawUser = $sqlCheck->fetch_assoc();
+            $role = $rawUser['role'];
 
-            return $user;
+            $level = ($role === 'admin') ? 1 : 2;
+
+            return [
+                'ID_ADM' => $rawUser['id_users'],
+                'ADM_ID' => $rawUser['id_users'],
+                'ADM_NAME' => $rawUser['nama_lengkap'],
+                'ADM_USER' => $rawUser['username'],
+                'ADM_EMAIL' => $rawUser['email'] ?? null,
+                'ADM_PHONE' => $rawUser['no_hp'],
+                'ADM_PASS'  => $rawUser['password'],
+                'ADM_LEVEL' => $level,
+                'ADM_STS' => 1,
+                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : 'Master Owner',
+                'role' => $role,
+                'ADM_COUNTRY' => 7
+            ];
 
         } catch (Exception $e) {
             if(SystemInfo::isDevelopment()) {
@@ -50,24 +64,9 @@ class Admin extends AdminAuth {
     } 
 
     public static function adminRoles() {
-        try {
-            global $db;
-            $user = Self::authentication() ?? [];
-            if(empty($user)) {
-                return [];
-            }
-
-            $currentLevel = $user['ADM_LEVEL'];
-            $sqlGet = $db->query("SELECT * FROM tb_admin_role WHERE (ID_ADMROLE > {$currentLevel} OR {$currentLevel} = 1) AND {$currentLevel} <= 2 AND ADMROLE_STS = -1");
-            return $sqlGet->fetch_all(MYSQLI_ASSOC);
-
-        } catch (Exception $e) {
-            if(SystemInfo::isDevelopment()) {
-                throw $e;
-            }
-
-            return [];
-        }
+        return [
+            ['ID_ADMROLE' => 1, 'ADMROLE_NAME' => 'Master', 'ADMROLE_STS' => -1]
+        ];
     }
 
     public static function getAdminBank(string $id): array|bool {

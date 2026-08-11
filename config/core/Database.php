@@ -54,16 +54,25 @@ class Database implements DatabaseInterface {
     public static function getBindTypes($value): string {
         switch($value) {
             case "varchar": return "s";
+            case "char": return "s";
             case "int": return "i";
             case "bigint": return "i";
+            case "tinyint": return "i";
+            case "smallint": return "i";
+            case "mediumint": return "i";
             case "double": return "d";
+            case "float": return "d";
+            case "decimal": return "d";
             case "datetime": return "s";
             case "date": return "s";
             case "text": return "s";
+            case "mediumtext": return "s";
             case "longtext": return "s";
             case "enum": return "s";
+            case "set": return "s";
             case "timestamp": return "s";
-            default: return "";
+            case "json": return "s";
+            default: return "s"; // fallback to string for unknown types
         }
     }
 

@@ -1,18 +1,19 @@
+<?php use Config\Core\SystemInfo; ?>
 <div class="main-header side-header sticky">
     <div class="main-container container-fluid">
         <div class="main-header-left">
             <a class="main-header-menu-icon" href="javascript:void(0);" id="mainSidebarToggle"><span></span></a>
             <div class="hor-logo">
-                <a class="main-logo" href="index.php">
-                    <img src="/assets/img/brand/logo.png" width="75%" class="header-brand-img desktop-logo" alt="logo">
-                    <img src="/assets/img/brand/logo-light.png" width="75%" class="header-brand-img desktop-logo-dark" alt="logo">
+                <a class="main-logo" href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo.png" width="75%" class="header-brand-img desktop-logo" alt="logo">
+                    <img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/brand/logo-light.png" width="75%" class="header-brand-img desktop-logo-dark" alt="logo">
                 </a>
             </div>
         </div>
         <div class="main-header-center">
             <div class="responsive-logo">
-                <a href="/dashboard"><img src="/assets/img/logo-rrfx3.png" class="mobile-logo" alt="logo"></a>
-                <a href="/dashboard"><img src="/assets/img/logo-rrfx-white1.png" class="mobile-logo-dark" alt="logo"></a>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx3.png" class="mobile-logo" alt="logo"></a>
+                <a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard"><img src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/logo-rrfx-white1.png" class="mobile-logo-dark" alt="logo"></a>
             </div>
         </div>
         <div class="main-header-right">
@@ -48,17 +49,17 @@
                         <!-- Profile -->
                         <div class="dropdown main-profile-menu">
                             <a class="d-flex" href="javascript:void(0);">
-                                <span class="main-img-user"><img alt="avatar" src="/assets/img/favicon/favicon.ico"></span>
+                                <span class="main-img-user"><img alt="avatar" src="<?= SystemInfo::app('ADMIN_URL') ?>/assets/img/favicon/favicon.ico"></span>
                             </a>
                             <div class="dropdown-menu">
                                 <div class="header-navheading">
                                     <h6 class="main-notification-title"><?= $user['ADM_NAME'] ?></h6>
-                                    <p class="main-notification-text"><?= $user['ADMROLE_NAME'] ?></p>
+                                    <p class="main-notification-text"><?= $user['ADMROLE_NAME'] ?? '' ?></p>
                                 </div>
-                                <a class="dropdown-item border-top" href="/password/view">
+                                <a class="dropdown-item border-top" href="<?= SystemInfo::app('ADMIN_URL') ?>/password/view">
                                     <i class="fe fe-settings"></i> Password
                                 </a>
-                                <a class="dropdown-item" href="/logout">
+                                <a class="dropdown-item" href="<?= SystemInfo::app('ADMIN_URL') ?>/logout">
                                     <i class="fe fe-power"></i> Sign Out
                                 </a>
                             </div>

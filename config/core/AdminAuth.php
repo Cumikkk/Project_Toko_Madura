@@ -8,28 +8,31 @@ class AdminAuth {
     public static string $sessionAuthName = "token";
 
     public static function logout() {
-        global $_SESSION, $_COOKIE;
-        $_SESSION['token_admin'] = "";
-        $_COOKIE['token_admin'] = "";
-
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION = [];
         session_destroy();
-        setcookie("token_admin", "");
         return true;
     }
 
     public static function setSessionData(array $data): bool {
-        global $_SESSION, $_COOKIE;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         if(empty($data['token'])) {
             return false;
         }
 
-        $_SESSION[ self::$sessionAuthName ] = $_COOKIE[ self::$sessionAuthName ] = $data['token'];
+        $_SESSION[ self::$sessionAuthName ] = $data['token'];
         return true;
     }
 
     public static function getSessionData(): array|bool {
-        global $_SESSION, $_COOKIE;
-        $token = $_SESSION[ self::$sessionAuthName ] ?? $_COOKIE[ self::$sessionAuthName ] ?? "";
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $token = $_SESSION[ self::$sessionAuthName ] ?? "";
         if(empty($token)) {
             return false;
         }
@@ -41,7 +44,7 @@ class AdminAuth {
 
     public static function authentication() {
         try {
-            global $db, $_SESSION, $_COOKIE;
+            global $db;
             $authData = self::getSessionData();
             if(!$authData) {
                 return false;
@@ -51,33 +54,47 @@ class AdminAuth {
                 $db = Database::connect();
             }
 
-            /** Check Database */
-            $token = $authData['token'];
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $userId = $_SESSION['user_id'] ?? null;
+            if (!$userId) {
+                return false;
+            }
+
             $sqlCheck = $db->query("
-                SELECT 
-                    * 
-                FROM tb_admin 
-                JOIN tb_admin_role tar ON (tar.ID_ADMROLE = ADM_LEVEL) 
-                JOIN tb_country tc ON (tc.ID_COUNTRY = ADM_COUNTRY)
-                WHERE ADM_TOKEN = '{$token}' 
+                SELECT * FROM users 
+                WHERE id_users = {$userId} AND role IN ('admin', 'master')
                 LIMIT 1
             ");
 
-            $user = $sqlCheck->fetch_assoc(); 
             if($sqlCheck->num_rows != 1) {
                 return false;
             }
 
-            
-            /** Check Expired */
-            if(strtotime($user['ADM_TOKEN_EXPIRED']) < strtotime("now")) {
-                return false;
-            }
+            $rawUser = $sqlCheck->fetch_assoc(); 
+            $role = $rawUser['role'];
+            $level = ($role === 'admin') ? 1 : 2;
+
+            // Map keys for backward compatibility with RRFX template admin
+            $user = [
+                'ID_ADM' => $rawUser['id_users'],
+                'ADM_ID' => $rawUser['id_users'],
+                'ADM_NAME' => $rawUser['nama_lengkap'],
+                'ADM_USER' => $rawUser['username'],
+                'ADM_EMAIL' => $rawUser['email'] ?? null,
+                'ADM_PHONE' => $rawUser['no_hp'],
+                'ADM_PASS'  => $rawUser['password'],
+                'ADM_LEVEL' => $level,
+                'ADM_STS' => 1,
+                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : 'Master Owner',
+                'role' => $role
+            ];
             
             return $user;
 
         } catch (Exception $e) {
-            if(ini_get("display_errors") == "1") {
+            if(SystemInfo::isDevelopment()) {
                 throw $e;
             }
 

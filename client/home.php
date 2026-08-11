@@ -8,8 +8,8 @@ use App\Models\CompanyProfile;
 use App\Models\Logger;
 use App\Models\User;
 
-$pageFile = "404";
-$pageTitle = "404";
+$pageFile = "omzet";
+$pageTitle = "Input Omzet";
 if (!empty($_GET["a"])) {
     $pageFile = htmlentities(str_replace('%', '', str_replace(' ', '_', stripslashes(($_GET['a'])))), ENT_QUOTES, 'WINDOWS-1252');
     $pageTitle = ucwords(strtolower(str_replace('-', ' ', $pageFile)));
@@ -17,12 +17,52 @@ if (!empty($_GET["a"])) {
 
 if ($pageFile == "logout") {
     User::logout();
-    die("<script>location.href ='/'</script>");
+    die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
 }
 
 $user = User::user();
 if (!$user) {
-    die("<script>alert('Session Expired, please re-login'); location.href ='/'</script>");
+    die("<script>alert('Session Expired, please re-login'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
+}
+
+$role = strtolower($user['role'] ?? '');
+
+// If outlet user, verify outlet is active and not expired
+if ($role === 'outlet') {
+    $dbCheck = \Config\Core\Database::connect();
+    $sqlStatus = $dbCheck->query("SELECT status, tipe_request, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$user['MBR_ID']} LIMIT 1");
+    if ($sqlStatus && $sqlStatus->num_rows > 0) {
+        $stData = $sqlStatus->fetch_assoc();
+        $today = date('Y-m-d');
+        $jt = !empty($stData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($stData['tgl_jatuh_tempo'])) : null;
+
+        if ($stData['status'] !== 'active') {
+            User::logout();
+            $isRenew = (($stData['tipe_request'] ?? '') === 'perpanjangan');
+            if ($stData['status'] === 'reject') {
+                $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Akun";
+                $msg = $label . " outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui');
+            } else {
+                $msg = $isRenew 
+                    ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
+                    : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+            }
+            die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
+        } elseif ($jt && $today > $jt) {
+            User::logout();
+            $msg = "Masa langganan outlet Anda telah berakhir pada tanggal " . date('d/m/Y', strtotime($jt)) . ". Silakan hubungi Investor/Admin untuk perpanjangan.";
+            die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
+        }
+    }
+}
+
+// Investor and Outlet do not use Dashboard -> Redirect to main modules
+if ($pageFile === 'dashboard' || empty($_GET['a'])) {
+    if ($role === 'investor') {
+        die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/outlet';</script>");
+    } elseif ($role === 'outlet') {
+        die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/omzet';</script>");
+    }
 }
 
 $userid = md5(md5($user['MBR_ID'])) ?? "";
@@ -69,9 +109,10 @@ Logger::client_log([
     <link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/css/sweetalert2.min.css">
     <link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/css/style.css">
-    <link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/css/custom.css">
-    <link rel="stylesheet" id="primaryColor" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/css/<?= ($user['MBR_THEME'] == '1') ? 'gold' : 'gold'; ?>-color.css">
+    <link rel="stylesheet" id="primaryColor" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/css/red-color.css">
+    <link rel="stylesheet" href="<?= SystemInfo::app('CLIENT_URL') ?>/assets/css/custom.css?v=<?= time(); ?>">
     <script src="<?= SystemInfo::app('CLIENT_URL') ?>/assets/vendor/js/jquery-3.6.0.min.js"></script>
+    <script>window.CLIENT_URL = "<?= SystemInfo::app('CLIENT_URL') ?>";</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.css" integrity="sha512-In/+MILhf6UMDJU4ZhDL0R0fEpsp4D3Le23m6+ujDWXwl3whwpucJG1PEmI3B07nyJx+875ccs+yX2CqQJUxUw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css" integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js" integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -91,6 +132,101 @@ Logger::client_log([
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <style rel="stylesheet">
+        /* CRITICAL NO-SIDEBAR TOPBAR OVERRIDES (FORCE FULL WIDTH 100%) */
+        html, body, 
+        html body.body-padding,
+        html body.body-padding.light-theme,
+        html body.body-padding.dark-theme,
+        html body.body-padding.expanded,
+        body.body-padding, 
+        body.body-p-top, 
+        body.light-theme, 
+        body.dark-theme {
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+        }
+
+        .main-content {
+            padding-top: 70px !important;
+            padding-bottom: 20px !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            margin-top: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+
+        .main-content-inner {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+
+        @media (min-width: 992px) {
+            .main-content {
+                padding-top: 70px !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            .main-content-inner {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+        }
+
+        /* FORCE REMOVE VERTICAL LEFT SIDEBAR */
+        .main-sidebar, 
+        .sidebar-overlay, 
+        #sidebarOverlay, 
+        #mainSidebar, 
+        .nav-close-btn {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* FORCE MAROON HEADER BACKGROUND & FULL WIDTH */
+        html body .header,
+        html body.light-theme .header,
+        html body.dark-theme .header,
+        html body .header.fixed-topbar-header,
+        .header {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            height: 70px !important;
+            z-index: 1040 !important;
+            background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%) !important;
+            background-color: #7D0A0A !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 20px rgba(125, 10, 10, 0.35) !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+
+        @media (min-width: 1200px) {
+            html body .header,
+            html body.light-theme .header,
+            html body.dark-theme .header,
+            html body .header.fixed-topbar-header {
+                padding-left: 32px !important;
+                padding-right: 32px !important;
+            }
+        }
+
         <?php if ($user['MBR_THEME'] == '1') { ?>.dataTables_length select {
             color: white !important;
             background-color: #242526 !important;
@@ -165,7 +301,7 @@ Logger::client_log([
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js')
+                navigator.serviceWorker.register('<?= SystemInfo::app('CLIENT_URL') ?>/service-worker.js')
                     .then(function(registration) {
                         console.log('Service Worker registered with scope:', registration.scope);
                     }, function(err) {

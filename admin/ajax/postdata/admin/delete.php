@@ -1,8 +1,6 @@
 <?php
 use App\Models\Helper;
-use App\Models\Admin;
 use Config\Core\Database;
-use App\Models\Logger;
 
 $permission = $adminPermissionCore->hasPermission($authorizedPermission, $url);
 if(!$permission) {
@@ -14,10 +12,11 @@ if(!$permission) {
     ]);
 }
 
-/** check admin id */
-$adminId = Helper::form_input($_POST['id'] ?? 0);
-$admin = Admin::findById($adminId);
-if(!$admin) {
+$adminId = intval(Helper::form_input($_POST['id'] ?? 0));
+
+// Check if admin user exists in users (all admin roles)
+$check = $db->query("SELECT id_users, username FROM users WHERE id_users = {$adminId} AND role IN ('admin', 'master') LIMIT 1");
+if($check->num_rows != 1) {
     JsonResponse([
         'code'      => 200,
         'success'   => false,
@@ -26,27 +25,32 @@ if(!$admin) {
     ]);
 }
 
-/** update */
-$update = Database::update("tb_admin", ['ADM_STS' => 0], ['ID_ADM' => $adminId]);
-if(!$update) {
+$admin = $check->fetch_assoc();
+
+// Prevent self deletion
+if ($admin['id_users'] == $user['ID_ADM']) {
     JsonResponse([
         'code'      => 200,
         'success'   => false,
-        'message'   => "Gagal menonaktifkan admin",
+        'message'   => "Anda tidak dapat menghapus akun Anda sendiri",
         'data'      => []
     ]);
 }
 
-Logger::admin_log([
-    'admid' => $user['ADM_ID'],
-    'module' => "admin",
-    'message' => "Menonaktifkan admin " . $admin['ADM_USER'],
-    'data'  => $admin
-]);
+// Delete from users table
+$delete = $db->query("DELETE FROM users WHERE id_users = {$adminId}");
+if(!$delete) {
+    JsonResponse([
+        'code'      => 200,
+        'success'   => false,
+        'message'   => "Gagal menghapus admin",
+        'data'      => []
+    ]);
+}
 
 JsonResponse([
     'code'      => 200,
     'success'   => true,
-    'message'   => "Admin berhasil di non-aktifkan",
+    'message'   => "Admin berhasil dihapus",
     'data'      => []
 ]);

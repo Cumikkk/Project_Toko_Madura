@@ -8,7 +8,9 @@ use Config\Core\Database;
 
 try {
     $db = Database::connect();
-    $parseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $rawParseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $ajaxPos = strpos($rawParseUrl, '/ajax');
+    $parseUrl = ($ajaxPos !== false) ? substr($rawParseUrl, $ajaxPos) : $rawParseUrl;
     $requestUri = str_replace(['\*', '/ajax', '/post'], ['', '', '/postdata'], $parseUrl);
     $fileUrl = __DIR__ . $requestUri . ".php";
 
@@ -21,22 +23,13 @@ try {
         ]);
     }
 
-    if(empty($_SERVER['HTTP_REFERER'])) {
-        JsonResponse([
-            'code'      => 403,
-            'success'   => false,
-            'message'   => "Invalid Request",
-            'data'      => []
-        ]);
-    }
-
     /** Authentication */
     $user = Admin::authentication();
     if(empty($user)) {
         JsonResponse([
-            'code'      => 403,
+            'code'      => 401,
             'success'   => false,
-            'message'   => "Invalid User",
+            'message'   => "Sesi login Anda telah berakhir. Silakan login kembali.",
             'data'      => []
         ]);
     }

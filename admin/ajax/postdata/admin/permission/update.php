@@ -76,7 +76,7 @@ if(!in_array($data['status'], ['false', 'true'])) {
 }
 
 /** Check Admin Role */
-$status = ($data['status'] == "true")? 1 : 0;
+$status = ($data['status'] == "true")? -1 : 0;
 $sqlInsert = $db->query("
     INSERT INTO admin_authorize SET
     admin_id = ".$admin['ID_ADM'].",

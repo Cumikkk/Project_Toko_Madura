@@ -11,6 +11,7 @@ try {
     global $_SESSION, $_COOKIE;
     global $db;
     $aws_folder = "https://allmediaindo-2.s3.ap-southeast-1.amazonaws.com/gfsprime/";
+    Database::connect();
     $dt = new Datatables( new MySQL([ 
         'host'     => Database::$host,
         'port'     => Database::$port,
@@ -34,7 +35,9 @@ try {
     /** Admin Permission */
     $adminPermissionCore = AdminPermissionFactory::adminPermissionCore();
     $authorizedPermission = $adminPermissionCore->getAuthrorizedPermissions($user['ID_ADM']);
-    $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $rawRequestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $ajaxPos = strpos($rawRequestUri, '/ajax');
+    $requestUri = ($ajaxPos !== false) ? substr($rawRequestUri, $ajaxPos) : $rawRequestUri;
     $url = str_replace("/ajax/datatable", "", $requestUri);
     $permission = $adminPermissionCore->hasPermission($authorizedPermission, $url);
     if(empty($_SERVER['HTTP_REFERER'])) {

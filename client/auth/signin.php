@@ -26,11 +26,11 @@ if($isLoggedIn) {
 			<form method="post" id="form-signin">
 				<input type="hidden" name="csrf_token" value="">
 				<div class="input-group mb-25">
-					<input required name="email" type="email" class="form-control" autocomplete="off" required placeholder="Email address">
-					<span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+					<input required name="email" type="text" class="form-control" autocomplete="off" placeholder="Username">
+					<span class="input-group-text"><i class="fa-regular fa-user"></i></span>
 				</div>
 				<div class="input-group mb-25">
-					<input required name="password" id="password" type="password" class="form-control" autocomplete="off" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{8,64}$" title="Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character, and be at least 8 characters long." required placeholder="Password">
+					<input required name="password" id="password" type="password" class="form-control" autocomplete="off" placeholder="Password">
 					<span class="input-group-text" style="cursor: pointer;" onclick="togglePassword('password')"><i id="passwordIcon" class="fa-regular fa-eye"></i></span>
 				</div>
 				<div class="d-flex justify-content-between mb-25">
@@ -84,20 +84,27 @@ if($isLoggedIn) {
 			button = $(this).find('button[type="submit"]');
 
 		button.addClass('loading');
-		$.post("/ajax/auth/signin", formData, function(resp) {
+		$.post("ajax/auth/signin", formData, function(resp) {
 			button.removeClass('loading');
 			if(!resp.success) {
-				Swal.fire(resp.alert);
+				Swal.fire(resp.alert || { icon: 'error', title: 'Login Gagal', text: resp.message || 'Username/Email atau Password salah' });
 				return false;
 			}
 
-			if(!resp.data.redirect) {
-				Swal.fire(resp.alert);
+			if(!resp.data || !resp.data.redirect) {
+				Swal.fire(resp.alert || { icon: 'error', title: 'Login Gagal', text: resp.message || 'Username/Email atau Password salah' });
 				return false;
 			}
 			
 			location.href = resp.data.redirect;
-		}, 'json');
+		}, 'json').fail(function(xhr) {
+			button.removeClass('loading');
+			Swal.fire({
+				icon: 'error',
+				title: 'Terjadi Kesalahan',
+				text: 'Gagal terhubung ke server. Silakan coba lagi.'
+			});
+		});
 	});
 	localStorage.clear();
 </script>

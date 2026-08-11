@@ -1,9 +1,15 @@
 <?php 
 use App\Models\Helper;
 use App\Models\Admin;
+use Config\Core\SystemInfo;
+
+if (($user['ADM_LEVEL'] ?? 1) != 1) {
+    $redirectUrl = SystemInfo::app('ADMIN_URL') . '/admin/view';
+    die("<script>location.href = '{$redirectUrl}'; </script>");
+}
 
 try {
-    $idAdmin = Helper::form_input($_GET['c'] ?? "me");
+    $idAdmin = Helper::form_input(!empty($_GET['c']) ? $_GET['c'] : ($_GET['b'] ?? "me"));
     if(empty($idAdmin)) {
         die("<script>alert('Invalid Admin ID'); location.href = '/admins'; </script>");
     }
@@ -37,7 +43,7 @@ try {
             </div>
             <div class="card-body">
                 <?php foreach($authorizeModule as $group) : ?>
-                    <?php if($group['min_level'] >= $dataAdmin['ADM_LEVEL']) : ?>
+                    <?php if($dataAdmin['ADM_LEVEL'] == 1 || $group['min_level'] >= $dataAdmin['ADM_LEVEL']) : ?>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead style="background-color: grey !important;">
@@ -56,7 +62,7 @@ try {
                                                 <td>
                                                     <div class="form-group mb-3">
                                                         <label class="mb-0">
-                                                            <input type="checkbox" name="input[]" value="<?= $perm['permission_id'] ?>" class="custom-switch-input" <?= ($perm['status'])? "checked" : "" ?> />
+                                                            <input type="checkbox" name="input[]" value="<?= $perm['permission_id'] ?>" class="custom-switch-input" <?= ($perm['status'] == -1 || $perm['status'] == 1)? "checked" : "" ?> />
                                                             <span class="custom-switch-indicator border-dark custom-switch-indicator-md"></span>
                                                         </label>
                                                     </div>

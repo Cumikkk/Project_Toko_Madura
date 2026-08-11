@@ -1,6 +1,6 @@
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">List Admin <?= $user['ADM_LEVEL'] ?></h2>
+        <h2 class="main-content-title tx-24 mg-b-5"><?= (($user['ADM_LEVEL'] ?? 1) == 2) ? "Kelola Akun Admin Staf" : "Kelola Seluruh Akun Admin"; ?></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= pathbreadcrumb(0) ?>/dashboard">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Admin</li>
@@ -9,11 +9,12 @@
 </div>
 
 <?php 
+$isMasterOwner = (($user['ADM_LEVEL'] ?? 1) == 2);
 Allmedia\Shared\AdminPermission\SharedViews::render("admins/view", [
     'isAllowToCreate' => $adminPermissionCore->isHavePermission($moduleId, "create"),
     'isAllowToUpdate' => $adminPermissionCore->isHavePermission($moduleId, "update"),
     'isAllowToDelete' => $adminPermissionCore->isHavePermission($moduleId, "delete"),
-    'isAllowToUpdatePermission' => $adminPermissionCore->isHavePermission($moduleId, "update.permission"),
+    'isAllowToUpdatePermission' => $isMasterOwner ? false : $adminPermissionCore->isHavePermission($moduleId, "update.permission"),
 ]); 
 ?>
 

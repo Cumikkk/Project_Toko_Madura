@@ -1,7 +1,5 @@
 <?php
 use App\Models\Helper;
-use App\Models\Admin;
-use App\Models\Logger;
 use Config\Core\Database;
 
 if(!$adminPermissionCore->hasPermission($authorizedPermission, "/admin/update/*")) {
@@ -25,9 +23,11 @@ foreach(['admin_id', 'new-password'] as $req) {
     }
 }
 
-/** check admin id */
-$admin = Admin::findById($data['admin_id']);
-if(!$admin) {
+$admin_id = intval($data['admin_id']);
+
+// Check if admin user exists in users (all admin roles)
+$check = $db->query("SELECT id_users FROM users WHERE id_users = {$admin_id} AND role IN ('admin', 'master') LIMIT 1");
+if($check->num_rows != 1) {
     JsonResponse([
         'code'      => 200,
         'success'   => false,
@@ -36,7 +36,7 @@ if(!$admin) {
     ]);
 }
 
-/** validasi password */
+// Validate password
 $check_password = Helper::validation_password($data['new-password']);
 if($check_password !== TRUE) {
     JsonResponse([
@@ -47,8 +47,8 @@ if($check_password !== TRUE) {
     ]);
 }
 
-/** Update Password */
-$update = Database::update("tb_admin", ['ADM_PASS' => password_hash($data['new-password'], PASSWORD_BCRYPT)], ['ADM_ID' => $admin['ADM_ID']]);
+// Update password in users table
+$update = Database::update("users", ['password' => password_hash($data['new-password'], PASSWORD_BCRYPT)], ['id_users' => $admin_id]);
 if(!$update) {
     JsonResponse([
         'code'      => 200,
@@ -57,14 +57,6 @@ if(!$update) {
         'data'      => []
     ]);
 }
-
-unset($data['new-password']);
-Logger::admin_log([
-    'admid' => $user['ADM_ID'],
-    'module' => "admin",
-    'message' => "Memperbarui password admin " . $admin['ADM_USER'],
-    'data'  => $data
-]);
 
 JsonResponse([
     'code'      => 200,

@@ -1,0 +1,80 @@
+/* Toko Madura Red-Maroon Theme System */
+:root {
+  --tm-primary: #7D0A0A;
+  --tm-primary-dark: #4D0709;
+  --tm-primary-hover: #A91D1D;
+  --tm-accent: #D62828;
+  --tm-bg-subtle: rgba(125, 10, 10, 0.08);
+}
+
+@-webkit-keyframes loader {
+  0% { background: #a9b4cc; }
+  50% { background: #7D0A0A; }
+  100% { background: #a9b4cc; }
+}
+@keyframes loader {
+  0% { background: #a9b4cc; }
+  50% { background: #7D0A0A; }
+  100% { background: #a9b4cc; }
+}
+
+input {
+  border: 1px solid rgba(125, 10, 10, 0.2);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #7D0A0A;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: #7D0A0A;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: white;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: #7D0A0A;
+  color: white;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border-color: #7D0A0A;
+  box-shadow: 0 0 0 0.25rem rgba(125, 10, 10, 0.25);
+}
+
+.bg-primary, .btn-primary {
+  background-color: #7D0A0A !important;
+  border-color: #7D0A0A !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: #A91D1D !important;
+  border-color: #A91D1D !important;
+}
+
+.text-primary {
+  color: #7D0A0A !important;
+}
+
+.border-primary {
+  border-color: #7D0A0A !important;
+}
+
+.badge.bg-primary {
+  background-color: #7D0A0A !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .sidebar-item.active > .sidebar-link,
+.sidebar-menu .sidebar-link:hover {
+  background: linear-gradient(90deg, rgba(125, 10, 10, 0.2) 0%, rgba(125, 10, 10, 0.05) 100%) !important;
+  border-left-color: #7D0A0A !important;
+  color: #7D0A0A !important;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 3px solid #7D0A0A !important;
+  color: #7D0A0A !important;
+}

@@ -60,7 +60,6 @@
 		autoButtonsPrevClass: 'btn btn-secondary',
 		stepNumberClass: 'badge bg-primary me-1',
 		onSubmit: function() {
-		  alert('Form submitted!');
 		  return true;
 		}
 	}

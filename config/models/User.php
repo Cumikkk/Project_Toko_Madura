@@ -39,13 +39,26 @@ class User extends UserAuth {
             }
     
             $db = Database::connect();
-            $sqlGet = $db->query("SELECT * FROM tb_member WHERE MBR_ID = {$userid} LIMIT 1");
+            $sqlGet = $db->query("SELECT * FROM users WHERE id_users = {$userid} LIMIT 1");
             if($sqlGet->num_rows != 1) {
                 return false;
             }
 
-            $user = $sqlGet->fetch_assoc();
-            $user['userid'] = md5(md5($userid));
+            $rawUser = $sqlGet->fetch_assoc();
+            
+            $user = [
+                'MBR_ID' => $rawUser['id_users'],
+                'ID_MBR' => $rawUser['id_users'],
+                'MBR_NAME' => $rawUser['nama_lengkap'],
+                'MBR_EMAIL' => $rawUser['email'] ?? null,
+                'MBR_USER' => $rawUser['username'],
+                'MBR_STS' => -1, 
+                'MBR_LOCKED' => 0,
+                'MBR_THEME' => $_SESSION['MBR_THEME'] ?? '0',
+                'MBR_AVATAR' => '',
+                'role' => $rawUser['role'],
+                'userid' => md5(md5($rawUser['id_users']))
+            ];
             
             if($user['MBR_LOCKED']) {
                 return false;
@@ -64,7 +77,7 @@ class User extends UserAuth {
 
      public static function avatar(string $filename): string {
         if(empty($filename) || $filename == "-") {
-            return "/assets/images/admin.png";
+            return SystemInfo::app('CLIENT_URL') . "/assets/images/admin.png";
         }
 
         return FileUpload::awsFile($filename);

@@ -1,0 +1,104 @@
+== KONTEKS PROYEK ==
+
+Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan pada Toko Madura. Aplikasi ini memiliki empat peran pengguna, yaitu Admin, Master, Investor, dan Outlet, dengan rincian tugas sebagai berikut:
+
+1. Tugas Admin
+- Mengelola akun Master, Investor, dan Outlet secara global.
+- Memverifikasi pengajuan outlet baru (ACC / Reject).
+- Mengatur konfigurasi sistem dan rekening bank pusat.
+
+2. Tugas Master
+- Mendaftarkan akun untuk setiap investor.
+- Melihat daftar investor yang didaftarkan saja.
+- Mengatur persentase potongan global. Pengaturan ini dibuat dinamis karena nilai persentase belum bersifat tetap.
+- Memantau berjalannya sistem secara garis besar. Setiap Master dapat melihat daftar investor di bawah naungannya.
+
+3. Tugas Investor
+- Mendaftarkan akun untuk setiap outlet yang berada di bawah kepemilikannya.
+- Melihat daftar outlet miliknya saja beserta rincian total omzet dari masing-masing outlet tersebut.
+- Melihat akumulasi keseluruhan potongan dari semua outlet miliknya. Nantinya, sistem akan secara otomatis mengalkulasi bagi hasil dari total kumpulan potongan ini (pembagian antara hak Investor dan hak Outlet).
+
+4. Tugas Outlet
+- Menginput total omzet penjualan yang didapatkan dari operasional toko pada setiap akhir periode pelaporan (misalnya harian, mingguan, atau bulanan).
+- Setelah penginputan, sistem akan secara otomatis menghitung nilai potongan berdasarkan persentase global yang sedang berlaku saat itu dan menyimpannya sebagai riwayat data.
+
+== DATABASE SCHEMA TERBARU (VERSI 2) ==
+
+CREATE DATABASE toko_madura;
+USE toko_madura;
+
+-- 1. TABEL USERS (Pusat Akun Login & Data Profil Seluruh Pengguna)
+CREATE TABLE users (
+    id_users INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nama_lengkap VARCHAR(100) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    no_hp VARCHAR(20) DEFAULT NULL,
+    kecamatan VARCHAR(100) DEFAULT NULL,
+    alamat_lengkap TEXT DEFAULT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'master', 'investor', 'outlet') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. TABEL INVESTOR (Profil & Tarif Langganan Investor)
+CREATE TABLE investor (
+    id_investor INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_users INT(10) UNSIGNED NOT NULL UNIQUE,
+    id_master INT(10) UNSIGNED NOT NULL,
+    biaya_langganan_outlet BIGINT NOT NULL DEFAULT 100000,
+    FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
+    FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE RESTRICT
+);
+
+-- 3. TABEL OUTLET (Data Toko & Lisensi Outlet)
+CREATE TABLE outlet (
+    id_outlet INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_users INT(10) UNSIGNED NOT NULL UNIQUE,
+    id_investor INT(10) UNSIGNED NOT NULL,
+    nama_outlet VARCHAR(100) NOT NULL,
+    persentase_potongan DECIMAL(5,2) NOT NULL DEFAULT 10.00,
+    persentase_hak_investor DECIMAL(5,2) NOT NULL DEFAULT 50.00,
+    status ENUM('pending', 'active', 'reject') NOT NULL DEFAULT 'pending',
+    tipe_request ENUM('baru', 'perpanjangan') NOT NULL DEFAULT 'baru',
+    tgl_request DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tgl_disetujui DATETIME DEFAULT NULL,
+    tgl_ditolak DATETIME DEFAULT NULL,
+    tgl_jatuh_tempo DATETIME DEFAULT NULL,
+    nominal_transfer BIGINT NOT NULL DEFAULT 0,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    alasan_penolakan TEXT DEFAULT NULL,
+    FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
+    FOREIGN KEY (id_investor) REFERENCES investor(id_investor) ON DELETE RESTRICT
+);
+
+-- 4. TABEL KOMISI MASTER (Riwayat Transfer Komisi Master)
+CREATE TABLE komisi_master (
+    id_komisi INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_master INT(10) UNSIGNED NOT NULL,
+    tgl_transfer DATETIME NOT NULL,
+    nominal_transfer_komisi BIGINT NOT NULL DEFAULT 0,
+    catatan TEXT NOT NULL,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE CASCADE
+);
+
+-- 5. TABEL LAPORAN OMZET (Transaksi Omzet Harian)
+CREATE TABLE laporan_omzet (
+    id_laporan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_outlet INT(10) UNSIGNED NOT NULL,
+    tanggal_omzet DATE NOT NULL,
+    nominal_omzet BIGINT NOT NULL DEFAULT 0,
+    persentase_potongan DECIMAL(5,2) NOT NULL,
+    persentase_hak_investor DECIMAL(5,2) NOT NULL,
+    nominal_potongan BIGINT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_outlet) REFERENCES outlet(id_outlet) ON DELETE RESTRICT,
+    INDEX idx_laporan_periode (tanggal_omzet)
+);
+
+-- 6. TABEL PENGATURAN SISTEM (Konfigurasi Rekening Bank Admin)
+CREATE TABLE pengaturan_sistem (
+    id_pengaturan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nama_pengaturan VARCHAR(50) NOT NULL UNIQUE,
+    nilai VARCHAR(255) NOT NULL
+);

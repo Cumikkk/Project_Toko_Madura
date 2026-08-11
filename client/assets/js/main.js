@@ -239,12 +239,12 @@
         let darkMode = localStorage.getItem('darkMode');
         const enableDarkMode = () => {
             $('body').removeClass('light-theme').addClass('dark-theme');
-            $('.header .main-logo .logo-big img, .mobile-logo img, .logo img').attr('src', '/assets/images/logo-white-new.png');
+            $('.header .main-logo .logo-big img, .mobile-logo img, .logo img').attr('src', window.CLIENT_URL + '/assets/images/logo-white-new.png');
             localStorage.setItem("darkMode", "enabled");
             localStorage.removeItem("lightMode");
 
             // Save the selected style sheet in local storage
-            $('#primaryColor').attr('href', '/assets/css/gold-color.css');
+            $('#primaryColor').attr('href', window.CLIENT_URL + '/assets/css/gold-color.css');
             localStorage.setItem('selectedStyleSheet', 'gold-color');
         };
         $('#darkTheme').on('click', function () {
@@ -257,14 +257,10 @@
                     Swal.showLoading();
                 }
             })
-            $.post("/ajax/post/dashboard/theme", {theme: 1}, function(resp) {
+            $.post(window.CLIENT_URL + "/ajax/post/dashboard/theme", {theme: 1}, function(resp) {
                 if (resp.success) {
-
-                    if (darkMode === "enabled") {
-                        enableDarkMode();
-                        $('#darkTheme').addClass('active');
-                    }
-
+                    enableDarkMode();
+                    $('#darkTheme').addClass('active');
                     location.reload();
                 }
             }, 'json')
@@ -274,13 +270,13 @@
         let lightMode = localStorage.getItem('lightMode');
         const enableLightMode = () => {
             $('body').removeClass('dark-theme').addClass('light-theme');
-            $('.header .main-logo .logo-big img, .mobile-logo img, .logo img').attr('src', '/assets/images/logo-white-new.png');
+            $('.header .main-logo .logo-big img, .mobile-logo img, .logo img').attr('src', window.CLIENT_URL + '/assets/images/logo-white-new.png');
             // localStorage.removeItem("blueMode");
             localStorage.setItem("lightMode", "enabled");
             localStorage.removeItem("darkMode");
 
             // Save the selected style sheet in local storage
-            $('#primaryColor').attr('href', '/assets/css/gold-color.css');
+            $('#primaryColor').attr('href', window.CLIENT_URL + '/assets/css/gold-color.css');
             localStorage.setItem('selectedStyleSheet', 'gold-color');
         };
         $('#lightTheme').on('click', function () {
@@ -293,14 +289,10 @@
                     Swal.showLoading();
                 }
             })
-            $.post("/ajax/post/dashboard/theme", {theme: 0}, function(resp) {
+            $.post(window.CLIENT_URL + "/ajax/post/dashboard/theme", {theme: 0}, function(resp) {
                 if (resp.success) {
-        
-                    if (lightMode === "enabled") {
-                        enableLightMode();
-                        $('#lightTheme').addClass('active');
-                    }
-
+                    enableLightMode();
+                    $('#lightTheme').addClass('active');
                     location.reload();
                 }
             }, 'json')
@@ -604,7 +596,7 @@
         $('.color-palette').on('click', function () {
             var styleSheet = $(this).data('color');
             $(this).addClass('active').siblings().removeClass('active');
-            $('#primaryColor').attr('href', '/assets/css/' + styleSheet + '.css');
+            $('#primaryColor').attr('href', window.CLIENT_URL + '/assets/css/' + styleSheet + '.css');
             
             // Save the selected style sheet in local storage
             localStorage.setItem('selectedStyleSheet', styleSheet);
@@ -614,7 +606,7 @@
         var selectedStyleSheet = localStorage.getItem('selectedStyleSheet');
         if (selectedStyleSheet) {
             $('.color-palette[data-color="' + selectedStyleSheet + '"]').addClass('active').siblings().removeClass('active');
-            $('#primaryColor').attr('href', '/assets/css/' + selectedStyleSheet + '.css');
+            $('#primaryColor').attr('href', window.CLIENT_URL + '/assets/css/' + selectedStyleSheet + '.css');
         }
 
 
@@ -823,8 +815,19 @@
             }
         });
         $(".sidebar-link").each(function () {
+            var currentUrl = window.location.href;
             var pageUrl = window.location.href.split(/[?#]/)[0];
-            if (this.href == pageUrl) {
+            var linkUrl = this.href;
+            
+            var isMatch = false;
+            if (window.location.search) {
+                isMatch = (linkUrl === currentUrl);
+            } else {
+                isMatch = (linkUrl.split(/[?#]/)[0] === pageUrl && !linkUrl.includes('?'));
+            }
+            
+            if (isMatch) {
+                $(".sidebar-link").removeClass("active");
                 $(this).addClass("active");
                 if (!$('.main-sidebar').hasClass('horizontal-menu')) {
                     $(this).parents(".sidebar-item").addClass("open");
@@ -869,8 +872,8 @@
                 }
             });
             $(document).on('click', function (e) {
-                if ($(e.target).is('.main-sidebar *') === false) {
-                    $('.main-sidebar').removeClass('sidebar-mini');
+                if ($(e.target).is('.main-sidebar, .main-sidebar *, #navClose, #navClose *, .nav-close-btn, .nav-close-btn *') === false) {
+                    $('.main-sidebar').removeClass('sidebar-mini mobile-open');
                     if ($(window).width() < 1200) {
                         if ($('.main-sidebar').hasClass('two-column-menu')) {
                             $('.main-sidebar').addClass('sub-menu-collapsed');

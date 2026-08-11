@@ -31,13 +31,14 @@ CompanyProfile::init();
 function JsonResponse(array $data = []) {
     /** ini tidak membaca script dibawahnya */
     http_response_code($data['code'] ?? 200);
+    $alert = $data['alert'] ?? [
+        'title' => (!empty($data['success']))? "Success" : "Failed",
+        'text' => $data['message'] ?? '',
+        'icon' => (!empty($data['success']))? "success" : "error"
+    ];
     exit(json_encode([
         ...$data,
-        'alert' => [
-            'title' => ($data['success'])? "Success" : "Failed",
-            'text' => $data['message'],
-            'icon' => ($data['success'])? "success" : "error"
-        ]
+        'alert' => $alert
     ]));
 }
 

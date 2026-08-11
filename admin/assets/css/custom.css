@@ -9,17 +9,66 @@
     float: left;
 }
 
+/* DataTables Pagination & Info Spacing Fix */
+/* Works when scrollX: true is set (adds dataTables_scrollBody wrapper) */
+.dataTables_wrapper .dataTables_scrollBody {
+    margin-bottom: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_scrollFoot,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 16px !important;
+}
+
+/* Also fix for non-scrollX tables */
+.dataTables_wrapper .table-responsive {
+    margin-bottom: 16px !important;
+}
+
+/* High-Specificity Nav Pills Tab Buttons Border & Styling */
+.nav-pills .nav-item .nav-link,
+.nav-pills .nav-link,
+.tab-bordered-btn {
+    border: 1px solid #b0b8c5 !important;
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border-radius: 6px !important;
+    padding: 8px 18px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.nav-pills .nav-item .nav-link.active,
+.nav-pills .nav-link.active,
+.tab-bordered-btn.active {
+    background-color: #6259ca !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 8px rgba(98, 89, 202, 0.25) !important;
+}
+
+.nav-pills .nav-item .nav-link:hover:not(.active),
+.nav-pills .nav-link:hover:not(.active),
+.tab-bordered-btn:hover:not(.active) {
+    background-color: #f0f2f9 !important;
+    border-color: #6259ca !important;
+    color: #6259ca !important;
+}
+
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+    -webkit-appearance: none !important;
+    margin: 0 !important;
 }
 
 /* Firefox */
 input[type=number] {
-    -moz-appearance: textfield;
+    -moz-appearance: textfield !important;
 }
+
 
 
 .custom-avatar-container {
@@ -53,4 +102,274 @@ input[type=number] {
 
 .edit-icon:hover {
     background-color: #052e60;
+}
+
+/* Interactive Outlet Stat Cards */
+.outlet-stat-card {
+    transition: all 0.25s ease-in-out;
+    border: 2px solid #e2e8f0 !important;
+    cursor: pointer;
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+}
+.outlet-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
+    border-color: #a5b4fc !important;
+}
+.outlet-stat-card.active-card {
+    border-color: #6259ca !important;
+    background-color: #f7f7fe !important;
+    box-shadow: 0 4px 12px rgba(98, 89, 202, 0.2) !important;
+}
+
+/* ==========================================================================
+   ADMIN PORTAL - DARK THEME ADAPTIVE STYLES & OVERRIDES
+   ========================================================================== */
+
+/* 1. Base Container & Cards in Dark Mode */
+body.dark-theme,
+.dark-theme {
+    background-color: #0e0e23 !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .card,
+.dark-theme .custom-card {
+    background-color: #19193a !important;
+    border-color: #27274f !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .card-header {
+    background-color: transparent !important;
+    border-bottom-color: #27274f !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .main-content-label,
+.dark-theme .card-title,
+.dark-theme h1, .dark-theme h2, .dark-theme h3, 
+.dark-theme h4, .dark-theme h5, .dark-theme h6 {
+    color: #ffffff !important;
+}
+
+/* 2. Tables & Datatables in Dark Mode */
+.dark-theme .table {
+    color: #e9ecef !important;
+    border-color: #27274f !important;
+}
+
+.dark-theme .table thead th,
+.dark-theme .table-light,
+.dark-theme .bg-light,
+.dark-theme .bg-body-secondary {
+    background-color: #1e1e42 !important;
+    color: #ffffff !important;
+    border-color: #27274f !important;
+}
+
+.dark-theme .table tbody td,
+.dark-theme .table tbody th {
+    border-color: #27274f !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .table-hover tbody tr:hover {
+    background-color: #25254a !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .text-dark,
+.dark-theme .text-body-emphasis {
+    color: #ffffff !important;
+}
+
+.dark-theme .text-muted,
+.dark-theme .text-body-secondary {
+    color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* 3. Badges, Buttons & Interactive Elements in Dark Mode */
+.dark-theme .badge.bg-light,
+.dark-theme .badge.bg-body-tertiary {
+    background-color: #25254e !important;
+    color: #ffffff !important;
+    border-color: #3b3b6b !important;
+}
+
+.dark-theme .btn-light {
+    background-color: #25254e !important;
+    border-color: #3b3b6b !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .btn-light:hover {
+    background-color: #313166 !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .btn-outline-light {
+    border-color: #3b3b6b !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .btn-outline-light:hover {
+    background-color: #25254e !important;
+    color: #ffffff !important;
+}
+
+/* 4. Nav Pills & Tab Buttons in Dark Mode */
+.dark-theme .nav-pills .nav-item .nav-link,
+.dark-theme .nav-pills .nav-link,
+.dark-theme .tab-bordered-btn {
+    border-color: #3b3b6b !important;
+    background-color: #1e1e42 !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .nav-pills .nav-item .nav-link.active,
+.dark-theme .nav-pills .nav-link.active,
+.dark-theme .tab-bordered-btn.active {
+    background-color: #6259ca !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .nav-pills .nav-item .nav-link:hover:not(.active),
+.dark-theme .nav-pills .nav-link:hover:not(.active),
+.dark-theme .tab-bordered-btn:hover:not(.active) {
+    background-color: #2b2b54 !important;
+    border-color: #6259ca !important;
+    color: #a5b4fc !important;
+}
+
+/* 5. Outlet Stat Cards in Dark Mode */
+.dark-theme .outlet-stat-card {
+    background-color: #19193a !important;
+    border-color: #27274f !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .outlet-stat-card:hover {
+    border-color: #6259ca !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-theme .outlet-stat-card.active-card {
+    border-color: #6259ca !important;
+    background-color: #25254e !important;
+}
+
+/* 6. Modals & SweetAlert2 in Dark Mode */
+.dark-theme .modal-content {
+    background-color: #19193a !important;
+    border-color: #27274f !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .modal-header,
+.dark-theme .modal-footer {
+    border-color: #27274f !important;
+}
+
+.dark-theme .modal-title {
+    color: #ffffff !important;
+}
+
+.dark-theme .form-control,
+.dark-theme .form-select,
+.dark-theme select,
+.dark-theme textarea {
+    background-color: #1e1e42 !important;
+    border-color: #3b3b6b !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    background-color: #23234d !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(98, 89, 202, 0.25) !important;
+}
+
+.dark-theme .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* SweetAlert2 Modal in Dark Theme */
+.dark-theme .swal2-popup {
+    background-color: #19193a !important;
+    color: #ffffff !important;
+    border: 1px solid #27274f !important;
+}
+
+.dark-theme .swal2-title {
+    color: #ffffff !important;
+}
+
+.dark-theme .swal2-html-container,
+.dark-theme .swal2-content {
+    color: #e9ecef !important;
+}
+
+.dark-theme .swal2-popup .bg-body-tertiary,
+.dark-theme .swal2-popup .bg-body,
+.dark-theme .swal2-popup .bg-light {
+    background-color: #25254e !important;
+    color: #ffffff !important;
+    border-color: #3b3b6b !important;
+}
+
+.dark-theme .swal2-popup .text-body-emphasis,
+.dark-theme .swal2-popup .text-dark {
+    color: #ffffff !important;
+}
+
+.dark-theme .swal2-popup .text-body-secondary,
+.dark-theme .swal2-popup .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* DataTables Controls in Dark Mode */
+.dark-theme .dataTables_wrapper .dataTables_length select,
+.dark-theme .dataTables_wrapper .dataTables_filter input {
+    background-color: #1e1e42 !important;
+    border-color: #3b3b6b !important;
+    color: #ffffff !important;
+}
+
+.dark-theme .dataTables_wrapper .dataTables_info {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark-theme .dataTables_wrapper .page-item .page-link,
+.dark-theme .dataTables_wrapper .paginate_button {
+    background-color: #1e1e42 !important;
+    border-color: #3b3b6b !important;
+    color: #e9ecef !important;
+}
+
+.dark-theme .dataTables_wrapper .page-item.active .page-link,
+.dark-theme .dataTables_wrapper .paginate_button.current {
+    background-color: #6259ca !important;
+    border-color: #6259ca !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   STICKY FOOTER FIX
+   .page adalah flex column dengan min-height:100vh, tetapi .main-content
+   perlu flex-grow:1 agar mengisi sisa ruang dan mendorong footer ke bawah
+   ========================================================================== */
+.main-content.side-content {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.main-content.side-content .main-container {
+    flex: 1 1 auto !important;
 }

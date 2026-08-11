@@ -2,8 +2,8 @@
     <?php
     $listGrup = $adminPermissionCore->availableGroup();
     $permissionModule = App\Factory\PermissionModuleFactory::init();
-    $moduleId = App\Models\Helper::form_input($_GET['d'] ?? "");
-    $module = $permissionModule->findModuleById($_GET['d']);
+    $moduleId = App\Models\Helper::form_input(!empty($_GET['d']) ? $_GET['d'] : ($_GET['c'] ?? 0));
+    $module = $permissionModule->findModuleById($moduleId);
     if(!$module) {
         die("<script>alert('Invalid Module'); location.href = '/developer/module'; </script>");
     }

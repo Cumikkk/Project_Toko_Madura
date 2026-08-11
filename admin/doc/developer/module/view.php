@@ -10,10 +10,14 @@
 </div>
 
 <?php 
+$dropdownGroups = array_filter($adminPermissionCore->availableGroup(), function($g) {
+	return isset($g['type']) && strcasecmp($g['type'], 'dropdown') == 0;
+});
+
 Allmedia\Shared\AdminPermission\SharedViews::render("permission-module/view", [
 	'isAllowToCreate' => $adminPermissionCore->isHavePermission($moduleId, "create"),
 	'isAllowToUpdate' => $adminPermissionCore->isHavePermission($moduleId, "update"),
 	'isAllowToDelete' => $adminPermissionCore->isHavePermission($moduleId, "delete"),
-	'availableGroups' => $adminPermissionCore->availableGroup(),
+	'availableGroups' => array_values($dropdownGroups),
 ]); 
 ?>

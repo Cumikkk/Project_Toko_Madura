@@ -50,7 +50,7 @@ $insert = Database::insert("admin_module_group", [
     'group' => $data['group_name'],
     'type' => $data['group_type'],
     'icon' => $data['group_icon'],
-    'min_level' => 0
+    'min_level' => 1
 ]);
 
 if(!$insert) {
@@ -60,6 +60,53 @@ if(!$insert) {
         'message'   => "Gagal memperbarui data grup",
         'data'      => []
     ]);
+}
+
+$db = Database::connect();
+$newGroupId = $db->insert_id;
+
+if ($data['group_type'] === 'single' && $newGroupId) {
+    // Automatically create default module for single group
+    $modName = strtolower(str_replace(' ', '-', trim($data['group_name'])));
+    $insertModule = Database::insert("admin_module", [
+        'group_id' => $newGroupId,
+        'module'   => $modName,
+        'status'   => -1,
+        'visible'  => -1
+    ]);
+
+    if ($insertModule) {
+        $newModId = $db->insert_id;
+        $permissions = ['view', 'create', 'update', 'delete'];
+        
+        $adminUsersRes = $db->query("SELECT id_users FROM users WHERE role IN ('admin', 'admin', 'master')");
+        $adminIds = [(int)$user['ADM_ID']];
+        if ($adminUsersRes && $adminUsersRes->num_rows > 0) {
+            while ($aur = $adminUsersRes->fetch_assoc()) {
+                $adminIds[] = (int)$aur['id_users'];
+            }
+        }
+        $adminIds = array_unique($adminIds);
+
+        foreach ($permissions as $perm) {
+            Database::insert("admin_permissions", [
+                'module_id'  => $newModId,
+                'code'       => $perm,
+                'desc'       => "{$perm} {$modName}",
+                'url'        => "/{$modName}/{$perm}",
+                'created_at' => date("Y-m-d H:i:s")
+            ]);
+            $pId = $db->insert_id;
+
+            foreach ($adminIds as $aid) {
+                Database::insert("admin_authorize", [
+                    'admin_id'      => $aid,
+                    'permission_id' => $pId,
+                    'status'        => -1
+                ]);
+            }
+        }
+    }
 }
 
 Logger::admin_log([

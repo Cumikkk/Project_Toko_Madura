@@ -8,7 +8,9 @@ require_once CONFIG_ROOT . "/vendor/autoload.php";
 
 try {
     $db = Database::connect();
-    $parseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $rawParseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $ajaxPos = strpos($rawParseUrl, '/ajax');
+    $parseUrl = ($ajaxPos !== false) ? substr($rawParseUrl, $ajaxPos) : $rawParseUrl;
     $requestUri = str_replace(['\*', '/ajax', '/auth'], ['', '', '/authentication'], $parseUrl);
     $fileUrl = __DIR__ . $requestUri . ".php";
 
