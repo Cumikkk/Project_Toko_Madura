@@ -19,8 +19,10 @@ if ($action === 'delete') {
     if ($resBkt && $rowBkt = $resBkt->fetch_assoc()) {
         $oldFile = trim($rowBkt['bukti_pembayaran'] ?? '');
         if (!empty($oldFile)) {
-            @unlink(CRM_ROOT . '/' . $oldFile);
-            @unlink(WEB_ROOT . '/' . $oldFile);
+            $pathAdmin = CRM_ROOT . '/' . $oldFile;
+            $pathClient = WEB_ROOT . '/' . $oldFile;
+            if (file_exists($pathAdmin)) @unlink($pathAdmin);
+            if (file_exists($pathClient)) @unlink($pathClient);
         }
     }
 
@@ -89,8 +91,10 @@ if ($idKomisi > 0) {
         if ($resBkt && $rowBkt = $resBkt->fetch_assoc()) {
             $oldFile = trim($rowBkt['bukti_pembayaran'] ?? '');
             if (!empty($oldFile) && $oldFile !== $buktiPath) {
-                @unlink(CRM_ROOT . '/' . $oldFile);
-                @unlink(WEB_ROOT . '/' . $oldFile);
+                $pathAdmin = CRM_ROOT . '/' . $oldFile;
+                $pathClient = WEB_ROOT . '/' . $oldFile;
+                if (file_exists($pathAdmin)) @unlink($pathAdmin);
+                if (file_exists($pathClient)) @unlink($pathClient);
             }
         }
 
