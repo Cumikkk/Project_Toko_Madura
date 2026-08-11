@@ -69,9 +69,9 @@ $resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHE
 
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="tanggal_komisi" class="form-label fw-bold">Tanggal Transfer <span class="text-danger">*</span></label>
-                                <input type="datetime-local" class="form-control" id="tanggal_komisi" name="tanggal_komisi" 
-                                       value="<?= !empty($komisiData['tanggal_komisi']) ? date('Y-m-d\TH:i', strtotime($komisiData['tanggal_komisi'])) : date('Y-m-d\TH:i'); ?>" required>
+                                <label for="tgl_transfer" class="form-label fw-bold">Tanggal Transfer <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="tgl_transfer" name="tgl_transfer" 
+                                       value="<?= !empty($komisiData['tgl_transfer']) ? date('Y-m-d\TH:i', strtotime($komisiData['tgl_transfer'])) : date('Y-m-d\TH:i'); ?>" required>
                             </div>
                         </div>
 

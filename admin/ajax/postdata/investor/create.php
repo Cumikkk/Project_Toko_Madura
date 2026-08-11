@@ -22,12 +22,12 @@ $username     = $data['username'] ?? '';
 $password     = $data['password'] ?? '';
 $no_hp        = !empty($data['no_hp']) ? $data['no_hp'] : null;
 $kecamatan    = !empty($data['kecamatan']) ? $data['kecamatan'] : null;
-$alamat       = !empty($data['alamat_investor']) ? $data['alamat_investor'] : null;
+$alamat       = !empty($data['alamat_lengkap']) ? $data['alamat_lengkap'] : null;
 // Alamat disimpan ke tabel users
-$persenRaw       = str_replace(',', '.', $data['persen_bagian_investor'] ?? '60.0');
+$persenRaw       = str_replace(',', '.', $data['persentase_hak_investor'] ?? '60.0');
 $persen          = floatval($persenRaw);
-$biayaRaw        = str_replace(',', '.', $data['biaya_langganan_outlet'] ?? '100000');
-$biayaLangganan = floatval($biayaRaw);
+$biayaRaw        = preg_replace('/[^0-9]/', '', $data['biaya_langganan_outlet'] ?? '100000');
+$biayaLangganan = intval($biayaRaw);
 
 if (empty($nama_lengkap) || empty($username)) {
     JsonResponse([
@@ -102,15 +102,15 @@ if ($isEdit) {
     if (!empty($password)) {
         $hashedPass = password_hash($password, PASSWORD_BCRYPT);
         $passSafe   = $db->real_escape_string($hashedPass);
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$userId}");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$userId}");
     } else {
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal} WHERE id_users = {$userId}");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$userId}");
     }
 
     $idMaster = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    // Update investor table (alamat & persen_bagian_investor sudah dipindah/dihapus)
-    $db->query("UPDATE investor SET id_master = {$idMaster}, biaya_langganan_outlet = {$biayaLangganan} WHERE id_investor = {$idInvestor}");
+    // Update investor table 
+    $db->query("UPDATE investor SET id_master = {$idMaster}, biaya_langganan_outlet = {$biayaLangganan}, persentase_hak_investor = {$persen} WHERE id_investor = {$idInvestor}");
 
     JsonResponse([
         'code'      => 200,
@@ -136,7 +136,7 @@ if ($isEdit) {
     $hashedPass = password_hash($password, PASSWORD_BCRYPT);
     $passSafe   = $db->real_escape_string($hashedPass);
 
-    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'investor')");
+    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'investor')");
 
     if ($db->affected_rows < 1) {
         JsonResponse([
@@ -150,7 +150,7 @@ if ($isEdit) {
     $newUserId = $db->insert_id;
     $idMaster  = intval($data['id_master'] ?? ($user['ADM_ID'] ?? 1));
 
-    $db->query("INSERT INTO investor (id_users, id_master, biaya_langganan_outlet, tanggal_bergabung) VALUES ({$newUserId}, {$idMaster}, {$biayaLangganan}, NOW())");
+    $db->query("INSERT INTO investor (id_users, id_master, biaya_langganan_outlet, persentase_hak_investor) VALUES ({$newUserId}, {$idMaster}, {$biayaLangganan}, {$persen})");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

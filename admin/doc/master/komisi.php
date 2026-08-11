@@ -9,7 +9,7 @@ $sqlKomisi = "
     SELECT km.*, u.nama_lengkap as nama_master, u.username as username_master
     FROM komisi_master km
     JOIN users u ON u.id_users = km.id_master
-    ORDER BY km.tanggal_komisi DESC, km.id_komisi DESC
+    ORDER BY km.tgl_transfer DESC, km.id_komisi DESC
 ";
 $listKomisi = $db->query($sqlKomisi);
 ?>
@@ -44,7 +44,6 @@ $listKomisi = $db->query($sqlKomisi);
                                 <th class="text-center" style="width: 5%;">No</th>
                                 <th class="text-center">Tanggal Transfer</th>
                                 <th class="text-center">Nama Master</th>
-                                <th class="text-center">Periode / Keterangan</th>
                                 <th class="text-center">Nominal Komisi</th>
                                 <th class="text-center">Bukti Bayar</th>
                                 <th class="text-center">Catatan</th>
@@ -56,14 +55,13 @@ $listKomisi = $db->query($sqlKomisi);
                                 <?php $no = 1; while ($row = $listKomisi->fetch_assoc()) : ?>
                                     <tr>
                                         <td class="text-center"><?= $no++ ?></td>
-                                        <td class="text-center"><?= date("d/m/Y H:i", strtotime($row['tanggal_komisi'])) ?></td>
+                                        <td class="text-center"><?= date("d/m/Y H:i", strtotime($row['tgl_transfer'])) ?></td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_master']) ?></strong>
                                             <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username_master']) ?></code></small>
                                         </td>
-                                        <td class="text-start"><strong><?= htmlspecialchars($row['periode']) ?></strong></td>
                                         <td class="text-center">
-                                            <span class="badge bg-success fs-6">Rp <?= number_format($row['nominal'], 0, ',', '.') ?></span>
+                                            <span class="badge bg-success fs-6">Rp <?= number_format($row['nominal_transfer_komisi'], 0, ',', '.') ?></span>
                                         </td>
                                         <td class="text-center">
                                             <?php if (!empty($row['bukti_pembayaran'])) : ?>
@@ -74,7 +72,7 @@ $listKomisi = $db->query($sqlKomisi);
                                                     </a>
                                                 <?php else : ?>
                                                     <button type="button" class="btn btn-outline-info btn-sm" 
-                                                            onclick="previewBuktiKomisi('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_master'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['periode'], ENT_QUOTES) ?>', 'Rp <?= number_format($row['nominal'], 0, ',', '.') ?>')">
+                                                            onclick="previewBuktiKomisi('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_master'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['catatan'] ?? '-', ENT_QUOTES) ?>', 'Rp <?= number_format($row['nominal_transfer_komisi'], 0, ',', '.') ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php endif; ?>
@@ -90,7 +88,7 @@ $listKomisi = $db->query($sqlKomisi);
                                                 <?php endif; ?>
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "delete")) : ?>
                                                     <button type="button" class="btn btn-danger btn-sm text-white" title="Hapus Komisi" 
-                                                            onclick="deleteKomisi(<?= $row['id_komisi'] ?>, '<?= htmlspecialchars($row['nama_master'], ENT_QUOTES, 'UTF-8') ?>', 'Rp <?= number_format($row['nominal'], 0, ',', '.') ?>')">
+                                                            onclick="deleteKomisi(<?= $row['id_komisi'] ?>, '<?= htmlspecialchars($row['nama_master'], ENT_QUOTES, 'UTF-8') ?>', 'Rp <?= number_format($row['nominal_transfer_komisi'], 0, ',', '.') ?>')">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 <?php endif; ?>
@@ -112,7 +110,7 @@ $listKomisi = $db->query($sqlKomisi);
 </div>
 
 <script type="text/javascript">
-function previewBuktiKomisi(filePath, namaMaster, periode, nominal) {
+function previewBuktiKomisi(filePath, namaMaster, catatan, nominal) {
     if (!filePath) {
         Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
         return;
@@ -133,8 +131,8 @@ function previewBuktiKomisi(filePath, namaMaster, periode, nominal) {
         + '</div>'
         + '<div class="d-flex align-items-center mb-2">'
         + '  <i class="fa fa-calendar-check-o text-success me-2" style="width:20px; text-align:center;"></i>'
-        + '  <span style="min-width:140px;" class="fw-bold">Keterangan:</span>'
-        + '  <span class="text-dark">' + (periode || '-') + '</span>'
+        + '  <span style="min-width:140px;" class="fw-bold">Catatan:</span>'
+        + '  <span class="text-dark">' + (catatan || '-') + '</span>'
         + '</div>'
         + '<div class="d-flex align-items-center">'
         + '  <i class="fa fa-money text-warning me-2" style="width:20px; text-align:center;"></i>'

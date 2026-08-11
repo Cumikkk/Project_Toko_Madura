@@ -31,7 +31,7 @@ if ($resReject && $resReject->num_rows > 0) {
 
 // 2. Fetch Active Outlets (not expired)
 $sqlActive = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
            u_inv.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -44,7 +44,7 @@ $activeOutlets = $db->query($sqlActive);
 
 // 3. Fetch Expired Outlets
 $sqlExpired = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
            u_inv.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -57,7 +57,7 @@ $expiredOutlets = $db->query($sqlExpired);
 
 // 4. Fetch Pending Outlets (Request Outlet)
 $sqlPending = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -70,7 +70,7 @@ $pendingOutlets = $db->query($sqlPending);
 
 // 5. Fetch Rejected Outlets
 $sqlReject = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat as alamat_outlet,
+    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
            u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
     FROM outlet o
     LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
@@ -185,7 +185,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $activeOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
-                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
+                                            <td class="text-center"><?= !empty($row['tgl_disetujui']) ? date("d/m/Y H:i", strtotime($row['tgl_disetujui'])) : (!empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-') ?></td>
                                             <td class="text-center">
                                                 <?php
                                                 if (!empty($row['tgl_jatuh_tempo'])) {
@@ -225,7 +225,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persen_bagian_investor'], 0) ?>%)</span>
+                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persentase_hak_investor'], 0) ?>%)</span>
                                                 <?php else : ?>
                                                     <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                 <?php endif; ?>
@@ -271,7 +271,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <?php $no = 1; while ($row = $expiredOutlets->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
-                                            <td class="text-center"><?= !empty($row['tanggal_disetujui']) ? date("d/m/Y H:i", strtotime($row['tanggal_disetujui'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?></td>
+                                            <td class="text-center"><?= !empty($row['tgl_disetujui']) ? date("d/m/Y H:i", strtotime($row['tgl_disetujui'])) : (!empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-') ?></td>
                                             <td class="text-center">
                                                 <?php
                                                 if (!empty($row['tgl_jatuh_tempo'])) {
@@ -301,7 +301,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persen_bagian_investor'], 0) ?>%)</span>
+                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persentase_hak_investor'], 0) ?>%)</span>
                                                 <?php else : ?>
                                                     <span class="badge bg-warning text-dark">Belum Ada Investor</span>
                                                 <?php endif; ?>
@@ -350,7 +350,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center">
-                                                <?= !empty($row['tanggal_request']) ? date("d/m/Y H:i", strtotime($row['tanggal_request'])) : (!empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-') ?>
+                                                <?= !empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-' ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
@@ -385,11 +385,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end fw-bold text-success">
-                                                Rp <?= number_format($row['nominal_biaya'], 0, ',', '.') ?>
+                                                Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>')">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_transfer'] ?? 0, 0, ',', '.') ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>
@@ -441,7 +441,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                         <tr>
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center">
-                                                <?= !empty($row['tanggal_ditolak']) ? date("d/m/Y H:i", strtotime($row['tanggal_ditolak'])) : '-' ?>
+                                                <?= !empty($row['tgl_ditolak']) ? date("d/m/Y H:i", strtotime($row['tgl_ditolak'])) : '-' ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (($row['tipe_request'] ?? 'baru') === 'perpanjangan') : ?>
@@ -476,11 +476,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end text-muted">
-                                                Rp <?= number_format($row['nominal_biaya'], 0, ',', '.') ?>
+                                                Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_biaya'] ?? 0, 0, ',', '.') ?>')">
+                                                    <button type="button" class="btn btn-outline-info btn-sm" onclick="previewBukti('<?= htmlspecialchars($row['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES) ?>', '<?= htmlspecialchars($row['nama_investor'] ?? '-', ENT_QUOTES) ?>', '<?= number_format($row['nominal_transfer'] ?? 0, 0, ',', '.') ?>')">
                                                         <i class="fas fa-image me-1"></i> Lihat Bukti
                                                     </button>
                                                 <?php else : ?>

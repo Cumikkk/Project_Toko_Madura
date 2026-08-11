@@ -4,7 +4,7 @@ use App\Models\Admin;
 $loggedInUser = Admin::authentication();
 $loggedInLevel = intval($loggedInUser['ADM_LEVEL'] ?? 1);
 
-$whereClause = "WHERE role = 'programmer'";
+$whereClause = "WHERE role = 'admin'";
 
 $dt->query("
     SELECT
@@ -29,7 +29,7 @@ $dt->hide('COUNTRY_NAME');
 
 $dt->edit('ADMROLE_NAME', function($data) {
     $r = strtolower($data['ADMROLE_NAME'] ?? '');
-    if ($r === 'programmer') {
+    if ($r === 'admin') {
         return "<span class='badge bg-danger'>Programmer</span>";
     } else {
         return "<span class='badge bg-primary'>Master (Owner)</span>";

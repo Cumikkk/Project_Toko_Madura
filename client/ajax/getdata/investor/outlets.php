@@ -17,11 +17,11 @@ $sql = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        u.alamat as alamat_outlet,
+        u.alamat_lengkap as alamat_outlet,
         u.kecamatan,
         o.status,
-        DATE_FORMAT(o.tanggal_request, '%d/%m/%Y %H:%i') as tanggal_bergabung,
-        DATE_FORMAT(o.tanggal_disetujui, '%d/%m/%Y %H:%i') as tanggal_disetujui
+        DATE_FORMAT(o.tgl_request, '%d/%m/%Y %H:%i') as tanggal_bergabung,
+        DATE_FORMAT(o.tgl_disetujui, '%d/%m/%Y %H:%i') as tgl_disetujui
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
     WHERE o.id_investor = {$idInvestor}

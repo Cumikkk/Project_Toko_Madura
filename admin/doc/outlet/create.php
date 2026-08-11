@@ -112,7 +112,7 @@ $investorList = $db->query("
                             </div>
                         </div>
                         <?php
-                        $defaultInvestor = (float)($outletData['persen_bagian_investor'] ?? 50.00);
+                        $defaultInvestor = (float)($outletData['persentase_hak_investor'] ?? 50.00);
                         $defaultOutlet = 100.00 - $defaultInvestor;
                         ?>
                         <div class="col-md-4 mb-3">
@@ -139,9 +139,9 @@ $investorList = $db->query("
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="form-group">
-                                <label for="persen_bagian_investor" class="form-label fw-bold">Hak Investor (%) <span class="text-danger">*</span></label>
+                                <label for="persentase_hak_investor" class="form-label fw-bold">Hak Investor (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persen_bagian_investor" name="persen_bagian_investor"
+                                    <input type="number" step="0.5" min="0" max="100" class="form-control fw-bold" id="persentase_hak_investor" name="persentase_hak_investor"
                                         placeholder="Contoh: 50.00"
                                         value="<?= htmlspecialchars($defaultInvestor); ?>" required oninput="balanceAdminOutletSplit('investor')">
                                     <span class="input-group-text border-end-0">%</span>
@@ -272,14 +272,14 @@ $investorList = $db->query("
             let selectedOption = $(this).find('option:selected');
             let persen = selectedOption.data('persen');
             if (persen !== undefined && persen !== '') {
-                $('#persen_bagian_investor').val(persen);
+                $('#persentase_hak_investor').val(persen);
                 window.balanceAdminOutletSplit('investor');
             }
         });
 
         window.balanceAdminOutletSplit = function(source) {
             if (source === 'investor') {
-                const invVal = parseFloat($('#persen_bagian_investor').val());
+                const invVal = parseFloat($('#persentase_hak_investor').val());
                 if (!isNaN(invVal)) {
                     const outVal = Math.max(0, 100 - invVal);
                     $('#persen_bagian_outlet').val(outVal.toFixed(2));
@@ -288,7 +288,7 @@ $investorList = $db->query("
                 const outVal = parseFloat($('#persen_bagian_outlet').val());
                 if (!isNaN(outVal)) {
                     const invVal = Math.max(0, 100 - outVal);
-                    $('#persen_bagian_investor').val(invVal.toFixed(2));
+                    $('#persentase_hak_investor').val(invVal.toFixed(2));
                 }
             }
         };
@@ -301,7 +301,7 @@ $investorList = $db->query("
         };
 
         window.stepAdminInvestor = function(dir) {
-            let el = $('#persen_bagian_investor');
+            let el = $('#persentase_hak_investor');
             let val = parseFloat(el.val()) || 0;
             val = Math.max(0, Math.min(100, val + dir));
             el.val(val.toFixed(2));

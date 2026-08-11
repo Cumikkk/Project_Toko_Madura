@@ -14,7 +14,7 @@ if ($idOutlet <= 0) {
 }
 
 $escapedAlasan = $db->real_escape_string($alasan);
-$update = $db->query("UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', tanggal_ditolak = NOW() WHERE id_outlet = {$idOutlet}");
+$update = $db->query("UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', tgl_ditolak = NOW() WHERE id_outlet = {$idOutlet}");
 if ($update) {
     echo json_encode(['success' => true, 'message' => 'Request outlet & pembayaran berhasil ditolak.']);
 } else {

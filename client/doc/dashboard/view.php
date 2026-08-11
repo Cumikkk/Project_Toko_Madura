@@ -28,9 +28,9 @@ if ($role === 'investor') {
     $resOutletCount = $db->query("SELECT COUNT(*) as total FROM outlet WHERE id_investor = {$investorId}")->fetch_assoc()['total'] ?? 0;
     $resOmzetTot = $db->query("
         SELECT 
-            IFNULL(SUM(lo.omzet), 0) as total_omzet, 
+            IFNULL(SUM(lo.nominal_omzet), 0) as total_omzet, 
             IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan,
-            IFNULL(SUM(lo.nominal_potongan * (IFNULL(o.persen_bagian_investor, 50.00) / 100.0)), 0) as total_hak_investor
+            IFNULL(SUM(lo.nominal_potongan * (IFNULL(o.persentase_hak_investor, 50.00) / 100.0)), 0) as total_hak_investor
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
         WHERE o.id_investor = {$investorId}
@@ -42,11 +42,12 @@ if ($role === 'investor') {
     $hakInvestor = (float)($resOmzetTot['total_hak_investor'] ?? 0);
 
     $resRecent = $db->query("
-        SELECT o.nama_outlet, lo.periode_laporan, lo.omzet, lo.nominal_potongan, lo.waktu_input
+        SELECT u.nama_lengkap as nama_outlet, lo.tanggal_omzet, lo.nominal_omzet, lo.nominal_potongan, lo.created_at
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
+        JOIN users u ON u.id_users = o.id_users
         WHERE o.id_investor = {$investorId}
-        ORDER BY lo.waktu_input DESC LIMIT 5
+        ORDER BY lo.created_at DESC LIMIT 5
     ");
 ?>
 <div class="row row-sm mb-4">
@@ -91,11 +92,11 @@ if ($role === 'investor') {
     // -------------------------------------------------------------
     // DASHBOARD OUTLET (KASIR)
     // -------------------------------------------------------------
-    $resOut = $db->query("SELECT id_outlet, nama_outlet FROM outlet WHERE id_users = {$userId} LIMIT 1")->fetch_assoc();
+    $resOut = $db->query("SELECT o.id_outlet, u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1")->fetch_assoc();
     $outletId = (int)($resOut['id_outlet'] ?? 0);
 
     $resOutletOmzet = $db->query("
-        SELECT COUNT(*) as total_laporan, IFNULL(SUM(omzet), 0) as total_omzet, IFNULL(SUM(nominal_potongan), 0) as total_potongan
+        SELECT COUNT(*) as total_laporan, IFNULL(SUM(nominal_omzet), 0) as total_omzet, IFNULL(SUM(nominal_potongan), 0) as total_potongan
         FROM laporan_omzet WHERE id_outlet = {$outletId}
     ")->fetch_assoc();
 

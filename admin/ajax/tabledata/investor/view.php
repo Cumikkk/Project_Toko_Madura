@@ -24,7 +24,7 @@ $dt->query("
         u.username as INV_USER,
         u.no_hp as INV_HP,
         u.kecamatan as INV_KECAMATAN,
-        u.alamat as INV_ALAMAT,
+        u.alamat_lengkap as INV_ALAMAT,
         u_master.nama_lengkap as MASTER_NAME,
         i.id_investor as ID_INV
     FROM investor i

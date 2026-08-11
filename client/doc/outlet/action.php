@@ -71,7 +71,7 @@ try {
         }
         $noHp = trim($db->real_escape_string($_POST['no_hp'] ?? ''));
         $persentasePotongan = isset($_POST['persentase_potongan']) ? (float)$_POST['persentase_potongan'] : 10.00;
-        $persenBagianInvestor = isset($_POST['persen_bagian_investor']) ? (float)$_POST['persen_bagian_investor'] : 50.00;
+        $persenBagianInvestor = isset($_POST['persentase_hak_investor']) ? (float)$_POST['persentase_hak_investor'] : 50.00;
 
         // Handle Upload Bukti Pembayaran
         $buktiPath = '';
@@ -111,8 +111,8 @@ try {
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
         // Simpan kecamatan & alamat outlet ke tabel users
-        $db->query("UPDATE users SET kecamatan = '{$kecamatan}', alamat = '{$alamatOutlet}' WHERE id_users = {$newUserId}");
-        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persen_bagian_investor, nama_outlet, status, nominal_biaya, bukti_pembayaran, tanggal_request) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
+        $db->query("UPDATE users SET kecamatan = '{$kecamatan}', alamat_lengkap = '{$alamatOutlet}' WHERE id_users = {$newUserId}");
+        $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persentase_hak_investor, nama_outlet, status, nominal_transfer, bukti_pembayaran, tgl_request) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
@@ -189,9 +189,9 @@ try {
         $sqlUpdate = "UPDATE outlet SET 
                         status = 'pending',
                         tipe_request = '{$tipeReqNow}',
-                        nominal_biaya = {$nominalBiaya},
+                        nominal_transfer = {$nominalBiaya},
                         bukti_pembayaran = '{$escapedBukti}',
-                        tanggal_request = NOW()
+                        tgl_request = NOW()
                       WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId}";
 
         if (!$db->query($sqlUpdate)) {
@@ -217,7 +217,7 @@ try {
         $alamatOutlet = trim($_POST['alamat_outlet'] ?? '');
         $kecamatan = trim($_POST['kecamatan'] ?? '');
         $persentasePotongan = (float)($_POST['persentase_potongan'] ?? 10.00);
-        $persenBagianInvestor = (float)($_POST['persen_bagian_investor'] ?? 50.00);
+        $persenBagianInvestor = (float)($_POST['persentase_hak_investor'] ?? 50.00);
         $namaPengelola = trim($_POST['nama_pengelola'] ?? '');
         $noHp = trim($_POST['no_hp'] ?? '');
         $username = trim($_POST['username'] ?? '');
@@ -285,12 +285,12 @@ try {
         $updateOutlet = $db->query("UPDATE outlet SET 
             nama_outlet = '{$safeNamaOutlet}', 
             persentase_potongan = {$persentasePotongan}, 
-            persen_bagian_investor = {$persenBagianInvestor},
+            persentase_hak_investor = {$persenBagianInvestor},
             status = 'pending',
             tipe_request = 'baru',
             bukti_pembayaran = '{$escapedBukti}',
             alasan_penolakan = NULL,
-            tanggal_request = NOW()
+            tgl_request = NOW()
             WHERE id_outlet = {$idOutlet}");
 
         if (!$updateOutlet) {
@@ -303,7 +303,7 @@ try {
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
                 kecamatan = '{$safeKecamatan}',
-                alamat = '{$safeAlamatOutlet}',
+                alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}', 
@@ -312,7 +312,7 @@ try {
         } else {
             $db->query("UPDATE users SET 
                 kecamatan = '{$safeKecamatan}',
-                alamat = '{$safeAlamatOutlet}',
+                alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}' 
@@ -330,7 +330,7 @@ try {
     // =========================================================================
     if ($action === 'get_detail') {
         $idOutlet = (int)($_GET['id_outlet'] ?? 0);
-        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.no_hp, u.kecamatan, u.alamat as alamat_outlet FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
+        $resDetail = $db->query("SELECT o.*, u.username, u.nama_lengkap, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat_outlet FROM outlet o JOIN users u ON o.id_users = u.id_users WHERE o.id_outlet = {$idOutlet} AND o.id_investor = {$investorId} LIMIT 1");
         if (!$resDetail || $resDetail->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data outlet tidak ditemukan.']);
         }
@@ -338,7 +338,7 @@ try {
         $detail = $resDetail->fetch_assoc();
         
         // Calculate omzet statistics for this outlet
-        $resOmzet = $db->query("SELECT COUNT(*) as total_laporan, IFNULL(SUM(omzet), 0) as total_omzet, IFNULL(SUM(nominal_potongan), 0) as total_potongan FROM laporan_omzet WHERE id_outlet = {$idOutlet}");
+        $resOmzet = $db->query("SELECT COUNT(*) as total_laporan, IFNULL(SUM(nominal_omzet), 0) as total_omzet, IFNULL(SUM(nominal_potongan), 0) as total_potongan FROM laporan_omzet WHERE id_outlet = {$idOutlet}");
         $statOmzet = $resOmzet ? $resOmzet->fetch_assoc() : ['total_laporan' => 0, 'total_omzet' => 0, 'total_potongan' => 0];
 
         $detail['total_laporan'] = (int)$statOmzet['total_laporan'];
@@ -357,7 +357,7 @@ try {
         $alamatOutlet = trim($_POST['alamat_outlet'] ?? '');
         $kecamatan = trim($_POST['kecamatan'] ?? '');
         $persentasePotongan = (float)($_POST['persentase_potongan'] ?? 10.00);
-        $persenBagianInvestor = (float)($_POST['persen_bagian_investor'] ?? 50.00);
+        $persenBagianInvestor = (float)($_POST['persentase_hak_investor'] ?? 50.00);
         $namaPengelola = trim($_POST['nama_pengelola'] ?? '');
         $noHp = trim($_POST['no_hp'] ?? '');
         $username = trim($_POST['username'] ?? '');
@@ -400,7 +400,7 @@ try {
             $updateOutlet = $db->query("UPDATE outlet SET 
                 nama_outlet = '{$safeNamaOutlet}', 
                 persentase_potongan = {$persentasePotongan}, 
-                persen_bagian_investor = {$persenBagianInvestor} 
+                persentase_hak_investor = {$persenBagianInvestor} 
                 WHERE id_outlet = {$idOutlet}");
 
             if (!$updateOutlet) {
@@ -410,9 +410,9 @@ try {
             // Update existing laporan_omzet records starting from Tanggal Mulai ONWARDS (>= safeMulai)
             $db->query("UPDATE laporan_omzet SET 
                 presentase_potongan = {$persentasePotongan},
-                persen_bagian_investor = {$persenBagianInvestor},
-                nominal_potongan = ROUND(omzet * ({$persentasePotongan} / 100.0), 2)
-                WHERE id_outlet = {$idOutlet} AND periode_laporan >= '{$safeMulai}'");
+                persentase_hak_investor = {$persenBagianInvestor},
+                nominal_potongan = ROUND(nominal_omzet * ({$persentasePotongan} / 100.0), 2)
+                WHERE id_outlet = {$idOutlet} AND tanggal_omzet >= '{$safeMulai}'");
                 
             $affectedRowsOmzet = $db->affected_rows;
         } else {
@@ -420,7 +420,7 @@ try {
             $updateOutlet = $db->query("UPDATE outlet SET 
                 nama_outlet = '{$safeNamaOutlet}', 
                 persentase_potongan = {$persentasePotongan}, 
-                persen_bagian_investor = {$persenBagianInvestor} 
+                persentase_hak_investor = {$persenBagianInvestor} 
                 WHERE id_outlet = {$idOutlet}");
 
             if (!$updateOutlet) {
@@ -434,7 +434,7 @@ try {
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
                 kecamatan = '{$safeKecamatan}',
-                alamat = '{$safeAlamatOutlet}',
+                alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}', 
@@ -443,7 +443,7 @@ try {
         } else {
             $db->query("UPDATE users SET 
                 kecamatan = '{$safeKecamatan}',
-                alamat = '{$safeAlamatOutlet}',
+                alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
                 username = '{$safeUsername}' 

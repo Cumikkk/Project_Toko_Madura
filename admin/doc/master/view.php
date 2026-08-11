@@ -6,7 +6,7 @@ $db = Database::connect();
 
 // Fetch Master list with sub-counts
 $sqlMasters = "
-    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat, u.created_at,
+    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat, u.created_at,
            COUNT(DISTINCT inv.id_investor) as total_investor,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM users u
@@ -71,7 +71,7 @@ $masters = $db->query($sqlMasters);
                                         <td class="text-center">
                                             <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat="<?= htmlspecialchars($row['alamat']) ?>" title="Klik untuk lihat detail alamat">
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat = "<?= htmlspecialchars($row['alamat']) ?>" title="Klik untuk lihat detail alamat">
                                                         <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
                                                     </span>
                                                 <?php else : ?>

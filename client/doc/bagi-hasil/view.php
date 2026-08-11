@@ -28,11 +28,11 @@ if ($role === 'investor') {
     }
 } else {
     // Logged in user is Outlet
-    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
+    $resOut = $db->query("SELECT o.id_outlet, o.id_investor, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor FROM outlet o WHERE o.id_users = {$userId} LIMIT 1");
     if ($resOut && $resOut->num_rows > 0) {
         $rowOut = $resOut->fetch_assoc();
         $investorId = (int)$rowOut['id_investor'];
-        $persenInvestor = (float)($rowOut['persen_bagian_investor'] ?? 50.00);
+        $persenInvestor = (float)($rowOut['persentase_hak_investor'] ?? 50.00);
         $targetOutletId = (int)$rowOut['id_outlet'];
     }
 }
@@ -63,7 +63,7 @@ $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 // Fetch list of outlets belonging to logged in investor
 $investorOutlets = [];
 if ($role === 'investor' && $investorId > 0) {
-    $resOuts = $db->query("SELECT id_outlet, nama_outlet FROM outlet WHERE id_investor = {$investorId} ORDER BY nama_outlet ASC");
+    $resOuts = $db->query("SELECT o.id_outlet, u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_investor = {$investorId} ORDER BY u.nama_lengkap ASC");
     if ($resOuts) {
         while ($oRow = $resOuts->fetch_assoc()) {
             $investorOutlets[] = $oRow;
@@ -87,7 +87,7 @@ $hasAnyLastDayDone = false;
 
 // Fetch distinct years available in database
 $whereYearSql = ($role === 'investor') ? "o.id_investor = {$investorId}" : "o.id_outlet = {$targetOutletId}";
-$resYears = $db->query("SELECT DISTINCT YEAR(l.periode_laporan) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereYearSql} ORDER BY y_periode DESC");
+$resYears = $db->query("SELECT DISTINCT YEAR(l.tanggal_omzet) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereYearSql} ORDER BY y_periode DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
         $availableYears[] = (int)$yRow['y_periode'];
@@ -102,12 +102,12 @@ $selectedOutletNama = '';
 
 if ($selectedOutletId > 0 && $role === 'investor') {
     $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
-    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$selectedOutletId} LIMIT 1");
+    $resOneOut = $db->query("SELECT u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$selectedOutletId} LIMIT 1");
     if ($resOneOut && $resOneOut->num_rows > 0) {
         $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
     }
 } elseif ($role === 'outlet' && $targetOutletId > 0) {
-    $resOneOut = $db->query("SELECT nama_outlet FROM outlet WHERE id_outlet = {$targetOutletId} LIMIT 1");
+    $resOneOut = $db->query("SELECT u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$targetOutletId} LIMIT 1");
     if ($resOneOut && $resOneOut->num_rows > 0) {
         $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
     }
@@ -119,7 +119,7 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConditions[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $whereConditions[] = "l.tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
     
     $t1 = strtotime($selectedTglMulai);
     $t2 = strtotime($selectedTglSelesai);
@@ -133,23 +133,23 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     }
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $whereConditions[] = "l.periode_laporan >= '{$safeMulai}'";
+    $whereConditions[] = "l.tanggal_omzet >= '{$safeMulai}'";
     $t1 = strtotime($selectedTglMulai);
     $d1 = date('j', $t1) . ' ' . ($bulanIndo[(int)date('n', $t1)] ?? '') . ' ' . date('Y', $t1);
     $periodeParts[] = 'Mulai ' . $d1;
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConditions[] = "l.periode_laporan <= '{$safeSelesai}'";
+    $whereConditions[] = "l.tanggal_omzet <= '{$safeSelesai}'";
     $t2 = strtotime($selectedTglSelesai);
     $d2 = date('j', $t2) . ' ' . ($bulanIndo[(int)date('n', $t2)] ?? '') . ' ' . date('Y', $t2);
     $periodeParts[] = 'Sampai ' . $d2;
 } else {
     if ($selectedBulan > 0) {
-        $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
+        $whereConditions[] = "MONTH(l.tanggal_omzet) = {$selectedBulan}";
         $periodeParts[] = $bulanIndo[$selectedBulan] ?? '';
     }
     if ($selectedTahun > 0) {
-        $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+        $whereConditions[] = "YEAR(l.tanggal_omzet) = {$selectedTahun}";
         $periodeParts[] = $selectedTahun;
     }
 }
@@ -170,21 +170,22 @@ if (!empty($laporanJoinConds)) {
 $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
-        o.nama_outlet,
+        u.nama_lengkap as nama_outlet,
         o.persentase_potongan,
-        IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor,
-        IFNULL(SUM(l.omzet), 0) as total_omzet,
+        IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor,
+        IFNULL(SUM(l.nominal_omzet), 0) as total_omzet,
         IFNULL(SUM(l.nominal_potongan), 0) as total_potongan_db,
-        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00)) / 100.0), 2)), 0) as total_hak_investor_db,
-        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persen_bagian_investor, IFNULL(o.persen_bagian_investor, 50.00))) / 100.0), 2)), 0) as total_hak_outlet_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * (IFNULL(l.persentase_hak_investor, IFNULL(o.persentase_hak_investor, 50.00)) / 100.0), 2)), 0) as total_hak_investor_db,
+        IFNULL(SUM(ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persentase_hak_investor, IFNULL(o.persentase_hak_investor, 50.00))) / 100.0), 2)), 0) as total_hak_outlet_db,
         COUNT(DISTINCT l.persentase_potongan) as count_distinct_rates,
         MIN(l.persentase_potongan) as min_rate,
         MAX(l.persentase_potongan) as max_rate
     FROM outlet o
+    JOIN users u ON u.id_users = o.id_users
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor
+    GROUP BY o.id_outlet, u.nama_lengkap, o.persentase_potongan, o.persentase_hak_investor
     ORDER BY o.id_outlet DESC
 ";
 
@@ -192,10 +193,10 @@ $resBagiHasil = $db->query($sqlBagiHasil);
 
 if ($resBagiHasil) {
     while ($row = $resBagiHasil->fetch_assoc()) {
-        $omzet = (float)$row['total_omzet'];
+        $nominal_omzet = (float)$row['total_omzet'];
         $idOutletRow = (int)$row['id_outlet'];
         $ratePotongan = (float)($row['persentase_potongan'] ?? 10.00);
-        $rateInvestor = (float)($row['persen_bagian_investor'] ?? 50.00);
+        $rateInvestor = (float)($row['persentase_hak_investor'] ?? 50.00);
         $rateOutlet = 100.00 - $rateInvestor;
 
         $countRates = (int)($row['count_distinct_rates'] ?? 0);
@@ -221,7 +222,7 @@ if ($resBagiHasil) {
 
         $row['persentase_potongan'] = $ratePotongan;
         $row['display_rate'] = $displayRate;
-        $row['persen_bagian_investor'] = $rateInvestor;
+        $row['persentase_hak_investor'] = $rateInvestor;
         $row['is_last_day_done'] = true;
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;

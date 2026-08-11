@@ -1,183 +1,104 @@
 == KONTEKS PROYEK ==
 
-Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan pada Toko Madura. Aplikasi ini memiliki tiga peran pengguna, yaitu Master, Investor, dan Outlet, dengan rincian tugas sebagai berikut:
+Saya sedang membuat aplikasi berbasis website untuk pemantauan laporan penjualan pada Toko Madura. Aplikasi ini memiliki empat peran pengguna, yaitu Admin, Master, Investor, dan Outlet, dengan rincian tugas sebagai berikut:
 
-1. Tugas Master
+1. Tugas Admin
+- Mengelola akun Master, Investor, dan Outlet secara global.
+- Memverifikasi pengajuan outlet baru (ACC / Reject).
+- Mengatur konfigurasi sistem dan rekening bank pusat.
+
+2. Tugas Master
 - Mendaftarkan akun untuk setiap investor.
 - Melihat daftar investor yang didaftarkan saja.
 - Mengatur persentase potongan global. Pengaturan ini dibuat dinamis karena nilai persentase belum bersifat tetap.
 - Memantau berjalannya sistem secara garis besar. Setiap Master dapat melihat daftar investor di bawah naungannya.
 
-2. Tugas Investor
+3. Tugas Investor
 - Mendaftarkan akun untuk setiap outlet yang berada di bawah kepemilikannya.
 - Melihat daftar outlet miliknya saja beserta rincian total omzet dari masing-masing outlet tersebut.
 - Melihat akumulasi keseluruhan potongan dari semua outlet miliknya. Nantinya, sistem akan secara otomatis mengalkulasi bagi hasil dari total kumpulan potongan ini (pembagian antara hak Investor dan hak Outlet).
 
-3. Tugas Outlet
+4. Tugas Outlet
 - Menginput total omzet penjualan yang didapatkan dari operasional toko pada setiap akhir periode pelaporan (misalnya harian, mingguan, atau bulanan).
 - Setelah penginputan, sistem akan secara otomatis menghitung nilai potongan berdasarkan persentase global yang sedang berlaku saat itu dan menyimpannya sebagai riwayat data.
 
-== DATABASE SCHEMA TERBARU ==
+== DATABASE SCHEMA TERBARU (VERSI 2) ==
 
 CREATE DATABASE toko_madura;
 USE toko_madura;
 
+-- 1. TABEL USERS (Pusat Akun Login & Data Profil Seluruh Pengguna)
 CREATE TABLE users (
     id_users INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nama_lengkap VARCHAR(100) NOT NULL,
     username VARCHAR(50) NOT NULL UNIQUE,
     no_hp VARCHAR(20) DEFAULT NULL,
-    email VARCHAR(100) DEFAULT NULL UNIQUE,
+    kecamatan VARCHAR(100) DEFAULT NULL,
+    alamat_lengkap TEXT DEFAULT NULL,
     password VARCHAR(255) NOT NULL,
-    role ENUM('master', 'investor', 'outlet', 'programmer') NOT NULL,
+    role ENUM('admin', 'master', 'investor', 'outlet') NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE komisi_master (
-    id_komisi INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_master INT(10) UNSIGNED NOT NULL,
-    tanggal_komisi DATETIME NOT NULL,
-    periode VARCHAR(100) NOT NULL,
-    nominal DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    catatan TEXT DEFAULT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE CASCADE
-);
-
+-- 2. TABEL INVESTOR (Profil & Tarif Langganan Investor)
 CREATE TABLE investor (
     id_investor INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_users INT(10) UNSIGNED NOT NULL UNIQUE,
     id_master INT(10) UNSIGNED NOT NULL,
-    alamat_investor TEXT DEFAULT NULL,
-    persen_bagian_investor DECIMAL(5,2) NOT NULL DEFAULT 50.00,
-    biaya_langganan_outlet DECIMAL(15,2) NOT NULL DEFAULT 100000.00,
+    biaya_langganan_outlet BIGINT NOT NULL DEFAULT 100000,
     FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
     FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE RESTRICT
 );
 
+-- 3. TABEL OUTLET (Data Toko & Lisensi Outlet)
 CREATE TABLE outlet (
     id_outlet INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_users INT(10) UNSIGNED NOT NULL UNIQUE,
     id_investor INT(10) UNSIGNED NOT NULL,
     nama_outlet VARCHAR(100) NOT NULL,
-    kecamatan VARCHAR(100) DEFAULT NULL,
-    alamat_outlet TEXT DEFAULT NULL,
-    persentase_potongan DECIMAL(5,2) DEFAULT 10.00,
-    persen_bagian_investor DECIMAL(5,2) DEFAULT 50.00,
-    status ENUM('pending','active','reject','inactive') NOT NULL DEFAULT 'pending',
-    nominal_biaya DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
-    tanggal_request DATETIME DEFAULT NULL,
-    tanggal_bergabung DATETIME DEFAULT NULL,
-    tanggal_ditolak DATETIME DEFAULT NULL,
-    alasan_penolakan TEXT DEFAULT NULL,
+    persentase_potongan DECIMAL(5,2) NOT NULL DEFAULT 10.00,
+    persentase_hak_investor DECIMAL(5,2) NOT NULL DEFAULT 50.00,
+    status ENUM('pending', 'active', 'reject') NOT NULL DEFAULT 'pending',
+    tipe_request ENUM('baru', 'perpanjangan') NOT NULL DEFAULT 'baru',
+    tgl_request DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tgl_disetujui DATETIME DEFAULT NULL,
+    tgl_ditolak DATETIME DEFAULT NULL,
     tgl_jatuh_tempo DATETIME DEFAULT NULL,
+    nominal_transfer BIGINT NOT NULL DEFAULT 0,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    alasan_penolakan TEXT DEFAULT NULL,
     FOREIGN KEY (id_users) REFERENCES users(id_users) ON DELETE CASCADE,
     FOREIGN KEY (id_investor) REFERENCES investor(id_investor) ON DELETE RESTRICT
 );
 
+-- 4. TABEL KOMISI MASTER (Riwayat Transfer Komisi Master)
+CREATE TABLE komisi_master (
+    id_komisi INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_master INT(10) UNSIGNED NOT NULL,
+    tgl_transfer DATETIME NOT NULL,
+    nominal_transfer_komisi BIGINT NOT NULL DEFAULT 0,
+    catatan TEXT NOT NULL,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (id_master) REFERENCES users(id_users) ON DELETE CASCADE
+);
+
+-- 5. TABEL LAPORAN OMZET (Transaksi Omzet Harian)
 CREATE TABLE laporan_omzet (
     id_laporan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     id_outlet INT(10) UNSIGNED NOT NULL,
-    periode_laporan DATE NOT NULL,
-    omzet DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    presentase_potongan DECIMAL(5,2) NOT NULL,
-    persen_bagian_investor DECIMAL(5,2) DEFAULT NULL,
-    nominal_potongan DECIMAL(15,2) NOT NULL,
-    waktu_input DATETIME NOT NULL,
+    tanggal_omzet DATE NOT NULL,
+    nominal_omzet BIGINT NOT NULL DEFAULT 0,
+    persentase_potongan DECIMAL(5,2) NOT NULL,
+    persentase_hak_investor DECIMAL(5,2) NOT NULL,
+    nominal_potongan BIGINT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_outlet) REFERENCES outlet(id_outlet) ON DELETE RESTRICT,
-    INDEX idx_laporan_periode (periode_laporan)
+    INDEX idx_laporan_periode (tanggal_omzet)
 );
 
-CREATE TABLE rekap_bagi_hasil (
-    id_rekap INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_investor INT(10) UNSIGNED NOT NULL,
-    periode_rekap VARCHAR(20) NOT NULL,
-    akumulasi_omzet DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    akumulasi_potongan DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    hak_investor DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    hak_outlet DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    FOREIGN KEY (id_investor) REFERENCES investor(id_investor) ON DELETE RESTRICT,
-    INDEX idx_rekap_periode (periode_rekap)
-);
-
+-- 6. TABEL PENGATURAN SISTEM (Konfigurasi Rekening Bank Admin)
 CREATE TABLE pengaturan_sistem (
     id_pengaturan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nama_pengaturan VARCHAR(50) NOT NULL UNIQUE,
     nilai VARCHAR(255) NOT NULL
 );
-
-== CATATAN UPDATE MODUL ADMIN ==
-- Group Pengaturan pada Portal Admin dikonfigurasi untuk Rekening Bank (/pengaturan/rekening_bank) dan Pengaturan Sistem. Biaya langganan outlet kini 100% dikelola per-investor pada tabel investor (biaya_langganan_outlet).
-- Card Request Outlet Terbaru pada Dashboard Admin difilter hanya menampilkan data berstatus pending.
-- Portal Admin Outlet dilengkapi 4 tab: Outlet Aktif, Expired / Non-Aktif, Request Masuk (Pending), dan Request Ditolak (Reject).
-- Sistem penolakan request outlet menggunakan SweetAlert2 dialog interaktif dengan catatan alasan wajib.
-- Akun outlet yang berstatus pending, reject, atau expired otomatis diblokir saat login dan dipaksa logout pada sesi aktif.
-- Memperbaiki pemanggilan `tanggal_bergabung` pada badge header banner kanan Outlet Panel (`client/doc/omzet/view.php`).
-- Mengatur logika arsitektur: `tanggal_bergabung` diisi sekali saat approval pertama (IFNULL - permanen selamanya), sedangkan `tanggal_disetujui` akan ter-update setiap persetujuan/perpanjangan langganan berkala oleh Admin (`admin/ajax/postdata/request-outlet/accept.php`).
-- Menambahkan kolom `tipe_request ENUM('baru', 'perpanjangan')` pada tabel outlet untuk membedakan pendaftaran baru vs perpanjangan langganan bulanan di Portal Admin & Client.
-- Mengimplementasikan Fitur Perpanjangan Langganan & Ajukan Ulang Pembayaran (Opsi B) di Portal Client Investor (`client/doc/outlet/view.php` & `action.php`): Teks Notifikasi Penolakan dan Tombol Aksi dibedakan secara presisi ("Pendaftaran Baru Ditolak Admin" vs "Perpanjangan Langganan Ditolak Admin").
-- Menyelaraskan tampilan monitoring status outlet pada Portal Client Master (`client/doc/outlet/view.php` & `dashboard/view.php`) agar menampilkan status real-time dinamis (Aktif, Expired, Pending, Reject).
-- Mengubah default tema portal client saat pertama kali login menjadi Tema Terang (Light Mode / `MBR_THEME = 0`) pada `config/models/User.php`.
-- Memperbarui data dummy outlet realistis dengan username singkat (`toko1` s.d `toko6`) dan password standar `123` untuk memfasilitasi 6 skenario testing lengkap (Aktif Normal, Aktif Mendekati Expired, Expired, Pending Perpanjangan, Pending Pendaftaran Baru, Pendaftaran Ditolak).
-- Mengembalikan modul Portal Admin Manajemen Outlet (`admin/doc/outlet/view.php`, `accept.php`, `reject.php`) 100% menggunakan kode bersih dan stabil milikmu untuk mencegah error.
-- Mengimplementasikan penghapusan otomatis file fisik `bukti_pembayaran` dari server saat Admin atau Investor menghapus outlet.
-- Merapikan navigasi topbar Portal Client Master Owner (`client/template/header.php`) menjadi 2 menu fokus utama (Data Investor & Data Outlet Toko), serta menyederhanakan alur navigasi dari `/dashboard` langsung mengarah ke `/investor`.
-- Merancang ulang halaman Data Investor Master Owner (`client/doc/investor/view.php`) dengan desain sistem modern: Header Banner Maroon Gradient, 3 Card Ringkasan Metrik (Total Investor, Total Toko, Total Outlet Aktif), Datatable Elegan dengan breakdown status toko, dan Modal Interaktif "Portofolio Toko Outlet".
-- Berhasil menggabungkan (merge) commit terbaru dari `origin/tegar1` (`95122f0`), mengintegrasikan fitur In-Page Lightbox Image Preview (`btn-preview-image-lightbox`) untuk pratinjau bukti pembayaran secara interaktif, serta menambahkan tampilan alasan penolakan admin langsung di dalam modal pengajuan ulang.
-- Merapikan desain kolom Status pada Portal Client Investor (`client/doc/outlet/view.php`): menggunakan kombinasi **Badge Status Kapsul** di atas dan **Tombol Action Slim Outline** di bawah dengan penataan jarak presisi `gap: 6px` dan lebar container 170px, sehingga antarmuka tabel menjadi sangat rapi, seimbang, dan tidak lagi nempel/sesak.
-- Mengimplementasikan **Active Session Guard & Banner Peringatan H-7 Expired** pada Portal Client Outlet (`client/doc/omzet/view.php`, `client/home.php`, `client/ajax/authentication/signin.php`): Sesi aktif outlet secara otomatis dicek real-time dan di-logout jika expired/pending/reject, penyempurnaan pesan konfirmasi perpanjangan langganan vs pendaftaran baru, serta penambahan Card Banner Warning H-7 Expired pada halaman utama Input Omzet Outlet untuk mengingatkan petugas mengabari Investor.
-- Memperbaiki bug struktur penutupan tag HTML (`tab-content` & tag orphan unclosed filter) pada Portal Client Outlet (`client/doc/omzet/view.php`): Memastikan Tab 2 (Riwayat & Rekap) kembali berada secara utuh di dalam container tab, sehingga konten tab yang tidak aktif dapat tersembunyi secara sempurna dan masalah halaman ter-scroll ke bawah sangat panjang telah terselesaikan.
-- Memperbarui seluruh password user di database MySQL phpMyAdmin menjadi `123` (`password_hash`), serta menyelaraskan status 5 outlet di 4 tab admin: Toko All Media Indo (Aktif / Expired 2026-08-31), Toko All Media Indo 1 (Aktif Hampir Expired H-3 / Expired 2026-08-03), Toko All Media Indo 2 (Pending / Request Masuk), Toko All Media Indo 3 (Expired / Non-Aktif / Expired 2026-07-15), dan Toko All Media Indo 4 (Reject / Request Ditolak). Export SQL otomatis diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengimplementasikan penetapan masa aktif otomatis 1 bulan (`DATE_ADD(NOW(), INTERVAL 1 MONTH)`) saat Admin mendaftarkan outlet baru secara langsung (`admin/ajax/postdata/outlet/create.php`), sehingga kolom Jatuh Tempo Langganan terisi otomatis dan tidak lagi bernilai kosong/dash (`-`).
-- Meredesain tata letak tabel Portal Admin Outlet (`admin/doc/outlet/view.php`) di seluruh 4 Tab (Aktif, Expired, Request Masuk, Request Ditolak): Menyediakan penyatuan subfield vertikal (Pengelola + No HP, Lokasi + Alamat, Investor + No HP), menghapus kolom No HP terpisah agar menghemat lebar tabel, mempertahankan tombol Edit & Hapus pada Tab Expired, serta menyelaraskan `colspan` secara presisi saat data kosong.
-- Menyempurnakan antarmuka Portal Admin Outlet (`admin/doc/outlet/view.php`): Memperbarui judul utama menjadi "Daftar Outlet Madura", mengganti seluruh istilah "Toko" menjadi "Outlet" (termasuk "Pengelola Outlet" & tooltip "Edit Outlet/Hapus Outlet"), mengembalikan kolom Kecamatan ke tampilan modal popover alamat (`showAlamat`), serta memperbarui data nama pengelola outlet di tabel `users` database agar tidak lagi menampilkan nama toko melainkan nama pengelola yang realistis. Database SQL dump diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengimplementasikan fitur **Set Bagi Hasil Investor** pada Form Tambah/Edit Outlet (`admin/doc/outlet/create.php` & `admin/ajax/postdata/outlet/create.php`): Menambahkan input field "Persentase Bagi Hasil Investor (%)", mengintegrasikan auto-populate JavaScript saat memilih Investor, dan secara otomatis meng-update persen bagi hasil pada tabel `investor`. Memperbarui nama akun pengelola `outlet` di database `users` menjadi "Muhhamad Tegar Kurniawan". Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menghapus input field Bagi Hasil Investor dari form Tambah/Edit Investor (`admin/doc/investor/create.php`) agar penyetelan persen bagi hasil hanya terpusat pada form Tambah/Edit Outlet. Merapikan ulang susunan grid form Tambah/Edit Outlet (`admin/doc/outlet/create.php`) menjadi 6 baris logis dengan menyandingkan Persentase Bagi Hasil Investor (%) dan Persentase Potongan Manajemen (%) di baris finansial yang sama.
-- Merapikan ulang susunan grid form Tambah/Edit Investor (`admin/doc/investor/create.php`) menjadi 4 baris simetris dan seimbang: Baris 1 (Nama Lengkap & No. HP), Baris 2 (Username & Password), Baris 3 (Master Owner & Kecamatan), dan Baris 4 (Alamat Investor Lengkap). Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Meredesain form Tambah/Edit Outlet (`admin/doc/outlet/create.php`) menjadi **2 Card Visual Bersebelahan (Kanan-Kiri)** (`col-lg-6` Kiri: Informasi Utama & Finansial Outlet, `col-lg-6` Kanan: Akun Akses Pengelola Outlet), menyelaraskan header card standar tanpa ikon, memperbarui label "Investor Pemodal" menjadi "Investor", serta menyederhanakan label Username/Password/No. HP. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengubah portal Master Client (`client/doc/investor/view.php` & `client/template/header.php`): Menghapus tombol/modal "Tambah Investor", serta mempebaiki bug pemuatan data pada aksi "Lihat Toko/Detail Outlet" dengan membuat router `client/ajax/appGet.php` dan menambahkan aturan rewrite `^get/` pada `client/ajax/.htaccess` sehingga data toko investor dapat tampil dengan cepat dan lancar. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengubah format kolom lokasi pada modal **Lihat Toko / Portofolio Toko Outlet** (`client/doc/investor/view.php`) menjadi **Kecamatan & Detail Alamat** yang menampilkan nama kecamatan disertai tombol info popover SweetAlert2 untuk melihat detail alamat lengkap toko. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyempurnakan penyajian data pada halaman Master Client (`client/doc/investor/view.php`): Menghapus prefiks "Kec." di seluruh halaman, mengubah badge kolom "Portofolio Outlet" hanya menampilkan jumlah outlet aktif saja, menghapus card ringkasan "Outlet Langganan Aktif", serta menghapus kolom "Status Toko" pada modal Lihat Toko. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Meredesain total antarmuka halaman Master Client (`client/doc/investor/view.php`) agar 100% responsif di seluruh layar perangkat (HP, Tablet, Desktop) menyelaraskan wrapper `main-content-inner`, desain card metrics, header banner "Data Investor", serta DataTables responsive wrapper persis seperti standar halaman investor & outlet di portal client. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyelaraskan 100% tampilan antarmuka halaman Master Client (`client/doc/investor/view.php`) dengan halaman Data Outlet Sub-Investor: menghapus wrapper DataTables abu-abu kusam, menerapkan tabel Bootstrap bersih dengan `table-group-divider`, mengganti tombol info `[i]` pada modal toko dengan tombol pill `Detail Alamat` bernuansa maroon, serta merapikan ikon gradient card summary. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyempurnakan antarmuka tabel Master Client (`client/doc/investor/view.php`): menghapus rincian username pada nama investor, mengubah label header kolom "Lokasi & Alamat" dan header modal toko menjadi "Kecamatan", serta merapikan alignment posisi kolom tabel secara presisi. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyederhanakan nama card summary di atas halaman Master Client (`client/doc/investor/view.php`) menjadi "Total Investor" dan "Total Outlet". Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyederhanakan judul header modal toko pada halaman Master Client (`client/doc/investor/view.php`) dari "Portofolio Toko Outlet:" menjadi "Portofolio Toko:". Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyelaraskan desain header modal portofolio toko (`#modalDetailOutlet`) pada `client/doc/investor/view.php` dengan gaya standar modal portal client lainnya: mengganti latar belakang pekat menjadi putih bersih (`bg-body`), menambahkan garis pemisah bawah (`border-bottom border-body-subtle`), serta menyajikan judul utama & sub-teks mitra investor dengan rapi. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menggabungkan (Merge) branch `origin/tegar1` ke branch `Cumikkk`: mengintegrasikan update desain dan fitur terbaru modul investor & outlet (fitur potongan omzet, pembagian hak investor/outlet, aksi kelola outlet, dan ekspor PDF). Konflik pada `admin/doc/outlet/create.php` dan `admin/ajax/postdata/outlet/create.php` telah diselesaikan dengan lancar. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Merapikan form Tambah/Edit Outlet (`admin/doc/outlet/create.php`): menghapus bidang input finansial lama yang ganda ("Bagi Hasil Investor" & "Potongan Manajemen") dan secara konsisten menggunakan bidang input 3-split terbaru ("Potongan Omzet (%)", "Hak Investor (%)", dan "Hak Outlet (%)"). Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menambahkan kolom input "Tanggal Jatuh Tempo (Masa Langganan Active)" pada form Edit Outlet (`admin/doc/outlet/create.php` & `admin/ajax/postdata/outlet/create.php`) agar admin dapat langsung memperpanjang masa aktif outlet expired menjadi aktif kembali tanpa perlu mendaftar/membuat akun ulang, serta memperbaiki tampilan ikon panah stepper persentase (`fas fa-chevron-up/down`). Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengatur pengkondisian tampilan kolom input "Perpanjang Tanggal Jatuh Tempo" (`admin/doc/outlet/create.php`) agar **hanya muncul secara otomatis ketika Admin mengedit outlet yang berstatus kadaluarsa (expired) atau non-aktif**, sehingga tampilan form edit outlet aktif normal tetap bersih dan fokus. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Mengembalikan desain tampilan kolom input "Tanggal Jatuh Tempo" (`admin/doc/outlet/create.php`) ke desain form-group standar yang bersih dan konsisten dengan elemen input lainnya di portal admin. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Memperbaiki bug error `Unknown column 'o.persen_bagian_investor'` pada `client/doc/bagi-hasil/view.php`, `client/doc/bagi-hasil/export_pdf.php`, `client/doc/dashboard/view.php`, `client/doc/omzet/export_pdf.php`, dan `admin/ajax/postdata/outlet/create.php` dengan secara tepat menghubungkan tabel `investor` (`inv.persen_bagian_investor`) dan menghapus referensi kolom yang salah pada tabel `outlet`. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Memperbarui antarmuka Master Investor (`client/doc/investor/view.php` & `client/ajax/getdata/investor/outlets.php`): menambahkan fitur pagination pada tabel investor dan modal toko, memfilter perhitungan card total outlet dan modal toko agar hanya menampilkan outlet aktif saja, serta menyelaraskan teks label ("Total Investor Saya", "Daftar Investor Saya", "Total Outlet", dan header modal "Total Outlet Investor: [nama investor]"). Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyelaraskan desain DataTables pagination pada modul client investor (`client/doc/investor/view.php`) dan client master outlet (`client/doc/outlet/view.php`) sehingga seluruh tabel master memuat paginasi modern 10 data per halaman dengan antarmuka yang seragam dan elegan. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menyelaraskan seluruh paginasi pada tampilan Master (`client/doc/investor/view.php` & `client/doc/outlet/view.php`) agar 100% menggunakan desain Paginasi Bootstrap Kustom bawaan portal client (teks info di kiri & tombol kapsul Prev/Next di kanan) sehingga tampilan antarmuka Master dan Investor benar-benar seragam dan presisi. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menghapus kontrol DataTables (Search box, dropdown Tampilkan Data, dan tombol paginasi yang terpotong) dari modal popup `Total Outlet Investor` (`client/doc/investor/view.php`) sehingga tampilan modal menjadi bersih, rapi, dan tidak berantakan. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Berhasil me-merge update terbaru dari branch `origin/tegar1` ke branch `Cumikkk`: menyelaraskan fitur & tampilan portal Investor dan Outlet (laporan omzet, bagi hasil, aksi kelola outlet, dan invoice/export), serta memastikan portal Admin & Master berjalan stabil tanpa error syntax. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Berhasil menyelaraskan total database & data dummy murni Tegar: membersihkan data outlet dummy lokal `Cumikkk` (55-59), menyelaraskan 12 akun pengguna Tegar dengan nama pengelola realistis (Bambang Sugiono, Hendra Wijaya, Siti Rahmawati, Dedi Pratama, Agus Setiawan, Fajar Nugroho, Eko Prasetyo, Budi), mempertahankan 10 data omzet baru Tegar (1-10 Agu), serta memastikan fitur Komisi Master (`komisi_master`) dan struktur DB `Cumikkk` 100% aktif & kompatibel. Export SQL diperbarui ke `database/toko_madura.sql` dan `sql/*.sql`.
-- Menghapus modul `biaya_langganan` dari grup Pengaturan Portal Admin karena biaya langganan outlet kini 100% dikelola per-investor pada tabel `investor` (`biaya_langganan_outlet`). Memperbaiki bug halaman putih (blank page) pada modul Data Master Admin (`/master/view`) dengan menambahkan definisi kolom `created_at` pada tabel `users` database MySQL lokal dan dump `database/toko_madura.sql`.
-- Mengintegrasikan update dummy terbaru dari Tegar: 14 data omzet baru bulan Juni 2026 untuk outlet `cumik` (total 63 data omzet), penyesuaian persentase potongan (8%) & persen investor (25%) outlet `cumik`, sambil tetap mempertahankan perbaikan kolom `created_at` pada `users` dan penghapusan modul `biaya_langganan` di tabel admin. Export SQL di-update ke `database/toko_madura.sql`.
-- Menyelesaikan paket revisi Portal Admin & Master Owner: (1) Mengubah indikator sorting panah pada kolom `Total Omzet` di tabel Outlet Omzet Tertinggi Dashboard Admin menjadi mengarah ke atas (UP), (2) Menyesuaikan label badge jumlah toko di tabel Data Master menjadi cukup `Toko` (tanpa kata "Aktif"), (3) Menambahkan fitur upload & simpan berkas Bukti Transfer Komisi ke folder `uploads/bukti_komisi/` serta menyamakan 100% desain tombol & modal preview bukti transfer antara Portal Admin & Portal Client Master Owner. Export SQL di-update ke `database/toko_madura.sql` dan `sql/komisi_master.sql`.
-- Menyempurnakan manajemen berkas bukti transfer & image-proxy: (1) Meng-update `admin/image-proxy.php` agar mendukung pembacaan berkas dari folder `uploads/bukti_komisi/`, (2) Memperbaiki pengurutan numerik pada tabel Outlet Omzet Tertinggi Dashboard Admin (penambahan atribut `data-order` pada nominal omzet), (3) Memperbaiki kesalahan sintaks JS DataTables pada Komisi Master Admin, (4) Menambahkan fungsi otomatis hapus berkas bukti lama (`@unlink`) pada endpoint UPDATE komisi master (`admin/ajax/postdata/master/komisi.php`), serta membersihkan 5 record DB yang mengacu pada file bukti yang tidak ditemukan di disk.
-- Menyelesaikan perapihan total database & penambahan fitur Alamat Master Owner: (1) Menambahkan kolom `kecamatan` & `alamat` pada tabel `users` sebagai pusat penyimpanan alamat pengguna (Master, Investor, Outlet), (2) Memindahkan/mengonversi data alamat eksisting tanpa ada data hilang, (3) Menghapus kolom duplikat `kecamatan`, `alamat_investor`, & `persen_bagian_master` pada `investor`, serta `kecamatan`, `alamat_outlet`, & `tanggal_bergabung` pada `outlet`, (4) Menambahkan input Kecamatan & Alamat pada form registrasi/edit Master Admin (`/master/create`) dan tombol modal info Alamat Master pada tabel Data Master (`/master/view`). Export SQL diperbarui ke `database/toko_madura.sql`.
-- Memperbaiki bug SQL error pada Portal Client saat pembuatan/pembaruan otomatis record investor: (1) Memperbaiki query `INSERT INTO investor` pada `client/doc/outlet/action.php`, `client/doc/outlet/view.php`, `admin/ajax/postdata/investor/create.php`, dan `client/ajax/postdata/investor/create.php` agar hanya memasukkan kolom aktif (`id_users`, `id_master`, `biaya_langganan_outlet`, `tanggal_bergabung`), (2) Meng-update penanganan filter periode laporan pada `client/doc/keuntungan-master/view.php`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Mengintegrasikan update database & branch terbaru Tegar (`origin/tegar1` per 07 Agu 2026): (1) Mengimpor 38 data omzet baru (total 98 data omzet) untuk outlet `cumik` dan `Toko Madura Merdeka` ke MySQL lokal, (2) Me-merge update branch `origin/tegar1` ke `Cumikkk` dan menyelesaikan konflik pada `client/doc/outlet/action.php` & `view.php` dengan mempertahankan struktur alamat terpusat di `users` dan filter rentang tanggal, (3) Memastikan 0 syntax error dan meng-update `database/toko_madura.sql`.
-- Memperbaiki bug Undefined Variable pada Portal Client: (1) Mendefinisikan variabel `$selectedTgl`, `$selectedBulan`, dan `$selectedTahun` secara aman pada `client/doc/outlet/view.php` untuk mencegah ErrorException fatal, (2) Mengamankan pengecekan array `$outletsList` pada `client/doc/bagi-hasil/view.php`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menyelesaikan revisi tampilan Portal Client role Master Owner: (1) Menyelaraskan 100% desain tabel, filter bar, metric cards, dan pagination pada halaman Data Investor (`client/doc/investor/view.php`) dengan standar outlet/investor, (2) Menyelaraskan 100% desain tabel, metric cards, footer summary, pagination, serta menambahkan filter pencarian & rentang tanggal pada halaman Keuntungan Master (`client/doc/keuntungan-master/view.php`). Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menyeleksi & merapikan revisi detail Portal Client: (1) Menghapus icon `user-tie` pada nama investor serta menghapus format `@`/`code` pada username di `client/doc/investor/view.php` dan `client/doc/keuntungan-master/view.php` agar tampil sebagai teks bersih, (2) Melengkapi fitur Live Search pencarian kata kunci, tombol filter utama, dan Modal Filter (rentang tanggal, bulan, tahun) pada halaman Riwayat Komisi Master (`client/doc/komisi/view.php`). Export SQL diperbarui ke `database/toko_madura.sql`.
-- Merapikan input file upload & arsitektur direktori berkas bukti komisi: (1) Menyelaraskan CSS tombol file selector `bukti_pembayaran` pada `admin/doc/master/komisi_create.php` agar simetris & presisi vertikal 100%, (2) Menghapus pop-up notifikasi `alert` browser saat upload berhasil untuk langsung melakukan redirect bersih tanpa popup, (3) Menghapus pembuatan folder ganda di `client/uploads/bukti_komisi/` sehingga berkas unggahan Admin disimpan terpusat di `admin/uploads/bukti_komisi/` (sesuai prinsip direktori pengunggah). Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menghapus skrip alert sisa template pada pemilihan berkas: (1) Menghapus pemicu `if(log) alert(log);` pada event listener `fileselect` di `admin/assets/js/form-elements.js` sehingga saat memilih file tidak muncul pop-up browser nama file, (2) Menghapus `alert('Form submitted!')` pada `admin/assets/js/form-wizard.js`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menyetel ulang seluruh konsep tampilan detail alamat & kecamatan di Portal Admin & Portal Client: Menghapus tombol kotak `[ (i) ]` / `Detail Alamat` terpisah dan menyatukan icon lokasi + nama kecamatan menjadi Badge Kapsul Interaktif `[ 📍 NamaKecamatan ]` yang dapat di-klik untuk membuka SweetAlert Modal detail alamat fisik lengkap & Google Maps Geotag secara elegan & konsisten di seluruh 7 modul aplikasi (`admin/doc/dashboard/view.php`, `admin/doc/master/view.php`, `admin/doc/investor/view.php`, `client/doc/investor/view.php`, `client/doc/keuntungan-master/view.php`, `client/doc/outlet/view.php`). Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menghapus tampilan username investor pada Portal Client role Master Owner: Menghapus render `username` investor di `client/doc/investor/view.php` sehingga kolom investor hanya menampilkan Nama Lengkap Investor & No. HP secara bersih & ringkas. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Penggabungan (Merge) branch `tegar1` ke branch `Cumikkk`: (1) Mengamankan integrasi revisi update persen potongan & bagi hasil omzet toko saat toggle rentang tanggal mati, (2) Mengamankan pengambilan kolom kecamatan & alamat_outlet dari `users` untuk modal edit outlet, (3) Pembersihan lencana tanggal input omzet, (4) Sinkronisasi `database/toko_madura.sql`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Mengimpor & Memperbarui Database Dummy Terbaru: Mengimpor dump SQL dummy terbaru ke database MySQL `toko_madura` dan menyinkronkan file export `database/toko_madura.sql`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menambahkan Link Geotag Google Maps pada Modal Detail Lokasi Role Master Owner: Mengintegrasikan tautan interaktif Geotag Google Maps (`https://www.google.com/maps/search/?api=1&query=...`) pada blok teks alamat lengkap modal SweetAlert di seluruh modul role Master Owner Portal Client (`client/doc/investor/view.php`, `client/doc/keuntungan-master/view.php`, `client/doc/outlet/view.php`) persis seperti di Portal Admin. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Mengembalikan data dummy komisi_master & melengkapi kolom bukti_pembayaran: Menambahkan kolom `bukti_pembayaran` pada tabel `komisi_master` dan mengisikan record dummy komisi Master Owner Rp 500.000 (Agustus 2026) sehingga metrics card Total Komisi Diterima & Komisi Bulan Ini pada Portal Client & Admin kembali terisi data akurat. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Memperbaiki Masalah Gambar Bukti Pembayaran & Komisi Gagal Dimuat: (1) Menyinkronkan path file `bukti_pembayaran` di database MySQL (`outlet` & `komisi_master`) mengarah ke berkas gambar fisik aktual di disk server, (2) Membuat `client/image-proxy.php` dan menyambungkan pratinjau bukti komisi & outlet di Portal Client (`client/doc/komisi/view.php` & `client/doc/outlet/view.php`) agar otomatis mendeteksi berkas baik di direktori `client/uploads/` maupun `admin/uploads/`. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Menghapus Input Pencarian Redundan pada Modal Filter Data Client Master: Menghapus elemen input masukan kata kunci pencarian di dalam modal pop-up Filter Data pada 3 modul Portal Client Master Owner (`client/doc/investor/view.php`, `client/doc/keuntungan-master/view.php`, `client/doc/komisi/view.php`) karena pencarian kata kunci telah difasilitasi oleh Kotak Live Search utama di luar modal. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Penggabungan (Merge) branch `tegar1` ke branch `Cumikkk`: Integrasi pembaruan dari `origin/tegar1` (penghapusan tombol reset filter di footer modal filter data outlet pada `client/doc/outlet/view.php`) dengan 0 konflik. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Perapihan Total Skema Database: (1) Membersihkan kolom duplikat `kecamatan`, `alamat_investor`, `persen_bagian_master`, dan `persen_bagian_investor` dari `investor`, serta `kecamatan`, `alamat_outlet`, dan `tanggal_bergabung` dari `outlet`, (2) Memperbaiki typo kolom `laporan_omzet.presentase_potongan` menjadi `persentase_potongan` pada DB dan skrip PHP (`client/doc/bagi-hasil/action.php`, `export_pdf.php`, `view.php`, dan `client/doc/omzet/action.php`), (3) Menjaga skema database bersih tanpa indeks tambahan sesuai instruksi user. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Audit Penyelarasan Kodingan Keseluruhan Pasca Migrasi DB: Menghapus sisa acuan kolom lama `inv.persen_bagian_investor` pada form edit outlet admin (`admin/doc/outlet/create.php`) dan ekspor PDF bagi hasil (`client/doc/bagi-hasil/export_pdf.php`) sehingga 100% kodingan PHP di seluruh 2 portal (Admin & Client) telah selaras 100% tanpa ada sisa acuan kolom mati. Export SQL diperbarui ke `database/toko_madura.sql`.
-- Penggabungan (Merge) branch `tegar1` ke branch `Cumikkk`: Integrasi 14 commit pembaruan dari `origin/tegar1` (fitur wizard 2-sesi ajukan ulang outlet ditolak dengan form pre-filled & tombol pratinjau bukti lama, penyesuaian margin/height modal bebas benturan navbar, perbaikan bug JS CLIENT_URL, serta pembukaan date picker omzet berdasarkan riwayat tanggal transaksi) dengan 0 konflik. Export SQL diperbarui ke `database/toko_madura.sql`.

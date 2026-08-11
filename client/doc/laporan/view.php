@@ -30,7 +30,7 @@ if ($role === 'investor') {
     $investorId = ($resInv && $resInv->num_rows > 0) ? (int)$resInv->fetch_assoc()['id_investor'] : 0;
 
     // Fetch distinct years
-    $resYears = $db->query("SELECT DISTINCT YEAR(l.periode_laporan) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE o.id_investor = {$investorId} ORDER BY y_periode DESC");
+    $resYears = $db->query("SELECT DISTINCT YEAR(l.tanggal_omzet) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE o.id_investor = {$investorId} ORDER BY y_periode DESC");
     if ($resYears) {
         while ($yRow = $resYears->fetch_assoc()) {
             $availableYears[] = (int)$yRow['y_periode'];
@@ -42,11 +42,11 @@ if ($role === 'investor') {
 
     // Build WHERE clause
     $whereConditions = ["o.id_investor = {$investorId}"];
-    if ($selectedBulan > 0) $whereConditions[] = "MONTH(l.periode_laporan) = {$selectedBulan}";
-    if ($selectedTahun > 0) $whereConditions[] = "YEAR(l.periode_laporan) = {$selectedTahun}";
+    if ($selectedBulan > 0) $whereConditions[] = "MONTH(l.tanggal_omzet) = {$selectedBulan}";
+    if ($selectedTahun > 0) $whereConditions[] = "YEAR(l.tanggal_omzet) = {$selectedTahun}";
     $whereSql = implode(" AND ", $whereConditions);
 
-    $sql = "SELECT l.*, o.nama_outlet FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereSql} ORDER BY l.periode_laporan DESC, l.id_laporan DESC";
+    $sql = "SELECT l.*, o.nama_outlet FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereSql} ORDER BY l.tanggal_omzet DESC, l.id_laporan DESC";
     $res = $db->query($sql);
     if ($res) {
         while ($r = $res->fetch_assoc()) {
@@ -61,7 +61,7 @@ if ($role === 'investor') {
     $outlet = ($resOut && $resOut->num_rows > 0) ? $resOut->fetch_assoc() : null;
     $outletId = $outlet ? (int)$outlet['id_outlet'] : 0;
 
-    $resYears = $db->query("SELECT DISTINCT YEAR(periode_laporan) as y_periode FROM laporan_omzet WHERE id_outlet = {$outletId} ORDER BY y_periode DESC");
+    $resYears = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as y_periode FROM laporan_omzet WHERE id_outlet = {$outletId} ORDER BY y_periode DESC");
     if ($resYears) {
         while ($yRow = $resYears->fetch_assoc()) {
             $availableYears[] = (int)$yRow['y_periode'];
@@ -72,11 +72,11 @@ if ($role === 'investor') {
     }
 
     $whereConditions = ["id_outlet = {$outletId}"];
-    if ($selectedBulan > 0) $whereConditions[] = "MONTH(periode_laporan) = {$selectedBulan}";
-    if ($selectedTahun > 0) $whereConditions[] = "YEAR(periode_laporan) = {$selectedTahun}";
+    if ($selectedBulan > 0) $whereConditions[] = "MONTH(tanggal_omzet) = {$selectedBulan}";
+    if ($selectedTahun > 0) $whereConditions[] = "YEAR(tanggal_omzet) = {$selectedTahun}";
     $whereSql = implode(" AND ", $whereConditions);
 
-    $sql = "SELECT * FROM laporan_omzet WHERE {$whereSql} ORDER BY periode_laporan DESC, id_laporan DESC";
+    $sql = "SELECT * FROM laporan_omzet WHERE {$whereSql} ORDER BY tanggal_omzet DESC, id_laporan DESC";
     $res = $db->query($sql);
     if ($res) {
         while ($r = $res->fetch_assoc()) {
@@ -207,7 +207,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                     $omz = (float)$r['omzet'];
                                     $pot = (float)$r['nominal_potongan'];
                                     $bersih = $omz - $pot;
-                                    $t = strtotime($r['periode_laporan']);
+                                    $t = strtotime($r['tanggal_omzet']);
                                 ?>
                                 <tr>
                                     <td class="py-3 ps-3 text-center text-body-secondary fw-bold"><?= $no++; ?></td>
@@ -216,7 +216,7 @@ if ($selectedBulan === 0 && $selectedTahun === 0) {
                                             <i class="fa-solid fa-calendar-days text-danger me-1"></i>
                                             <?= date('d M Y', $t); ?>
                                         </div>
-                                        <small class="text-body-secondary"><?= date('H:i', strtotime($r['waktu_input'])); ?> WIB</small>
+                                        <small class="text-body-secondary"><?= date('H:i', strtotime($r['created_at'])); ?> WIB</small>
                                     </td>
                                     <td class="py-3 px-3">
                                         <div class="fw-semibold text-body-emphasis"><?= htmlspecialchars($r['nama_outlet'] ?? 'Outlet'); ?></div>

@@ -79,7 +79,7 @@ if ($data['group_type'] === 'single' && $newGroupId) {
         $newModId = $db->insert_id;
         $permissions = ['view', 'create', 'update', 'delete'];
         
-        $adminUsersRes = $db->query("SELECT id_users FROM users WHERE role IN ('programmer', 'admin', 'master')");
+        $adminUsersRes = $db->query("SELECT id_users FROM users WHERE role IN ('admin', 'admin', 'master')");
         $adminIds = [(int)$user['ADM_ID']];
         if ($adminUsersRes && $adminUsersRes->num_rows > 0) {
             while ($aur = $adminUsersRes->fetch_assoc()) {

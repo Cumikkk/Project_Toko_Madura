@@ -11,7 +11,7 @@ if ($idOutlet <= 0) {
     exit;
 }
 
-$update = $db->query("UPDATE outlet SET status = 'active', tanggal_disetujui = NOW(), tanggal_bergabung = IFNULL(tanggal_bergabung, NOW()), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$idOutlet}");
+$update = $db->query("UPDATE outlet SET status = 'active', tgl_disetujui = NOW(), tanggal_bergabung = IFNULL(tanggal_bergabung, NOW()), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$idOutlet}");
 if ($update) {
     echo json_encode(['success' => true, 'message' => 'Request outlet & pembayaran berhasil disetujui. Outlet kini resmi aktif!']);
 } else {

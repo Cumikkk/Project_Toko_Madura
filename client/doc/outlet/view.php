@@ -26,7 +26,7 @@ if ($role === 'master') {
     $totalPagesM   = ceil($totalRecordsM / $limitM);
 
     $listMasterOutlets = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan as kecamatan_outlet, u_out.alamat as alamat_outlet, o.tanggal_request as tanggal_bergabung,
+        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan as kecamatan_outlet, u_out.alamat as alamat_outlet, o.tgl_request as tanggal_bergabung,
                o.status, o.tgl_jatuh_tempo, o.tipe_request,
                u_inv.nama_lengkap as nama_investor, u_inv.kecamatan as kecamatan_investor, u_inv.alamat as alamat_investor, u_out.username as username_outlet
         FROM outlet o
@@ -117,7 +117,7 @@ if ($role === 'master') {
                                                         <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs cursor-pointer" style="font-size: 11px; cursor: pointer;"
                                                               data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>"
                                                               data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?: '-') ?>"
-                                                              data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>"
+                                                              data-alamat = "<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>"
                                                               title="Klik untuk lihat detail alamat">
                                                             <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'N/A') ?>
                                                         </span>
@@ -135,7 +135,7 @@ if ($role === 'master') {
                                                         <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs cursor-pointer" style="font-size: 10px; cursor: pointer;"
                                                               data-nama="<?= htmlspecialchars($row['nama_investor']) ?>"
                                                               data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?: '-') ?>"
-                                                              data-alamat="<?= htmlspecialchars($row['alamat_investor'] ?: '-') ?>"
+                                                              data-alamat = "<?= htmlspecialchars($row['alamat_investor'] ?: '-') ?>"
                                                               title="Klik untuk lihat detail alamat">
                                                             <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?>
                                                         </span>
@@ -331,22 +331,22 @@ $whereOutletConds = ["o.id_investor = {$investorId}"];
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereOutletConds[] = "DATE(o.tanggal_request) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $whereOutletConds[] = "DATE(o.tgl_request) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $whereOutletConds[] = "DATE(o.tanggal_request) >= '{$safeMulai}'";
+    $whereOutletConds[] = "DATE(o.tgl_request) >= '{$safeMulai}'";
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereOutletConds[] = "DATE(o.tanggal_request) <= '{$safeSelesai}'";
+    $whereOutletConds[] = "DATE(o.tgl_request) <= '{$safeSelesai}'";
 } elseif (!empty($selectedTgl)) {
     $safeTgl = $db->real_escape_string($selectedTgl);
-    $whereOutletConds[] = "DATE(o.tanggal_request) = '{$safeTgl}'";
+    $whereOutletConds[] = "DATE(o.tgl_request) = '{$safeTgl}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereOutletConds[] = "MONTH(o.tanggal_request) = {$selectedBulan}";
+        $whereOutletConds[] = "MONTH(o.tgl_request) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereOutletConds[] = "YEAR(o.tanggal_request) = {$selectedTahun}";
+        $whereOutletConds[] = "YEAR(o.tgl_request) = {$selectedTahun}";
     }
 }
 $whereOutletSql = "WHERE " . implode(" AND ", $whereOutletConds);
@@ -380,24 +380,24 @@ $sqlOutlets = "
         o.id_outlet,
         o.nama_outlet,
         u.kecamatan,
-        u.alamat as alamat_outlet,
+        u.alamat_lengkap as alamat_outlet,
         o.persentase_potongan,
-        o.persen_bagian_investor,
+        o.persentase_hak_investor,
         o.status,
-        o.nominal_biaya,
+        o.nominal_transfer,
         o.bukti_pembayaran,
         o.alasan_penolakan,
-        o.tanggal_request as tanggal_bergabung,
+        o.tgl_request as tanggal_bergabung,
         o.tipe_request,
         o.tgl_jatuh_tempo,
-        o.tanggal_request,
+        o.tgl_request,
         u.nama_lengkap,
         u.no_hp,
         u.username
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
     {$whereOutletSql}
-    ORDER BY o.tanggal_request DESC, o.id_outlet DESC
+    ORDER BY o.tgl_request DESC, o.id_outlet DESC
     LIMIT {$limit} OFFSET {$offset}
 ";
 
@@ -624,7 +624,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                                 <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-3 py-1.5 btn-detail-alamat shadow-xs fw-bold" 
                                                     data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
                                                     data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
-                                                    data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-alamat = "<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
                                                     style="font-size: 11px;">
                                                     <i class="fa-solid fa-location-dot me-1 text-danger"></i>Detail Alamat
                                                 </button>
@@ -642,7 +642,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 
                                                 <?php if ($isPendingRenewal || $isPendingNew) : ?>
                                                     <?php 
-                                                    $tglPengajuanFormatted = !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : (!empty($row['tanggal_request']) ? date('d/m/Y H:i', strtotime($row['tanggal_request'])) . ' WIB' : '-');
+                                                    $tglPengajuanFormatted = !empty($row['tanggal_bergabung']) ? date('d/m/Y H:i', strtotime($row['tanggal_bergabung'])) . ' WIB' : (!empty($row['tgl_request']) ? date('d/m/Y H:i', strtotime($row['tgl_request'])) . ' WIB' : '-');
                                                     $buktiUrl = !empty($row['bukti_pembayaran']) ? (SystemInfo::app('CLIENT_URL') . '/image-proxy.php?file=' . urlencode($row['bukti_pembayaran'])) : '';
                                                     ?>
                                                     <div class="d-flex flex-column align-items-center justify-content-center py-2 mx-auto" style="width: 170px; min-height: 56px; gap: 6px;">
@@ -872,7 +872,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('investor')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('investor')">
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -1103,7 +1103,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-4">
                             <label class="form-label fw-semibold text-body-secondary required mb-0.5" style="font-size: 9.5px;">Hak Investor</label>
                             <div class="input-group input-group-sm" style="height: 28px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('investor')">
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control form-control-sm rounded-start-3 fw-bold text-center px-1 py-0" style="font-size: 10.5px; height: 28px;" required oninput="balanceEditOutletSplit('investor')">
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-1 py-0 border-end-0" style="font-size: 9px; height: 28px;">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 28px;">
                                     <div class="d-flex flex-column h-100" style="width: 20px;">
@@ -1442,7 +1442,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -2005,7 +2005,7 @@ $(document).ready(function() {
                     $('#edit_alamat_outlet').val(res.data.alamat_outlet);
                     $('#edit_persentase_potongan').val(parseFloat(res.data.persentase_potongan).toFixed(2));
                     
-                    const invPct = parseFloat(res.data.persen_bagian_investor) || 50.00;
+                    const invPct = parseFloat(res.data.persentase_hak_investor) || 50.00;
                     $('#edit_persen_bagian_investor').val(invPct.toFixed(2));
                     $('#edit_persen_bagian_outlet').val((100 - invPct).toFixed(2));
 
@@ -2360,7 +2360,7 @@ $(document).ready(function() {
                         $('#resubmit_alamat_outlet').val(data.alamat_outlet);
                         
                         const potVal = parseFloat(data.persentase_potongan || 10.00);
-                        const invVal = parseFloat(data.persen_bagian_investor || 50.00);
+                        const invVal = parseFloat(data.persentase_hak_investor || 50.00);
                         const outVal = (100.00 - invVal).toFixed(2);
                         $('#resubmit_persentase_potongan').val(potVal);
                         $('#resubmit_persen_bagian_investor').val(invVal);

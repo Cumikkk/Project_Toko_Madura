@@ -21,7 +21,7 @@ $bulanIndo = [
 ];
 
 // Get Outlet Record for Logged-In User
-$resOutlet = $db->query("SELECT o.*, u_inv.alamat as alamat_investor, u_inv.nama_lengkap as nama_investor FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users WHERE o.id_users = {$userId} LIMIT 1");
+$resOutlet = $db->query("SELECT o.*, u_inv.alamat_lengkap as alamat_investor, u_inv.nama_lengkap as nama_investor, u_kasir.alamat_lengkap as alamat_outlet, u_kasir.kecamatan, u_kasir.nama_lengkap as nama_outlet FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1");
 $outlet = $resOutlet ? $resOutlet->fetch_assoc() : null;
 
 // Get Current Cut Percentage directly from Outlet record (set during registration by Investor)
@@ -45,7 +45,7 @@ if ($outlet) {
     $idOutlet = (int)$outlet['id_outlet'];
 
     // Fetch distinct years available in database
-    $resYears = $db->query("SELECT DISTINCT YEAR(periode_laporan) as y_periode FROM laporan_omzet WHERE id_outlet = {$idOutlet} ORDER BY y_periode DESC");
+    $resYears = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as y_periode FROM laporan_omzet WHERE id_outlet = {$idOutlet} ORDER BY y_periode DESC");
     if ($resYears) {
         while ($yRow = $resYears->fetch_assoc()) {
             $availableYears[] = (int)$yRow['y_periode'];
@@ -61,7 +61,7 @@ if ($outlet) {
     if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
         $safeMulai = $db->real_escape_string($selectedTglMulai);
         $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-        $whereConditions[] = "periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+        $whereConditions[] = "tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
         
         if ($selectedTglMulai === $selectedTglSelesai) {
             $labelParts[] = date('d/m/Y', strtotime($selectedTglMulai));
@@ -70,19 +70,19 @@ if ($outlet) {
         }
     } elseif (!empty($selectedTglMulai)) {
         $safeMulai = $db->real_escape_string($selectedTglMulai);
-        $whereConditions[] = "periode_laporan >= '{$safeMulai}'";
+        $whereConditions[] = "tanggal_omzet >= '{$safeMulai}'";
         $labelParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
     } elseif (!empty($selectedTglSelesai)) {
         $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-        $whereConditions[] = "periode_laporan <= '{$safeSelesai}'";
+        $whereConditions[] = "tanggal_omzet <= '{$safeSelesai}'";
         $labelParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
     } else {
         if ($selectedBulan > 0) {
-            $whereConditions[] = "MONTH(periode_laporan) = {$selectedBulan}";
+            $whereConditions[] = "MONTH(tanggal_omzet) = {$selectedBulan}";
             $labelParts[] = $bulanIndo[$selectedBulan] ?? '';
         }
         if ($selectedTahun > 0) {
-            $whereConditions[] = "YEAR(periode_laporan) = {$selectedTahun}";
+            $whereConditions[] = "YEAR(tanggal_omzet) = {$selectedTahun}";
             $labelParts[] = $selectedTahun;
         }
     }
@@ -96,12 +96,12 @@ if ($outlet) {
     $lastDayDateStr = sprintf('%04d-%02d-%02d', $checkTahun, $checkBulan, cal_days_in_month(CAL_GREGORIAN, $checkBulan, $checkTahun));
 
     // Check if last day of this month is submitted
-    $chkLastDay = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND periode_laporan = '{$lastDayDateStr}' LIMIT 1");
+    $chkLastDay = $db->query("SELECT id_laporan FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND tanggal_omzet = '{$lastDayDateStr}' LIMIT 1");
     $isLastDayDone = ($chkLastDay && $chkLastDay->num_rows > 0);
 
     // Fetch all matching reports for accumulation
     $allLaporanList = [];
-    $sqlLaporan = "SELECT * FROM laporan_omzet WHERE {$whereSql} ORDER BY periode_laporan DESC, id_laporan DESC";
+    $sqlLaporan = "SELECT * FROM laporan_omzet WHERE {$whereSql} ORDER BY tanggal_omzet DESC, id_laporan DESC";
     $resLaporan = $db->query($sqlLaporan);
     if ($resLaporan) {
         while ($row = $resLaporan->fetch_assoc()) {
@@ -299,7 +299,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
     <?php else : ?>
 
         <?php
-            $tglJoinRaw = !empty($outlet['tanggal_bergabung']) ? $outlet['tanggal_bergabung'] : (!empty($outlet['tanggal_disetujui']) ? $outlet['tanggal_disetujui'] : (!empty($outlet['tanggal_request']) ? $outlet['tanggal_request'] : ''));
+            $tglJoinRaw = !empty($outlet['tgl_disetujui']) ? $outlet['tgl_disetujui'] : (!empty($outlet['tgl_request']) ? $outlet['tgl_request'] : '');
             $tglJoinFormatted = (!empty($tglJoinRaw) && strtotime($tglJoinRaw) > 0) ? (date('d', strtotime($tglJoinRaw)) . ' ' . ($bulanIndo[(int)date('n', strtotime($tglJoinRaw))] ?? '') . ' ' . date('Y', strtotime($tglJoinRaw))) : '-';
             $namaInvestorStr = !empty($outlet['nama_investor']) ? $outlet['nama_investor'] : 'Investor Mitra';
             
@@ -420,14 +420,14 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
 
                                      <!-- Tanggal Omzet (Bebas Pilih Tanggal) -->
                                      <div class="mb-4">
-                                         <label for="periode_laporan" class="form-label fw-bold text-body-emphasis small text-uppercase">
+                                         <label for="tanggal_omzet" class="form-label fw-bold text-body-emphasis small text-uppercase">
                                              <i class="fa-light fa-calendar-day me-1 text-danger"></i>Tanggal Omzet <span class="text-danger">*</span>
                                          </label>
                                          <div class="input-group input-group-lg date-picker-wrapper cursor-pointer">
                                              <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
                                                  <i class="fa-solid fa-calendar-days fs-5"></i>
                                              </span>
-                                             <input type="date" name="periode_laporan" id="periode_laporan" class="form-control border-body-subtle bg-body text-body-emphasis fw-bold cursor-pointer" value="<?= date('Y-m-d'); ?>" required onclick="if(this.showPicker){this.showPicker();}">
+                                             <input type="date" name="tanggal_omzet" id="tanggal_omzet" class="form-control border-body-subtle bg-body text-body-emphasis fw-bold cursor-pointer" value="<?= date('Y-m-d'); ?>" required onclick="if(this.showPicker){this.showPicker();}">
                                          </div>
                                      </div>
 
@@ -508,7 +508,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                         <?php foreach ($laporanList as $index => $row) : ?>
                                             <?php 
                                                 $omz = (float)$row['omzet'];
-                                                $t = strtotime($row['periode_laporan']);
+                                                $t = strtotime($row['tanggal_omzet']);
                                                 $tglStr = date('d/m/Y', $t);
                                                 $itemNo = $offset + $index + 1;
                                             ?>
@@ -522,7 +522,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                                 </td>
                                                 <td>
                                                     <small class="text-body-secondary">
-                                                        <?= date('d/m/Y H:i', strtotime($row['waktu_input'])); ?>
+                                                        <?= date('d/m/Y H:i', strtotime($row['created_at'])); ?>
                                                     </small>
                                                 </td>
                                                 <td>
@@ -999,7 +999,7 @@ $(document).ready(function() {
                 submitBtn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane me-2"></i> Simpan Omzet Harian');
                 if (res.success) {
                     form[0].reset();
-                    $('#periode_laporan').val('<?= date('Y-m-d'); ?>');
+                    $('#tanggal_omzet').val('<?= date('Y-m-d'); ?>');
                     $('#omzet_input_real').val('');
                     $('#omzet_input_display').val('');
 
@@ -1021,7 +1021,7 @@ $(document).ready(function() {
                                 </div>
                                 <div class="d-flex justify-content-between small">
                                     <span class="text-body-secondary"><i class="fa-solid fa-clock me-1 text-primary"></i>Waktu Input:</span>
-                                    <span class="text-body-emphasis">${dt.waktu_input || '-'}</span>
+                                    <span class="text-body-emphasis">${dt.created_at || '-'}</span>
                                 </div>
                             </div>
                         </div>
@@ -1133,7 +1133,7 @@ $(document).ready(function() {
                     $('#det_omzet_head').text(omzetFormatted);
                     $('#det_periode_head').text('Tanggal: ' + res.data.tgl_indo);
                     $('#det_periode').text(res.data.tgl_indo);
-                    $('#det_waktu').text(res.data.waktu_input);
+                    $('#det_waktu').text(res.data.created_at);
                     $('#detailLaporanContent').removeClass('d-none');
                 } else {
                     $('#modalDetailLaporan').modal('hide');

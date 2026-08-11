@@ -26,19 +26,19 @@ $joinLoConds = [];
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $joinLoConds[] = "lo.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $joinLoConds[] = "lo.tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $joinLoConds[] = "lo.periode_laporan >= '{$safeMulai}'";
+    $joinLoConds[] = "lo.tanggal_omzet >= '{$safeMulai}'";
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $joinLoConds[] = "lo.periode_laporan <= '{$safeSelesai}'";
+    $joinLoConds[] = "lo.tanggal_omzet <= '{$safeSelesai}'";
 } else {
     if ($selectedBulan > 0) {
-        $joinLoConds[] = "MONTH(lo.periode_laporan) = {$selectedBulan}";
+        $joinLoConds[] = "MONTH(lo.tanggal_omzet) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $joinLoConds[] = "YEAR(lo.periode_laporan) = {$selectedTahun}";
+        $joinLoConds[] = "YEAR(lo.tanggal_omzet) = {$selectedTahun}";
     }
 }
 
@@ -67,7 +67,7 @@ $offset = ($page - 1) * $limit;
 // Fetch Available Years for Filter
 $availableYears = [];
 $resYears = $db->query("
-    SELECT DISTINCT YEAR(lo.periode_laporan) as y_periode 
+    SELECT DISTINCT YEAR(lo.tanggal_omzet) as y_periode 
     FROM laporan_omzet lo 
     JOIN outlet o ON o.id_outlet = lo.id_outlet 
     JOIN investor i ON i.id_investor = o.id_investor 
@@ -88,7 +88,7 @@ if (!in_array((int)date('Y'), $availableYears)) {
 // Overall Totals for Metric Summary Cards (across all filtered outlets)
 $sqlSummaryTot = "
     SELECT 
-        IFNULL(SUM(lo.omzet), 0) as grand_omzet,
+        IFNULL(SUM(lo.nominal_omzet), 0) as grand_omzet,
         IFNULL(SUM(lo.nominal_potongan), 0) as grand_potongan
     FROM outlet o
     JOIN investor i ON i.id_investor = o.id_investor
@@ -116,7 +116,7 @@ $sqlKeuntungan = "
         u_out.alamat as alamat_outlet,
         u_inv.nama_lengkap as nama_investor,
         5.00 as persen_master,
-        IFNULL(SUM(lo.omzet), 0) as total_omzet,
+        IFNULL(SUM(lo.nominal_omzet), 0) as total_omzet,
         IFNULL(SUM(lo.nominal_potongan), 0) as total_potongan
     FROM outlet o
     JOIN investor i ON i.id_investor = o.id_investor
@@ -138,7 +138,7 @@ $totalHakPage = 0;
 if ($reports && $reports->num_rows > 0) {
     while ($row = $reports->fetch_assoc()) {
         $reportList[] = $row;
-        $omzet = (float)$row['total_omzet'];
+        $nominal_omzet = (float)$row['total_omzet'];
         $potongan = (float)$row['total_potongan'];
         $omzetBersih = $omzet - $potongan;
         $persenMaster = (float)$row['persen_master'];
@@ -290,7 +290,7 @@ $bulanIndo = [
                                     <?php 
                                     $no = $offset + 1; 
                                     foreach ($reportList as $row) :
-                                        $omzet = (float)$row['total_omzet'];
+                                        $nominal_omzet = (float)$row['total_omzet'];
                                         $potongan = (float)$row['total_potongan'];
                                         $omzetBersih = $omzet - $potongan;
                                         $persenMaster = (float)$row['persen_master'];
@@ -307,7 +307,7 @@ $bulanIndo = [
                                                         <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs" style="font-size: 11px; cursor: pointer;"
                                                               data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>"
                                                               data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
-                                                              data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
+                                                              data-alamat = "<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8') ?>"
                                                               title="Klik untuk lihat detail alamat">
                                                             <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan'] ?: 'N/A') ?>
                                                         </span>

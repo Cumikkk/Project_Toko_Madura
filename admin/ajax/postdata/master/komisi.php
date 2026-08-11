@@ -31,9 +31,9 @@ if ($action === 'delete') {
 
 // INSERT / UPDATE ACTION
 $idMaster  = intval($_POST['id_master'] ?? 0);
-$tanggal   = trim($_POST['tanggal_komisi'] ?? '');
-$periode   = trim($_POST['periode'] ?? '');
-$nominal   = (float)($_POST['nominal'] ?? 0);
+$tanggal   = trim($_POST['tgl_transfer'] ?? '');
+$nominalStr = preg_replace('/[^0-9]/', '', $_POST['nominal_transfer_komisi'] ?? '0');
+$nominal   = intval($nominalStr);
 $catatan   = trim($_POST['catatan'] ?? '');
 
 if ($idMaster <= 0) {
@@ -47,8 +47,8 @@ if (empty($tanggal)) {
     $tanggal = date('Y-m-d H:i:s', strtotime($tanggal));
 }
 
-if (empty($periode)) {
-    echo json_encode(['success' => false, 'message' => 'Harap isi periode / keterangan komisi!']);
+if (empty($catatan)) {
+    echo json_encode(['success' => false, 'message' => 'Harap isi catatan komisi!']);
     exit;
 }
 
@@ -79,7 +79,6 @@ if (isset($_FILES['bukti_pembayaran']) && $_FILES['bukti_pembayaran']['error'] =
     }
 }
 
-$periodeEsc = $db->real_escape_string($periode);
 $catatanEsc = $db->real_escape_string($catatan);
 
 if ($idKomisi > 0) {
@@ -101,9 +100,8 @@ if ($idKomisi > 0) {
     }
     $sql = "UPDATE komisi_master 
             SET id_master = {$idMaster}, 
-                tanggal_komisi = '{$tanggal}', 
-                periode = '{$periodeEsc}', 
-                nominal = {$nominal}, 
+                tgl_transfer = '{$tanggal}', 
+                nominal_transfer_komisi = {$nominal}, 
                 catatan = '{$catatanEsc}'
                 {$updateBukti}
             WHERE id_komisi = {$idKomisi}";
@@ -112,8 +110,8 @@ if ($idKomisi > 0) {
 } else {
     // INSERT
     $buktiVal = !empty($buktiPath) ? "'" . $db->real_escape_string($buktiPath) . "'" : "NULL";
-    $sql = "INSERT INTO komisi_master (id_master, tanggal_komisi, periode, nominal, catatan, bukti_pembayaran, created_at) 
-            VALUES ({$idMaster}, '{$tanggal}', '{$periodeEsc}', {$nominal}, '{$catatanEsc}', {$buktiVal}, NOW())";
+    $sql = "INSERT INTO komisi_master (id_master, tgl_transfer, nominal_transfer_komisi, catatan, bukti_pembayaran) 
+            VALUES ({$idMaster}, '{$tanggal}', {$nominal}, '{$catatanEsc}', {$buktiVal})";
     $db->query($sql);
     echo json_encode(['success' => true, 'message' => 'Data komisi master berhasil ditambahkan.']);
 }

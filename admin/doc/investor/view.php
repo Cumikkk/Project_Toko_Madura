@@ -18,7 +18,7 @@ if ($loggedInLevel == 1) {
 
 // Fetch investors list with Master Owner name and active outlet counts
 $investors = $db->query("
-    SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat as alamat_investor,
+    SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat_investor, u.created_at as tanggal_bergabung,
            u_master.nama_lengkap as nama_master,
            COUNT(DISTINCT o.id_outlet) as total_outlet
     FROM investor i
@@ -82,7 +82,7 @@ $investors = $db->query("
                                         <td class="text-center">
                                             <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_investor'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" title="Klik untuk lihat detail alamat">
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat = "<?= htmlspecialchars($row['alamat_investor']) ?>" title="Klik untuk lihat detail alamat">
                                                         <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
                                                     </span>
                                                 <?php else : ?>

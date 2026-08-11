@@ -17,7 +17,7 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, u_out.alamat as alamat_outlet, o.persentase_potongan, IFNULL(o.persen_bagian_investor, 50.00) as persen_bagian_investor, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, u_out.alamat as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN users u_out ON o.id_users = u_out.id_users
     LEFT JOIN investor i ON o.id_investor = i.id_investor
@@ -50,7 +50,7 @@ $labelParts = [];
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConditions[] = "periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $whereConditions[] = "tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
     
     if ($selectedTglMulai === $selectedTglSelesai) {
         $labelParts[] = date('d/m/Y', strtotime($selectedTglMulai));
@@ -59,19 +59,19 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     }
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $whereConditions[] = "periode_laporan >= '{$safeMulai}'";
+    $whereConditions[] = "tanggal_omzet >= '{$safeMulai}'";
     $labelParts[] = 'Mulai ' . date('d/m/Y', strtotime($selectedTglMulai));
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConditions[] = "periode_laporan <= '{$safeSelesai}'";
+    $whereConditions[] = "tanggal_omzet <= '{$safeSelesai}'";
     $labelParts[] = 's/d ' . date('d/m/Y', strtotime($selectedTglSelesai));
 } else {
     if ($selectedBulan > 0) {
-        $whereConditions[] = "MONTH(periode_laporan) = {$selectedBulan}";
+        $whereConditions[] = "MONTH(tanggal_omzet) = {$selectedBulan}";
         $labelParts[] = $bulanIndo[$selectedBulan] ?? '';
     }
     if ($selectedTahun > 0) {
-        $whereConditions[] = "YEAR(periode_laporan) = {$selectedTahun}";
+        $whereConditions[] = "YEAR(tanggal_omzet) = {$selectedTahun}";
         $labelParts[] = $selectedTahun;
     }
 }
@@ -79,7 +79,7 @@ if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
 $periodeLabelStr = !empty($labelParts) ? implode(" ", $labelParts) : "Semua Periode";
 $whereSql = "WHERE " . implode(" AND ", $whereConditions);
 
-$sqlOmzet = "SELECT * FROM laporan_omzet {$whereSql} ORDER BY periode_laporan ASC";
+$sqlOmzet = "SELECT * FROM laporan_omzet {$whereSql} ORDER BY tanggal_omzet ASC";
 $resOmzet = $db->query($sqlOmzet);
 
 $laporanList = [];
@@ -287,10 +287,10 @@ ob_start();
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
                         <td>
-                            <strong><?= date('d/m/Y', strtotime($row['periode_laporan'])); ?></strong>
+                            <strong><?= date('d/m/Y', strtotime($row['tanggal_omzet'])); ?></strong>
                         </td>
                         <td style="color: #64748b;">
-                            <?= date('d/m/Y H:i', strtotime($row['waktu_input'])); ?>
+                            <?= date('d/m/Y H:i', strtotime($row['created_at'])); ?>
                         </td>
                         <td class="text-end fw-bold text-success">
                             Rp <?= number_format((float)$row['omzet'], 0, ',', '.'); ?>
@@ -317,7 +317,7 @@ ob_start();
 
     <?php 
         $potonganGlobal = (float)($outlet['persentase_potongan'] ?? 10.00);
-        $persenInvVal   = (float)($outlet['persen_bagian_investor'] ?? 50.00);
+        $persenInvVal   = (float)($outlet['persentase_hak_investor'] ?? 50.00);
         $persenOutVal   = 100.00 - $persenInvVal;
 
         $pot10Pdf  = ($totalNominalPotongan > 0) ? $totalNominalPotongan : round($totalOmzet * ($potonganGlobal / 100), 2);

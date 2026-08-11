@@ -18,25 +18,25 @@ $whereConds = ["(i.id_master = {$userId} OR i.id_master IS NULL)"];
 
 if (!empty($search)) {
     $safeSearch = $db->real_escape_string($search);
-    $whereConds[] = "(u.nama_lengkap LIKE '%{$safeSearch}%' OR u.username LIKE '%{$safeSearch}%' OR u.no_hp LIKE '%{$safeSearch}%' OR u.kecamatan LIKE '%{$safeSearch}%' OR u.alamat LIKE '%{$safeSearch}%')";
+    $whereConds[] = "(u.nama_lengkap LIKE '%{$safeSearch}%' OR u.username LIKE '%{$safeSearch}%' OR u.no_hp LIKE '%{$safeSearch}%' OR u.kecamatan LIKE '%{$safeSearch}%' OR u.alamat_lengkap LIKE '%{$safeSearch}%')";
 }
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConds[] = "DATE(i.tanggal_bergabung) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $whereConds[] = "DATE(u.created_at) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $whereConds[] = "DATE(i.tanggal_bergabung) >= '{$safeMulai}'";
+    $whereConds[] = "DATE(u.created_at) >= '{$safeMulai}'";
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConds[] = "DATE(i.tanggal_bergabung) <= '{$safeSelesai}'";
+    $whereConds[] = "DATE(u.created_at) <= '{$safeSelesai}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereConds[] = "MONTH(i.tanggal_bergabung) = {$selectedBulan}";
+        $whereConds[] = "MONTH(u.created_at) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereConds[] = "YEAR(i.tanggal_bergabung) = {$selectedTahun}";
+        $whereConds[] = "YEAR(u.created_at) = {$selectedTahun}";
     }
 }
 
@@ -72,7 +72,7 @@ $sumOutlets = ($resTotalActiveOut && $rowAO = $resTotalActiveOut->fetch_assoc())
 
 // Fetch distinct years of investor registration
 $availableYears = [];
-$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_bergabung) as y_periode FROM investor WHERE (id_master = {$userId} OR id_master IS NULL) ORDER BY y_periode DESC");
+$resYears = $db->query("SELECT DISTINCT YEAR(u.created_at) as y_periode FROM investor i JOIN users u ON u.id_users = i.id_users WHERE (i.id_master = {$userId} OR i.id_master IS NULL) ORDER BY y_periode DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
         if (!empty($yRow['y_periode'])) {
@@ -92,8 +92,8 @@ $sqlInv = "
         u.username,
         u.no_hp,
         u.kecamatan,
-        u.alamat as alamat_investor,
-        i.tanggal_bergabung,
+        u.alamat_lengkap as alamat_investor,
+        u.created_at as tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet,
         SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
     FROM investor i
@@ -241,7 +241,7 @@ $bulanIndo = [
                                                      <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs" style="font-size: 11px; cursor: pointer;"
                                                            data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
                                                            data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
-                                                           data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-alamat = "<?= htmlspecialchars($inv['alamat_investor'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
                                                            title="Klik untuk lihat detail alamat">
                                                          <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($inv['kecamatan'] ?: 'N/A'); ?>
                                                      </span>
@@ -503,9 +503,9 @@ $(document).ready(function() {
                     let safeKec = String(kecText).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                     let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                     let locColHtml = item.alamat_outlet ? 
-                        `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" data-nama="${safeNama}" data-kecamatan="${safeKec}" data-alamat="${safeAlamat}" title="Klik untuk lihat detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>` :
+                        `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" data-nama="${safeNama}" data-kecamatan="${safeKec}" data-alamat = "${safeAlamat}" title="Klik untuk lihat detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>` :
                         `<span class="badge bg-light text-body-secondary border" style="font-size: 11px;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${kecText}</span>`;
-                    let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tanggal_disetujui ? item.tanggal_disetujui : '-');
+                    let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tgl_disetujui ? item.tgl_disetujui : '-');
 
                     html += `
                         <tr>

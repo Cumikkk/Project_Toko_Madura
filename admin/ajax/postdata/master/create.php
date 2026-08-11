@@ -74,9 +74,9 @@ if ($isEdit) {
     if (!empty($password)) {
         $hashedPass = password_hash($password, PASSWORD_BCRYPT);
         $passSafe   = $db->real_escape_string($hashedPass);
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
     } else {
-        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat = {$alamatVal} WHERE id_users = {$idUsers} AND role = 'master'");
+        $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$idUsers} AND role = 'master'");
     }
 
     JsonResponse([
@@ -103,7 +103,7 @@ if ($isEdit) {
     $hashedPass = password_hash($password, PASSWORD_BCRYPT);
     $passSafe   = $db->real_escape_string($hashedPass);
 
-    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'master')");
+    $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'master')");
 
     if ($db->affected_rows < 1) {
         JsonResponse([

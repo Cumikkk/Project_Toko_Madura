@@ -26,8 +26,9 @@ if ($action === 'get_detail_harian') {
 
     // Fetch outlet details and investor split percentage
     $resOut = $db->query("
-        SELECT o.nama_outlet, o.persentase_potongan, o.persen_bagian_investor 
+        SELECT u.nama_lengkap as nama_outlet, o.persentase_potongan, o.persentase_hak_investor 
         FROM outlet o 
+        JOIN users u ON u.id_users = o.id_users
         WHERE o.id_outlet = {$idOutlet} 
         LIMIT 1
     ");
@@ -38,7 +39,7 @@ if ($action === 'get_detail_harian') {
     $rowOutInfo = $resOut->fetch_assoc();
     $namaOutlet = $rowOutInfo['nama_outlet'];
     $ratePotongan = isset($rowOutInfo['persentase_potongan']) ? (float)$rowOutInfo['persentase_potongan'] : 10.00;
-    $persenInvSplit = isset($rowOutInfo['persen_bagian_investor']) ? (float)$rowOutInfo['persen_bagian_investor'] : 50.00;
+    $persenInvSplit = isset($rowOutInfo['persentase_hak_investor']) ? (float)$rowOutInfo['persentase_hak_investor'] : 50.00;
     $persenOutSplit = 100.00 - $persenInvSplit;
 
     // Build filter conditions based on passed parameters
@@ -47,24 +48,24 @@ if ($action === 'get_detail_harian') {
     if (!empty($tglMulai) && !empty($tglSelesai)) {
         $safeMulai = $db->real_escape_string($tglMulai);
         $safeSelesai = $db->real_escape_string($tglSelesai);
-        $whereConds[] = "l.periode_laporan BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+        $whereConds[] = "l.tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
     } elseif (!empty($tglMulai)) {
         $safeMulai = $db->real_escape_string($tglMulai);
-        $whereConds[] = "l.periode_laporan >= '{$safeMulai}'";
+        $whereConds[] = "l.tanggal_omzet >= '{$safeMulai}'";
     } elseif (!empty($tglSelesai)) {
         $safeSelesai = $db->real_escape_string($tglSelesai);
-        $whereConds[] = "l.periode_laporan <= '{$safeSelesai}'";
+        $whereConds[] = "l.tanggal_omzet <= '{$safeSelesai}'";
     } else {
         if ($bulan > 0) {
-            $whereConds[] = "MONTH(l.periode_laporan) = {$bulan}";
+            $whereConds[] = "MONTH(l.tanggal_omzet) = {$bulan}";
         }
         if ($tahun > 0) {
-            $whereConds[] = "YEAR(l.periode_laporan) = {$tahun}";
+            $whereConds[] = "YEAR(l.tanggal_omzet) = {$tahun}";
         }
     }
 
     $whereSql = implode(" AND ", $whereConds);
-    $sql = "SELECT id_laporan, periode_laporan, omzet, persentase_potongan, persen_bagian_investor, nominal_potongan, waktu_input FROM laporan_omzet l WHERE {$whereSql} ORDER BY periode_laporan ASC";
+    $sql = "SELECT id_laporan, tanggal_omzet, nominal_omzet, persentase_potongan, persentase_hak_investor, nominal_potongan, created_at FROM laporan_omzet l WHERE {$whereSql} ORDER BY tanggal_omzet ASC";
     $res = $db->query($sql);
 
     $items = [];
@@ -80,16 +81,16 @@ if ($action === 'get_detail_harian') {
 
     if ($res) {
         while ($row = $res->fetch_assoc()) {
-            $omzet = (float)$row['omzet'];
-            $tglStr = date('d', strtotime($row['periode_laporan'])) . ' ' . 
-                      ($bulanIndo[(int)date('n', strtotime($row['periode_laporan']))] ?? '') . ' ' . 
-                      date('Y', strtotime($row['periode_laporan']));
+            $nominal_omzet = (float)$row['nominal_omzet'];
+            $tglStr = date('d', strtotime($row['tanggal_omzet'])) . ' ' . 
+                      ($bulanIndo[(int)date('n', strtotime($row['tanggal_omzet']))] ?? '') . ' ' . 
+                      date('Y', strtotime($row['tanggal_omzet']));
 
             $itemRatePot = (isset($row['persentase_potongan']) && (float)$row['persentase_potongan'] > 0) ? (float)$row['persentase_potongan'] : $ratePotongan;
-            $itemPersenInv = (isset($row['persen_bagian_investor']) && (float)$row['persen_bagian_investor'] > 0) ? (float)$row['persen_bagian_investor'] : $persenInvSplit;
+            $itemPersenInv = (isset($row['persentase_hak_investor']) && (float)$row['persentase_hak_investor'] > 0) ? (float)$row['persentase_hak_investor'] : $persenInvSplit;
             $itemPersenOut = 100.00 - $itemPersenInv;
 
-            $pot10 = (isset($row['nominal_potongan']) && (float)$row['nominal_potongan'] > 0) ? (float)$row['nominal_potongan'] : round($omzet * ($itemRatePot / 100.0), 2);
+            $pot10 = (isset($row['nominal_potongan']) && (float)$row['nominal_potongan'] > 0) ? (float)$row['nominal_potongan'] : round($nominal_omzet * ($itemRatePot / 100.0), 2);
             $hakInv = round($pot10 * ($itemPersenInv / 100.0), 2);
             $hakOut = round($pot10 * ($itemPersenOut / 100.0), 2);
             $bersihOut = $omzet - $pot10 + $hakOut;
@@ -101,7 +102,7 @@ if ($action === 'get_detail_harian') {
 
             $items[] = [
                 'id_laporan' => (int)$row['id_laporan'],
-                'tgl_raw' => $row['periode_laporan'],
+                'tgl_raw' => $row['tanggal_omzet'],
                 'tgl_formatted' => $tglStr,
                 'omzet' => $omzet,
                 'rate_potongan' => $itemRatePot,

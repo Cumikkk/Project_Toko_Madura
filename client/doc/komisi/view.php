@@ -24,19 +24,19 @@ if (!empty($search)) {
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConds[] = "DATE(tanggal_komisi) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
+    $whereConds[] = "DATE(tgl_transfer) BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
 } elseif (!empty($selectedTglMulai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
-    $whereConds[] = "DATE(tanggal_komisi) >= '{$safeMulai}'";
+    $whereConds[] = "DATE(tgl_transfer) >= '{$safeMulai}'";
 } elseif (!empty($selectedTglSelesai)) {
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
-    $whereConds[] = "DATE(tanggal_komisi) <= '{$safeSelesai}'";
+    $whereConds[] = "DATE(tgl_transfer) <= '{$safeSelesai}'";
 } else {
     if ($selectedBulan > 0) {
-        $whereConds[] = "MONTH(tanggal_komisi) = {$selectedBulan}";
+        $whereConds[] = "MONTH(tgl_transfer) = {$selectedBulan}";
     }
     if ($selectedTahun > 0) {
-        $whereConds[] = "YEAR(tanggal_komisi) = {$selectedTahun}";
+        $whereConds[] = "YEAR(tgl_transfer) = {$selectedTahun}";
     }
 }
 
@@ -57,7 +57,7 @@ $offset = ($page - 1) * $limit;
 $sqlStats = $db->query("
     SELECT 
         IFNULL(SUM(nominal), 0) as total_komisi,
-        IFNULL(SUM(CASE WHEN MONTH(tanggal_komisi) = MONTH(CURRENT_DATE()) AND YEAR(tanggal_komisi) = YEAR(CURRENT_DATE()) THEN nominal ELSE 0 END), 0) as komisi_bulan_ini
+        IFNULL(SUM(CASE WHEN MONTH(tgl_transfer) = MONTH(CURRENT_DATE()) AND YEAR(tgl_transfer) = YEAR(CURRENT_DATE()) THEN nominal ELSE 0 END), 0) as komisi_bulan_ini
     FROM komisi_master 
     {$whereSql}
 ");
@@ -65,7 +65,7 @@ $stats = $sqlStats ? $sqlStats->fetch_assoc() : ['total_komisi' => 0, 'komisi_bu
 
 // Fetch distinct years of komisi transfers
 $availableYears = [];
-$resYears = $db->query("SELECT DISTINCT YEAR(tanggal_komisi) as y_periode FROM komisi_master WHERE id_master = {$masterId} ORDER BY y_periode DESC");
+$resYears = $db->query("SELECT DISTINCT YEAR(tgl_transfer) as y_periode FROM komisi_master WHERE id_master = {$masterId} ORDER BY y_periode DESC");
 if ($resYears) {
     while ($yRow = $resYears->fetch_assoc()) {
         if (!empty($yRow['y_periode'])) {
@@ -82,7 +82,7 @@ $sqlList = "
     SELECT * 
     FROM komisi_master 
     {$whereSql}
-    ORDER BY tanggal_komisi DESC, id_komisi DESC
+    ORDER BY tgl_transfer DESC, id_komisi DESC
     LIMIT {$limit} OFFSET {$offset}
 ";
 $resKomisi = $db->query($sqlList);
@@ -221,7 +221,7 @@ $bulanIndo = [
                                             <td class="text-center">
                                                 <span class="badge bg-body-tertiary border text-body-emphasis px-2.5 py-1 rounded-3 fw-semibold font-monospace small">
                                                     <i class="fa-regular fa-clock me-1 text-primary"></i>
-                                                    <?= date("d/m/Y H:i", strtotime($km['tanggal_komisi'])) ?> WIB
+                                                    <?= date("d/m/Y H:i", strtotime($km['tgl_transfer'])) ?> WIB
                                                 </span>
                                             </td>
                                             <td>
