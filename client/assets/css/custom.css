@@ -950,3 +950,8 @@ html body .header span.brand-title {
 .right-sidebar { --primary-color: #F26539 !important; }
 .right-sidebar .dashboard-icon.active { border-color: #F26539 !important; }
 .right-sidebar .dashboard-icon.active::after { color: #F26539 !important; }
+
+/* Fix Layout Settings Colors Visibility */
+.right-sidebar .bg-nav { background: #F26539 !important; }
+.right-sidebar .bg-menu { background: #E2E8F0 !important; }
+.right-sidebar .dashboard-icon.active { border-color: #F26539 !important; }
