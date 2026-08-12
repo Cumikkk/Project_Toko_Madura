@@ -443,6 +443,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                             <span class="input-group-text bg-body-tertiary border-body-subtle fw-bold text-body">Rp</span>
                                             <input type="text" id="omzet_input_display" class="form-control border-body-subtle bg-body text-body fw-extrabold fs-4" placeholder="0" required autocomplete="off">
                                             <input type="hidden" name="omzet" id="omzet_input_real" value="">
+                                            <input type="hidden" name="nominal_omzet" id="omzet_input_real_alias" value="">
 
                                             <!-- Tombol Panah Naik & Turun di Pojok Kanan Kolom -->
                                             <div class="input-group-text p-0 bg-body border-body-subtle overflow-hidden d-flex flex-column" style="border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
@@ -873,26 +874,32 @@ $(document).ready(function() {
 
     function syncOmzetValues(newVal) {
         newVal = Math.max(0, newVal);
-        $('#omzet_input_real').val(newVal > 0 ? newVal : '');
+        const valStr = newVal > 0 ? newVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
         $('#omzet_input_display').val(formatRupiahDisplay(newVal));
     }
 
     $('#btnOmzetMinus').on('click', function() {
-        let currentVal = parseInt($('#omzet_input_real').val()) || 0;
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let currentVal = parseInt(rawVal) || parseInt($('#omzet_input_real').val()) || 0;
         currentVal = Math.max(0, currentVal - STEP_OMZET);
         syncOmzetValues(currentVal);
     });
 
     $('#btnOmzetPlus').on('click', function() {
-        let currentVal = parseInt($('#omzet_input_real').val()) || 0;
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let currentVal = parseInt(rawVal) || parseInt($('#omzet_input_real').val()) || 0;
         currentVal += STEP_OMZET;
         syncOmzetValues(currentVal);
     });
 
-    $('#omzet_input_display').on('input keyup change', function() {
+    $('#omzet_input_display').on('input keyup change blur', function() {
         let rawVal = $(this).val().replace(/[^\d]/g, '');
         let numVal = parseInt(rawVal) || 0;
-        $('#omzet_input_real').val(numVal > 0 ? numVal : '');
+        const valStr = numVal > 0 ? numVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
         $(this).val(formatRupiahDisplay(numVal));
     });
 
@@ -985,6 +992,18 @@ $(document).ready(function() {
     // 1. Submit Form Input Omzet Harian
     $('#formInputOmzet').on('submit', function(e) {
         e.preventDefault();
+
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let numVal = parseInt(rawVal) || 0;
+        const valStr = numVal > 0 ? numVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
+
+        if (numVal <= 0) {
+            Swal.fire('Gagal', 'Nominal omzet harian harus lebih besar dari Rp 0.', 'error');
+            return false;
+        }
+
         const form = $(this);
         const submitBtn = form.find('button[type="submit"]');
 
