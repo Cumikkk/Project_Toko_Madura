@@ -88,7 +88,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: resp.message || 'Data admin berhasil disimpan.',
+                        text: resp.message || 'Data admin berhasil ditambahkan.',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -103,7 +103,7 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
                 }
             }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
-                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
                 if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }

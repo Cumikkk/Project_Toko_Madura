@@ -85,7 +85,9 @@ use App\Models\Admin;
                                         location.reload();
                                     }
                                 })
-                            }, 'json')
+                            }, 'json').fail(function() {
+                                Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
+                            });
                         }
                     })
                 })
