@@ -257,7 +257,7 @@ $(document).ready(function() {
             },
             error: function() {
                 btn.prop('disabled', false);
-                Swal.fire('Error!', 'Gagal terhubung ke server.', 'error');
+                Swal.fire('Error!', 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.', 'error');
             }
         });
     });

@@ -118,10 +118,12 @@ if ($isEdit) {
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/master/create", data, (resp) => {
                 button.removeClass('loading').prop('disabled', false);
                 if (resp.success) {
+                    let isEdit = $('input[name="id_users"]').val() ? true : false;
+                    let defaultSuccessMsg = isEdit ? 'Data master berhasil diperbarui.' : 'Data master berhasil ditambahkan.';
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: resp.message || 'Data master berhasil disimpan.',
+                        text: resp.message || defaultSuccessMsg,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -136,7 +138,7 @@ if ($isEdit) {
                 }
             }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
-                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
                 if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }

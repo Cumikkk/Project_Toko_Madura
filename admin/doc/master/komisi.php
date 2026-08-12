@@ -173,7 +173,7 @@ function deleteKomisi(id, master, nominal) {
                     Swal.fire('Gagal!', resp.message || 'Gagal menghapus data komisi', 'error');
                 }
             }, 'json').fail(() => {
-                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
             });
         }
     });

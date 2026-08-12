@@ -197,7 +197,7 @@ function deleteMaster(id, nama, totalInvestor, totalOutlet) {
                     Swal.fire('Gagal!', resp.message || 'Gagal menghapus data master', 'error');
                 }
             }, 'json').fail(function() {
-                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
             });
         }
     });
