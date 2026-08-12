@@ -122,8 +122,8 @@ $topbarTab  = $_GET['tab'] ?? '';
                 <button class="header-btn fullscreen-btn d-none d-md-inline-flex" id="btnFullscreen" title="Layar Penuh"><i class="fa-light fa-expand"></i></button>
 
                 <!-- Profile Avatar Dropdown -->
-                <div class="header-btn-box profile-btn-box">
-                    <button class="p-0 border-0 bg-transparent" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="header-btn-box profile-btn-box dropdown">
+                    <button class="p-0 border-0 bg-transparent profile-btn" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="custom-avatar-container shadow-sm" style="width: 38px; height: 38px;">
                             <img class="custom-avatar" style="width: 38px; height: 38px;" src="<?= App\Models\User::avatar($user['MBR_AVATAR']); ?>" alt="Avatar">
                         </div>
@@ -136,7 +136,7 @@ $topbarTab  = $_GET['tab'] ?? '';
                             </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
+                        <li><a class="dropdown-item fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger fw-bold" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><span class="dropdown-icon me-2 text-danger"><i class="fa-regular fa-arrow-right-from-bracket"></i></span> Logout</a></li>
                     </ul>
@@ -205,7 +205,7 @@ $topbarTab  = $_GET['tab'] ?? '';
                     </div>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information"><span class="dropdown-icon"><i class="fa-regular fa-circle-user"></i></span> Profile</a>
+                    <a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon"><i class="fa-regular fa-circle-user"></i></span> Profile</a>
                 </li>
                 <li>
                     <a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/help-center"><span class="dropdown-icon"><i class="fa-regular fa-circle-question"></i></span> Help</a>
@@ -215,7 +215,7 @@ $topbarTab  = $_GET['tab'] ?? '';
     </div>
     <div class="bottom-panel">
         <div class="button-group">
-            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/personal-information"><i class="fa-light fa-gear"></i><span>Settings</span></a>
+            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><i class="fa-light fa-gear"></i><span>Settings</span></a>
             <a href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><i class="fa-light fa-power-off"></i><span>Logout</span></a>
         </div>
     </div>
