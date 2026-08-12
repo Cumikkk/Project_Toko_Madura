@@ -85,12 +85,16 @@ use Config\Core\SystemInfo;
                         location.reload();
                     }
                 });
-            }, 'json').fail(function() {
+            }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
+                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
                 Swal.fire({
                     icon: 'error',
-                    title: 'Kesalahan!',
-                    text: 'Terjadi kesalahan koneksi server.'
+                    title: 'Perhatian!',
+                    text: errorMsg
                 });
             });
         });

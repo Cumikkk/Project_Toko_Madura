@@ -95,15 +95,25 @@ $(document).ready(function() {
         $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/pengaturan/update", formData, function(resp) {
             btn.prop('disabled', false);
             if (resp.success) {
-                Swal.fire('Berhasil!', resp.message, 'success').then(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: resp.message || 'Pengaturan berhasil diperbarui.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(function() {
                     location.reload();
                 });
             } else {
-                Swal.fire('Gagal!', resp.message || 'Gagal menyimpan pengaturan', 'error');
+                Swal.fire('Gagal!', resp.message || 'Gagal menyimpan pengaturan.', 'error');
             }
-        }, 'json').fail(function() {
+        }, 'json').fail(function(xhr) {
             btn.prop('disabled', false);
-            Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+            let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
+            if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            Swal.fire('Error!', errorMsg, 'error');
         });
     });
 });
