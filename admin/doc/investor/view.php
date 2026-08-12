@@ -1,34 +1,12 @@
 <?php
-use Config\Core\Database;
+use App\Models\Investor;
 use Config\Core\SystemInfo;
-
-$db = Database::connect();
 
 $loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
 $loggedInId    = intval($user['ADM_ID'] ?? 1);
 
-// Role Filtering:
-if ($loggedInLevel == 1) {
-    $whereClause = "";
-} elseif ($loggedInLevel == 2) {
-    $whereClause = "WHERE i.id_master = {$loggedInId}";
-} else {
-    $whereClause = "WHERE i.id_master IN (SELECT id_users FROM users WHERE role = 'master')";
-}
-
 // Fetch investors list with Master Owner name and active outlet counts
-$investors = $db->query("
-    SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat_investor, u.created_at as tanggal_bergabung,
-           u_master.nama_lengkap as nama_master,
-           COUNT(DISTINCT o.id_outlet) as total_outlet
-    FROM investor i
-    JOIN users u ON (u.id_users = i.id_users)
-    LEFT JOIN users u_master ON (u_master.id_users = i.id_master)
-    LEFT JOIN outlet o ON (o.id_investor = i.id_investor AND o.status = 'active')
-    {$whereClause}
-    GROUP BY i.id_investor
-    ORDER BY u.nama_lengkap ASC
-");
+$investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
 ?>
 
 <div class="page-header">
