@@ -28,7 +28,7 @@ class Investor {
             FROM investor i
             JOIN users u ON (u.id_users = i.id_users)
             LEFT JOIN users u_master ON (u_master.id_users = i.id_master)
-            LEFT JOIN outlet o ON (o.id_investor = i.id_investor AND o.status = 'active')
+            LEFT JOIN outlet o ON (o.id_investor = i.id_investor AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE()))
             {$whereClause}
             GROUP BY i.id_investor
             ORDER BY u.nama_lengkap ASC
