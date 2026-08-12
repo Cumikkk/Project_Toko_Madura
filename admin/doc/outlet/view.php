@@ -156,14 +156,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
@@ -232,14 +235,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
@@ -311,14 +317,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
@@ -402,14 +411,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
