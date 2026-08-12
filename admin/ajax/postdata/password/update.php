@@ -51,10 +51,10 @@
     }
 
     $UPDATE_DATA = [
-        "ADM_PASS" => password_hash($data["pass03"], PASSWORD_BCRYPT)
+        "password" => password_hash($data["pass03"], PASSWORD_BCRYPT)
     ];
     
-    $update = Database::update("tb_admin", $UPDATE_DATA, ['ADM_ID' => $user['ADM_ID']]);
+    $update = Database::update("users", $UPDATE_DATA, ['id_users' => $user['ID_ADM']]);
     if(!$update) {
         JsonResponse([
             'code'  => 200,
