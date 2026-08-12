@@ -1,77 +1,27 @@
 <?php
 use Config\Core\Database;
 use Config\Core\SystemInfo;
-use App\Models\User;
+use App\Models\Outlet;
 
 $db = Database::connect();
 
-// 1. Fetch counts for stats cards
-$activeCount = 0;
-$resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active' AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
-if ($resActive && $resActive->num_rows > 0) {
-    $activeCount = (int)$resActive->fetch_assoc()['total'];
-}
-
-$expiredCount = 0;
-$resExpired = $db->query("SELECT COUNT(*) as total FROM outlet WHERE (status = 'active' AND DATE(tgl_jatuh_tempo) < CURRENT_DATE()) OR status = 'inactive'");
-if ($resExpired && $resExpired->num_rows > 0) {
-    $expiredCount = (int)$resExpired->fetch_assoc()['total'];
-}
-
-$pendingCount = User::get_status('pending')['total'];
-$rejectCount = User::get_status('reject')['total'];
+$stats = Outlet::getOutletStats();
+$activeCount = $stats['activeCount'];
+$expiredCount = $stats['expiredCount'];
+$pendingCount = $stats['pendingCount'];
+$rejectCount = $stats['rejectCount'];
 
 // 2. Fetch Active Outlets (not expired)
-$sqlActive = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-           u_inv.nama_lengkap as nama_investor
-    FROM outlet o
-    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
-    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
-    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
-    ORDER BY o.nama_outlet ASC
-";
-$activeOutlets = $db->query($sqlActive);
+$activeOutlets = Outlet::getActiveOutlets();
 
 // 3. Fetch Expired Outlets
-$sqlExpired = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-           u_inv.nama_lengkap as nama_investor
-    FROM outlet o
-    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
-    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
-    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE (o.status = 'active' AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
-    ORDER BY o.tgl_jatuh_tempo DESC, o.nama_outlet ASC
-";
-$expiredOutlets = $db->query($sqlExpired);
+$expiredOutlets = Outlet::getExpiredOutlets();
 
 // 4. Fetch Pending Outlets (Request Outlet)
-$sqlPending = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-           u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
-    FROM outlet o
-    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
-    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
-    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE o.status = 'pending'
-    ORDER BY o.id_outlet DESC
-";
-$pendingOutlets = $db->query($sqlPending);
+$pendingOutlets = Outlet::getPendingOutlets();
 
 // 5. Fetch Rejected Outlets
-$sqlReject = "
-    SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-           u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
-    FROM outlet o
-    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
-    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
-    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE o.status = 'reject'
-    ORDER BY o.id_outlet DESC
-";
-$rejectedOutlets = $db->query($sqlReject);
+$rejectedOutlets = Outlet::getRejectedOutlets();
 
 // Helper: safely encode alamat for JS variable
 function safeJsonAlamat($str) {
@@ -206,14 +156,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
@@ -282,14 +235,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
@@ -361,14 +317,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
@@ -452,14 +411,17 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?= htmlspecialchars($row['kecamatan'] ?? '-') ?>
+                                                <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <button type="button" class="btn btn-outline-info btn-xs ms-1" 
-                                                            onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)'
-                                                            title="Lihat Alamat Lengkap">
-                                                        <i class="fa fa-info-circle"></i>
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
                                                 <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>

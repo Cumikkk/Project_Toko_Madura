@@ -1,24 +1,15 @@
 <?php
-
-use Config\Core\Database;
+use App\Models\Investor;
+use App\Models\Master;
 use Config\Core\SystemInfo;
 
-$db = Database::connect();
 $idInvestor = intval($_GET['id'] ?? ($_GET['c'] ?? 0));
 $isEdit = ($idInvestor > 0);
 
 $investorData = null;
 if ($isEdit) {
-    $resInv = $db->query("
-        SELECT i.*, u.nama_lengkap, u.username, u.no_hp
-        FROM investor i
-        JOIN users u ON (u.id_users = i.id_users)
-        WHERE i.id_investor = {$idInvestor}
-        LIMIT 1
-    ");
-    if ($resInv && $resInv->num_rows > 0) {
-        $investorData = $resInv->fetch_assoc();
-    } else {
+    $investorData = Investor::getInvestorById($idInvestor);
+    if (!$investorData) {
         $isEdit = false;
         $idInvestor = 0;
     }
@@ -31,7 +22,7 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 }
 
 // Fetch list of Master Owners
-$masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 'master' ORDER BY nama_lengkap ASC");
+$masterList = Master::getAllMasterOptions();
 ?>
 
 <div class="page-header">
@@ -136,8 +127,8 @@ $masterList = $db->query("SELECT id_users, nama_lengkap FROM users WHERE role = 
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="alamat_investor" class="form-label fw-bold">Alamat Lengkap Investor <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="alamat_investor" name="alamat_investor" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo" required><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
+                                <label for="alamat_lengkap" class="form-label fw-bold">Alamat Lengkap Investor <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="alamat_lengkap" name="alamat_lengkap" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo" required><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
 

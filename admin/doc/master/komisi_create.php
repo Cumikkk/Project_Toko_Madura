@@ -1,31 +1,21 @@
 <?php
-use Config\Core\Database;
+use App\Models\Master;
 use Config\Core\SystemInfo;
-
-$db = Database::connect();
 
 $idKomisi = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $isEdit   = ($idKomisi > 0);
 $komisiData = null;
 
 if ($isEdit) {
-    $res = $db->query("
-        SELECT km.*, u.nama_lengkap as nama_master 
-        FROM komisi_master km 
-        LEFT JOIN users u ON u.id_users = km.id_master 
-        WHERE km.id_komisi = {$idKomisi} 
-        LIMIT 1
-    ");
-    if ($res && $res->num_rows > 0) {
-        $komisiData = $res->fetch_assoc();
-    } else {
+    $komisiData = Master::getKomisiById($idKomisi);
+    if (!$komisiData) {
         $redirectUrl = SystemInfo::app('ADMIN_URL') . '/master/komisi';
         die("<script>alert('Data Komisi tidak ditemukan!'); location.href = '{$redirectUrl}';</script>");
     }
 }
 
 // Fetch all Master accounts for dropdown select
-$resMasters = $db->query("SELECT id_users, nama_lengkap, username FROM users WHERE role = 'master' ORDER BY nama_lengkap ASC");
+$resMasters = Master::getAllMasterOptions();
 ?>
 
 <div class="page-header">

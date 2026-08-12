@@ -87,7 +87,7 @@ class AdminAuth {
                 'ADM_PASS'  => $rawUser['password'],
                 'ADM_LEVEL' => $level,
                 'ADM_STS' => 1,
-                'ADMROLE_NAME' => ($level == 1) ? 'Programmer' : 'Master Owner',
+                'ADMROLE_NAME' => ($level == 1) ? 'Admin' : 'Master Owner',
                 'role' => $role
             ];
             

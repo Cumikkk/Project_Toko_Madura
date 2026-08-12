@@ -779,7 +779,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: TAMBAH OUTLET (WIZARD 2 SESI - PIXEL PERFECT GRID) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalTambahOutlet" tabindex="-1" aria-labelledby="modalTambahOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             
             <!-- Modal Header -->
@@ -995,7 +995,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: EDIT OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalEditOutlet" tabindex="-1" aria-labelledby="modalEditOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 440px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 440px;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 12px;">
             <div class="modal-header border-0 pb-0 pt-2 px-2.5">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalEditOutletLabel" style="font-size: 13px;">
@@ -1027,9 +1027,35 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
 
 <style>
+/* Compact & Stationary Modal Dialog - Clear of Navbar */
+.modal {
+    overflow-y: auto !important;
+}
 .modal-dialog {
-    margin-top: 85px !important;
-    margin-bottom: 40px !important;
+    margin-top: 80px !important;
+    margin-bottom: 30px !important;
+    max-height: calc(100vh - 110px) !important;
+    height: auto !important;
+}
+.modal-content {
+    max-height: calc(100vh - 110px) !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+.modal-content form {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+.modal-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: calc(100vh - 250px) !important;
+    min-height: 0 !important;
 }
 .custom-toggle-switch {
     position: relative;
@@ -1209,7 +1235,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: DETAIL OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalDetailOutlet" tabindex="-1" aria-labelledby="modalDetailOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 500px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 500px;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 16px;">
             <div class="modal-header border-0 pb-0 pt-4 px-4">
                 <h5 class="modal-title fw-bold text-body-emphasis" id="modalDetailOutletLabel">
@@ -1217,7 +1243,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4" style="max-height: 55vh; overflow-y: auto;">
+            <div class="modal-body p-4" >
                 <div id="detailOutletLoading" class="text-center py-4">
                     <div class="spinner-border text-danger" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -1266,7 +1292,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: PERPANJANG LANGGANAN OUTLET (Theme Adaptive) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalPerpanjangOutlet" tabindex="-1" aria-labelledby="modalPerpanjangOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 420px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 420px;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
@@ -1334,7 +1360,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: AJUKAN ULANG PENDAFTARAN OUTLET (2-SESI WIZARD PRE-FILLED) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalAjukanUlangPendaftaran" tabindex="-1" aria-labelledby="modalAjukanUlangPendaftaranLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 540px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             
             <!-- Modal Header -->
@@ -1556,7 +1582,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: PREVIEW BUKTI TRANSFER PEMBAYARAN -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalPreviewBuktiPembayaran" tabindex="-1" aria-labelledby="modalPreviewBuktiPembayaranLabel" aria-hidden="true" style="z-index: 1060;">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 680px; margin-top: 80px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 680px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalPreviewBuktiPembayaranLabel">
@@ -1564,7 +1590,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                 </h6>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-3 text-center bg-dark-subtle d-flex align-items-center justify-content-center" style="min-height: 350px; max-height: 70vh; overflow-y: auto;">
+            <div class="modal-body p-3 text-center bg-dark-subtle d-flex align-items-center justify-content-center" >
                 <img id="previewBuktiImg" src="" class="img-fluid rounded-3 shadow-sm border" style="max-height: 65vh; object-fit: contain;" alt="Bukti Transfer">
                 <iframe id="previewBuktiPdf" src="" class="w-100 rounded-3 border d-none" style="height: 65vh;" frameborder="0"></iframe>
             </div>
@@ -1586,7 +1612,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px; margin-top: 85px !important; margin-bottom: 40px !important;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>

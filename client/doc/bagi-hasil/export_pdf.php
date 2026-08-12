@@ -186,10 +186,10 @@ if ($resBagiHasil) {
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
-        $row['total_bersih_outlet'] = ($omzet - $potongan10) + $hakOutlet;
+        $row['total_bersih_outlet'] = ($nominal_omzet - $potongan10) + $hakOutlet;
         $row['is_last_day_done'] = true;
 
-        $totOmzet += $omzet;
+        $totOmzet += $nominal_omzet;
         $totPotongan10 += $potongan10;
         $totHakInvestor += $hakInvestor;
         $totHakOutlet += $hakOutlet;
@@ -239,27 +239,29 @@ ob_start();
         }
         .meta-box {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 8px 12px;
+            padding: 6px 8px;
             vertical-align: top;
+            font-size: 10.5px;
+            word-wrap: break-word;
+            word-break: break-all;
         }
         .meta-label {
             color: #64748b;
             font-weight: bold;
-            width: 120px;
         }
         .meta-value {
             color: #0f172a;
             font-weight: bold;
         }
         
-        /* Summary Metric Cards Table */
         .summary-table {
             width: 100%;
             border-collapse: collapse;
@@ -268,20 +270,25 @@ ob_start();
         .summary-card {
             padding: 10px;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
             background-color: #ffffff;
-            text-align: center;
+            vertical-align: top;
         }
-        .summary-card-title {
+        .metric-title {
             font-size: 9px;
             font-weight: bold;
             color: #64748b;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .summary-card-val {
+        .metric-value {
             font-size: 13px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-top: 3px;
+        }
+        .metric-sub {
+            font-size: 8.5px;
+            color: #94a3b8;
+            margin-top: 2px;
         }
         
         .data-table {
@@ -313,20 +320,6 @@ ob_start();
         .text-danger { color: #dc2626; }
         .text-success { color: #16a34a; }
         .text-warning { color: #d97706; }
-
-        .footer-table {
-            width: 100%;
-            margin-top: 40px;
-            border-collapse: collapse;
-        }
-        .footer-table td {
-            width: 50%;
-            text-align: center;
-            vertical-align: top;
-        }
-        .signature-space {
-            height: 60px;
-        }
     </style>
 </head>
 <body>
@@ -345,30 +338,36 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Metadata Info -->
-    <table class="meta-box">
+    <!-- Metadata Box -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
         <tr>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
+            <!-- Left Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px; border-right: 1px dashed #cbd5e1;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                     <tr>
-                        <td class="meta-label">Akses Role</td>
-                        <td class="meta-value">: <?= strtoupper($role); ?></td>
+                        <td style="width: 35%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Akses Role</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 60%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= strtoupper($role); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label">Jumlah Outlet</td>
-                        <td class="meta-value">: <?= $countOutlet; ?> Outlet Terdaftar</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Jumlah Outlet</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= $countOutlet; ?> Outlet Terdaftar</td>
                     </tr>
                 </table>
             </td>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
+            <!-- Right Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                     <tr>
-                        <td class="meta-label">Periode Laporan</td>
-                        <td class="meta-value">: <?= htmlspecialchars($periodeTitleStr); ?></td>
+                        <td style="width: 36%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Periode Laporan</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 59%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($periodeTitleStr); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label">Nama Toko</td>
-                        <td class="meta-value">: <?= htmlspecialchars($displayNamaToko); ?></td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Nama Toko</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($displayNamaToko); ?></td>
                     </tr>
                 </table>
             </td>

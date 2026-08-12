@@ -22,7 +22,7 @@ if(empty($user)) {
 
 /** Redirect Master Owner to Client Portal */
 if (strtolower($user['role'] ?? '') === 'master') {
-    die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/dashboard';</script>");
+    die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/investor';</script>");
 }
 
 /** update token expired */

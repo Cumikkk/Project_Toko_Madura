@@ -62,7 +62,7 @@ $_SESSION['user_id'] = $admin['id_users'];
 
 Admin::setSessionData(['token' => $token]);
 
-$redirectUrl = (strtolower($admin['role'] ?? '') === 'master') ? SystemInfo::app('CLIENT_URL') . '/dashboard' : 'dashboard';
+$redirectUrl = (strtolower($admin['role'] ?? '') === 'master') ? SystemInfo::app('CLIENT_URL') . '/investor' : 'dashboard';
 
 JsonResponse([
     'code'      => 200,

@@ -118,7 +118,7 @@ $bulanIndo = [
                     <div class="row align-items-center g-3">
                         <div class="col-12">
                             <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
-                                <i class="fa-solid fa-crown text-warning me-1"></i> Master Access
+                                <i class="fa-solid text-warning me-1"></i> Master Access
                             </span>
                             <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Komisi Master</h2>
                             <p class="text-white-50 small mb-0">Rekapitulasi komisi & apresiasi dari Admin atas kontribusi kemitraan investor Anda.</p>

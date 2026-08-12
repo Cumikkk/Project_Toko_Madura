@@ -56,9 +56,11 @@ if ($role === 'outlet') {
     }
 }
 
-// Investor and Outlet do not use Dashboard -> Redirect to main modules
+// Master, Investor and Outlet do not use Dashboard -> Redirect to main modules
 if ($pageFile === 'dashboard' || empty($_GET['a'])) {
-    if ($role === 'investor') {
+    if ($role === 'master') {
+        die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/investor';</script>");
+    } elseif ($role === 'investor') {
         die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/outlet';</script>");
     } elseif ($role === 'outlet') {
         die("<script>location.href = '" . SystemInfo::app('CLIENT_URL') . "/omzet';</script>");

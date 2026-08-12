@@ -29,26 +29,21 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
             <div class="card-body">
                 <form action="" method="post" id="form-create-admin">
                     <div class="row">
-                        <!-- BARIS 1: NAMA LENGKAP ADMIN & NO. HP -->
-                        <div class="col-md-6 mb-3">
+                        <!-- BARIS 1: NAMA LENGKAP ADMIN -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="add-fullname" class="form-label fw-bold">Nama Lengkap Admin <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="add-fullname" name="add-fullname" placeholder="Contoh: Fahrul Alfanani" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="add-phone" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="add-phone" name="add-phone" placeholder="Contoh: 081234567890" required>
-                            </div>
-                        </div>
+                        
 
                         <!-- BARIS 2: ROLE & USERNAME -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="add-level" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
                                 <select name="add-level" id="add-level" class="form-control" required>
-                                    <option value="1" selected>Admin (Programmer)</option>
+                                    <option value="1" selected>Admin</option>
                                 </select>
                             </div>
                         </div>

@@ -21,7 +21,7 @@ $bulanIndo = [
 ];
 
 // Get Outlet Record for Logged-In User
-$resOutlet = $db->query("SELECT o.*, u_inv.alamat_lengkap as alamat_investor, u_inv.nama_lengkap as nama_investor, u_kasir.alamat_lengkap as alamat_outlet, u_kasir.kecamatan, u_kasir.nama_lengkap as nama_outlet FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1");
+$resOutlet = $db->query("SELECT o.*, u_inv.alamat_lengkap as alamat_investor, u_inv.nama_lengkap as nama_investor, u_kasir.alamat_lengkap as alamat_outlet, u_kasir.kecamatan, u_kasir.nama_lengkap as nama_pengelola, COALESCE(NULLIF(o.nama_outlet, ''), u_kasir.nama_lengkap) as nama_outlet FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1");
 $outlet = $resOutlet ? $resOutlet->fetch_assoc() : null;
 
 // Get Current Cut Percentage directly from Outlet record (set during registration by Investor)
@@ -418,16 +418,19 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     <input type="hidden" name="action" value="add">
                                     <input type="hidden" name="id_outlet" value="<?= (int)($outlet['id_outlet'] ?? 0); ?>">
 
-                                     <!-- Tanggal Omzet (Bebas Pilih Tanggal) -->
+                                     <!-- Tanggal Omzet (Terkunci Hari Ini) -->
                                      <div class="mb-4">
                                          <label for="tanggal_omzet" class="form-label fw-bold text-body-emphasis small text-uppercase">
                                              <i class="fa-light fa-calendar-day me-1 text-danger"></i>Tanggal Omzet <span class="text-danger">*</span>
                                          </label>
-                                         <div class="input-group input-group-lg date-picker-wrapper cursor-pointer">
+                                         <div class="input-group input-group-lg">
                                              <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
-                                                 <i class="fa-solid fa-calendar-days fs-5"></i>
+                                                 <i class="fa-solid fa-lock fs-5"></i>
                                              </span>
-                                             <input type="date" name="tanggal_omzet" id="tanggal_omzet" class="form-control border-body-subtle bg-body text-body-emphasis fw-bold cursor-pointer" value="<?= date('Y-m-d'); ?>" required onclick="if(this.showPicker){this.showPicker();}">
+                                             <input type="date" name="tanggal_omzet" id="tanggal_omzet" class="form-control border-body-subtle bg-body-tertiary text-body-emphasis fw-bold" value="<?= date('Y-m-d'); ?>" min="<?= date('Y-m-d'); ?>" max="<?= date('Y-m-d'); ?>" readonly style="pointer-events: none;">
+                                         </div>
+                                         <div class="form-text text-body-secondary mt-1.5" style="font-size: 11px;">
+                                             <i class="fa-solid fa-lock me-1 text-danger"></i>Tanggal omzet terkunci otomatis untuk hari ini (<strong><?= date('d/m/Y'); ?></strong>).
                                          </div>
                                      </div>
 
@@ -440,6 +443,7 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                             <span class="input-group-text bg-body-tertiary border-body-subtle fw-bold text-body">Rp</span>
                                             <input type="text" id="omzet_input_display" class="form-control border-body-subtle bg-body text-body fw-extrabold fs-4" placeholder="0" required autocomplete="off">
                                             <input type="hidden" name="omzet" id="omzet_input_real" value="">
+                                            <input type="hidden" name="nominal_omzet" id="omzet_input_real_alias" value="">
 
                                             <!-- Tombol Panah Naik & Turun di Pojok Kanan Kolom -->
                                             <div class="input-group-text p-0 bg-body border-body-subtle overflow-hidden d-flex flex-column" style="border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
@@ -531,14 +535,11 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                                     </span>
                                                 </td>
                                                 <td class="text-center pe-3">
-                                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                                        <button type="button" class="btn btn-sm btn-light border text-info btn-detail-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Lihat Detail">
-                                                            <i class="fa-light fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Edit Laporan">
-                                                            <i class="fa-light fa-pen-to-square"></i>
-                                                        </button>
-                                                    </div>
+                                                     <div class="d-flex align-items-center justify-content-center gap-1">
+                                                         <button type="button" class="btn btn-sm btn-light border text-info btn-detail-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Lihat Detail">
+                                                             <i class="fa-light fa-eye"></i>
+                                                         </button>
+                                                     </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -873,26 +874,32 @@ $(document).ready(function() {
 
     function syncOmzetValues(newVal) {
         newVal = Math.max(0, newVal);
-        $('#omzet_input_real').val(newVal > 0 ? newVal : '');
+        const valStr = newVal > 0 ? newVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
         $('#omzet_input_display').val(formatRupiahDisplay(newVal));
     }
 
     $('#btnOmzetMinus').on('click', function() {
-        let currentVal = parseInt($('#omzet_input_real').val()) || 0;
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let currentVal = parseInt(rawVal) || parseInt($('#omzet_input_real').val()) || 0;
         currentVal = Math.max(0, currentVal - STEP_OMZET);
         syncOmzetValues(currentVal);
     });
 
     $('#btnOmzetPlus').on('click', function() {
-        let currentVal = parseInt($('#omzet_input_real').val()) || 0;
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let currentVal = parseInt(rawVal) || parseInt($('#omzet_input_real').val()) || 0;
         currentVal += STEP_OMZET;
         syncOmzetValues(currentVal);
     });
 
-    $('#omzet_input_display').on('input keyup change', function() {
+    $('#omzet_input_display').on('input keyup change blur', function() {
         let rawVal = $(this).val().replace(/[^\d]/g, '');
         let numVal = parseInt(rawVal) || 0;
-        $('#omzet_input_real').val(numVal > 0 ? numVal : '');
+        const valStr = numVal > 0 ? numVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
         $(this).val(formatRupiahDisplay(numVal));
     });
 
@@ -985,6 +992,18 @@ $(document).ready(function() {
     // 1. Submit Form Input Omzet Harian
     $('#formInputOmzet').on('submit', function(e) {
         e.preventDefault();
+
+        let rawVal = $('#omzet_input_display').val().replace(/[^\d]/g, '');
+        let numVal = parseInt(rawVal) || 0;
+        const valStr = numVal > 0 ? numVal : '';
+        $('#omzet_input_real').val(valStr);
+        $('#omzet_input_real_alias').val(valStr);
+
+        if (numVal <= 0) {
+            Swal.fire('Gagal', 'Nominal omzet harian harus lebih besar dari Rp 0.', 'error');
+            return false;
+        }
+
         const form = $(this);
         const submitBtn = form.find('button[type="submit"]');
 
@@ -1065,7 +1084,7 @@ $(document).ready(function() {
                 if (res.success) {
                     $('#edit_id_laporan').val(res.data.id_laporan);
                     $('#edit_tanggal_omzet').val(res.data.tgl_formatted);
-                    $('#edit_omzet_val').val(new Intl.NumberFormat('id-ID').format(res.data.omzet));
+                    $('#edit_omzet_val').val(new Intl.NumberFormat('id-ID').format(res.data.nominal_omzet));
                     $('#modalEditLaporan').modal('show');
                 } else {
                     Swal.fire('Gagal', res.message, 'error');
@@ -1129,7 +1148,7 @@ $(document).ready(function() {
             success: function(res) {
                 $('#detailLaporanLoading').addClass('d-none');
                 if (res.success) {
-                    const omzetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(res.data.omzet);
+                    const omzetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(res.data.nominal_omzet);
                     $('#det_omzet_head').text(omzetFormatted);
                     $('#det_periode_head').text('Tanggal: ' + res.data.tgl_indo);
                     $('#det_periode').text(res.data.tgl_indo);

@@ -49,8 +49,10 @@ try {
     // =========================================================================
     if ($action === 'add') {
         $tanggalOmzet = trim($_POST['tanggal_omzet'] ?? date('Y-m-d'));
-        $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', $_POST['nominal_omzet'] ?? '0');
+        $rawOmzetInput = $_POST['nominal_omzet'] ?? $_POST['omzet'] ?? $_POST['omzet_input_display'] ?? '0';
+        $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', (string)$rawOmzetInput);
         $nominal_omzet = (int)$rawOmzet;
+        $omzet = $nominal_omzet;
 
         if (empty($tanggalOmzet)) {
             JsonResponse(['success' => false, 'message' => 'Mohon pilih tanggal penginputan omzet.']);
@@ -77,7 +79,7 @@ try {
 
         // Apply active outlet deduction percentage and investor split to this entry
         $appliedPercent = $presentaseGlobal;
-        $persenInvGlobal = isset($outlet['persentase_hak_investor']) ? (float)$outlet['persentase_hak_investor'] : 50.00;
+        $persenInvGlobal = isset($outlet['persentase_hak_investor']) ? (float)$outlet['persentase_hak_investor'] : (isset($outlet['persen_bagian_investor']) ? (float)$outlet['persen_bagian_investor'] : 50.00);
         $nominalPotongan = (int)round($nominal_omzet * ($appliedPercent / 100.0));
 
         $waktuInput = date('Y-m-d H:i:s');
@@ -113,13 +115,13 @@ try {
     // =========================================================================
     if ($action === 'get_detail') {
         $idLaporan = (int)($_GET['id_laporan'] ?? 0);
-        $resDetail = $db->query("SELECT * FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
+        $resDetail = $db->query("SELECT *, nominal_omzet as omzet, tanggal_omzet as periode_laporan, persentase_potongan as presentase_potongan, persentase_hak_investor as persen_bagian_investor FROM laporan_omzet WHERE id_laporan = {$idLaporan} AND id_outlet = {$idOutlet} LIMIT 1");
         if (!$resDetail || $resDetail->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Data laporan omzet tidak ditemukan.']);
         }
 
         $detail = $resDetail->fetch_assoc();
-        $detail['bersih_outlet'] = (float)$detail['nominal_omzet'] - (float)$detail['nominal_potongan'];
+        $detail['bersih_outlet'] = (float)($detail['nominal_omzet'] ?? 0) - (float)($detail['nominal_potongan'] ?? 0);
         
         $timestamp = strtotime($detail['tanggal_omzet']);
         $detail['tgl_formatted'] = date('Y-m-d', $timestamp);
@@ -135,8 +137,10 @@ try {
     if ($action === 'edit') {
         $idLaporan = (int)($_POST['id_laporan'] ?? 0);
         $tanggalOmzet = trim($_POST['tanggal_omzet'] ?? '');
-        $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', $_POST['nominal_omzet'] ?? '0');
+        $rawOmzetInput = $_POST['nominal_omzet'] ?? $_POST['omzet'] ?? $_POST['omzet_input_display'] ?? '0';
+        $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', (string)$rawOmzetInput);
         $nominal_omzet = (int)$rawOmzet;
+        $omzet = $nominal_omzet;
 
         if (empty($idLaporan) || empty($tanggalOmzet)) {
             JsonResponse(['success' => false, 'message' => 'Mohon lengkapi tanggal dan nominal omzet.']);
