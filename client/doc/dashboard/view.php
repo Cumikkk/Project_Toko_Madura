@@ -92,7 +92,7 @@ if ($role === 'investor') {
     // -------------------------------------------------------------
     // DASHBOARD OUTLET (KASIR)
     // -------------------------------------------------------------
-    $resOut = $db->query("SELECT o.id_outlet, u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1")->fetch_assoc();
+    $resOut = $db->query("SELECT o.id_outlet, COALESCE(NULLIF(o.nama_outlet, ''), u.nama_lengkap) as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1")->fetch_assoc();
     $outletId = (int)($resOut['id_outlet'] ?? 0);
 
     $resOutletOmzet = $db->query("
