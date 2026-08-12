@@ -2,69 +2,72 @@
 use App\Models\Pengaturan;
 use Config\Core\SystemInfo;
 
-// Fetch current settings using the new Model
-$settings = Pengaturan::getSettings();
+// Fetch current bank settings
+$settings = Pengaturan::getSettings(['bank_nama', 'bank_no_rekening', 'bank_atas_nama']);
 
-$bankNama       = $settings['bank_nama'] ?? 'BCA';
-$bankNoRek      = $settings['bank_no_rekening'] ?? '123-456-7890';
-$bankAtasNama   = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
+$bankNama     = $settings['bank_nama'] ?? 'BCA';
+$bankNoRek    = $settings['bank_no_rekening'] ?? '123-456-7890';
+$bankAtasNama = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 ?>
 
 <div class="page-header">
     <div>
-        <h2 class="main-content-title tx-24 mg-b-5">Pengaturan Sistem & Rekening Bank</h2>
+        <h2 class="main-content-title tx-24 mg-b-5">Pengaturan Rekening Bank</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Pengaturan</li>
+            <li class="breadcrumb-item"><a href="#">Pengaturan</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Rekening Bank</li>
         </ol>
     </div>
 </div>
 
 <div class="row row-sm">
-    <div class="col-lg-8 col-md-12">
+    <div class="col-lg-7 col-md-12">
         <div class="card custom-card">
-            <div class="card-header border-bottom">
-                <h6 class="main-content-label mb-0"><i class="fa fa-cog text-primary me-2"></i>Kelola Pengaturan Sistem</h6>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Informasi Rekening Bank Pembayaran</h5>
+                </div>
             </div>
             <div class="card-body">
-                <form id="form-setting" method="POST">
-                    <h6 class="text-primary font-weight-bold mb-3"><i class="fa fa-university me-2"></i>Informasi Rekening Bank Pembayaran</h6>
-                    <div class="row row-sm mb-3">
-                        <div class="col-md-4 mb-2">
-                            <label class="form-label font-weight-semibold">Nama Bank <span class="text-danger">*</span></label>
-                            <input type="text" name="bank_nama" class="form-control" value="<?= htmlspecialchars($bankNama, ENT_QUOTES) ?>" placeholder="Contoh: BCA / Mandiri / BRI" required>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label class="form-label font-weight-semibold">Nomor Rekening <span class="text-danger">*</span></label>
-                            <input type="text" name="bank_no_rekening" class="form-control" value="<?= htmlspecialchars($bankNoRek, ENT_QUOTES) ?>" placeholder="Contoh: 123-456-7890" required>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label class="form-label font-weight-semibold">Atas Nama Rekening <span class="text-danger">*</span></label>
-                            <input type="text" name="bank_atas_nama" class="form-control" value="<?= htmlspecialchars($bankAtasNama, ENT_QUOTES) ?>" placeholder="Contoh: Toko Madura Pusat" required>
-                        </div>
+                <form id="form-rekening-bank" method="POST">
+                    <input type="hidden" name="setting_type" value="rekening_bank">
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-semibold">Nama Bank <span class="text-danger">*</span></label>
+                        <input type="text" name="bank_nama" class="form-control" value="<?= htmlspecialchars($bankNama, ENT_QUOTES) ?>" placeholder="Contoh: BCA / Mandiri / BRI" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-semibold">Nomor Rekening <span class="text-danger">*</span></label>
+                        <input type="text" name="bank_no_rekening" class="form-control" value="<?= htmlspecialchars($bankNoRek, ENT_QUOTES) ?>" placeholder="Contoh: 123-456-7890" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label font-weight-semibold">Atas Nama <span class="text-danger">*</span></label>
+                        <input type="text" name="bank_atas_nama" class="form-control" value="<?= htmlspecialchars($bankAtasNama, ENT_QUOTES) ?>" placeholder="Contoh: Toko Madura Pusat" required>
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">
-                        <button type="submit" class="btn btn-primary px-4"><i class="fa fa-save me-1"></i> Simpan Pengaturan Rekening</button>
+                        <button type="submit" class="btn btn-primary px-4">Simpan Rekening Bank</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Preview Card -->
-    <div class="col-lg-4 col-md-12">
+    <!-- Preview Box -->
+    <div class="col-lg-5 col-md-12">
         <div class="card custom-card">
-            <div class="card-header border-bottom">
-                <h6 class="main-content-label mb-0"><i class="fa fa-eye text-info me-2"></i>Tampilan Di Portal Investor</h6>
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Pratinjau Di Investor</h5>
+                </div>
             </div>
             <div class="card-body">
-                <p class="text-muted small">Berikut adalah pratinjau bagaimana informasi rekening bank tampil kepada investor saat mendaftarkan outlet:</p>
-                
-                <div class="p-3 bg-light rounded border border-info" style="border-radius:12px;">
-                    <strong class="text-dark small d-block mb-1"><i class="fa fa-university text-primary me-1"></i> Rekening Pembayaran Resmi</strong>
-                    <p class="small text-muted mb-0">
-                        Transfer ke <strong id="preview-bank">Bank <?= htmlspecialchars($bankNama) ?>: <?= htmlspecialchars($bankNoRek) ?></strong> a.n. <strong id="preview-an"><?= htmlspecialchars($bankAtasNama) ?></strong>.
+                <p class="text-muted small mb-2">Informasi rekening ini akan ditampilkan pada saat investor melakukan pendaftaran atau perpanjangan outlet:</p>
+                <div class="p-3 bg-light rounded border" style="border-radius:10px;">
+                    <p class="small text-dark mb-0">
+                        Transfer ke <strong>Bank <?= htmlspecialchars($bankNama) ?>: <?= htmlspecialchars($bankNoRek) ?></strong> a.n. <strong><?= htmlspecialchars($bankAtasNama) ?></strong>.
                     </p>
                 </div>
             </div>
@@ -74,7 +77,7 @@ $bankAtasNama   = $settings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $('#form-setting').on('submit', function(e) {
+    $('#form-rekening-bank').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
         var btn = $(this).find('button[type="submit"]');
@@ -82,7 +85,7 @@ $(document).ready(function() {
         btn.prop('disabled', true);
         Swal.fire({
             title: 'Memproses...',
-            text: 'Sedang menyimpan pengaturan sistem',
+            text: 'Sedang menyimpan rekening bank',
             allowOutsideClick: false,
             didOpen: function() {
                 Swal.showLoading();
