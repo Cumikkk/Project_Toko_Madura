@@ -1,24 +1,16 @@
 <?php
-use Config\Core\Database;
+use App\Models\Outlet;
+use App\Models\Investor;
 use Config\Core\SystemInfo;
 
-$db = Database::connect();
 $idOutlet = intval($_GET['id'] ?? ($_GET['c'] ?? 0));
 $isEdit = ($idOutlet > 0);
 
 $outletData = null;
 
 if ($isEdit) {
-    $resOut = $db->query("
-        SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp
-        FROM outlet o
-        LEFT JOIN users u ON (u.id_users = o.id_users)
-        LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
-        WHERE o.id_outlet = {$idOutlet} LIMIT 1
-    ");
-    if ($resOut && $resOut->num_rows > 0) {
-        $outletData = $resOut->fetch_assoc();
-    } else {
+    $outletData = Outlet::getOutletById($idOutlet);
+    if (!$outletData) {
         $isEdit   = false;
         $idOutlet = 0;
     }
@@ -43,12 +35,9 @@ if (!$adminPermissionCore->isHavePermission($moduleId, $requiredPermission)) {
 }
 
 // Fetch list of Investors
-$investorList = $db->query("
-    SELECT i.id_investor, u.nama_lengkap
-    FROM investor i
-    JOIN users u ON (u.id_users = i.id_users)
-    ORDER BY u.nama_lengkap ASC
-");
+$loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
+$loggedInId    = intval($user['ADM_ID'] ?? 1);
+$investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
 ?>
 
 <div class="page-header">
