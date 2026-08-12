@@ -41,7 +41,7 @@ class Outlet {
         $db = Database::connect();
         $sql = "
             SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor
+                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
@@ -56,7 +56,7 @@ class Outlet {
         $db = Database::connect();
         $sql = "
             SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor
+                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor

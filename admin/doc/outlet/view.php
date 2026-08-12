@@ -168,11 +168,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-start">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persentase_hak_investor'], 0) ?>%)</span>
+                                                    <strong><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="badge bg-warning text-dark">Belum Ada Investor</span>
+                                                    <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -247,11 +250,14 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-start">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <span class="badge bg-info"><?= htmlspecialchars($row['nama_investor']) ?> (<?= number_format($row['persentase_hak_investor'], 0) ?>%)</span>
+                                                    <strong><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="badge bg-warning text-dark">Belum Ada Investor</span>
+                                                    <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
@@ -650,7 +656,7 @@ $(document).ready(function() {
                         Swal.fire('Gagal!', resp.message || 'Gagal mengaktifkan outlet', 'error');
                     }
                 }, 'json').fail(function() {
-                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
                 });
             }
         });
@@ -705,7 +711,7 @@ $(document).ready(function() {
                         Swal.fire('Gagal!', resp.message || 'Gagal menolak request outlet', 'error');
                     }
                 }, 'json').fail(function() {
-                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
                 });
             }
         });
@@ -762,7 +768,7 @@ function editAlasanPenolakan(id, nama, alasan) {
                         Swal.fire('Gagal!', resp.message || 'Gagal memperbarui alasan penolakan', 'error');
                     }
                 }, 'json').fail(function() {
-                    Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
                 });
             }
         });
@@ -837,7 +843,7 @@ function deleteOutlet(id, nama) {
                     Swal.fire('Gagal!', resp.message || 'Gagal menghapus outlet', 'error');
                 }
             }, 'json').fail(function() {
-                Swal.fire('Error!', 'Gagal terhubung ke server', 'error');
+                Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
             });
         }
     });

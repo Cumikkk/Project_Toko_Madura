@@ -312,10 +312,12 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/create", data, (resp) => {
                 button.removeClass('loading').prop('disabled', false);
                 if (resp.success) {
+                    let isEdit = $('input[name="id_outlet"]').val() ? true : false;
+                    let defaultSuccessMsg = isEdit ? 'Data outlet berhasil diperbarui.' : 'Data outlet berhasil ditambahkan.';
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: resp.message || 'Data outlet berhasil disimpan.',
+                        text: resp.message || defaultSuccessMsg,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -330,10 +332,14 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                 }
             }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
+                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Perhatian!',
-                    text: 'Gagal terhubung ke server. Silakan coba lagi.'
+                    text: errorMsg
                 });
             });
         });
