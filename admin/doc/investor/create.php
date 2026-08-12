@@ -161,10 +161,12 @@ $masterList = Master::getAllMasterOptions();
             $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/investor/create", data, (resp) => {
                 button.removeClass('loading').prop('disabled', false);
                 if (resp.success) {
+                    let isEdit = $('input[name="id_investor"]').val() ? true : false;
+                    let defaultSuccessMsg = isEdit ? 'Data investor berhasil diperbarui.' : 'Data investor berhasil ditambahkan.';
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: resp.message || 'Data investor berhasil disimpan.',
+                        text: resp.message || defaultSuccessMsg,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -179,7 +181,7 @@ $masterList = Master::getAllMasterOptions();
                 }
             }, 'json').fail(function(xhr) {
                 button.removeClass('loading').prop('disabled', false);
-                let errorMsg = 'Gagal terhubung ke server. Silakan coba lagi.';
+                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
                 if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
