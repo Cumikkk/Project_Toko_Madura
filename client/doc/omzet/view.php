@@ -539,6 +539,9 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                                          <button type="button" class="btn btn-sm btn-light border text-info btn-detail-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Lihat Detail">
                                                              <i class="fa-light fa-eye"></i>
                                                          </button>
+                                                         <button type="button" class="btn btn-sm btn-light border text-danger btn-delete-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" data-tgl="<?= date('d/m/Y', strtotime($row['tanggal_omzet'])); ?>" title="Hapus Laporan">
+                                                             <i class="fa-light fa-trash-can"></i>
+                                                         </button>
                                                      </div>
                                                 </td>
                                             </tr>
