@@ -68,15 +68,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="nama_outlet" class="form-label fw-bold">Nama Outlet <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
-                                    placeholder="Contoh: Toko Madura Waru"
-                                    value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mb-3">
+<div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="id_investor" class="form-label fw-bold">Investor <span class="text-danger">*</span></label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
@@ -92,7 +84,15 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 <small class="text-muted">Pilih investor yang menaungi outlet ini.</small>
                             </div>
                         </div>
-                        <div class="col-md-12 mb-3">
+<div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="nama_outlet" class="form-label fw-bold">Nama Outlet <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
+                                    placeholder="Contoh: Toko Madura Waru"
+                                    value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
+                            </div>
+                        </div>
+<div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="kecamatan" class="form-label fw-bold">Kecamatan <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="kecamatan" name="kecamatan"
@@ -100,7 +100,25 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>" required>
                             </div>
                         </div>
-                        <?php
+<div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
+                                    placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
+                            </div>
+                        </div>
+<?php if ($isExpiredOrInactive) : ?>
+                            <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Aktif)</label>
+                                    <input type="date" class="form-control" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
+                                        value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
+                                    <small class="text-muted d-block mt-1">Ubah tanggal ini ke tanggal mendatang untuk memperpanjang masa aktif outlet tanpa perlu membuat akun baru lagi.</small>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+<?php
                         $defaultInvestor = (float)($outletData['persentase_hak_investor'] ?? 50.00);
                         $defaultOutlet = 100.00 - $defaultInvestor;
                         ?>
@@ -166,32 +184,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                                <small class="text-muted" style="font-size: 11px;">Hak outlet.</small>
-                            </div>
-                        </div>
-
-                        <?php if ($isExpiredOrInactive) : ?>
-                            <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
-                            <div class="col-md-12 mb-3">
-                                <div class="form-group">
-                                    <label for="tgl_jatuh_tempo" class="form-label fw-bold">Tanggal Jatuh Tempo (Masa Langganan Aktif)</label>
-                                    <input type="date" class="form-control" id="tgl_jatuh_tempo" name="tgl_jatuh_tempo"
-                                        value="<?= htmlspecialchars(!empty($outletData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletData['tgl_jatuh_tempo'])) : date('Y-m-d', strtotime('+1 month'))); ?>">
-                                    <small class="text-muted d-block mt-1">Ubah tanggal ini ke tanggal mendatang untuk memperpanjang masa aktif outlet tanpa perlu membuat akun baru lagi.</small>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- 6. ALAMAT LENGKAP -->
-                        <div class="col-md-12 mb-3">
-                            <div class="form-group">
-                                <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
-                                    placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
-                            </div>
-                        </div>
-                    </div>
+</div>
                 </div>
             </div>
         </div>
