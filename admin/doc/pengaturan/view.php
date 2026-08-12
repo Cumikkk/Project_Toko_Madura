@@ -1,17 +1,9 @@
 <?php
+use App\Models\Pengaturan;
 use Config\Core\SystemInfo;
-use Config\Core\Database;
 
-$db = Database::connect();
-
-// Fetch current settings
-$settings = [];
-$res = $db->query("SELECT nama_pengaturan, nilai FROM pengaturan_sistem");
-if ($res) {
-    while ($r = $res->fetch_assoc()) {
-        $settings[$r['nama_pengaturan']] = $r['nilai'];
-    }
-}
+// Fetch current settings using the new Model
+$settings = Pengaturan::getSettings();
 
 $bankNama       = $settings['bank_nama'] ?? 'BCA';
 $bankNoRek      = $settings['bank_no_rekening'] ?? '123-456-7890';
