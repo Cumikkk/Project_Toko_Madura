@@ -40,19 +40,14 @@ if(!$admin) {
                     <input type="hidden" name="admin_id" value="<?= $admin['ID_ADM']; ?>">
                     
                     <div class="row">
-                        <!-- BARIS 1: NAMA LENGKAP ADMIN & NO. HP -->
-                        <div class="col-md-6 mb-3">
+                        <!-- BARIS 1: NAMA LENGKAP ADMIN -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="fullname" class="form-label fw-bold">Nama Lengkap Admin <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Contoh: Fahrul Alfanani" value="<?= htmlspecialchars($admin['ADM_NAME'] ?? '') ?>" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="no_hp" class="form-label fw-bold">No. HP / WhatsApp <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890" value="<?= htmlspecialchars($admin['ADM_PHONE'] ?? '') ?>" required>
-                            </div>
-                        </div>
+
 
                         <!-- BARIS 2: ROLE & USERNAME -->
                         <div class="col-md-6 mb-3">

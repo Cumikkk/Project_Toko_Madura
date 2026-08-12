@@ -29,8 +29,8 @@ if(!$adminPermissionCore->isHavePermission($moduleId, "create")) {
             <div class="card-body">
                 <form action="" method="post" id="form-create-admin">
                     <div class="row">
-                        <!-- BARIS 1: NAMA LENGKAP ADMIN & NO. HP -->
-                        <div class="col-md-6 mb-3">
+                        <!-- BARIS 1: NAMA LENGKAP ADMIN -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="add-fullname" class="form-label fw-bold">Nama Lengkap Admin <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="add-fullname" name="add-fullname" placeholder="Contoh: Fahrul Alfanani" required>
