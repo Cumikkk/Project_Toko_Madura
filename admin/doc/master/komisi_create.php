@@ -249,8 +249,18 @@ $(document).ready(function() {
             success: function(resp) {
                 btn.prop('disabled', false);
                 if (resp.success) {
-                    // Direct redirect without notification modal
-                    location.href = "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
+                    let isEdit = $('input[name="id_komisi"]').val() ? true : false;
+                    let defaultSuccessMsg = isEdit ? 'Data komisi berhasil diperbarui.' : 'Data komisi berhasil ditambahkan.';
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: resp.message || defaultSuccessMsg,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.href = resp.data?.redirect || "<?= SystemInfo::app('ADMIN_URL') ?>/master/komisi";
+                    });
                 } else {
                     Swal.fire('Gagal!', resp.message || 'Gagal menyimpan data komisi.', 'error');
                 }
