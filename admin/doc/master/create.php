@@ -1,4 +1,5 @@
 <?php
+use App\Models\Master;
 use Config\Core\Database;
 use Config\Core\SystemInfo;
 
@@ -13,10 +14,8 @@ if ($isEdit) {
         $redirectUrl = SystemInfo::app('ADMIN_URL') . '/master/view';
         die("<script>location.href = '{$redirectUrl}';</script>");
     }
-    $res = $db->query("SELECT * FROM users WHERE id_users = {$idMaster} AND role = 'master' LIMIT 1");
-    if ($res && $res->num_rows > 0) {
-        $masterData = $res->fetch_assoc();
-    } else {
+    $masterData = Master::getMasterById($idMaster);
+    if (!$masterData) {
         $redirectUrl = SystemInfo::app('ADMIN_URL') . '/master/view';
         die("<script>alert('Data Master tidak ditemukan!'); location.href = '{$redirectUrl}';</script>");
     }

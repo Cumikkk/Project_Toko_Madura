@@ -1,22 +1,9 @@
 <?php
-use Config\Core\Database;
 use Config\Core\SystemInfo;
-
-$db = Database::connect();
+use App\Models\Master;
 
 // Fetch Master list with sub-counts
-$sqlMasters = "
-    SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat, u.created_at,
-           COUNT(DISTINCT inv.id_investor) as total_investor,
-           COUNT(DISTINCT o.id_outlet) as total_outlet
-    FROM users u
-    LEFT JOIN investor inv ON inv.id_master = u.id_users
-    LEFT JOIN outlet o ON (o.id_investor = inv.id_investor AND o.status = 'active')
-    WHERE u.role = 'master'
-    GROUP BY u.id_users
-    ORDER BY u.id_users DESC
-";
-$masters = $db->query($sqlMasters);
+$masters = Master::getAllMasters();
 ?>
 
 <div class="page-header">

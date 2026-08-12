@@ -1,17 +1,9 @@
 <?php
-use Config\Core\Database;
 use Config\Core\SystemInfo;
-
-$db = Database::connect();
+use App\Models\Master;
 
 // Fetch all Komisi records
-$sqlKomisi = "
-    SELECT km.*, u.nama_lengkap as nama_master, u.username as username_master
-    FROM komisi_master km
-    JOIN users u ON u.id_users = km.id_master
-    ORDER BY km.tgl_transfer DESC, km.id_komisi DESC
-";
-$listKomisi = $db->query($sqlKomisi);
+$listKomisi = Master::getAllKomisi();
 ?>
 
 <div class="page-header">

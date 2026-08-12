@@ -16,30 +16,10 @@ class Dashboard {
         }
     }
 
-    public static function getMasterCount(): int {
-        try {
-            $db = Database::connect();
-            $query = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'master'");
-            return (int)($query->fetch_assoc()['total'] ?? 0);
-        } catch (Exception $e) {
-            return 0;
-        }
-    }
-
-    public static function getInvestorCount(): int {
-        try {
-            $db = Database::connect();
-            $query = $db->query("SELECT COUNT(*) as total FROM investor");
-            return (int)($query->fetch_assoc()['total'] ?? 0);
-        } catch (Exception $e) {
-            return 0;
-        }
-    }
-
     public static function getOutletCount(): int {
         try {
             $db = Database::connect();
-            $query = $db->query("SELECT COUNT(*) as total FROM outlet");
+            $query = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active'");
             return (int)($query->fetch_assoc()['total'] ?? 0);
         } catch (Exception $e) {
             return 0;

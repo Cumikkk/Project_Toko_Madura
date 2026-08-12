@@ -65,7 +65,7 @@ $recentRequests = Dashboard::getRecentRequests();
         <div class="card custom-card">
             <div class="card-body">
                 <div class="card-order-reviews">
-                    <h6 class="mb-3 text-muted">Total Outlet</h6>
+                    <h6 class="mb-3 text-muted">Total Outlet Aktif</h6>
                     <h3 class="text-end mb-0"><i class="fa fa-building icon-size float-start text-success"></i><span><?= number_format($outletCount) ?></span></h3>
                 </div>
             </div>
