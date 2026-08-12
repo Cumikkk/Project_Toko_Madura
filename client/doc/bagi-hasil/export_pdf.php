@@ -186,10 +186,10 @@ if ($resBagiHasil) {
         $row['potongan_10'] = $potongan10;
         $row['hak_investor'] = $hakInvestor;
         $row['hak_outlet'] = $hakOutlet;
-        $row['total_bersih_outlet'] = ($omzet - $potongan10) + $hakOutlet;
+        $row['total_bersih_outlet'] = ($nominal_omzet - $potongan10) + $hakOutlet;
         $row['is_last_day_done'] = true;
 
-        $totOmzet += $omzet;
+        $totOmzet += $nominal_omzet;
         $totPotongan10 += $potongan10;
         $totHakInvestor += $hakInvestor;
         $totHakOutlet += $hakOutlet;
