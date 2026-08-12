@@ -945,7 +945,8 @@ html body .header span.brand-title {
     .main-content {
         padding-top: 85px !important;
     }
-}
+}
+
 /* Fix Layout Settings Colors */
 .right-sidebar { --primary-color: #F26539 !important; }
 .right-sidebar .dashboard-icon.active { border-color: #F26539 !important; }
@@ -955,3 +956,6 @@ html body .header span.brand-title {
 .right-sidebar .bg-nav { background: #F26539 !important; }
 .right-sidebar .bg-menu { background: #E2E8F0 !important; }
 .right-sidebar .dashboard-icon.active { border-color: #F26539 !important; }
+
+/* Force Gear Icon Orange */
+.right-sidebar-btn button.theme-settings-btn { background-color: #F26539 !important; color: #ffffff !important; border-color: #F26539 !important; }
