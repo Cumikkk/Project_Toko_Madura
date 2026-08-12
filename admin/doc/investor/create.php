@@ -128,7 +128,7 @@ $masterList = Master::getAllMasterOptions();
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
                                 <label for="alamat_lengkap" class="form-label fw-bold">Alamat Lengkap Investor <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="alamat_lengkap" name="alamat_lengkap" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo" required><?= htmlspecialchars($investorData['alamat_lengkap'] ?? ''); ?></textarea>
+                                <textarea class="form-control" id="alamat_lengkap" name="alamat_lengkap" rows="3" placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo" required><?= htmlspecialchars($investorData['alamat_investor'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
