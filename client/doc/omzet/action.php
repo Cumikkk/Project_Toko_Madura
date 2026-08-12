@@ -51,6 +51,7 @@ try {
         $tanggalOmzet = trim($_POST['tanggal_omzet'] ?? date('Y-m-d'));
         $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', $_POST['nominal_omzet'] ?? '0');
         $nominal_omzet = (int)$rawOmzet;
+        $omzet = $nominal_omzet;
 
         if (empty($tanggalOmzet)) {
             JsonResponse(['success' => false, 'message' => 'Mohon pilih tanggal penginputan omzet.']);
@@ -137,6 +138,7 @@ try {
         $tanggalOmzet = trim($_POST['tanggal_omzet'] ?? '');
         $rawOmzet = str_replace(['.', ',', 'Rp', ' '], '', $_POST['nominal_omzet'] ?? '0');
         $nominal_omzet = (int)$rawOmzet;
+        $omzet = $nominal_omzet;
 
         if (empty($idLaporan) || empty($tanggalOmzet)) {
             JsonResponse(['success' => false, 'message' => 'Mohon lengkapi tanggal dan nominal omzet.']);

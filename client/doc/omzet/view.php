@@ -418,16 +418,19 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                     <input type="hidden" name="action" value="add">
                                     <input type="hidden" name="id_outlet" value="<?= (int)($outlet['id_outlet'] ?? 0); ?>">
 
-                                     <!-- Tanggal Omzet (Bebas Pilih Tanggal) -->
+                                     <!-- Tanggal Omzet (Terkunci Hari Ini) -->
                                      <div class="mb-4">
                                          <label for="tanggal_omzet" class="form-label fw-bold text-body-emphasis small text-uppercase">
                                              <i class="fa-light fa-calendar-day me-1 text-danger"></i>Tanggal Omzet <span class="text-danger">*</span>
                                          </label>
-                                         <div class="input-group input-group-lg date-picker-wrapper cursor-pointer">
+                                         <div class="input-group input-group-lg">
                                              <span class="input-group-text bg-body-tertiary border-body-subtle text-danger">
-                                                 <i class="fa-solid fa-calendar-days fs-5"></i>
+                                                 <i class="fa-solid fa-lock fs-5"></i>
                                              </span>
-                                             <input type="date" name="tanggal_omzet" id="tanggal_omzet" class="form-control border-body-subtle bg-body text-body-emphasis fw-bold cursor-pointer" value="<?= date('Y-m-d'); ?>" required onclick="if(this.showPicker){this.showPicker();}">
+                                             <input type="date" name="tanggal_omzet" id="tanggal_omzet" class="form-control border-body-subtle bg-body-tertiary text-body-emphasis fw-bold" value="<?= date('Y-m-d'); ?>" min="<?= date('Y-m-d'); ?>" max="<?= date('Y-m-d'); ?>" readonly style="pointer-events: none;">
+                                         </div>
+                                         <div class="form-text text-body-secondary mt-1.5" style="font-size: 11px;">
+                                             <i class="fa-solid fa-lock me-1 text-danger"></i>Tanggal omzet terkunci otomatis untuk hari ini (<strong><?= date('d/m/Y'); ?></strong>).
                                          </div>
                                      </div>
 
@@ -531,14 +534,11 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                                     </span>
                                                 </td>
                                                 <td class="text-center pe-3">
-                                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                                        <button type="button" class="btn btn-sm btn-light border text-info btn-detail-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Lihat Detail">
-                                                            <i class="fa-light fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Edit Laporan">
-                                                            <i class="fa-light fa-pen-to-square"></i>
-                                                        </button>
-                                                    </div>
+                                                     <div class="d-flex align-items-center justify-content-center gap-1">
+                                                         <button type="button" class="btn btn-sm btn-light border text-info btn-detail-laporan rounded-3 px-2 py-1" data-id="<?= $row['id_laporan']; ?>" title="Lihat Detail">
+                                                             <i class="fa-light fa-eye"></i>
+                                                         </button>
+                                                     </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -1065,7 +1065,7 @@ $(document).ready(function() {
                 if (res.success) {
                     $('#edit_id_laporan').val(res.data.id_laporan);
                     $('#edit_tanggal_omzet').val(res.data.tgl_formatted);
-                    $('#edit_omzet_val').val(new Intl.NumberFormat('id-ID').format(res.data.omzet));
+                    $('#edit_omzet_val').val(new Intl.NumberFormat('id-ID').format(res.data.nominal_omzet));
                     $('#modalEditLaporan').modal('show');
                 } else {
                     Swal.fire('Gagal', res.message, 'error');
@@ -1129,7 +1129,7 @@ $(document).ready(function() {
             success: function(res) {
                 $('#detailLaporanLoading').addClass('d-none');
                 if (res.success) {
-                    const omzetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(res.data.omzet);
+                    const omzetFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(res.data.nominal_omzet);
                     $('#det_omzet_head').text(omzetFormatted);
                     $('#det_periode_head').text('Tanggal: ' + res.data.tgl_indo);
                     $('#det_periode').text(res.data.tgl_indo);
