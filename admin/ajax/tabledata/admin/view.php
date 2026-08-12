@@ -30,7 +30,7 @@ $dt->hide('COUNTRY_NAME');
 $dt->edit('ADMROLE_NAME', function($data) {
     $r = strtolower($data['ADMROLE_NAME'] ?? '');
     if ($r === 'admin') {
-        return "<span class='badge bg-danger'>Programmer</span>";
+        return "<span class='badge bg-danger'>Admin</span>";
     } else {
         return "<span class='badge bg-primary'>Master (Owner)</span>";
     }
