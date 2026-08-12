@@ -338,19 +338,39 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Metadata Info -->
-    <table class="meta-box">
+    <!-- Metadata Box -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
         <tr>
-            <td class="meta-label" style="width: 16%;">Akses Role</td>
-            <td class="meta-value" style="width: 34%;">: <?= strtoupper($role); ?></td>
-            <td class="meta-label" style="width: 18%;">Periode Laporan</td>
-            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($periodeTitleStr); ?></td>
-        </tr>
-        <tr>
-            <td class="meta-label" style="width: 16%;">Jumlah Outlet</td>
-            <td class="meta-value" style="width: 34%;">: <?= $countOutlet; ?> Outlet Terdaftar</td>
-            <td class="meta-label" style="width: 18%;">Nama Toko</td>
-            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($displayNamaToko); ?></td>
+            <!-- Left Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px; border-right: 1px dashed #cbd5e1;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 35%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Akses Role</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 60%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= strtoupper($role); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Jumlah Outlet</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= $countOutlet; ?> Outlet Terdaftar</td>
+                    </tr>
+                </table>
+            </td>
+            <!-- Right Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 36%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Periode Laporan</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 59%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($periodeTitleStr); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Nama Toko</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($displayNamaToko); ?></td>
+                    </tr>
+                </table>
+            </td>
         </tr>
     </table>
 

@@ -237,25 +237,49 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Outlet Metadata -->
-    <table class="meta-box">
+    <!-- Outlet Metadata Box -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
         <tr>
-            <td class="meta-label" style="width: 16%;">Nama Outlet</td>
-            <td class="meta-value" style="width: 34%;">: <?= htmlspecialchars($outlet['nama_outlet']); ?></td>
-            <td class="meta-label" style="width: 18%;">Periode Laporan</td>
-            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($periodeLabelStr); ?></td>
-        </tr>
-        <tr>
-            <td class="meta-label" style="width: 16%;">Alamat Outlet</td>
-            <td class="meta-value" style="width: 34%;">: <?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
-            <td class="meta-label" style="width: 18%;">Total Hari Input</td>
-            <td class="meta-value" style="width: 32%;">: <?= $totalHariInput; ?> Hari</td>
-        </tr>
-        <tr>
-            <td class="meta-label" style="width: 16%;"></td>
-            <td class="meta-value" style="width: 34%;"></td>
-            <td class="meta-label" style="width: 18%;">Investor</td>
-            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></td>
+            <!-- Left Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px; border-right: 1px dashed #cbd5e1;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 32%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Nama Outlet</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 63%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['nama_outlet']); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Investor Mitra</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor Mitra'); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Alamat Outlet</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
+                    </tr>
+                </table>
+            </td>
+            <!-- Right Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 36%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Periode Laporan</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 59%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($periodeLabelStr); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Total Hari Input</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top;"><?= $totalHariInput; ?> Hari</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Tanggal Cetak</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top;"><?= date('d/m/Y H:i'); ?> WIB</td>
+                    </tr>
+                </table>
+            </td>
         </tr>
     </table>
 
