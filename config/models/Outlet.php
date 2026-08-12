@@ -261,7 +261,7 @@ class Outlet {
         $id = intval($idOutlet);
         if ($id <= 0) return ['success' => false, 'message' => "ID Outlet tidak valid"];
 
-        $sql = "UPDATE outlet SET status = 'active', tgl_disetujui = NOW(), tanggal_bergabung = IFNULL(tanggal_bergabung, NOW()), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$id}";
+        $sql = "UPDATE outlet SET status = 'active', tgl_disetujui = NOW(), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$id}";
         if ($db->query($sql)) {
             return ['success' => true, 'message' => 'Request outlet & pembayaran berhasil disetujui. Outlet kini resmi aktif!'];
         }
