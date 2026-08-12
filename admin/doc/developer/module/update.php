@@ -243,7 +243,9 @@
                                             location.reload();
                                         }
                                     })
-                                }, 'json')
+                                }, 'json').fail(function() {
+                                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
+                                });
                             }
                         })
                     })
@@ -263,7 +265,10 @@
                             location.reload();
                         }
                     })
-                }, 'json')
+                }, 'json').fail(function() {
+                    button.removeClass("loading");
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
+                });
             })
 
             $('#form-create-permission').on('submit', function(event) {
@@ -279,7 +284,10 @@
                             location.reload();
                         }
                     })
-                }, 'json')
+                }, 'json').fail(function() {
+                    button.removeClass("loading");
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
+                });
             })
 
             $('#form-update-permission').on('submit', function(event) {
@@ -296,7 +304,10 @@
                             location.reload();
                         }
                     })
-                }, 'json')
+                }, 'json').fail(function() {
+                    button.removeClass("loading");
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem (Server Error). Silakan muat ulang halaman.', 'error');
+                });
             })
         })
     </script>
