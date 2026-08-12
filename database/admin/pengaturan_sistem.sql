@@ -28,7 +28,7 @@ CREATE TABLE `pengaturan_sistem` (
   `nilai` varchar(255) NOT NULL,
   PRIMARY KEY (`id_pengaturan`),
   UNIQUE KEY `nama_pengaturan` (`nama_pengaturan`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-11 15:52:21
+-- Dump completed on 2026-08-12 11:59:08
