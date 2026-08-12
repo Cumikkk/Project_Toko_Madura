@@ -130,14 +130,25 @@ ob_start();
             border: 1px solid #e2e8f0;
             border-radius: 6px;
         }
+        .meta-box {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
         .meta-box td {
-            padding: 8px 12px;
+            padding: 6px 8px;
             vertical-align: top;
+            font-size: 10.5px;
+            word-wrap: break-word;
+            word-break: break-all;
         }
         .meta-label {
             color: #64748b;
             font-weight: bold;
-            width: 120px;
         }
         .meta-value {
             color: #0f172a;
@@ -229,34 +240,22 @@ ob_start();
     <!-- Outlet Metadata -->
     <table class="meta-box">
         <tr>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td class="meta-label">Nama Outlet</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['nama_outlet']); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Alamat Outlet</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
-                    </tr>
-                </table>
-            </td>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td class="meta-label">Periode Laporan</td>
-                        <td class="meta-value">: <?= htmlspecialchars($periodeLabelStr); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Total Hari Input</td>
-                        <td class="meta-value">: <?= $totalHariInput; ?> Hari</td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Investor</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></td>
-                    </tr>
-                </table>
-            </td>
+            <td class="meta-label" style="width: 16%;">Nama Outlet</td>
+            <td class="meta-value" style="width: 34%;">: <?= htmlspecialchars($outlet['nama_outlet']); ?></td>
+            <td class="meta-label" style="width: 18%;">Periode Laporan</td>
+            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($periodeLabelStr); ?></td>
+        </tr>
+        <tr>
+            <td class="meta-label" style="width: 16%;">Alamat Outlet</td>
+            <td class="meta-value" style="width: 34%;">: <?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
+            <td class="meta-label" style="width: 18%;">Total Hari Input</td>
+            <td class="meta-value" style="width: 32%;">: <?= $totalHariInput; ?> Hari</td>
+        </tr>
+        <tr>
+            <td class="meta-label" style="width: 16%;"></td>
+            <td class="meta-value" style="width: 34%;"></td>
+            <td class="meta-label" style="width: 18%;">Investor</td>
+            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></td>
         </tr>
     </table>
 

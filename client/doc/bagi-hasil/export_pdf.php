@@ -239,27 +239,29 @@ ob_start();
         }
         .meta-box {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 8px 12px;
+            padding: 6px 8px;
             vertical-align: top;
+            font-size: 10.5px;
+            word-wrap: break-word;
+            word-break: break-all;
         }
         .meta-label {
             color: #64748b;
             font-weight: bold;
-            width: 120px;
         }
         .meta-value {
             color: #0f172a;
             font-weight: bold;
         }
         
-        /* Summary Metric Cards Table */
         .summary-table {
             width: 100%;
             border-collapse: collapse;
@@ -268,20 +270,25 @@ ob_start();
         .summary-card {
             padding: 10px;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
             background-color: #ffffff;
-            text-align: center;
+            vertical-align: top;
         }
-        .summary-card-title {
+        .metric-title {
             font-size: 9px;
             font-weight: bold;
             color: #64748b;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .summary-card-val {
+        .metric-value {
             font-size: 13px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-top: 3px;
+        }
+        .metric-sub {
+            font-size: 8.5px;
+            color: #94a3b8;
+            margin-top: 2px;
         }
         
         .data-table {
@@ -313,20 +320,6 @@ ob_start();
         .text-danger { color: #dc2626; }
         .text-success { color: #16a34a; }
         .text-warning { color: #d97706; }
-
-        .footer-table {
-            width: 100%;
-            margin-top: 40px;
-            border-collapse: collapse;
-        }
-        .footer-table td {
-            width: 50%;
-            text-align: center;
-            vertical-align: top;
-        }
-        .signature-space {
-            height: 60px;
-        }
     </style>
 </head>
 <body>
@@ -348,30 +341,16 @@ ob_start();
     <!-- Metadata Info -->
     <table class="meta-box">
         <tr>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td class="meta-label">Akses Role</td>
-                        <td class="meta-value">: <?= strtoupper($role); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Jumlah Outlet</td>
-                        <td class="meta-value">: <?= $countOutlet; ?> Outlet Terdaftar</td>
-                    </tr>
-                </table>
-            </td>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td class="meta-label">Periode Laporan</td>
-                        <td class="meta-value">: <?= htmlspecialchars($periodeTitleStr); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Nama Toko</td>
-                        <td class="meta-value">: <?= htmlspecialchars($displayNamaToko); ?></td>
-                    </tr>
-                </table>
-            </td>
+            <td class="meta-label" style="width: 16%;">Akses Role</td>
+            <td class="meta-value" style="width: 34%;">: <?= strtoupper($role); ?></td>
+            <td class="meta-label" style="width: 18%;">Periode Laporan</td>
+            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($periodeTitleStr); ?></td>
+        </tr>
+        <tr>
+            <td class="meta-label" style="width: 16%;">Jumlah Outlet</td>
+            <td class="meta-value" style="width: 34%;">: <?= $countOutlet; ?> Outlet Terdaftar</td>
+            <td class="meta-label" style="width: 18%;">Nama Toko</td>
+            <td class="meta-value" style="width: 32%;">: <?= htmlspecialchars($displayNamaToko); ?></td>
         </tr>
     </table>
 
