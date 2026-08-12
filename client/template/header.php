@@ -186,41 +186,7 @@ $topbarTab  = $_GET['tab'] ?? '';
 </div>
 <!-- header end -->
 
-<!-- profile right sidebar start -->
-<div class="profile-right-sidebar">
-    <button class="right-bar-close"><i class="fa-light fa-angle-right"></i></button>
-    <div class="top-panel">
-        <div class="profile-content scrollable">
-            <ul>
-                <li>
-                    <div class="dropdown-txt text-center">
-                        <p class="mb-0"><?= $user['MBR_NAME']; ?></p>
-                        <!-- <span class="d-block">Web Developer</span> -->
-                        <div class="d-flex justify-content-center">
-                            <div class="form-check pt-3">
-                                <input class="form-check-input" type="checkbox" id="seeProfileAsDropdown">
-                                <label class="form-check-label" for="seeProfileAsDropdown">See as dropdown</label>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon"><i class="fa-regular fa-circle-user"></i></span> Profile</a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="<?= SystemInfo::app('CLIENT_URL') ?>/help-center"><span class="dropdown-icon"><i class="fa-regular fa-circle-question"></i></span> Help</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="bottom-panel">
-        <div class="button-group">
-            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><i class="fa-light fa-gear"></i><span>Settings</span></a>
-            <a href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><i class="fa-light fa-power-off"></i><span>Logout</span></a>
-        </div>
-    </div>
-</div>
-<!-- profile right sidebar end -->
+
 
 <div class="right-sidebar-btn d-lg-block d-none">
     <button class="header-btn theme-settings-btn"><i class="fa-light fa-gear"></i></button>
