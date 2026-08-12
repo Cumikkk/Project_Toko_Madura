@@ -100,7 +100,8 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     value="<?= htmlspecialchars($outletData['kecamatan'] ?? ''); ?>" required>
                             </div>
                         </div>
-<div class="col-md-12 mb-3">
+<!-- 6. ALAMAT LENGKAP -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="alamat_outlet" name="alamat_outlet" rows="3"
@@ -184,7 +185,11 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                             </button>
                                         </div>
                                     </div>
-</div>
+                                </div>
+                                <small class="text-muted" style="font-size: 11px;">Hak outlet.</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
