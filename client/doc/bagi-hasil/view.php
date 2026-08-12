@@ -63,7 +63,7 @@ $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 // Fetch list of outlets belonging to logged in investor
 $investorOutlets = [];
 if ($role === 'investor' && $investorId > 0) {
-    $resOuts = $db->query("SELECT o.id_outlet, u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_investor = {$investorId} ORDER BY u.nama_lengkap ASC");
+    $resOuts = $db->query("SELECT o.id_outlet, o.nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_investor = {$investorId} ORDER BY o.nama_outlet ASC");
     if ($resOuts) {
         while ($oRow = $resOuts->fetch_assoc()) {
             $investorOutlets[] = $oRow;
@@ -74,13 +74,12 @@ if ($role === 'investor' && $investorId > 0) {
 // Determine last day of selected month/year to check if deduction is active
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
-$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $checkBulan, $checkTahun);
-$lastDayDateStr = sprintf('%04d-%02d-%02d', $checkTahun, $checkBulan, $daysInMonth);
+$lastDayStr = date('Y-m-t', strtotime("{$checkTahun}-{$checkBulan}-01"));
+$todayStr = date('Y-m-d');
+$isMonthEnded = ($todayStr >= $lastDayStr);
 
-$availableYears = [];
-$rows = [];
 $totOmzet = 0;
-$totPotongan10 = 0;
+$totPotongan = 0;
 $totHakInvestor = 0;
 $totHakOutlet = 0;
 $hasAnyLastDayDone = false;
@@ -102,12 +101,12 @@ $selectedOutletNama = '';
 
 if ($selectedOutletId > 0 && $role === 'investor') {
     $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
-    $resOneOut = $db->query("SELECT u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$selectedOutletId} LIMIT 1");
+    $resOneOut = $db->query("SELECT o.nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$selectedOutletId} LIMIT 1");
     if ($resOneOut && $resOneOut->num_rows > 0) {
         $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
     }
 } elseif ($role === 'outlet' && $targetOutletId > 0) {
-    $resOneOut = $db->query("SELECT u.nama_lengkap as nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$targetOutletId} LIMIT 1");
+    $resOneOut = $db->query("SELECT o.nama_outlet FROM outlet o JOIN users u ON u.id_users = o.id_users WHERE o.id_outlet = {$targetOutletId} LIMIT 1");
     if ($resOneOut && $resOneOut->num_rows > 0) {
         $selectedOutletNama = $resOneOut->fetch_assoc()['nama_outlet'];
     }
@@ -170,7 +169,7 @@ if (!empty($laporanJoinConds)) {
 $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
-        u.nama_lengkap as nama_outlet,
+        o.nama_outlet,
         o.persentase_potongan,
         IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor,
         IFNULL(SUM(l.nominal_omzet), 0) as total_omzet,
@@ -185,7 +184,7 @@ $sqlBagiHasil = "
     LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
     LEFT JOIN laporan_omzet l ON {$joinOnClause}
     WHERE {$whereConditions[0]}
-    GROUP BY o.id_outlet, u.nama_lengkap, o.persentase_potongan, o.persentase_hak_investor
+    GROUP BY o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persentase_hak_investor
     ORDER BY o.id_outlet DESC
 ";
 

@@ -26,7 +26,7 @@ if ($action === 'get_detail_harian') {
 
     // Fetch outlet details and investor split percentage
     $resOut = $db->query("
-        SELECT u.nama_lengkap as nama_outlet, o.persentase_potongan, o.persentase_hak_investor 
+        SELECT o.nama_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor 
         FROM outlet o 
         JOIN users u ON u.id_users = o.id_users
         WHERE o.id_outlet = {$idOutlet} 
@@ -93,9 +93,9 @@ if ($action === 'get_detail_harian') {
             $pot10 = (isset($row['nominal_potongan']) && (float)$row['nominal_potongan'] > 0) ? (float)$row['nominal_potongan'] : round($nominal_omzet * ($itemRatePot / 100.0), 2);
             $hakInv = round($pot10 * ($itemPersenInv / 100.0), 2);
             $hakOut = round($pot10 * ($itemPersenOut / 100.0), 2);
-            $bersihOut = $omzet - $pot10 + $hakOut;
+            $bersihOut = $nominal_omzet - $pot10 + $hakOut;
 
-            $totOmzet += $omzet;
+            $totOmzet += $nominal_omzet;
             $totPotongan += $pot10;
             $totHakInvestor += $hakInv;
             $totHakOutlet += $hakOut;
@@ -104,7 +104,7 @@ if ($action === 'get_detail_harian') {
                 'id_laporan' => (int)$row['id_laporan'],
                 'tgl_raw' => $row['tanggal_omzet'],
                 'tgl_formatted' => $tglStr,
-                'omzet' => $omzet,
+                'omzet' => $nominal_omzet,
                 'rate_potongan' => $itemRatePot,
                 'persen_investor' => $itemPersenInv,
                 'persen_outlet' => $itemPersenOut,

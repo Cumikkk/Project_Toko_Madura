@@ -17,7 +17,7 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, u_out.alamat as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN users u_out ON o.id_users = u_out.id_users
     LEFT JOIN investor i ON o.id_investor = i.id_investor
@@ -90,7 +90,7 @@ $totalHariInput = 0;
 if ($resOmzet) {
     while ($row = $resOmzet->fetch_assoc()) {
         $laporanList[] = $row;
-        $totalOmzet += (float)$row['omzet'];
+        $totalOmzet += (float)($row['nominal_omzet'] ?? $row['omzet'] ?? 0);
         $totalNominalPotongan += (float)($row['nominal_potongan'] ?? 0);
     }
 }
@@ -118,37 +118,37 @@ ob_start();
             border-collapse: collapse;
             margin-bottom: 20px;
             border-bottom: 2px solid #7D0A0A;
-            padding-bottom: 10px;
         }
-        .header-title {
-            color: #7D0A0A;
-            font-size: 18px;
+        .header-table td {
+            padding: 5px 0;
+        }
+        .logo-text {
+            font-size: 20px;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0;
-        }
-        .header-subtitle {
-            font-size: 10px;
-            color: #64748b;
-            margin-top: 2px;
+            color: #7D0A0A;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
         }
         .meta-box {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 8px 12px;
+            padding: 6px 8px;
             vertical-align: top;
+            font-size: 10.5px;
+            word-wrap: break-word;
+            word-break: break-all;
         }
         .meta-label {
             color: #64748b;
             font-weight: bold;
-            width: 120px;
         }
         .meta-value {
             color: #0f172a;
@@ -237,34 +237,46 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Outlet Metadata -->
-    <table class="meta-box">
+    <!-- Outlet Metadata Box -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
         <tr>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
+            <!-- Left Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px; border-right: 1px dashed #cbd5e1;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                     <tr>
-                        <td class="meta-label">Nama Outlet</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['nama_outlet']); ?></td>
+                        <td style="width: 32%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Nama Outlet</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 63%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['nama_outlet']); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label">Alamat Outlet</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Investor Mitra</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor Mitra'); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Alamat Outlet</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($outlet['alamat_outlet'] ?: '-'); ?></td>
                     </tr>
                 </table>
             </td>
-            <td style="width: 50%;">
-                <table style="width: 100%;">
+            <!-- Right Side Info -->
+            <td style="width: 50%; vertical-align: top; padding: 10px 14px;">
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                     <tr>
-                        <td class="meta-label">Periode Laporan</td>
-                        <td class="meta-value">: <?= htmlspecialchars($periodeLabelStr); ?></td>
+                        <td style="width: 36%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Periode Laporan</td>
+                        <td style="width: 5%; color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="width: 59%; color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top; word-wrap: break-word; word-break: break-all;"><?= htmlspecialchars($periodeLabelStr); ?></td>
                     </tr>
                     <tr>
-                        <td class="meta-label">Total Hari Input</td>
-                        <td class="meta-value">: <?= $totalHariInput; ?> Hari</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Total Hari Input</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top;"><?= $totalHariInput; ?> Hari</td>
                     </tr>
                     <tr>
-                        <td class="meta-label">Investor</td>
-                        <td class="meta-value">: <?= htmlspecialchars($outlet['nama_investor'] ?? 'Investor'); ?></td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">Tanggal Cetak</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 3px 0; vertical-align: top;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 3px 0; vertical-align: top;"><?= date('d/m/Y H:i'); ?> WIB</td>
                     </tr>
                 </table>
             </td>
@@ -293,7 +305,7 @@ ob_start();
                             <?= date('d/m/Y H:i', strtotime($row['created_at'])); ?>
                         </td>
                         <td class="text-end fw-bold text-success">
-                            Rp <?= number_format((float)$row['omzet'], 0, ',', '.'); ?>
+                            Rp <?= number_format((float)($row['nominal_omzet'] ?? $row['omzet'] ?? 0), 0, ',', '.'); ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
