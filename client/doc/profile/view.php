@@ -12,60 +12,48 @@ $userData = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $roleLabel = "Pengguna";
+$avatarIcon = "fa-user-tie";
+
 if ($user['role'] == 'investor') {
     $roleLabel = "Investor Toko Madura";
 } elseif ($user['role'] == 'master') {
     $roleLabel = "Master Admin";
 } elseif ($user['role'] == 'kasir') {
     $roleLabel = "Kasir Outlet";
+    $avatarIcon = "fa-cash-register";
 } elseif ($user['role'] == 'outlet') {
     $roleLabel = "Pengelola Outlet";
-}
-
-$nameParts = explode(' ', $userData['nama_lengkap']);
-$initials = '';
-if(count($nameParts) >= 2) {
-    $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[1], 0, 1));
-} else {
-    $initials = strtoupper(substr($userData['nama_lengkap'], 0, 2));
+    $avatarIcon = "fa-store";
 }
 ?>
 <style>
-    .profile-card-header {
-        height: 120px;
-        background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);
-    }
     .profile-avatar {
         width: 100px;
         height: 100px;
-        font-size: 36px;
-        background: #ffffff;
+        font-size: 40px;
+        background: linear-gradient(135deg, #7D0A0A 0%, #4A0404 100%);
         border: 4px solid #ffffff;
-        color: #7D0A0A;
+        color: #ffffff;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        margin-top: -50px;
-        position: relative;
-        z-index: 2;
+        margin: 0 auto;
     }
     
-    /* Elegant floating label styling */
-    .form-floating > .form-control {
+    .form-control {
         border: 1px solid #dee2e6;
         border-radius: 0.5rem;
-        background-color: #f8f9fa;
+        background-color: #ffffff;
+        padding: 0.6rem 1rem;
     }
-    .form-floating > .form-control:focus {
+    .form-control:focus {
         border-color: #7D0A0A;
         background-color: #ffffff;
         box-shadow: 0 0 0 0.25rem rgba(125, 10, 10, 0.15);
     }
-    .form-floating > .form-control:focus ~ label {
-        color: #7D0A0A;
+    .form-label {
         font-weight: 600;
-    }
-    .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        color: #6c757d;
-        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.4rem;
+        font-size: 0.95rem;
     }
     
     .btn-save-profile {
@@ -100,15 +88,16 @@ if(count($nameParts) >= 2) {
         <!-- Left Column: Master Profile Card -->
         <div class="col-lg-4 col-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center bg-white">
-                <div class="profile-card-header"></div>
-                <div class="card-body px-4 pb-4 pt-0">
-                    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 profile-avatar">
-                        <span class="fw-bold"><?= $initials ?></span>
+                <div class="card-body p-4 p-md-5">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-4 profile-avatar">
+                        <i class="fa-solid <?= $avatarIcon ?>"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($userData['nama_lengkap']) ?></h5>
-                    <span class="badge px-3 py-2 rounded-pill fw-semibold mb-3" style="background-color: rgba(125, 10, 10, 0.1); color: #7D0A0A;">
-                        <i class="fa-solid fa-user-shield me-1"></i> <?= $roleLabel ?>
-                    </span>
+                    <h5 class="fw-bold text-dark mb-2"><?= htmlspecialchars($userData['nama_lengkap']) ?></h5>
+                    <div class="mb-4">
+                        <span class="badge px-3 py-2 rounded-pill fw-semibold" style="background-color: rgba(125, 10, 10, 0.1); color: #7D0A0A;">
+                            <i class="fa-solid fa-user-shield me-1"></i> <?= $roleLabel ?>
+                        </span>
+                    </div>
                     
                     <?php if(!empty($userData['kecamatan'])): ?>
                     <p class="text-muted small mb-4"><i class="fa-solid fa-location-dot me-1" style="color: #7D0A0A;"></i> Kec. <?= htmlspecialchars($userData['kecamatan']) ?></p>
@@ -130,70 +119,63 @@ if(count($nameParts) >= 2) {
 
         <!-- Right Column: Forms -->
         <div class="col-lg-8 col-12">
-            <div class="card border-0 shadow-sm rounded-4 bg-white">
-                <div class="card-body p-4 p-md-5">
-                    <form id="formProfileUser">
-                        
+            <form id="formProfileUser">
+                <!-- Card 1: Informasi Akun -->
+                <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                    <div class="card-body p-4 p-md-5">
                         <h5 class="card-title-profile"><i class="fa-solid fa-id-card me-2"></i>Informasi Akun</h5>
-                        <div class="row g-4 mb-5">
+                        
+                        <div class="row g-4">
                             <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="namaLengkap" name="nama_lengkap" value="<?= htmlspecialchars($userData['nama_lengkap']) ?>" placeholder="Nama Lengkap" required>
-                                    <label for="namaLengkap">Nama Lengkap</label>
-                                </div>
+                                <label class="form-label">Nama Lengkap</label>
+                                <input type="text" class="form-control" name="nama_lengkap" value="<?= htmlspecialchars($userData['nama_lengkap']) ?>" placeholder="Masukkan nama lengkap" required>
                             </div>
                             <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($userData['username']) ?>" placeholder="Username" required>
-                                    <label for="username">Username</label>
-                                </div>
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($userData['username']) ?>" placeholder="Masukkan username" required>
                             </div>
                             <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="noHp" name="no_hp" value="<?= htmlspecialchars($userData['no_hp'] ?? '') ?>" placeholder="No. WhatsApp / Telepon">
-                                    <label for="noHp">No. WhatsApp / Telepon</label>
-                                </div>
+                                <label class="form-label">No. WhatsApp / Telepon</label>
+                                <input type="text" class="form-control" name="no_hp" value="<?= htmlspecialchars($userData['no_hp'] ?? '') ?>" placeholder="08xxxxxxxxxx">
                             </div>
                             <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="kecamatan" name="kecamatan" value="<?= htmlspecialchars($userData['kecamatan'] ?? '') ?>" placeholder="Kecamatan">
-                                    <label for="kecamatan">Kecamatan</label>
-                                </div>
+                                <label class="form-label">Kecamatan</label>
+                                <input type="text" class="form-control" name="kecamatan" value="<?= htmlspecialchars($userData['kecamatan'] ?? '') ?>" placeholder="Nama kecamatan">
                             </div>
                             <div class="col-12">
-                                <div class="form-floating">
-                                    <textarea class="form-control" id="alamatLengkap" name="alamat_lengkap" placeholder="Alamat Lengkap" style="height: 100px"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
-                                    <label for="alamatLengkap">Alamat Lengkap</label>
-                                </div>
+                                <label class="form-label">Alamat Lengkap</label>
+                                <textarea class="form-control" name="alamat_lengkap" placeholder="Detail alamat" style="height: 100px"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
                             </div>
                         </div>
-
-                        <h5 class="card-title-profile"><i class="fa-solid fa-lock me-2"></i>Keamanan Akun</h5>
-                        <p class="text-muted small mb-3">Kosongkan kolom password di bawah ini jika Anda tidak ingin mengubah kata sandi.</p>
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password Baru">
-                                    <label for="password">Password Baru</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-12">
-                                <div class="form-floating">
-                                    <input type="password" class="form-control" id="passwordConfirm" name="password_confirm" placeholder="Konfirmasi Password">
-                                    <label for="passwordConfirm">Konfirmasi Password Baru</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-danger btn-lg px-5 py-2 fw-bold shadow-sm rounded-pill btn-save-profile">
-                                <i class="fa-solid fa-floppy-disk me-2"></i> Simpan Perubahan
-                            </button>
-                        </div>
-                        
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Card 2: Keamanan Akun -->
+                <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="card-title-profile"><i class="fa-solid fa-lock me-2"></i>Keamanan Akun</h5>
+                        <p class="text-muted small mb-4">Kosongkan kolom password di bawah ini jika Anda tidak ingin mengubah kata sandi.</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Password Baru</label>
+                                <input type="password" class="form-control" name="password" placeholder="Password baru">
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Konfirmasi Password Baru</label>
+                                <input type="password" class="form-control" name="password_confirm" placeholder="Ulangi password baru">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-end mt-2 mb-4">
+                    <button type="submit" class="btn btn-danger px-5 py-2 fw-bold shadow-sm rounded-pill btn-save-profile">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Simpan Perubahan
+                    </button>
+                </div>
+                
+            </form>
         </div>
     </div>
 </div>
