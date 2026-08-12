@@ -1,7 +1,7 @@
 <?php
 use Config\Core\Database;
 use Config\Core\SystemInfo;
-use App\Models\User;
+use App\Models\Outlet;
 
 $db = Database::connect();
 
