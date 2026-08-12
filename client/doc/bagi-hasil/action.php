@@ -26,7 +26,7 @@ if ($action === 'get_detail_harian') {
 
     // Fetch outlet details and investor split percentage
     $resOut = $db->query("
-        SELECT u.nama_lengkap as nama_outlet, o.persentase_potongan, o.persentase_hak_investor 
+        SELECT o.nama_outlet, o.persentase_potongan, IFNULL(o.persen_bagian_investor, IFNULL(o.persentase_hak_investor, 50.00)) as persentase_hak_investor 
         FROM outlet o 
         JOIN users u ON u.id_users = o.id_users
         WHERE o.id_outlet = {$idOutlet} 

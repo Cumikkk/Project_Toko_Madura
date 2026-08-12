@@ -42,7 +42,7 @@ if ($role === 'investor') {
     $hakInvestor = (float)($resOmzetTot['total_hak_investor'] ?? 0);
 
     $resRecent = $db->query("
-        SELECT u.nama_lengkap as nama_outlet, lo.tanggal_omzet, lo.nominal_omzet, lo.nominal_potongan, lo.created_at
+        SELECT o.nama_outlet, lo.tanggal_omzet, lo.nominal_omzet, lo.nominal_potongan, lo.created_at
         FROM laporan_omzet lo
         JOIN outlet o ON o.id_outlet = lo.id_outlet
         JOIN users u ON u.id_users = o.id_users
