@@ -17,7 +17,7 @@ $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Get Outlet Info for logged-in user
 $resOut = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, u_out.alamat as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor
+    SELECT o.id_outlet, o.nama_outlet, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor
     FROM outlet o
     LEFT JOIN users u_out ON o.id_users = u_out.id_users
     LEFT JOIN investor i ON o.id_investor = i.id_investor
@@ -90,7 +90,7 @@ $totalHariInput = 0;
 if ($resOmzet) {
     while ($row = $resOmzet->fetch_assoc()) {
         $laporanList[] = $row;
-        $totalOmzet += (float)$row['omzet'];
+        $totalOmzet += (float)($row['nominal_omzet'] ?? $row['omzet'] ?? 0);
         $totalNominalPotongan += (float)($row['nominal_potongan'] ?? 0);
     }
 }
@@ -118,25 +118,14 @@ ob_start();
             border-collapse: collapse;
             margin-bottom: 20px;
             border-bottom: 2px solid #7D0A0A;
-            padding-bottom: 10px;
         }
-        .header-title {
-            color: #7D0A0A;
-            font-size: 18px;
+        .header-table td {
+            padding: 5px 0;
+        }
+        .logo-text {
+            font-size: 20px;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0;
-        }
-        .header-subtitle {
-            font-size: 10px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-        .meta-box {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
+            color: #7D0A0A;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
@@ -293,7 +282,7 @@ ob_start();
                             <?= date('d/m/Y H:i', strtotime($row['created_at'])); ?>
                         </td>
                         <td class="text-end fw-bold text-success">
-                            Rp <?= number_format((float)$row['omzet'], 0, ',', '.'); ?>
+                            Rp <?= number_format((float)($row['nominal_omzet'] ?? $row['omzet'] ?? 0), 0, ',', '.'); ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
