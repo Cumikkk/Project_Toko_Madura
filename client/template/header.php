@@ -131,7 +131,7 @@ $topbarTab  = $_GET['tab'] ?? '';
                     <ul class="dropdown-menu profile-dropdown-menu shadow-lg">
                         <li>
                             <div class="dropdown-txt text-center py-2">
-                                <p class="fw-bold mb-0 text-body-emphasis"><?php echo htmlspecialchars($user['MBR_NAME'] ?? 'User'); ?></p>
+                                <p class="fw-bold mb-0 text-body-emphasis"><?php echo htmlspecialchars(!empty($user['nama_lengkap']) ? $user['nama_lengkap'] : (!empty($user['username']) ? $user['username'] : 'User')); ?></p>
                                 <span class="badge bg-danger-subtle text-danger small text-uppercase rounded-pill px-2 py-1 mt-1"><?= strtoupper($user['role'] ?? 'outlet'); ?></span>
                             </div>
                         </li>
