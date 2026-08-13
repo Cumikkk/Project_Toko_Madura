@@ -184,19 +184,6 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
 </style>
 
 <div class="main-content-inner py-3 mb-5 pb-4">
-    
-    <!-- Title Card Section -->
-    <div class="card border-0 shadow-sm rounded-4 bg-body p-3.5 px-4 mb-3">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <h4 class="fw-extrabold text-body-emphasis mb-1 d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-user-gear text-danger fs-4"></i>
-                    Pengaturan Profil Saya
-                </h4>
-                <p class="text-body-secondary mb-0 small">Kelola informasi identitas, domisili, dan keamanan kata sandi akun Anda dalam satu tampilan presisi.</p>
-            </div>
-        </div>
-    </div>
 
     <!-- Header Hero Banner Card -->
     <div class="card profile-hero-card shadow-sm p-3 mb-4">
