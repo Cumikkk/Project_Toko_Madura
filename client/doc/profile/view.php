@@ -21,23 +21,20 @@ $userData = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $roleLabel = "Pengguna Sistem";
-$roleBadgeClass = "bg-primary-subtle text-primary";
+$roleBadgeClass = "bg-danger-subtle text-danger border border-danger-subtle";
 $avatarIcon = "fa-user-tie";
 
 if ($user['role'] == 'investor') {
     $roleLabel = "Investor Toko Madura";
-    $roleBadgeClass = "bg-danger-subtle text-danger border border-danger-subtle";
 } elseif ($user['role'] == 'master') {
     $roleLabel = "Master Administrator";
-    $roleBadgeClass = "bg-dark text-white";
+    $avatarIcon = "fa-user-gear";
 } elseif ($user['role'] == 'kasir') {
     $roleLabel = "Kasir Outlet";
     $avatarIcon = "fa-cash-register";
-    $roleBadgeClass = "bg-info-subtle text-info";
 } elseif ($user['role'] == 'outlet') {
     $roleLabel = "Pengelola Outlet";
     $avatarIcon = "fa-store";
-    $roleBadgeClass = "bg-warning-subtle text-warning-emphasis";
 }
 
 $bulanIndo = [
@@ -55,93 +52,70 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
 <style>
     .profile-hero-card {
         background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%);
-        border-radius: 20px;
+        border-radius: 18px;
         color: #ffffff;
         position: relative;
         overflow: hidden;
+        border: none;
     }
     .profile-hero-card::before {
         content: '';
         position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.04);
         pointer-events: none;
     }
     
-    .profile-avatar-container {
-        position: relative;
-        display: inline-block;
-    }
     .profile-avatar-box {
-        width: 105px;
-        height: 105px;
-        font-size: 44px;
+        width: 85px;
+        height: 85px;
+        font-size: 36px;
         background: linear-gradient(135deg, #8B0000 0%, #4A0404 100%);
-        border: 4px solid #ffffff;
+        border: 3.5px solid #ffffff;
         color: #ffffff;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
         border-radius: 50%;
-        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
     }
-    .avatar-status-dot {
+    .avatar-online-dot {
         position: absolute;
-        bottom: 6px;
-        right: 6px;
-        width: 18px;
-        height: 18px;
+        bottom: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
         background-color: #22c55e;
-        border: 3px solid #ffffff;
+        border: 2.5px solid #ffffff;
         border-radius: 50%;
     }
 
-    .stat-mini-card {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 14px;
-        padding: 12px 16px;
-        transition: all 0.25s ease;
+    .hero-stat-pill {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
     }
-    .stat-mini-card:hover {
-        background: rgba(255, 255, 255, 0.16);
-        transform: translateY(-2px);
-    }
-
-    .form-custom-group .input-group-text {
-        background-color: var(--bs-body-bg, #f8fafc);
-        border-color: var(--bs-border-color, #dee2e6);
-        color: #7D0A0A;
-        font-size: 15px;
-        min-width: 46px;
-        justify-content: center;
-    }
-
-    .form-custom-group .form-control {
-        border-color: var(--bs-border-color, #dee2e6);
-        padding: 0.65rem 1rem;
-        font-size: 0.95rem;
-    }
-
-    .form-custom-group .form-control:focus {
-        border-color: #7D0A0A;
-        box-shadow: 0 0 0 0.25rem rgba(125, 10, 10, 0.15);
+    .hero-stat-pill:hover {
+        background: rgba(255, 255, 255, 0.15);
     }
 
     .card-profile-section {
-        border-radius: 18px;
+        border-radius: 16px;
         border: none;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
-    .section-title-badge {
+    .section-header-title {
         font-size: 1rem;
         font-weight: 700;
         color: #7D0A0A;
@@ -149,28 +123,28 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
         align-items: center;
         gap: 8px;
         padding-bottom: 12px;
-        border-bottom: 2px solid rgba(125, 10, 10, 0.1);
-        margin-bottom: 20px;
+        border-bottom: 2px solid rgba(125, 10, 10, 0.08);
+        margin-bottom: 18px;
     }
 
-    .btn-save-profile {
-        background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%);
-        color: #ffffff;
-        border: none;
-        padding: 12px 36px;
-        font-size: 1rem;
-        font-weight: 700;
-        border-radius: 50px;
-        box-shadow: 0 6px 18px rgba(125, 10, 10, 0.25);
-        transition: all 0.3s ease;
+    .form-custom-group .input-group-text {
+        background-color: var(--bs-body-bg, #f8fafc);
+        border-color: var(--bs-border-color, #dee2e6);
+        color: #7D0A0A;
+        font-size: 14px;
+        min-width: 44px;
+        justify-content: center;
     }
-    .btn-save-profile:hover {
-        color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(125, 10, 10, 0.35);
+
+    .form-custom-group .form-control {
+        border-color: var(--bs-border-color, #dee2e6);
+        padding: 0.6rem 0.9rem;
+        font-size: 0.92rem;
     }
-    .btn-save-profile:active {
-        transform: translateY(0);
+
+    .form-custom-group .form-control:focus {
+        border-color: #7D0A0A;
+        box-shadow: 0 0 0 0.2rem rgba(125, 10, 10, 0.12);
     }
 
     .toggle-password-btn {
@@ -178,309 +152,256 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
         border-color: var(--bs-border-color, #dee2e6);
         color: #64748b;
         cursor: pointer;
-        transition: all 0.2s ease;
     }
     .toggle-password-btn:hover {
         color: #7D0A0A;
         background-color: #f1f5f9;
     }
+
+    .btn-save-profile {
+        background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%);
+        color: #ffffff;
+        border: none;
+        padding: 10px 32px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(125, 10, 10, 0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-save-profile:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(125, 10, 10, 0.35);
+    }
+
+    .security-check-box {
+        background-color: rgba(125, 10, 10, 0.03);
+        border: 1px solid rgba(125, 10, 10, 0.1);
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
 </style>
 
-<div class="main-content-inner py-4">
+<div class="main-content-inner py-3">
     
-    <!-- Title Page -->
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+    <!-- Title Section -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
         <div>
-            <h3 class="fw-extrabold text-body-emphasis mb-1 d-flex align-items-center gap-2">
-                <i class="fa-solid fa-user-gear text-danger fs-3"></i>
-                Profil Saya
-            </h3>
-            <p class="text-body-secondary mb-0 small">Kelola informasi identitas akun, data diri, dan keamanan kata sandi Anda secara fleksibel.</p>
+            <h4 class="fw-extrabold text-body-emphasis mb-1 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-user-gear text-danger fs-4"></i>
+                Pengaturan Profil Saya
+            </h4>
+            <p class="text-body-secondary mb-0 small">Kelola informasi identitas, domisili, dan keamanan kata sandi akun Anda dalam satu tampilan presisi.</p>
         </div>
         <div>
             <span class="badge bg-body-tertiary border text-body-emphasis px-3 py-2 rounded-pill small fw-semibold shadow-sm">
-                <i class="fa-solid fa-clock me-1 text-danger"></i> Sesi Aktif: <?= date('d/m/Y'); ?>
+                <i class="fa-solid fa-user-check me-1 text-success"></i> Status: Terverifikasi
             </span>
         </div>
     </div>
 
     <!-- Header Hero Banner Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card profile-hero-card border-0 shadow-sm p-3 p-md-4">
-                <div class="row align-items-center g-3">
-                    <!-- Avatar & Primary Info -->
-                    <div class="col-lg-7 col-12">
-                        <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3">
-                            <div class="profile-avatar-container flex-shrink-0">
-                                <div class="profile-avatar-box">
-                                    <i class="fa-solid <?= $avatarIcon ?>"></i>
-                                </div>
-                                <div class="avatar-status-dot" title="Akun Aktif"></div>
-                            </div>
-                            <div class="pt-1">
-                                <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mb-1.5 flex-wrap">
-                                    <h4 class="fw-bold mb-0 text-white"><?= htmlspecialchars($userData['nama_lengkap']) ?></h4>
-                                    <span class="badge bg-white text-danger fw-bold rounded-pill px-3 py-1 fs-12 shadow-sm">
-                                        <i class="fa-solid fa-shield-check me-1"></i><?= $roleLabel ?>
-                                    </span>
-                                </div>
-                                <p class="mb-2 text-white-50 small d-flex align-items-center justify-content-center justify-content-sm-start gap-2 flex-wrap">
-                                    <span><i class="fa-solid fa-at text-warning me-1"></i><?= htmlspecialchars($userData['username']) ?></span>
-                                    <span>•</span>
-                                    <span><i class="fa-solid fa-location-dot text-warning me-1"></i><?= !empty($userData['kecamatan']) ? ('Kec. ' . htmlspecialchars($userData['kecamatan'])) : 'Lokasi belum diisi' ?></span>
-                                </p>
-                                <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 text-white-50 fs-12">
-                                    <i class="fa-solid fa-calendar-check text-warning"></i>
-                                    <span>Bergabung sejak: <strong><?= $joinDate; ?></strong></span>
-                                </div>
-                            </div>
-                        </div>
+    <div class="card profile-hero-card shadow-sm p-3 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            
+            <!-- Left Info: Avatar + User Identity -->
+            <div class="d-flex align-items-center gap-3 text-center text-md-start flex-column flex-sm-row">
+                <div class="profile-avatar-box flex-shrink-0">
+                    <i class="fa-solid <?= $avatarIcon ?>"></i>
+                    <div class="avatar-online-dot" title="Sesi Aktif"></div>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mb-1 flex-wrap">
+                        <h4 class="fw-bold mb-0 text-white"><?= htmlspecialchars($userData['nama_lengkap']) ?></h4>
+                        <span class="badge bg-white text-danger fw-bold rounded-pill px-2.5 py-1 fs-12 shadow-sm">
+                            <i class="fa-solid fa-shield-check me-1"></i><?= $roleLabel ?>
+                        </span>
                     </div>
-
-                    <!-- Mini Stat Cards (Right Side for Investor/User) -->
-                    <div class="col-lg-5 col-12">
-                        <div class="row g-2 justify-content-end">
-                            <?php if ($user['role'] === 'investor' && !empty($userData['id_investor'])) : ?>
-                                <div class="col-6 col-sm-6">
-                                    <div class="stat-mini-card text-center text-sm-start">
-                                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase mb-1">
-                                            <i class="fa-solid fa-hashtag me-1 text-warning"></i>ID Investor
-                                        </small>
-                                        <span class="fw-bold text-white fs-5">#<?= sprintf('%03d', $userData['id_investor']); ?></span>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-sm-6">
-                                    <div class="stat-mini-card text-center text-sm-start">
-                                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase mb-1">
-                                            <i class="fa-solid fa-store me-1 text-warning"></i>Mitra Toko
-                                        </small>
-                                        <span class="fw-bold text-white fs-5"><?= (int)($userData['total_outlet'] ?? 0); ?> <small class="fs-12 text-white-50">Cabang</small></span>
-                                    </div>
-                                </div>
-                            <?php else : ?>
-                                <div class="col-6 col-sm-6">
-                                    <div class="stat-mini-card text-center text-sm-start">
-                                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase mb-1">
-                                            <i class="fa-solid fa-circle-check me-1 text-warning"></i>Status Akun
-                                        </small>
-                                        <span class="fw-bold text-white fs-6"><i class="fa-solid fa-check-circle me-1 text-success"></i> Terverifikasi</span>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-sm-6">
-                                    <div class="stat-mini-card text-center text-sm-start">
-                                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase mb-1">
-                                            <i class="fa-solid fa-user-shield me-1 text-warning"></i>Peran Usaha
-                                        </small>
-                                        <span class="fw-bold text-white fs-6 text-truncate d-block"><?= $roleLabel; ?></span>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                    <p class="mb-1 text-white-50 small d-flex align-items-center justify-content-center justify-content-sm-start gap-2 flex-wrap">
+                        <span><i class="fa-solid fa-at text-warning me-1"></i><?= htmlspecialchars($userData['username']) ?></span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-location-dot text-warning me-1"></i><?= !empty($userData['kecamatan']) ? ('Kec. ' . htmlspecialchars($userData['kecamatan'])) : 'Lokasi belum diisi' ?></span>
+                    </p>
+                    <div class="text-white-50 fs-12">
+                        <i class="fa-solid fa-calendar-check text-warning me-1"></i>Bergabung sejak: <strong><?= $joinDate; ?></strong>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Info: Inline Quick Stat Pills -->
+            <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-md-end">
+                <?php if ($user['role'] === 'investor' && !empty($userData['id_investor'])) : ?>
+                    <div class="hero-stat-pill text-center text-md-start">
+                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">ID Investor</small>
+                        <span class="fw-bold text-white fs-6">#<?= sprintf('%03d', $userData['id_investor']); ?></span>
+                    </div>
+                    <div class="hero-stat-pill text-center text-md-start">
+                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">Mitra Toko</small>
+                        <span class="fw-bold text-white fs-6"><?= (int)($userData['total_outlet'] ?? 0); ?> <small class="fs-12 text-white-50">Cabang</small></span>
+                    </div>
+                <?php else : ?>
+                    <div class="hero-stat-pill text-center text-md-start">
+                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">Peran Usaha</small>
+                        <span class="fw-bold text-white fs-6"><?= $roleLabel; ?></span>
+                    </div>
+                <?php endif; ?>
+                <div class="hero-stat-pill text-center text-md-start">
+                    <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">No. WhatsApp</small>
+                    <span class="fw-bold text-white fs-6"><?= !empty($userData['no_hp']) ? htmlspecialchars($userData['no_hp']) : '-'; ?></span>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Main Content Form Section -->
-    <div class="row g-4">
-        
-        <!-- Left Column: Quick Profile Info Card -->
-        <div class="col-lg-4 col-12">
-            <div class="card card-profile-section bg-body border-0 shadow-sm overflow-hidden mb-4">
-                <div class="card-body p-4">
-                    <h6 class="section-title-badge">
-                        <i class="fa-solid fa-id-card-clip text-danger"></i>
-                        Ringkasan Kontak
+    <!-- Master Form Container (100% Balanced 2-Column Grid) -->
+    <form id="formProfileUser" autocomplete="off">
+        <div class="row g-4">
+            
+            <!-- LEFT COLUMN (col-lg-6): Identitas & Kontak -->
+            <div class="col-lg-6 col-12">
+                <div class="card card-profile-section bg-body p-4">
+                    <h6 class="section-header-title">
+                        <i class="fa-solid fa-id-card text-danger"></i>
+                        Data Identitas & Informasi Kontak
                     </h6>
 
-                    <div class="list-group list-group-flush border-0">
-                        <div class="list-group-item bg-transparent px-0 py-3 border-bottom d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
-                                <span class="text-body-secondary small fw-semibold">Nama Akun</span>
+                    <div class="row g-3">
+                        <!-- Nama Lengkap -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Nama Lengkap Pengguna <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" class="form-control" name="nama_lengkap" value="<?= htmlspecialchars($userData['nama_lengkap']) ?>" placeholder="Masukkan nama lengkap" required>
                             </div>
-                            <span class="fw-bold text-body-emphasis small text-truncate" style="max-width: 150px;"><?= htmlspecialchars($userData['nama_lengkap']); ?></span>
                         </div>
 
-                        <div class="list-group-item bg-transparent px-0 py-3 border-bottom d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fa-brands fa-whatsapp"></i>
-                                </div>
-                                <span class="text-body-secondary small fw-semibold">No. WhatsApp</span>
+                        <!-- Username -->
+                        <div class="col-md-6 col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Username Akun <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                                <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($userData['username']) ?>" placeholder="Masukkan username" required>
                             </div>
-                            <span class="fw-bold text-body-emphasis small"><?= !empty($userData['no_hp']) ? htmlspecialchars($userData['no_hp']) : '-'; ?></span>
                         </div>
 
-                        <div class="list-group-item bg-transparent px-0 py-3 border-bottom d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fa-solid fa-location-dot"></i>
-                                </div>
-                                <span class="text-body-secondary small fw-semibold">Kecamatan</span>
+                        <!-- No HP / WhatsApp -->
+                        <div class="col-md-6 col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                No. WhatsApp / Telepon
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-brands fa-whatsapp"></i></span>
+                                <input type="text" class="form-control" name="no_hp" value="<?= htmlspecialchars($userData['no_hp'] ?? '') ?>" placeholder="08xxxxxxxxxx">
                             </div>
-                            <span class="fw-bold text-body-emphasis small"><?= !empty($userData['kecamatan']) ? htmlspecialchars($userData['kecamatan']) : '-'; ?></span>
                         </div>
 
-                        <div class="list-group-item bg-transparent px-0 py-3 d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                </div>
-                                <span class="text-body-secondary small fw-semibold">Status Akses</span>
+                        <!-- Kecamatan -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Kecamatan Domisili
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                                <input type="text" class="form-control" name="kecamatan" value="<?= htmlspecialchars($userData['kecamatan'] ?? '') ?>" placeholder="Nama kecamatan domisili">
                             </div>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
-                                <i class="fa-solid fa-circle-check me-1"></i>Aktif
-                            </span>
+                        </div>
+
+                        <!-- Alamat Lengkap -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Detail Alamat Lengkap
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fa-solid fa-location-dot"></i></span>
+                                <textarea class="form-control" name="alamat_lengkap" placeholder="Detail alamat rumah / usaha lengkap Anda..." style="height: 105px; resize: none;"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Petunjuk Keamanan Card -->
-            <div class="card card-profile-section border border-warning-subtle shadow-sm p-3" style="background: rgba(255, 193, 7, 0.05);">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; font-size: 16px;">
-                        <i class="fa-solid fa-lightbulb"></i>
+            <!-- RIGHT COLUMN (col-lg-6): Keamanan & Kata Sandi -->
+            <div class="col-lg-6 col-12">
+                <div class="card card-profile-section bg-body p-4">
+                    <h6 class="section-header-title">
+                        <i class="fa-solid fa-shield-halved text-danger"></i>
+                        Keamanan & Pembaruan Kata Sandi
+                    </h6>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Password Baru -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Kata Sandi Baru
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                <input type="password" class="form-control" id="inputNewPassword" name="password" placeholder="Kosongkan jika tidak ingin mengubah kata sandi">
+                                <button class="btn toggle-password-btn px-3" type="button" data-target="inputNewPassword" title="Lihat/Sembunyikan Kata Sandi">
+                                    <i class="fa-solid fa-eye fs-14"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Konfirmasi Password Baru -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-body-emphasis small mb-1">
+                                Konfirmasi Kata Sandi Baru
+                            </label>
+                            <div class="input-group form-custom-group">
+                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" class="form-control" id="inputConfirmPassword" name="password_confirm" placeholder="Ulangi kata sandi baru untuk verifikasi">
+                                <button class="btn toggle-password-btn px-3" type="button" data-target="inputConfirmPassword" title="Lihat/Sembunyikan Kata Sandi">
+                                    <i class="fa-solid fa-eye fs-14"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="fw-bold text-body-emphasis mb-1" style="font-size: 13.5px;">Tips Keamanan Akun</h6>
-                        <p class="text-body-secondary mb-0 fs-12" style="line-height: 1.45;">
-                            Gunakan kombinasi kata sandi yang kuat (huruf besar, huruf kecil, dan angka). Jangan berikan username & password Anda kepada siapapun.
-                        </p>
+
+                    <!-- Extra Security Indicator Box (Balances vertical height perfectly with left card) -->
+                    <div class="security-check-box mt-auto">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fa-solid fa-shield-check text-success fs-5"></i>
+                            <h6 class="fw-bold text-body-emphasis mb-0 fs-13">Panduan Keamanan Kata Sandi</h6>
+                        </div>
+                        <ul class="text-body-secondary fs-12 ps-3 mb-0" style="line-height: 1.5;">
+                            <li>Gunakan minimal 6 karakter dengan variasi angka dan huruf.</li>
+                            <li>Ganti kata sandi secara berkala untuk menjaga keamanan akun investor.</li>
+                            <li>Pastikan Anda mengingat username dan kata sandi baru sebelum menyimpan.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column: Edit Profile Forms -->
-        <div class="col-lg-8 col-12">
-            <form id="formProfileUser" autocomplete="off">
-                
-                <!-- Card 1: Informasi Personal -->
-                <div class="card card-profile-section bg-body border-0 shadow-sm mb-4">
-                    <div class="card-body p-4 p-md-4.5">
-                        <h6 class="section-title-badge">
-                            <i class="fa-solid fa-user-pen text-danger"></i>
-                            Informasi Identitas & Diri
-                        </h6>
-
-                        <div class="row g-3">
-                            <!-- Nama Lengkap -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Nama Lengkap <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                    <input type="text" class="form-control" name="nama_lengkap" value="<?= htmlspecialchars($userData['nama_lengkap']) ?>" placeholder="Masukkan nama lengkap" required>
-                                </div>
-                            </div>
-
-                            <!-- Username -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Username Pengguna <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
-                                    <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($userData['username']) ?>" placeholder="Masukkan username" required>
-                                </div>
-                            </div>
-
-                            <!-- No HP / WA -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    No. WhatsApp / Telepon
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-brands fa-whatsapp"></i></span>
-                                    <input type="text" class="form-control" name="no_hp" value="<?= htmlspecialchars($userData['no_hp'] ?? '') ?>" placeholder="Contoh: 081234567890">
-                                </div>
-                            </div>
-
-                            <!-- Kecamatan -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Kecamatan Domisili
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
-                                    <input type="text" class="form-control" name="kecamatan" value="<?= htmlspecialchars($userData['kecamatan'] ?? '') ?>" placeholder="Nama kecamatan domisili">
-                                </div>
-                            </div>
-
-                            <!-- Alamat Lengkap -->
-                            <div class="col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Detail Alamat Lengkap
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text align-items-start pt-2.5"><i class="fa-solid fa-location-dot"></i></span>
-                                    <textarea class="form-control" name="alamat_lengkap" placeholder="Masukkan alamat domisili lengkap Anda..." style="height: 90px; resize: vertical;"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
-                                </div>
-                            </div>
+            <!-- BOTTOM BAR: Action Button Bar -->
+            <div class="col-12 mt-3">
+                <div class="card border-0 shadow-sm rounded-4 bg-body p-3">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2 text-body-secondary small">
+                            <i class="fa-solid fa-circle-info text-primary"></i>
+                            <span>Pastikan seluruh data yang Anda ubah sudah sesuai sebelum menekan tombol simpan.</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <button type="reset" class="btn btn-light border rounded-pill px-4 fw-bold text-body-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn btn-save-profile d-inline-flex align-items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Simpan Perubahan Profil</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Card 2: Keamanan Akun & Password -->
-                <div class="card card-profile-section bg-body border-0 shadow-sm mb-4">
-                    <div class="card-body p-4 p-md-4.5">
-                        <h6 class="section-title-badge">
-                            <i class="fa-solid fa-lock text-danger"></i>
-                            Pembaruan Kata Sandi (Opsional)
-                        </h6>
-                        <p class="text-body-secondary small mb-3">Kosongkan kolom kata sandi di bawah ini apabila Anda tidak ingin mengubah password akun saat ini.</p>
-
-                        <div class="row g-3">
-                            <!-- Password Baru -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Kata Sandi Baru
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                                    <input type="password" class="form-control" id="inputNewPassword" name="password" placeholder="Ketik kata sandi baru">
-                                    <button class="btn toggle-password-btn px-3" type="button" data-target="inputNewPassword" title="Lihat/Sembunyikan Kata Sandi">
-                                        <i class="fa-solid fa-eye fs-14"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Konfirmasi Password Baru -->
-                            <div class="col-md-6 col-12">
-                                <label class="form-label fw-bold text-body-emphasis small mb-1.5">
-                                    Konfirmasi Kata Sandi Baru
-                                </label>
-                                <div class="input-group form-custom-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-shield-halved"></i></span>
-                                    <input type="password" class="form-control" id="inputConfirmPassword" name="password_confirm" placeholder="Ulangi kata sandi baru">
-                                    <button class="btn toggle-password-btn px-3" type="button" data-target="inputConfirmPassword" title="Lihat/Sembunyikan Kata Sandi">
-                                        <i class="fa-solid fa-eye fs-14"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button Bar -->
-                <div class="d-flex justify-content-end align-items-center mb-4">
-                    <button type="submit" class="btn btn-save-profile d-inline-flex align-items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Simpan Perubahan Profil</span>
-                    </button>
-                </div>
-
-            </form>
         </div>
-
-    </div>
+    </form>
 </div>
 
 <script type="text/javascript">
