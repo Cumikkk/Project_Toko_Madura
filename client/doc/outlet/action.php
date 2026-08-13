@@ -409,7 +409,7 @@ try {
             
             // Update existing laporan_omzet records starting from Tanggal Mulai ONWARDS (>= safeMulai)
             $db->query("UPDATE laporan_omzet SET 
-                presentase_potongan = {$persentasePotongan},
+                persentase_potongan = {$persentasePotongan},
                 persentase_hak_investor = {$persenBagianInvestor},
                 nominal_potongan = ROUND(nominal_omzet * ({$persentasePotongan} / 100.0), 2)
                 WHERE id_outlet = {$idOutlet} AND tanggal_omzet >= '{$safeMulai}'");
