@@ -1287,10 +1287,12 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <table class="table table-sm table-hover align-middle mb-0" style="font-size: 11.5px;">
                                 <thead class="table-light text-body-secondary sticky-top">
                                     <tr>
-                                        <th class="fw-semibold">Tanggal</th>
+                                        <th class="fw-semibold" style="width:5%">No</th>
+                                        <th class="fw-semibold">Tanggal Request</th>
                                         <th class="fw-semibold">Tipe</th>
-                                        <th class="fw-semibold">Nominal</th>
+                                        <th class="fw-semibold text-end">Nominal</th>
                                         <th class="fw-semibold">Status</th>
+                                        <th class="fw-semibold">Tgl Disetujui</th>
                                         <th class="fw-semibold text-center">Bukti</th>
                                     </tr>
                                 </thead>
@@ -2189,17 +2191,19 @@ $(document).ready(function() {
                     // Render Riwayat Pembayaran
                     let riwayatHtml = '';
                     if (res.data.riwayat_langganan && res.data.riwayat_langganan.length > 0) {
-                        res.data.riwayat_langganan.forEach(function(r) {
+                        res.data.riwayat_langganan.forEach(function(r, idx) {
+                            let rNo = idx + 1;
                             let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
                             let rTipe = r.tipe_request === 'baru'
-                                ? '<span class="text-primary fw-semibold">Baru</span>'
-                                : '<span class="text-warning fw-semibold">Perpanjang</span>';
+                                ? '<span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size:9px;">Pendaftaran Baru</span>'
+                                : '<span class="badge bg-warning-subtle text-dark border border-warning" style="font-size:9px;">Perpanjangan</span>';
                             let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
+                            let rDisetujui = r.tgl_disetujui ? r.tgl_disetujui.split(' ')[0] : '<span class="text-body-secondary">-</span>';
 
                             let rStatus = '';
-                            if (r.status === 'pending') rStatus = '<span class="badge bg-warning-subtle text-dark border border-warning" style="font-size:9px;">Pending</span>';
-                            else if (r.status === 'active') rStatus = '<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:9px;">Disetujui</span>';
-                            else if (r.status === 'reject') rStatus = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:9px;">Ditolak</span>';
+                            if (r.status === 'pending') rStatus = '<span class="badge bg-warning-subtle text-dark border border-warning" style="font-size:9px;"><i class="fa-regular fa-clock me-1"></i>Pending</span>';
+                            else if (r.status === 'active') rStatus = '<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:9px;"><i class="fa-solid fa-circle-check me-1"></i>Disetujui</span>';
+                            else if (r.status === 'reject') rStatus = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:9px;"><i class="fa-solid fa-circle-xmark me-1"></i>Ditolak</span>';
 
                             let rBuktiBtn = '<span class="text-body-secondary">-</span>';
                             if (r.bukti_pembayaran) {
@@ -2209,15 +2213,17 @@ $(document).ready(function() {
                             }
 
                             riwayatHtml += '<tr>'
-                                + '<td class="text-nowrap">' + rTgl + '</td>'
+                                + '<td class="text-body-secondary fw-semibold">' + rNo + '</td>'
+                                + '<td class="text-nowrap small">' + rTgl + '</td>'
                                 + '<td>' + rTipe + '</td>'
-                                + '<td class="fw-bold">' + rNominal + '</td>'
+                                + '<td class="fw-bold text-end">' + rNominal + '</td>'
                                 + '<td>' + rStatus + '</td>'
+                                + '<td class="text-nowrap small">' + rDisetujui + '</td>'
                                 + '<td class="text-center">' + rBuktiBtn + '</td>'
                                 + '</tr>';
                         });
                     } else {
-                        riwayatHtml = '<tr><td colspan="5" class="text-center text-body-secondary py-3">Belum ada riwayat pembayaran.</td></tr>';
+                        riwayatHtml = '<tr><td colspan="7" class="text-center text-body-secondary py-3"><i class="fa-solid fa-inbox me-2"></i>Belum ada riwayat pembayaran.</td></tr>';
                     }
                     $('#det_riwayat_tbody').html(riwayatHtml);
 

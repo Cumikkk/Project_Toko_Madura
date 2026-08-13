@@ -481,24 +481,33 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 <div class="modal fade" id="modalHistoriPembayaran" tabindex="-1" aria-labelledby="modalHistoriLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalHistoriLabel"><i class="fas fa-history me-2"></i>Histori Pembayaran: <span id="historiNamaOutlet">-</span></h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalHistoriLabel">
+                    <i class="fas fa-history me-2 text-primary"></i>
+                    Histori Pembayaran Langganan
+                    &mdash; <small class="text-muted fw-normal" id="historiNamaOutlet">-</small>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
+                <div id="historiInfoBadge" class="mb-3 d-none">
+                    <span class="badge bg-secondary me-1" id="badgeTotalHistori">0 Transaksi</span>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover text-nowrap w-100 align-middle">
-                        <thead class="bg-light text-center">
+                    <table class="table table-bordered text-nowrap w-100 align-middle">
+                        <thead class="table-secondary text-center">
                             <tr>
+                                <th style="width:5%">No</th>
                                 <th>Tanggal Request</th>
                                 <th>Tipe</th>
-                                <th>Nominal</th>
+                                <th class="text-end">Nominal</th>
                                 <th>Status</th>
+                                <th>Jatuh Tempo</th>
                                 <th>Bukti</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyHistori">
-                            <tr><td colspan="5" class="text-center">Memuat...</td></tr>
+                            <tr><td colspan="7" class="text-center py-3 text-muted">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -891,19 +900,24 @@ function deleteOutlet(id, nama) {
 // ============================================================
 function showHistori(id, nama) {
     $('#historiNamaOutlet').text(nama);
-    $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
+    $('#historiInfoBadge').addClass('d-none');
+    $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
     $('#modalHistoriPembayaran').modal('show');
 
     $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/get_histori", { id_outlet: id }, function(resp) {
         if (resp.success) {
             let html = '';
             if (resp.data && resp.data.length > 0) {
-                resp.data.forEach(function(r) {
+                $('#badgeTotalHistori').text(resp.data.length + ' Transaksi');
+                $('#historiInfoBadge').removeClass('d-none');
+                resp.data.forEach(function(r, idx) {
+                    let rNo = idx + 1;
                     let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
                     let rTipe = r.tipe_request === 'baru'
-                        ? '<span class="badge bg-primary">Baru</span>'
-                        : '<span class="badge bg-warning text-dark">Perpanjang</span>';
+                        ? '<span class="badge bg-info text-white">Pendaftaran Baru</span>'
+                        : '<span class="badge bg-warning text-dark">Perpanjangan</span>';
                     let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
+                    let rJatuhTempo = r.tgl_jatuh_tempo ? r.tgl_jatuh_tempo.split(' ')[0] : '<span class="text-muted">-</span>';
 
                     let rStatus = '';
                     if (r.status === 'pending') rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
@@ -915,26 +929,28 @@ function showHistori(id, nama) {
                         let encodedPath = encodeURIComponent(r.bukti_pembayaran);
                         let adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
                         let proxyUrl = adminUrl + '/image-proxy.php?file=' + encodedPath;
-                        rBukti = '<a href="' + proxyUrl + '" target="_blank" class="btn btn-outline-info btn-sm py-0 px-2" title="Lihat Bukti"><i class="fas fa-image"></i></a>';
+                        rBukti = '<a href="' + proxyUrl + '" target="_blank" class="btn btn-outline-info btn-sm py-0 px-2" title="Lihat Bukti Bayar"><i class="fas fa-image me-1"></i>Lihat</a>';
                     }
 
                     html += '<tr class="text-center">'
+                        + '<td class="fw-semibold text-muted">' + rNo + '</td>'
                         + '<td>' + rTgl + '</td>'
                         + '<td>' + rTipe + '</td>'
-                        + '<td class="text-end fw-bold text-success">' + rNominal + '</td>'
+                        + '<td class="text-end fw-semibold text-success">' + rNominal + '</td>'
                         + '<td>' + rStatus + '</td>'
+                        + '<td class="text-muted">' + rJatuhTempo + '</td>'
                         + '<td>' + rBukti + '</td>'
                         + '</tr>';
                 });
             } else {
-                html = '<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada histori pembayaran untuk outlet ini.</td></tr>';
+                html = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-inbox me-2"></i>Belum ada histori pembayaran untuk outlet ini.</td></tr>';
             }
             $('#tbodyHistori').html(html);
         } else {
-            $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data.</td></tr>');
+            $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data.</td></tr>');
         }
     }, 'json').fail(function() {
-        $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
+        $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
     });
 }
 
