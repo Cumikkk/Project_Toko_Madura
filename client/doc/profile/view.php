@@ -217,10 +217,6 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
             <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-md-end">
                 <?php if ($user['role'] === 'investor' && !empty($userData['id_investor'])) : ?>
                     <div class="hero-stat-pill text-center text-md-start">
-                        <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">ID Investor</small>
-                        <span class="fw-bold text-white fs-6">#<?= sprintf('%03d', $userData['id_investor']); ?></span>
-                    </div>
-                    <div class="hero-stat-pill text-center text-md-start">
                         <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">Mitra Toko</small>
                         <span class="fw-bold text-white fs-6"><?= (int)($userData['total_outlet'] ?? 0); ?> <small class="fs-12 text-white-50">Cabang</small></span>
                     </div>
@@ -230,10 +226,6 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
                         <span class="fw-bold text-white fs-6"><?= $roleLabel; ?></span>
                     </div>
                 <?php endif; ?>
-                <div class="hero-stat-pill text-center text-md-start">
-                    <small class="text-white-50 d-block fw-semibold fs-11 text-uppercase">No. WhatsApp</small>
-                    <span class="fw-bold text-white fs-6"><?= !empty($userData['no_hp']) ? htmlspecialchars($userData['no_hp']) : '-'; ?></span>
-                </div>
             </div>
 
         </div>
