@@ -362,23 +362,10 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- BOTTOM BAR: Action Button Bar -->
-            <div class="col-12 mt-2 mb-5 pb-4">
-                <div class="card border-0 shadow-sm rounded-4 bg-body p-3">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-2 text-body-secondary small">
-                            <i class="fa-solid fa-circle-info text-primary"></i>
-                            <span>Pastikan seluruh data yang Anda ubah sudah sesuai sebelum menekan tombol simpan.</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 ms-auto">
-                            <button type="reset" class="btn btn-light border rounded-pill px-4 fw-bold text-body-secondary">
-                                <i class="fa-solid fa-rotate-left me-1"></i> Batal
-                            </button>
-                            <button type="submit" class="btn btn-save-profile d-inline-flex align-items-center gap-2">
+                        <!-- Tombol Simpan Perubahan Profil (Di bawah Konfirmasi Kata Sandi Baru) -->
+                        <div class="col-12 pt-2">
+                            <button type="submit" class="btn btn-save-profile w-100 d-inline-flex align-items-center justify-content-center gap-2">
                                 <i class="fa-solid fa-floppy-disk"></i>
                                 <span>Simpan Perubahan Profil</span>
                             </button>
