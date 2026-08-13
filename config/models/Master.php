@@ -11,6 +11,7 @@ class Master {
     // READ (GET) METHODS
     // ==============================================
 
+    // Fungsi untuk mendapatkan semua data Master beserta jumlah investor dan outlet yang terkait
     public static function getAllMasters() {
         $db = Database::connect();
         $sql = "
@@ -27,6 +28,7 @@ class Master {
         return $db->query($sql);
     }
 
+    // Fungsi untuk mendapatkan data Master berdasarkan ID
     public static function getMasterById($id_users) {
         $db = Database::connect();
         $id = intval($id_users);
@@ -34,11 +36,13 @@ class Master {
         return ($res && $res->num_rows > 0) ? $res->fetch_assoc() : null;
     }
 
+    // Fungsi untuk mendapatkan semua opsi Master (id_users, nama_lengkap, username)
     public static function getAllMasterOptions() {
         $db = Database::connect();
         return $db->query("SELECT id_users, nama_lengkap, username FROM users WHERE role = 'master' ORDER BY nama_lengkap ASC");
     }
 
+    // Fungsi untuk mendapatkan semua data komisi Master, dengan opsi filter berdasarkan ID Master
     public static function getAllKomisi($id_master = null) {
         $db = Database::connect();
         $sql = "
@@ -54,6 +58,7 @@ class Master {
         return $db->query($sql);
     }
 
+    // Fungsi untuk mendapatkan data komisi Master berdasarkan ID Komisi
     public static function getKomisiById($id_komisi) {
         $db = Database::connect();
         $id = intval($id_komisi);
@@ -65,6 +70,7 @@ class Master {
     // WRITE (SAVE / DELETE) METHODS
     // ==============================================
 
+    // Fungsi untuk menyimpan data Master (insert atau update)
     public static function saveMaster($data) {
         $db = Database::connect();
         $idUsers = intval($data['id_users'] ?? 0);
@@ -136,6 +142,7 @@ class Master {
         }
     }
 
+    // Fungsi untuk menghapus akun Master beserta seluruh data terikatnya (investor, outlet, laporan omzet)
     public static function deleteMaster($id_users) {
         $db = Database::connect();
         $idUsers = intval($id_users);
@@ -182,6 +189,7 @@ class Master {
         }
     }
 
+    // Fungsi untuk menyimpan data komisi Master (insert atau update)
     public static function saveKomisi($data, $files) {
         $db = Database::connect();
         $idKomisi = intval($data['id_komisi'] ?? 0);
@@ -229,7 +237,7 @@ class Master {
             // UPDATE
             $updateBukti = "";
             if (!empty($buktiPath)) {
-                // Hapus berkas bukti lama dari disk jika ada berkas baru diunggah
+                // Hapus berkas bukti lama dari penyimpanan jika ada berkas baru diunggah
                 $resBkt = $db->query("SELECT bukti_pembayaran FROM komisi_master WHERE id_komisi = {$idKomisi} LIMIT 1");
                 if ($resBkt && $rowBkt = $resBkt->fetch_assoc()) {
                     $oldFile = trim($rowBkt['bukti_pembayaran'] ?? '');
@@ -262,6 +270,7 @@ class Master {
         }
     }
 
+    // Fungsi untuk menghapus data komisi Master berdasarkan ID Komisi
     public static function deleteKomisi($id_komisi) {
         $db = Database::connect();
         $idKomisi = intval($id_komisi);

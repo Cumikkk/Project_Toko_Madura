@@ -11,6 +11,7 @@ class Investor {
     // READ (GET) METHODS
     // ==============================================
 
+    // Fungsi untuk mendapatkan semua data investor, dengan filter berdasarkan level login dan ID master
     public static function getAllInvestors($loggedInLevel = 1, $loggedInId = 1) {
         $db = Database::connect();
         
@@ -36,6 +37,7 @@ class Investor {
         return $db->query($sql);
     }
 
+    // Fungsi untuk mendapatkan data investor berdasarkan ID investor
     public static function getInvestorById($idInvestor) {
         $db = Database::connect();
         $id = intval($idInvestor);
@@ -55,6 +57,7 @@ class Investor {
     // WRITE (SAVE / DELETE) METHODS
     // ==============================================
 
+    // Fungsi untuk menyimpan data investor (baik untuk menambah maupun mengedit)
     public static function saveInvestor($data, $currentUserId = 1) {
         $db = Database::connect();
         $idInvestor = intval($data['id_investor'] ?? 0);
@@ -160,6 +163,7 @@ class Investor {
         }
     }
 
+    // Fungsi untuk menghapus data investor beserta outlet yang terkait
     public static function deleteInvestor($idInvestor) {
         $db = Database::connect();
         $id = intval($idInvestor);
