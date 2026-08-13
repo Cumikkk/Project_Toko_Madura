@@ -180,6 +180,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
@@ -262,6 +263,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
@@ -355,11 +357,12 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
-                                                        <i class="fas fa-check me-1"></i> Setujui
+                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
+                                                    <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" title="Setujui">
+                                                        <i class="fas fa-check"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm btn-reject" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>">
-                                                        <i class="fas fa-times me-1"></i> Tolak
+                                                    <button type="button" class="btn btn-danger btn-sm btn-reject" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" title="Tolak">
+                                                        <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -452,6 +455,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
+                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <button type="button" class="btn btn-success btn-sm text-white btn-edit" onclick='editAlasanPenolakan(<?= $row['id_outlet'] ?>, <?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alasan_penolakan'] ?? '') ?>)' title="Edit Alasan Penolakan">
                                                             <i class="fas fa-edit"></i>
@@ -468,6 +472,39 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL HISTORI PEMBAYARAN -->
+<div class="modal fade" id="modalHistoriPembayaran" tabindex="-1" aria-labelledby="modalHistoriLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalHistoriLabel"><i class="fas fa-history me-2"></i>Histori Pembayaran: <span id="historiNamaOutlet">-</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-nowrap w-100 align-middle">
+                        <thead class="bg-light text-center">
+                            <tr>
+                                <th>Tanggal Request</th>
+                                <th>Tipe</th>
+                                <th>Nominal</th>
+                                <th>Status</th>
+                                <th>Bukti</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyHistori">
+                            <tr><td colspan="5" class="text-center">Memuat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -848,4 +885,54 @@ function deleteOutlet(id, nama) {
         }
     });
 }
+
+// ============================================================
+// Histori Pembayaran
+// ============================================================
+function showHistori(id, nama) {
+    $('#historiNamaOutlet').text(nama);
+    $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
+    $('#modalHistoriPembayaran').modal('show');
+
+    $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/get_histori", { id_outlet: id }, function(resp) {
+        if (resp.success) {
+            let html = '';
+            if (resp.data.length > 0) {
+                resp.data.forEach(function(r) {
+                    let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
+                    let rTipe = r.tipe_request === 'baru' ? '<span class="badge bg-primary">Baru</span>' : '<span class="badge bg-warning text-dark">Perpanjang</span>';
+                    let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
+                    
+                    let rStatus = '';
+                    if (r.status === 'pending') rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
+                    else if (r.status === 'active') rStatus = '<span class="badge bg-success">Disetujui</span>';
+                    else if (r.status === 'reject') rStatus = '<span class="badge bg-danger">Ditolak</span>';
+                    
+                    let rBukti = '-';
+                    if (r.bukti_pembayaran) {
+                        rBukti = '<button class="btn btn-outline-info btn-sm py-0 px-2" onclick="previewBukti(\\'' + r.bukti_pembayaran + '\\', \\'' + nama + '\\', \\'-\\', \\'' + r.nominal_transfer + '\\')"><i class="fas fa-image"></i></button>';
+                    }
+
+                    html += `
+                        <tr class="text-center">
+                            <td>${rTgl}</td>
+                            <td>${rTipe}</td>
+                            <td class="text-end fw-bold text-success">${rNominal}</td>
+                            <td>${rStatus}</td>
+                            <td>${rBukti}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html = '<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada histori pembayaran untuk outlet ini.</td></tr>';
+            }
+            $('#tbodyHistori').html(html);
+        } else {
+            $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data.</td></tr>');
+        }
+    }, 'json').fail(function() {
+        $('#tbodyHistori').html('<tr><td colspan="5" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
+    });
+}
+
 </script>

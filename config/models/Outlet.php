@@ -254,6 +254,7 @@ class Outlet {
 
         $sql = "UPDATE outlet SET status = 'active', tgl_disetujui = NOW(), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$id}";
         if ($db->query($sql)) {
+            $db->query("UPDATE riwayat_langganan SET status = 'active', tgl_disetujui = NOW() WHERE id_outlet = {$id} AND status = 'pending' ORDER BY id_riwayat DESC LIMIT 1");
             return ['success' => true, 'message' => 'Request outlet & pembayaran berhasil disetujui. Outlet kini resmi aktif!'];
         }
         return ['success' => false, 'message' => 'Gagal mengaktifkan outlet: ' . $db->error];
@@ -266,6 +267,7 @@ class Outlet {
         $escapedAlasan = $db->real_escape_string(trim($alasan));
         $sql = "UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', tgl_ditolak = NOW() WHERE id_outlet = {$id}";
         if ($db->query($sql)) {
+            $db->query("UPDATE riwayat_langganan SET status = 'reject', alasan_penolakan = '{$escapedAlasan}' WHERE id_outlet = {$id} AND status = 'pending' ORDER BY id_riwayat DESC LIMIT 1");
             return ['success' => true, 'message' => 'Request outlet & pembayaran berhasil ditolak.'];
         }
         return ['success' => false, 'message' => 'Gagal menolak outlet: ' . $db->error];
@@ -280,6 +282,7 @@ class Outlet {
         $escapedAlasan = $db->real_escape_string($alasan);
         $sql = "UPDATE outlet SET alasan_penolakan = '{$escapedAlasan}' WHERE id_outlet = {$id} AND status = 'reject'";
         if ($db->query($sql)) {
+            $db->query("UPDATE riwayat_langganan SET alasan_penolakan = '{$escapedAlasan}' WHERE id_outlet = {$id} AND status = 'reject' ORDER BY id_riwayat DESC LIMIT 1");
             return ['success' => true, 'message' => 'Alasan penolakan outlet berhasil diperbarui.'];
         }
         return ['success' => false, 'message' => 'Gagal memperbarui alasan penolakan: ' . $db->error];

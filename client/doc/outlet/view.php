@@ -1279,6 +1279,27 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <span class="fw-bold text-body-emphasis" id="det_total_laporan">0 Laporan</span>
                         </div>
                     </div>
+
+                    <!-- Riwayat Pembayaran Container -->
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-body-emphasis mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-secondary"></i>Riwayat Perpanjangan / Pembayaran</h6>
+                        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                            <table class="table table-sm table-hover align-middle mb-0" style="font-size: 11.5px;">
+                                <thead class="table-light text-body-secondary sticky-top">
+                                    <tr>
+                                        <th class="fw-semibold">Tanggal</th>
+                                        <th class="fw-semibold">Tipe</th>
+                                        <th class="fw-semibold">Nominal</th>
+                                        <th class="fw-semibold">Status</th>
+                                        <th class="fw-semibold text-center">Bukti</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="det_riwayat_tbody" class="border-top-0">
+                                    <!-- Diisi oleh JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0 pb-4 px-4">
@@ -2164,6 +2185,41 @@ $(document).ready(function() {
                     }
 
                     $('#det_banner_action').html(bannerHtml);
+
+                    // Render Riwayat Pembayaran
+                    let riwayatHtml = '';
+                    if (res.data.riwayat_langganan && res.data.riwayat_langganan.length > 0) {
+                        res.data.riwayat_langganan.forEach(function(r) {
+                            let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
+                            let rTipe = r.tipe_request === 'baru' ? '<span class="text-primary">Baru</span>' : '<span class="text-warning">Perpanjang</span>';
+                            let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
+                            
+                            let rStatus = '';
+                            if (r.status === 'pending') rStatus = '<span class="badge bg-warning-subtle text-dark border border-warning" style="font-size:9px;">Pending</span>';
+                            else if (r.status === 'active') rStatus = '<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:9px;">Disetujui</span>';
+                            else if (r.status === 'reject') rStatus = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:9px;">Ditolak</span>';
+                            
+                            let rBuktiBtn = '-';
+                            if (r.bukti_pembayaran) {
+                                let fUrl = '<?= SystemInfo::app("CLIENT_URL"); ?>/' + r.bukti_pembayaran;
+                                rBuktiBtn = '<button type="button" class="btn btn-xs btn-outline-danger py-0 px-2 rounded-1 btn-preview-image-lightbox" data-src="'+fUrl+'" data-title="Bukti"><i class="fa-solid fa-image"></i></button>';
+                            }
+
+                            riwayatHtml += `
+                                <tr>
+                                    <td class="text-nowrap">${rTgl}</td>
+                                    <td>${rTipe}</td>
+                                    <td class="fw-bold">${rNominal}</td>
+                                    <td>${rStatus}</td>
+                                    <td class="text-center">${rBuktiBtn}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        riwayatHtml = '<tr><td colspan="5" class="text-center text-body-secondary py-3">Belum ada riwayat pembayaran.</td></tr>';
+                    }
+                    $('#det_riwayat_tbody').html(riwayatHtml);
+
                     $('#detailOutletContent').removeClass('d-none');
                 } else {
                     $('#modalDetailOutlet').modal('hide');

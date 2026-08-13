@@ -116,6 +116,10 @@ try {
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
         }
+        $newOutletId = $db->insert_id;
+
+        // Insert into riwayat_langganan
+        $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request) VALUES ({$newOutletId}, 'baru', {$nominalBiaya}, '{$escapedBukti}', 'pending', NOW())");
 
         JsonResponse([
             'success' => true,
@@ -174,14 +178,8 @@ try {
             JsonResponse(['success' => false, 'message' => 'Harap unggah foto / file bukti transfer pembayaran baru.']);
         }
 
-        // Unlink old payment proof if exists
-        $oldBukti = trim($rowOutlet['bukti_pembayaran'] ?? '');
-        if (!empty($oldBukti)) {
-            $path1 = __DIR__ . '/../../' . $oldBukti;
-            if (file_exists($path1)) {
-                @unlink($path1);
-            }
-        }
+        // (Dihapus: Unlink old payment proof if exists)
+        // Kita tidak lagi menghapus bukti pembayaran lama, agar histori di tabel riwayat_langganan tidak kehilangan gambarnya.
 
         $escapedBukti = $db->real_escape_string($buktiPath);
 
@@ -197,6 +195,9 @@ try {
         if (!$db->query($sqlUpdate)) {
             JsonResponse(['success' => false, 'message' => 'Gagal mengajukan request: ' . $db->error]);
         }
+
+        // Insert into riwayat_langganan
+        $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request) VALUES ({$idOutlet}, '{$tipeReqNow}', {$nominalBiaya}, '{$escapedBukti}', 'pending', NOW())");
 
         $msgText = ($tipeReqNow === 'perpanjangan')
             ? 'Request perpanjangan langganan untuk outlet "' . htmlspecialchars($namaOutlet) . '" & bukti transfer berhasil dikirim! Menunggu konfirmasi verifikasi dari Admin.'
@@ -228,12 +229,13 @@ try {
         }
 
         // Verify ownership
-        $resCheck = $db->query("SELECT id_outlet, id_users, nama_outlet, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
+        $resCheck = $db->query("SELECT id_outlet, id_users, nama_outlet, bukti_pembayaran, nominal_transfer FROM outlet WHERE id_outlet = {$idOutlet} AND id_investor = {$investorId} LIMIT 1");
         if (!$resCheck || $resCheck->num_rows === 0) {
             JsonResponse(['success' => false, 'message' => 'Outlet tidak ditemukan atau Anda tidak memiliki akses.']);
         }
         $rowOutlet = $resCheck->fetch_assoc();
         $associatedUserId = (int)$rowOutlet['id_users'];
+        $nominalBiaya = (float)$rowOutlet['nominal_transfer'];
         $buktiPath = $rowOutlet['bukti_pembayaran']; // Default to existing proof
 
         // Check if username used by another user
@@ -259,13 +261,7 @@ try {
             $targetFilePath = $uploadDir . $newFileName;
 
             if (move_uploaded_file($_FILES['bukti_pembayaran']['tmp_name'], $targetFilePath)) {
-                // Unlink old payment proof if exists
-                if (!empty($rowOutlet['bukti_pembayaran'])) {
-                    $oldPath = __DIR__ . '/../../' . $rowOutlet['bukti_pembayaran'];
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
-                }
+                // (Dihapus: Unlink old payment proof)
                 $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
             }
         }
@@ -296,6 +292,9 @@ try {
         if (!$updateOutlet) {
             JsonResponse(['success' => false, 'message' => 'Gagal memperbarui data pengajuan: ' . $db->error]);
         }
+
+        // Tambahkan ke riwayat langganan
+        $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request) VALUES ({$idOutlet}, 'baru', {$nominalBiaya}, '{$escapedBukti}', 'pending', NOW())");
 
         // Update User Account (kecamatan, alamat, nama_lengkap, no_hp, username, password)
         if (!empty($password)) {
@@ -344,6 +343,15 @@ try {
         $detail['total_laporan'] = (int)$statOmzet['total_laporan'];
         $detail['total_omzet'] = (float)$statOmzet['total_omzet'];
         $detail['total_potongan'] = (float)$statOmzet['total_potongan'];
+
+        // Ambil Riwayat Pembayaran
+        $detail['riwayat_langganan'] = [];
+        $resRiwayat = $db->query("SELECT * FROM riwayat_langganan WHERE id_outlet = {$idOutlet} ORDER BY id_riwayat DESC");
+        if ($resRiwayat) {
+            while ($r = $resRiwayat->fetch_assoc()) {
+                $detail['riwayat_langganan'][] = $r;
+            }
+        }
 
         JsonResponse(['success' => true, 'data' => $detail]);
     }

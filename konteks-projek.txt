@@ -101,7 +101,22 @@ CREATE TABLE laporan_omzet (
     INDEX idx_outlet_tanggal (id_outlet, tanggal_omzet)
 );
 
--- 6. TABEL PENGATURAN SISTEM (Konfigurasi Rekening Bank Admin)
+-- 6. TABEL RIWAYAT LANGGANAN (Histori Pembayaran Langganan Outlet)
+CREATE TABLE riwayat_langganan (
+    id_riwayat INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_outlet INT(10) UNSIGNED NOT NULL,
+    tipe_request ENUM('baru', 'perpanjangan') NOT NULL DEFAULT 'baru',
+    nominal_transfer BIGINT NOT NULL DEFAULT 0,
+    bukti_pembayaran VARCHAR(255) DEFAULT NULL,
+    status ENUM('pending', 'active', 'reject') NOT NULL DEFAULT 'pending',
+    alasan_penolakan TEXT DEFAULT NULL,
+    tgl_request DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tgl_disetujui DATETIME DEFAULT NULL,
+    FOREIGN KEY (id_outlet) REFERENCES outlet(id_outlet) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_riwayat_outlet_status (id_outlet, status)
+);
+
+-- 7. TABEL PENGATURAN SISTEM (Konfigurasi Rekening Bank Admin)
 CREATE TABLE pengaturan_sistem (
     id_pengaturan INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nama_pengaturan VARCHAR(50) NOT NULL UNIQUE,
