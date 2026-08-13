@@ -130,13 +130,13 @@ $topbarTab  = $_GET['tab'] ?? '';
                     </button>
                     <ul class="dropdown-menu profile-dropdown-menu shadow-lg">
                         <li>
-                            <div class="dropdown-txt px-3 py-2 text-start">
-                                <h6 class="fw-bold mb-0 text-dark"><?= htmlspecialchars($user['MBR_NAME'] ?? 'User') ?></h6>
-                                <small class="text-muted text-uppercase"><?= htmlspecialchars($user['role'] ?? 'outlet') ?></small>
+                            <div class="text-center" style="padding: 20px 20px 15px;">
+                                <h6 class="fw-semibold text-dark" style="font-size: 15px; margin-bottom: 2px;"><?= htmlspecialchars($user['MBR_NAME'] ?? 'User') ?></h6>
+                                <p class="text-secondary mb-0" style="font-size: 13px; text-transform: uppercase;"><?= htmlspecialchars($user['role'] ?? 'outlet') ?></p>
                             </div>
                         </li>
-                        <li><a class="dropdown-item border-top fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
-                        <li><a class="dropdown-item text-danger fw-bold" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><span class="dropdown-icon me-2 text-danger"><i class="fa-regular fa-arrow-right-from-bracket"></i></span> Logout</a></li>
+                        <li><a class="dropdown-item border-top py-2" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><i class="fa-solid fa-gear me-2"></i> Profil Saya</a></li>
+                        <li><a class="dropdown-item py-2" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><i class="fa-solid fa-power-off me-2"></i> Sign Out</a></li>
                     </ul>
                 </div>
 
