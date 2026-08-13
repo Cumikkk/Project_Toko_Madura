@@ -959,3 +959,16 @@ html body .header span.brand-title {
 
 /* Force Gear Icon Orange */
 .right-sidebar-btn button.theme-settings-btn { background-color: #F26539 !important; color: #ffffff !important; border-color: #F26539 !important; }
+
+ / *   F i x   d r o p d o w n   h o v e r   v i s i b i l i t y   * / 
+ h t m l   b o d y . l i g h t - t h e m e   . d r o p d o w n - m e n u   . d r o p d o w n - i t e m : h o v e r , 
+ h t m l   b o d y . l i g h t - t h e m e   . d r o p d o w n - m e n u   . d r o p d o w n - i t e m : f o c u s   { 
+         b a c k g r o u n d - c o l o r :   r g b a ( 1 2 5 ,   1 0 ,   1 0 ,   0 . 0 5 )   ! i m p o r t a n t ; 
+         c o l o r :   # 7 D 0 A 0 A   ! i m p o r t a n t ; 
+ } 
+ h t m l   b o d y . l i g h t - t h e m e   . d r o p d o w n - m e n u   . d r o p d o w n - i t e m . t e x t - d a n g e r : h o v e r , 
+ h t m l   b o d y . l i g h t - t h e m e   . d r o p d o w n - m e n u   . d r o p d o w n - i t e m . t e x t - d a n g e r : f o c u s   { 
+         b a c k g r o u n d - c o l o r :   r g b a ( 2 2 0 ,   5 3 ,   6 9 ,   0 . 1 )   ! i m p o r t a n t ; 
+         c o l o r :   # d c 3 5 4 5   ! i m p o r t a n t ; 
+ }  
+ 

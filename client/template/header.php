@@ -130,14 +130,12 @@ $topbarTab  = $_GET['tab'] ?? '';
                     </button>
                     <ul class="dropdown-menu profile-dropdown-menu shadow-lg">
                         <li>
-                            <div class="dropdown-txt text-center py-2">
-                                <p class="fw-bold mb-0 text-body-emphasis"><?php echo htmlspecialchars(!empty($user['nama_lengkap']) ? $user['nama_lengkap'] : (!empty($user['username']) ? $user['username'] : 'User')); ?></p>
-                                <span class="badge bg-danger-subtle text-danger small text-uppercase rounded-pill px-2 py-1 mt-1"><?= strtoupper($user['role'] ?? 'outlet'); ?></span>
+                            <div class="dropdown-txt px-3 py-2 text-start">
+                                <h6 class="fw-bold mb-0 text-dark"><?= htmlspecialchars($user['MBR_NAME'] ?? 'User') ?></h6>
+                                <small class="text-muted text-uppercase"><?= htmlspecialchars($user['role'] ?? 'outlet') ?></small>
                             </div>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item border-top fw-semibold" href="<?= SystemInfo::app('CLIENT_URL') ?>/profile"><span class="dropdown-icon me-2"><i class="fa-regular fa-circle-user"></i></span> Profil Saya</a></li>
                         <li><a class="dropdown-item text-danger fw-bold" href="<?= SystemInfo::app('CLIENT_URL') ?>/logout"><span class="dropdown-icon me-2 text-danger"><i class="fa-regular fa-arrow-right-from-bracket"></i></span> Logout</a></li>
                     </ul>
                 </div>
