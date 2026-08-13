@@ -11,8 +11,6 @@ class Outlet {
     // ==============================================
     // READ (GET) METHODS
     // ==============================================
-
-    // Fungsi untuk mendapatkan statistik outlet berdasarkan statusnya
     public static function getOutletStats() {
         $db = Database::connect();
         $stats = [
@@ -37,8 +35,6 @@ class Outlet {
 
         return $stats;
     }
-
-    // Fungsi untuk mendapatkan daftar outlet aktif berdasarkan tanggal jatuh tempo
     public static function getActiveOutlets() {
         $db = Database::connect();
         $sql = "
@@ -53,8 +49,6 @@ class Outlet {
         ";
         return $db->query($sql);
     }
-
-    // Fungsi untuk mendapatkan daftar outlet yang sudah expired atau inactive berdasarkan tanggal jatuh tempo
     public static function getExpiredOutlets() {
         $db = Database::connect();
         $sql = "
@@ -69,8 +63,6 @@ class Outlet {
         ";
         return $db->query($sql);
     }
-
-    // Fungsi untuk mendapatkan daftar outlet yang masih pending
     public static function getPendingOutlets() {
         $db = Database::connect();
         $sql = "
@@ -85,8 +77,6 @@ class Outlet {
         ";
         return $db->query($sql);
     }
-
-    // Fungsi untuk mendapatkan daftar outlet yang ditolak
     public static function getRejectedOutlets() {
         $db = Database::connect();
         $sql = "
@@ -101,8 +91,6 @@ class Outlet {
         ";
         return $db->query($sql);
     }
-
-    // Fungsi untuk mendapatkan detail outlet berdasarkan ID outlet
     public static function getOutletById($idOutlet) {
         $db = Database::connect();
         $id = intval($idOutlet);
@@ -120,8 +108,6 @@ class Outlet {
     // ==============================================
     // WRITE (SAVE / DELETE / UPDATE) METHODS
     // ==============================================
-
-    // Fungsi untuk menyimpan data outlet baru atau memperbarui data outlet yang sudah ada
     public static function saveOutlet($data, $currentUserId = 1) {
         $db = Database::connect();
         $idOutlet = intval($data['id_outlet'] ?? 0);
@@ -224,8 +210,6 @@ class Outlet {
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
-
-    // Fungsi untuk menghapus outlet beserta akun kasir dan laporan omzet terkait
     public static function deleteOutlet($idOutlet) {
         $db = Database::connect();
         $id = intval($idOutlet);
@@ -263,8 +247,6 @@ class Outlet {
             return ['success' => false, 'message' => "Gagal menghapus cabang outlet: " . $e->getMessage()];
         }
     }
-
-    // Fungsi untuk menyetujui request outlet dan pembayaran, serta mengaktifkan outlet
     public static function acceptRequest($idOutlet) {
         $db = Database::connect();
         $id = intval($idOutlet);
@@ -276,8 +258,6 @@ class Outlet {
         }
         return ['success' => false, 'message' => 'Gagal mengaktifkan outlet: ' . $db->error];
     }
-
-    // Fungsi untuk menolak request outlet dan pembayaran, serta menyimpan alasan penolakan
     public static function rejectRequest($idOutlet, $alasan) {
         $db = Database::connect();
         $id = intval($idOutlet);
@@ -290,8 +270,6 @@ class Outlet {
         }
         return ['success' => false, 'message' => 'Gagal menolak outlet: ' . $db->error];
     }
-
-    // Fungsi untuk memperbarui alasan penolakan outlet yang sudah ditolak
     public static function updateRejectReason($idOutlet, $alasan) {
         $db = Database::connect();
         $id = intval($idOutlet);

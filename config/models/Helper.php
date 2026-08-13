@@ -335,7 +335,7 @@ class Helper {
         $len = strlen($text);
 
         if ($len <= ($visibleStart + $visibleEnd)) {
-            return str_repeat($maskChar, $len); // terlalu pendek → full mask
+            return str_repeat($maskChar, $len); // terlalu pendek â†’ full mask
         }
 
         $start  = substr($text, 0, $visibleStart);
@@ -371,9 +371,9 @@ class Helper {
         $currencyCode = strtoupper($currencyCode);
         $symbols = [
             'USD' => '$',
-            'EUR' => '€',
-            'GBP' => '£',
-            'JPY' => '¥',
+            'EUR' => 'â‚¬',
+            'GBP' => 'Â£',
+            'JPY' => 'Â¥',
             'IDR' => 'Rp',
         ];
 

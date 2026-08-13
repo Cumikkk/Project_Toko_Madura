@@ -11,8 +11,6 @@ class Pengaturan {
      * @param array $keys (Optional) List of setting names to fetch
      * @return array Associative array of [nama_pengaturan => nilai]
      */
-
-    // Fungsi untuk mendapatkan pengaturan sistem dari database
     public static function getSettings(array $keys = []): array {
         $db = Database::connect();
         $settings = [];
@@ -40,8 +38,6 @@ class Pengaturan {
      * @param array $updates Associative array of [nama_pengaturan => nilai]
      * @return array [success => bool, message => string]
      */
-
-    // Fungsi untuk memperbarui pengaturan sistem di database
     public static function updateSettings(array $updates): array {
         if (empty($updates)) {
             return ['success' => false, 'message' => 'Tidak ada data pengaturan yang dikirim'];

@@ -5,8 +5,6 @@ use Config\Core\Database;
 use Exception;
 
 class Dashboard {
-
-    // Fungsi untuk mendapatkan jumlah pengguna berdasarkan role tertentu
     public static function getRoleCount(string $role): int {
         try {
             $db = Database::connect();
@@ -16,8 +14,6 @@ class Dashboard {
             return 0;
         }
     }
-
-    // Fungsi untuk mendapatkan jumlah outlet yang aktif dan belum jatuh tempo
     public static function getOutletCount(): int {
         try {
             $db = Database::connect();
@@ -27,8 +23,6 @@ class Dashboard {
             return 0;
         }
     }
-
-    // Fungsi untuk mendapatkan jumlah laporan pendapatan (omzet) dengan total omzet tertinggi
     public static function getTopByOmzet() {
         $db = Database::connect();
         $sql = "
@@ -44,8 +38,6 @@ class Dashboard {
         ";
         return $db->query($sql);
     }
-
-    // Fungsi untuk mendapatkan daftar permintaan outlet terbaru yang berstatus 'pending'
     public static function getRecentRequests() {
         $db = Database::connect();
         $sql = "
