@@ -185,19 +185,16 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
 
 <div class="main-content-inner py-3 mb-5 pb-4">
     
-    <!-- Title Section -->
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-        <div>
-            <h4 class="fw-extrabold text-body-emphasis mb-1 d-flex align-items-center gap-2">
-                <i class="fa-solid fa-user-gear text-danger fs-4"></i>
-                Pengaturan Profil Saya
-            </h4>
-            <p class="text-body-secondary mb-0 small">Kelola informasi identitas, domisili, dan keamanan kata sandi akun Anda dalam satu tampilan presisi.</p>
-        </div>
-        <div>
-            <span class="badge bg-body-tertiary border text-body-emphasis px-3 py-2 rounded-pill small fw-semibold shadow-sm">
-                <i class="fa-solid fa-user-check me-1 text-success"></i> Status: Terverifikasi
-            </span>
+    <!-- Title Card Section -->
+    <div class="card border-0 shadow-sm rounded-4 bg-body p-3.5 px-4 mb-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <h4 class="fw-extrabold text-body-emphasis mb-1 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-danger fs-4"></i>
+                    Pengaturan Profil Saya
+                </h4>
+                <p class="text-body-secondary mb-0 small">Kelola informasi identitas, domisili, dan keamanan kata sandi akun Anda dalam satu tampilan presisi.</p>
+            </div>
         </div>
     </div>
 
