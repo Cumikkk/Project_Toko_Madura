@@ -183,7 +183,7 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
     }
 </style>
 
-<div class="main-content-inner py-3">
+<div class="main-content-inner py-3 mb-5 pb-4">
     
     <!-- Title Section -->
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -319,7 +319,7 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
                             </label>
                             <div class="input-group form-custom-group">
                                 <span class="input-group-text align-items-start pt-2"><i class="fa-solid fa-location-dot"></i></span>
-                                <textarea class="form-control" name="alamat_lengkap" placeholder="Detail alamat rumah / usaha lengkap Anda..." style="height: 105px; resize: none;"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
+                                <textarea class="form-control" name="alamat_lengkap" placeholder="Detail alamat rumah / usaha lengkap Anda..." style="height: 65px; min-height: 65px; resize: vertical;"><?= htmlspecialchars($userData['alamat_lengkap'] ?? '') ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -334,7 +334,7 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
                         Keamanan & Pembaruan Kata Sandi
                     </h6>
 
-                    <div class="row g-3 mb-3">
+                    <div class="row g-3">
                         <!-- Password Baru -->
                         <div class="col-12">
                             <label class="form-label fw-bold text-body-emphasis small mb-1">
@@ -363,24 +363,11 @@ if (!empty($userData['created_at']) && strtotime($userData['created_at']) > 0) {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Extra Security Indicator Box (Balances vertical height perfectly with left card) -->
-                    <div class="security-check-box mt-auto">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="fa-solid fa-shield-check text-success fs-5"></i>
-                            <h6 class="fw-bold text-body-emphasis mb-0 fs-13">Panduan Keamanan Kata Sandi</h6>
-                        </div>
-                        <ul class="text-body-secondary fs-12 ps-3 mb-0" style="line-height: 1.5;">
-                            <li>Gunakan minimal 6 karakter dengan variasi angka dan huruf.</li>
-                            <li>Ganti kata sandi secara berkala untuk menjaga keamanan akun investor.</li>
-                            <li>Pastikan Anda mengingat username dan kata sandi baru sebelum menyimpan.</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
 
             <!-- BOTTOM BAR: Action Button Bar -->
-            <div class="col-12 mt-3">
+            <div class="col-12 mt-2 mb-5 pb-4">
                 <div class="card border-0 shadow-sm rounded-4 bg-body p-3">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-2 text-body-secondary small">
