@@ -897,31 +897,34 @@ function showHistori(id, nama) {
     $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/get_histori", { id_outlet: id }, function(resp) {
         if (resp.success) {
             let html = '';
-            if (resp.data.length > 0) {
+            if (resp.data && resp.data.length > 0) {
                 resp.data.forEach(function(r) {
                     let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
-                    let rTipe = r.tipe_request === 'baru' ? '<span class="badge bg-primary">Baru</span>' : '<span class="badge bg-warning text-dark">Perpanjang</span>';
+                    let rTipe = r.tipe_request === 'baru'
+                        ? '<span class="badge bg-primary">Baru</span>'
+                        : '<span class="badge bg-warning text-dark">Perpanjang</span>';
                     let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
-                    
+
                     let rStatus = '';
                     if (r.status === 'pending') rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
                     else if (r.status === 'active') rStatus = '<span class="badge bg-success">Disetujui</span>';
                     else if (r.status === 'reject') rStatus = '<span class="badge bg-danger">Ditolak</span>';
-                    
-                    let rBukti = '-';
+
+                    let rBukti = '<span class="text-muted">-</span>';
                     if (r.bukti_pembayaran) {
-                        rBukti = '<button class="btn btn-outline-info btn-sm py-0 px-2" onclick="previewBukti(\\'' + r.bukti_pembayaran + '\\', \\'' + nama + '\\', \\'-\\', \\'' + r.nominal_transfer + '\\')"><i class="fas fa-image"></i></button>';
+                        let encodedPath = encodeURIComponent(r.bukti_pembayaran);
+                        let adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+                        let proxyUrl = adminUrl + '/image-proxy.php?file=' + encodedPath;
+                        rBukti = '<a href="' + proxyUrl + '" target="_blank" class="btn btn-outline-info btn-sm py-0 px-2" title="Lihat Bukti"><i class="fas fa-image"></i></a>';
                     }
 
-                    html += `
-                        <tr class="text-center">
-                            <td>${rTgl}</td>
-                            <td>${rTipe}</td>
-                            <td class="text-end fw-bold text-success">${rNominal}</td>
-                            <td>${rStatus}</td>
-                            <td>${rBukti}</td>
-                        </tr>
-                    `;
+                    html += '<tr class="text-center">'
+                        + '<td>' + rTgl + '</td>'
+                        + '<td>' + rTipe + '</td>'
+                        + '<td class="text-end fw-bold text-success">' + rNominal + '</td>'
+                        + '<td>' + rStatus + '</td>'
+                        + '<td>' + rBukti + '</td>'
+                        + '</tr>';
                 });
             } else {
                 html = '<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada histori pembayaran untuk outlet ini.</td></tr>';
