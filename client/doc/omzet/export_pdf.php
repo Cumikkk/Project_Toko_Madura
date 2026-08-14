@@ -21,7 +21,7 @@ $idOutlet = isset($_GET['id_outlet']) ? (int)$_GET['id_outlet'] : (isset($_GET['
 
 if ($idOutlet > 0) {
     $resOut = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, o.kecamatan, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor, u_out.nama_lengkap as nama_pengelola, u_out.username as username_outlet
+        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor, u_out.nama_lengkap as nama_pengelola, u_out.username as username_outlet
         FROM outlet o
         LEFT JOIN users u_out ON o.id_users = u_out.id_users
         LEFT JOIN investor i ON o.id_investor = i.id_investor
@@ -31,7 +31,7 @@ if ($idOutlet > 0) {
     ");
 } else {
     $resOut = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, o.kecamatan, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor, u_out.nama_lengkap as nama_pengelola, u_out.username as username_outlet
+        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan, u_out.alamat_lengkap as alamat_outlet, o.persentase_potongan, IFNULL(o.persentase_hak_investor, 50.00) as persentase_hak_investor, u.nama_lengkap as nama_investor, u_out.nama_lengkap as nama_pengelola, u_out.username as username_outlet
         FROM outlet o
         LEFT JOIN users u_out ON o.id_users = u_out.id_users
         LEFT JOIN investor i ON o.id_investor = i.id_investor

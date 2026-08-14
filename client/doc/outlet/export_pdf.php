@@ -37,9 +37,9 @@ $sqlOutlet = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        o.kecamatan,
-        o.alamat_outlet,
-        o.tanggal_bergabung,
+        u_out.kecamatan,
+        u_out.alamat_lengkap as alamat_outlet,
+        IFNULL(o.tgl_disetujui, u_out.created_at) as tanggal_bergabung,
         o.tgl_jatuh_tempo,
         o.status,
         o.persentase_potongan,
