@@ -879,7 +879,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Potongan Omzet (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="wizard_persentase_potongan" class="form-control rounded-start-3 fw-bold" placeholder="10.00" value="10.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="wizard_persentase_potongan" class="form-control rounded-start-3 fw-bold bg-body" placeholder="10.00" value="10.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -897,7 +897,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold bg-body" placeholder="50.00" value="50.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -915,7 +915,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Outlet (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="wizard_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="wizard_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold bg-body" placeholder="50.00" value="50.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -1080,7 +1080,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Potongan Omzet (%)</label>
                             <div class="input-group" style="height: 38px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" readonly required>
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                     <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1099,7 +1099,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
                             <div class="input-group" style="height: 38px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" readonly required>
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                     <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1118,7 +1118,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
                             <div class="input-group" style="height: 38px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" readonly required>
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                     <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1392,7 +1392,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Potongan Omzet (%)</label>
                                 <div class="input-group" style="height: 38px;">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="10.00" value="10.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" placeholder="10.00" value="10.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1410,7 +1410,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
                                 <div class="input-group" style="height: 38px;">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" placeholder="50.00" value="50.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1428,7 +1428,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
                                 <div class="input-group" style="height: 38px;">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required>
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14 bg-body" style="height: 38px;" placeholder="50.00" value="50.00" readonly required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
