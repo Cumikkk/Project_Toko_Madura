@@ -69,7 +69,7 @@ if ($isEdit) {
 
                         <!-- BARIS 2: KECAMATAN & ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label fw-bold">Wilayah / Desa <span class="text-danger">*</span></label>
+                            <label class="form-label fw-bold">Wilayah<span class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-3 mb-2">
                                     <select class="form-select wilayah-select" id="provinsi" data-placeholder="Pilih Provinsi" required>

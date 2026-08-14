@@ -89,7 +89,7 @@ $masterList = Master::getAllMasterOptions();
                                     <?php if ($masterList && $masterList->num_rows > 0) : ?>
                                         <?php while ($m = $masterList->fetch_assoc()) : ?>
                                             <option value="<?= $m['id_users']; ?>" <?= (($investorData['id_master'] ?? 0) == $m['id_users']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($m['nama_lengkap']); ?>
+                                                <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)
                                             </option>
                                         <?php endwhile; ?>
                                     <?php endif; ?>
@@ -102,7 +102,7 @@ $masterList = Master::getAllMasterOptions();
                                 <label for="biaya_langganan_outlet" class="form-label fw-bold">Nominal Biaya Langganan Outlet (Rp) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text border-end-0">Rp</span>
-                                    <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="100000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 100000); ?>" required>
+                                    <input type="number" step="10000" min="0" class="form-control fw-bold border-start-0 border-end-0" id="biaya_langganan_outlet" name="biaya_langganan_outlet" placeholder="150000" value="<?= (int)($investorData['biaya_langganan_outlet'] ?? 150000); ?>" required>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
                                             <button type="button" class="btn btn-sm btn-light border-0 rounded-0 py-0 px-1 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepBiayaInvestor(25000)" style="font-size: 10px; line-height: 1; padding: 2px;" title="Tambah (+Rp 25.000)">
@@ -176,17 +176,24 @@ $masterList = Master::getAllMasterOptions();
     }
 
     var isEdit = <?= $isEdit ? 'true' : 'false' ?>;
+    var isInitialEditCascade = isEdit;
     var edit_provinsi = "<?= $isEdit ? ($investorData['provinsi'] ?? '') : '' ?>";
     var edit_kabupaten = "<?= $isEdit ? ($investorData['kabupaten'] ?? '') : '' ?>";
     var edit_kecamatan = "<?= $isEdit ? ($investorData['kecamatan'] ?? '') : '' ?>";
     var edit_id_wilayah = "<?= $isEdit ? ($investorData['id_wilayah'] ?? '') : '' ?>";
 
     $(document).ready(function() {
-        if ($.fn.select2) {
-            $('#id_master').select2({ width: '100%' });
-        }
-
         const adminUrl = "<?= SystemInfo::app('ADMIN_URL') ?>";
+
+        // Inisialisasi Select2 untuk Master Owner
+        if ($.fn.select2) {
+            $('#id_master').select2({ 
+                width: '100%',
+                placeholder: '-- Pilih Master Owner --',
+                allowClear: false,
+                language: { noResults: function() { return 'Tidak ada master ditemukan'; } }
+            });
+        }
 
         // Inisialisasi Select2 manual untuk dropdown wilayah
         function initWilayahSelect2(selector) {
@@ -214,7 +221,7 @@ $masterList = Master::getAllMasterOptions();
             }, 120);
         }
 
-        $('.wilayah-select').on('select2:close', function() {
+        $('.wilayah-select, #id_master').on('select2:close', function() {
             let $container = $(this).next('.select2-container');
             $container.find('.select2-selection').blur();
         });
@@ -233,6 +240,84 @@ $masterList = Master::getAllMasterOptions();
         initWilayahSelect2('#kabupaten');
         initWilayahSelect2('#kecamatan');
         initWilayahSelect2('#id_wilayah');
+
+        // Auto focus ke input pertama saat halaman dimuat
+        setTimeout(() => {
+            $('#nama_lengkap').focus();
+        }, 150);
+
+        // Alur Navigasi Tombol Enter Berurutan
+        $('#nama_lengkap').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#no_hp').focus();
+            }
+        });
+
+        $('#no_hp').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#username').focus();
+            }
+        });
+
+        $('#username').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#password').focus();
+            }
+        });
+
+        $('#password').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                openNextSelect2('#id_master');
+            }
+        });
+
+        $('#id_master').on('select2:select', function() {
+            setTimeout(() => {
+                $('#biaya_langganan_outlet').focus();
+            }, 120);
+        });
+
+        $('#biaya_langganan_outlet').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                openNextSelect2('#provinsi');
+            }
+        });
+
+        // Navigasi saat data TETAP dipilih (tidak berubah)
+        $('#provinsi').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
+                    openNextSelect2('#kabupaten');
+                }
+            }, 150);
+        });
+
+        $('#kabupaten').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
+                    openNextSelect2('#kecamatan');
+                }
+            }, 150);
+        });
+
+        $('#kecamatan').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
+                    openNextSelect2('#id_wilayah');
+                }
+            }, 150);
+        });
+
+        $('#id_wilayah').on('select2:select', function() {
+            setTimeout(() => {
+                $('#alamat_lengkap').focus();
+            }, 150);
+        });
 
         // Load Provinsi
         function loadProvinsi() {
@@ -273,10 +358,10 @@ $masterList = Master::getAllMasterOptions();
                     }
                     $('#kabupaten').html(options).prop('disabled', false);
                     initWilayahSelect2('#kabupaten');
-                    if (isEdit && edit_kabupaten) {
+                    if (isInitialEditCascade && edit_kabupaten) {
                         $('#kabupaten').trigger('change');
                         edit_provinsi = "";
-                    } else if (!isEdit || !edit_kabupaten) {
+                    } else {
                         openNextSelect2('#kabupaten');
                     }
                 });
@@ -303,10 +388,10 @@ $masterList = Master::getAllMasterOptions();
                     }
                     $('#kecamatan').html(options).prop('disabled', false);
                     initWilayahSelect2('#kecamatan');
-                    if (isEdit && edit_kecamatan) {
+                    if (isInitialEditCascade && edit_kecamatan) {
                         $('#kecamatan').trigger('change');
                         edit_kabupaten = "";
-                    } else if (!isEdit || !edit_kecamatan) {
+                    } else {
                         openNextSelect2('#kecamatan');
                     }
                 });
@@ -332,10 +417,11 @@ $masterList = Master::getAllMasterOptions();
                     }
                     $('#id_wilayah').html(options).prop('disabled', false);
                     initWilayahSelect2('#id_wilayah');
-                    if (isEdit && edit_id_wilayah) {
+                    if (isInitialEditCascade && edit_id_wilayah) {
                         edit_kecamatan = "";
                         edit_id_wilayah = "";
-                    } else if (!isEdit || !edit_id_wilayah) {
+                        isInitialEditCascade = false;
+                    } else {
                         openNextSelect2('#id_wilayah');
                     }
                 });

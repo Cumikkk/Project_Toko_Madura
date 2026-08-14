@@ -31,28 +31,16 @@ $masters = Master::getAllMasters();
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-md-6">
                         <label class="form-label fw-bold">Filter Provinsi</label>
                         <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
                             <option value="">Semua Provinsi</option>
                         </select>
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-md-6">
                         <label class="form-label fw-bold">Filter Kabupaten / Kota</label>
                         <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
                             <option value="">Semua Kabupaten</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label fw-bold">Filter Kecamatan</label>
-                        <select id="filterKecamatan" class="form-select filter-select" data-placeholder="Semua Kecamatan" disabled>
-                            <option value="">Semua Kecamatan</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label fw-bold">Filter Kelurahan / Desa</label>
-                        <select id="filterKelurahan" class="form-select filter-select" data-placeholder="Semua Kelurahan" disabled>
-                            <option value="">Semua Kelurahan</option>
                         </select>
                     </div>
                 </div>
@@ -113,10 +101,10 @@ $masters = Master::getAllMasters();
                                                           data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?? '') ?>"
                                                           data-kelurahan="<?= htmlspecialchars($row['kelurahan'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -179,8 +167,14 @@ $(document).ready(function() {
         
         Swal.fire({
             title: 'Alamat Lengkap Master Owner',
-            html: '<p class="text-start mb-2"><strong>Master Owner:</strong> ' + nama + '</p>' +
-                  '<p class="text-start mb-2"><strong>Wilayah:</strong> <span class="text-capitalize">Kel. ' + kelurahan.toLowerCase() + ', Kec. ' + kecamatan.toLowerCase() + ', Kab. ' + kabupaten.toLowerCase() + ', Prov. ' + provinsi.toLowerCase() + '</span></p>' +
+            html: '<div class="text-start mb-3" style="display: grid; grid-template-columns: max-content auto 1fr; column-gap: 8px; row-gap: 8px; font-size: 15px; line-height: 1.6;">' +
+                    '<div class="fw-bold text-dark">Master Owner</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-dark">' + nama + '</div>' +
+                    '<div class="fw-bold text-dark">Wilayah</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-capitalize text-dark">' + kelurahan.toLowerCase() + ', Kec. ' + kecamatan.toLowerCase() + ', Kab. ' + kabupaten.toLowerCase() + ', Prov. ' + provinsi.toLowerCase() + '</div>' +
+                  '</div>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
@@ -233,11 +227,9 @@ $(document).ready(function() {
         }, 10);
     });
 
-    // Inisialisasi ke-4 dropdown filter sejak awal
+    // Inisialisasi dropdown filter sejak awal
     initFilterSelect2('#filterProvinsi');
     initFilterSelect2('#filterKabupaten');
-    initFilterSelect2('#filterKecamatan');
-    initFilterSelect2('#filterKelurahan');
 
     var tableMaster = null;
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-master')) {
@@ -280,24 +272,14 @@ $(document).ready(function() {
         let $row = $(tableMaster.row(index).node());
         let rowProv = ($row.attr('data-provinsi') || '').toUpperCase().trim();
         let rowKab = ($row.attr('data-kabupaten') || '').toUpperCase().trim();
-        let rowKec = ($row.attr('data-kecamatan') || '').toUpperCase().trim();
-        let rowKel = ($row.attr('data-kelurahan') || '').toUpperCase().trim();
         
         let filterProv = ($('#filterProvinsi').val() || '').toUpperCase().trim();
         let filterKab = ($('#filterKabupaten').val() || '').toUpperCase().trim();
-        let filterKec = ($('#filterKecamatan').val() || '').toUpperCase().trim();
-        let filterKel = ($('#filterKelurahan').val() || '').toUpperCase().trim();
         
         if (filterProv && rowProv !== filterProv) {
             return false;
         }
         if (filterKab && rowKab !== filterKab) {
-            return false;
-        }
-        if (filterKec && rowKec !== filterKec) {
-            return false;
-        }
-        if (filterKel && rowKel !== filterKel) {
             return false;
         }
         return true;
@@ -308,10 +290,6 @@ $(document).ready(function() {
         let prov = $(this).val();
         $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
         initFilterSelect2('#filterKabupaten');
-        $('#filterKecamatan').html('<option value="">Semua Kecamatan</option>').prop('disabled', true);
-        initFilterSelect2('#filterKecamatan');
-        $('#filterKelurahan').html('<option value="">Semua Kelurahan</option>').prop('disabled', true);
-        initFilterSelect2('#filterKelurahan');
         
         if (prov) {
             $.post(adminUrl + "/ajax/post/wilayah/get_kabupaten", { provinsi: prov }, function(res) {
@@ -333,60 +311,6 @@ $(document).ready(function() {
 
     // Event filter Kabupaten
     $('#filterKabupaten').on('change', function() {
-        let prov = $('#filterProvinsi').val();
-        let kab = $(this).val();
-        $('#filterKecamatan').html('<option value="">Semua Kecamatan</option>').prop('disabled', true);
-        initFilterSelect2('#filterKecamatan');
-        $('#filterKelurahan').html('<option value="">Semua Kelurahan</option>').prop('disabled', true);
-        initFilterSelect2('#filterKelurahan');
-
-        if (kab) {
-            $.post(adminUrl + "/ajax/post/wilayah/get_kecamatan", { provinsi: prov, kabupaten: kab }, function(res) {
-                let options = '<option value="">Semua Kecamatan</option>';
-                if (res.results) {
-                    res.results.forEach(item => {
-                        options += `<option value="${item.id}">${item.text}</option>`;
-                    });
-                }
-                $('#filterKecamatan').html(options).prop('disabled', false);
-                initFilterSelect2('#filterKecamatan');
-                openNextFilterSelect2('#filterKecamatan');
-            });
-        }
-        if (tableMaster) {
-            tableMaster.draw();
-        }
-    });
-
-    // Event filter Kecamatan
-    $('#filterKecamatan').on('change', function() {
-        let prov = $('#filterProvinsi').val();
-        let kab = $('#filterKabupaten').val();
-        let kec = $(this).val();
-        $('#filterKelurahan').html('<option value="">Semua Kelurahan</option>').prop('disabled', true);
-        initFilterSelect2('#filterKelurahan');
-
-        if (kec) {
-            $.post(adminUrl + "/ajax/post/wilayah/get_kelurahan", { provinsi: prov, kabupaten: kab, kecamatan: kec }, function(res) {
-                let options = '<option value="">Semua Kelurahan</option>';
-                if (res.results) {
-                    res.results.forEach(item => {
-                        let val = item.kelurahan || item.id;
-                        options += `<option value="${val}">${item.text}</option>`;
-                    });
-                }
-                $('#filterKelurahan').html(options).prop('disabled', false);
-                initFilterSelect2('#filterKelurahan');
-                openNextFilterSelect2('#filterKelurahan');
-            });
-        }
-        if (tableMaster) {
-            tableMaster.draw();
-        }
-    });
-
-    // Event filter Kelurahan
-    $('#filterKelurahan').on('change', function() {
         if (tableMaster) {
             tableMaster.draw();
         }
@@ -396,13 +320,9 @@ $(document).ready(function() {
     $('#btnResetFilter').on('click', function() {
         $('#filterProvinsi').val('').trigger('change.select2');
         $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true).val('').trigger('change.select2');
-        $('#filterKecamatan').html('<option value="">Semua Kecamatan</option>').prop('disabled', true).val('').trigger('change.select2');
-        $('#filterKelurahan').html('<option value="">Semua Kelurahan</option>').prop('disabled', true).val('').trigger('change.select2');
         
         initFilterSelect2('#filterProvinsi');
         initFilterSelect2('#filterKabupaten');
-        initFilterSelect2('#filterKecamatan');
-        initFilterSelect2('#filterKelurahan');
         
         if (tableMaster) {
             tableMaster.draw();

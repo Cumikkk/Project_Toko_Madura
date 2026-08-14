@@ -22,7 +22,7 @@ class Investor {
 
         $sql = "
             SELECT i.*, u.nama_lengkap, u.username, u.no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_investor, u.created_at as tanggal_bergabung,
-                   u_master.nama_lengkap as nama_master,
+                   u_master.nama_lengkap as nama_master, u_master.username as username_master,
                    COUNT(DISTINCT o.id_outlet) as total_outlet
             FROM investor i
             JOIN users u ON (u.id_users = i.id_users)

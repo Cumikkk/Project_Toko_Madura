@@ -1,5 +1,6 @@
 <?php
 use App\Models\Investor;
+use App\Models\Master;
 use Config\Core\SystemInfo;
 
 $loggedInLevel = intval($user['ADM_LEVEL'] ?? 1);
@@ -7,6 +8,7 @@ $loggedInId    = intval($user['ADM_ID'] ?? 1);
 
 // Fetch investors list with Master Owner name and active outlet counts
 $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
+$masterOptions = Master::getAllMasterOptions();
 ?>
 
 <div class="page-header">
@@ -19,6 +21,52 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
     </div>
 </div>
 
+<!-- Filter Card -->
+<div class="row row-sm mb-3">
+    <div class="col-lg-12">
+        <div class="card custom-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Filter Data Wilayah & Master</h5>
+                    <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm" title="Reset semua filter">
+                        <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Master Owner</label>
+                        <select id="filterMaster" class="form-select filter-select" data-placeholder="Semua Master Owner">
+                            <option value="">Semua Master Owner</option>
+                            <?php if ($masterOptions && $masterOptions->num_rows > 0) : ?>
+                                <?php while ($m = $masterOptions->fetch_assoc()) : ?>
+                                    <option value="<?= htmlspecialchars(strtoupper($m['nama_lengkap'])); ?>">
+                                        <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)
+                                    </option>
+                                <?php endwhile; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Provinsi</label>
+                        <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
+                            <option value="">Semua Provinsi</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Kabupaten / Kota</label>
+                        <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
+                            <option value="">Semua Kabupaten</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Table Card -->
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
@@ -35,21 +83,25 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="investor-table">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 5%;">No</th>
-                                <th class="text-center">Tanggal Bergabung</th>
-                                <th class="text-center">Nama Investor</th>
-                                <th class="text-center">No. HP</th>
-                                <th class="text-center">Wilayah</th>
-                                <th class="text-center">Biaya Langganan / Outlet</th>
-                                <th class="text-center">Master Owner</th>
-                                <th class="text-center">Total Outlet Aktif</th>
-                                <th class="text-center" width="15%">#</th>
+                                <th class="text-center" style="width: 5%;">NO</th>
+                                <th class="text-center">TANGGAL BERGABUNG</th>
+                                <th class="text-center">NAMA INVESTOR</th>
+                                <th class="text-center">NO. HP</th>
+                                <th class="text-center">WILAYAH</th>
+                                <th class="text-center">BIAYA LANGGANAN / OUTLET</th>
+                                <th class="text-center">MASTER OWNER</th>
+                                <th class="text-center">TOTAL OUTLET AKTIF</th>
+                                <th class="text-center" style="width: 15%;">#</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ($investors && $investors->num_rows > 0) : ?>
                                 <?php $no = 1; while ($row = $investors->fetch_assoc()) : ?>
-                                    <tr>
+                                    <tr data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>" 
+                                        data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>" 
+                                        data-kecamatan="<?= htmlspecialchars(strtoupper($row['kecamatan'] ?? '')) ?>" 
+                                        data-kelurahan="<?= htmlspecialchars(strtoupper($row['kelurahan'] ?? '')) ?>"
+                                        data-master="<?= htmlspecialchars(strtoupper($row['nama_master'] ?? '')) ?>">
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-center"><?= !empty($row['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($row['tanggal_bergabung'])) : '-' ?></td>
                                         <td class="text-start">
@@ -60,7 +112,7 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                         <td class="text-center">
                                             <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_investor'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" 
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs py-1.5 px-2.5" style="cursor: pointer; font-size: 13px; font-weight: 500;" 
                                                           data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
                                                           data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
                                                           data-provinsi="<?= htmlspecialchars($row['provinsi'] ?? '') ?>"
@@ -68,18 +120,29 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                                           data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?? '') ?>"
                                                           data-kelurahan="<?= htmlspecialchars($row['kelurahan'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-center"><span class="badge bg-light text-dark border">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</span></td>
-                                        <td class="text-center"><span class="badge bg-info"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></span></td>
-                                        <td class="text-center"><span class="badge bg-success fs-6"><?= number_format($row['total_outlet'] ?? 0) ?> Toko</span></td>
+                                        <td class="text-center">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</td>
+                                        <td class="text-start">
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></strong>
+                                            <?php if (!empty($row['username_master'])) : ?>
+                                                <br><small class="text-muted"><code>@<?= htmlspecialchars($row['username_master']) ?></code></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if (!empty($row['total_outlet']) && $row['total_outlet'] > 0) : ?>
+                                                <span class="badge bg-success fs-6"><?= number_format($row['total_outlet']) ?> Toko</span>
+                                            <?php else : ?>
+                                                <span class="text-muted fs-6">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
@@ -107,8 +170,56 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
 
 <script type="text/javascript">
 $(document).ready(function() {
+    var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+
+    // Inisialisasi Select2 untuk Filter Wilayah & Master
+    function initFilterSelect2(selector) {
+        let $el = $(selector);
+        let placeholder = $el.attr('data-placeholder') || 'Pilih...';
+        if ($el.data('select2')) {
+            $el.select2('destroy');
+        }
+        $el.select2({
+            width: '100%',
+            placeholder: placeholder,
+            allowClear: false,
+            language: { noResults: function() { return 'Tidak ada hasil'; } }
+        });
+    }
+
+    function openNextFilterSelect2(selector) {
+        setTimeout(() => {
+            let $el = $(selector);
+            $el.select2('open');
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 120);
+    }
+
+    $('.filter-select').on('select2:close', function() {
+        let $container = $(this).next('.select2-container');
+        $container.find('.select2-selection').blur();
+    });
+
+    $(document).on('select2:open', function() {
+        setTimeout(() => {
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 10);
+    });
+
+    // Inisialisasi dropdown filter
+    initFilterSelect2('#filterMaster');
+    initFilterSelect2('#filterProvinsi');
+    initFilterSelect2('#filterKabupaten');
+
+    var tableInvestor = null;
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#investor-table')) {
-        $('#investor-table').DataTable({
+        tableInvestor = $('#investor-table').DataTable({
             processing: true,
             deferRender: true,
             scrollX: true,
@@ -132,6 +243,99 @@ $(document).ready(function() {
         });
     }
 
+    // Load Provinsi untuk Filter
+    $.get(adminUrl + "/ajax/post/wilayah/get_provinsi", function(res) {
+        let options = '<option value="">Semua Provinsi</option>';
+        if (res.results) {
+            res.results.forEach(item => {
+                options += `<option value="${item.id}">${item.text}</option>`;
+            });
+        }
+        $('#filterProvinsi').html(options);
+        initFilterSelect2('#filterProvinsi');
+    });
+
+    // Custom filtering function for DataTable
+    $.fn.dataTable.ext.search.push(function(settings, searchData, index) {
+        if (!settings.nTable || settings.nTable.id !== 'investor-table') {
+            return true;
+        }
+        if (!tableInvestor) {
+            return true;
+        }
+        let $row = $(tableInvestor.row(index).node());
+        let rowMaster = ($row.attr('data-master') || '').toUpperCase().trim();
+        let rowProv = ($row.attr('data-provinsi') || '').toUpperCase().trim();
+        let rowKab = ($row.attr('data-kabupaten') || '').toUpperCase().trim();
+        
+        let filterMaster = ($('#filterMaster').val() || '').toUpperCase().trim();
+        let filterProv = ($('#filterProvinsi').val() || '').toUpperCase().trim();
+        let filterKab = ($('#filterKabupaten').val() || '').toUpperCase().trim();
+        
+        if (filterMaster && rowMaster !== filterMaster) {
+            return false;
+        }
+        if (filterProv && rowProv !== filterProv) {
+            return false;
+        }
+        if (filterKab && rowKab !== filterKab) {
+            return false;
+        }
+        return true;
+    });
+
+    // Event filter Master Owner
+    $('#filterMaster').on('change select2:select', function(e) {
+        if (e.type === 'select2:select' && $(this).val()) {
+            openNextFilterSelect2('#filterProvinsi');
+        }
+        if (tableInvestor) {
+            tableInvestor.draw();
+        }
+    });
+
+    // Event filter Provinsi
+    $('#filterProvinsi').on('change', function() {
+        let prov = $(this).val();
+        $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
+        initFilterSelect2('#filterKabupaten');
+        
+        if (prov) {
+            $.post(adminUrl + "/ajax/post/wilayah/get_kabupaten", { provinsi: prov }, function(res) {
+                let options = '<option value="">Semua Kabupaten</option>';
+                if (res.results) {
+                    res.results.forEach(item => {
+                        options += `<option value="${item.id}">${item.text}</option>`;
+                    });
+                }
+                $('#filterKabupaten').html(options).prop('disabled', false);
+                initFilterSelect2('#filterKabupaten');
+                openNextFilterSelect2('#filterKabupaten');
+            });
+        }
+        if (tableInvestor) {
+            tableInvestor.draw();
+        }
+    });
+
+    // Event filter Kabupaten
+    $('#filterKabupaten').on('change', function() {
+        if (tableInvestor) {
+            tableInvestor.draw();
+        }
+    });
+
+    // Reset Filter Button
+    $('#btnResetFilter').on('click', function() {
+        $('#filterMaster').val('').trigger('change');
+        $('#filterProvinsi').val('').trigger('change');
+        $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
+        initFilterSelect2('#filterKabupaten');
+        if (tableInvestor) {
+            tableInvestor.draw();
+        }
+    });
+
     // Modal popup detail alamat investor
     $('.btn-lihat-alamat').on('click', function() {
         let nama = $(this).data('nama');
@@ -146,8 +350,14 @@ $(document).ready(function() {
         
         Swal.fire({
             title: 'Alamat Lengkap Investor',
-            html: '<p class="text-start mb-2"><strong>Investor:</strong> ' + nama + '</p>' +
-                  '<p class="text-start mb-2"><strong>Wilayah:</strong> <span class="text-capitalize">Kel. ' + kelurahan.toLowerCase() + ', Kec. ' + kecamatan.toLowerCase() + ', Kab. ' + kabupaten.toLowerCase() + ', Prov. ' + provinsi.toLowerCase() + '</span></p>' +
+            html: '<div class="text-start mb-3" style="display: grid; grid-template-columns: max-content auto 1fr; column-gap: 8px; row-gap: 8px; font-size: 15px; line-height: 1.6;">' +
+                    '<div class="fw-bold text-dark">Investor</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-dark">' + nama + '</div>' +
+                    '<div class="fw-bold text-dark">Wilayah</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-capitalize text-dark">' + kelurahan.toLowerCase() + ', Kec. ' + kecamatan.toLowerCase() + ', Kab. ' + kabupaten.toLowerCase() + ', Prov. ' + provinsi.toLowerCase() + '</div>' +
+                  '</div>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
