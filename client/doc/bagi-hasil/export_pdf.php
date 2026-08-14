@@ -207,14 +207,14 @@ if ($resDaily) {
     }
 }
 
-// HTML Template for Dompdf (Data Neraca Sederhana & Presisi Alignment Header Table)
+// HTML Template for Dompdf
 ob_start();
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Neraca Sederhana Investor - <?= htmlspecialchars($periodeTitleStr); ?></title>
+    <title>Laporan Keuangan Sederhana Investor - <?= htmlspecialchars($periodeTitleStr); ?></title>
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -386,7 +386,7 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Profil Metadata Neraca -->
+    <!-- Profil Metadata -->
     <table class="meta-box">
         <tr>
             <td style="width: 50%; vertical-align: top; padding: 6px 10px; border-right: 1px dashed #cbd5e1;">
@@ -420,8 +420,8 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Bagian I: Ikhtisar Posisi Neraca Keuangan (2-Column Balance Sheet Table) -->
-    <div class="section-title">I. IKHTISAR POSISI NERACA KEUANGAN (FINANCIAL BALANCE SHEET SUMMARY)</div>
+    <!-- Bagian I: Ikhtisar Posisi Keuangan -->
+    <div class="section-title">I. IKHTISAR POSISI KEUANGAN</div>
     <table class="balance-summary-table">
         <tr>
             <!-- SISI AKTIVA: ARUS OMZET & PENERIMAAN KAS -->
@@ -474,8 +474,8 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Bagian II: Tabel Rekapitulasi Posisi Neraca Per Outlet Toko (Tabel Atas Tanpa Kolom Skema Pot) -->
-    <div class="section-title">II. TABEL REKAPITULASI POSISI NERACA PER OUTLET TOKO</div>
+    <!-- Bagian II: Tabel Rekapitulasi Posisi Keuangan Per Outlet Toko -->
+    <div class="section-title">II. TABEL REKAPITULASI POSISI KEUANGAN PER OUTLET TOKO</div>
     <table class="data-table">
         <thead>
             <tr>
@@ -540,7 +540,7 @@ ob_start();
             
             <div class="section-title">III. RINCIAN HARIAN OMZET &amp; BAGI HASIL - TOKO #<?= $outletNum; ?>: <?= htmlspecialchars($rOut['nama_outlet']); ?></div>
             
-            <!-- Ringkasan Neraca Sederhana Toko Ini -->
+            <!-- Ringkasan Keuangan Toko Ini -->
             <table class="meta-box" style="margin-bottom: 10px; background-color: #ffffff; border: 1px solid #cbd5e1;">
                 <tr>
                     <td style="width: 25%; padding: 6px 10px; border-right: 1px solid #e2e8f0;">
@@ -631,14 +631,14 @@ ob_start();
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Neraca (Page Break Avoid) -->
+    <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Laporan (Page Break Avoid) -->
     <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
         <tr>
             <td style="width: 60%; vertical-align: top; padding-right: 15px;">
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
-                    <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT NERACA HARIAN:</div>
+                    <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT HARIAN:</div>
                     <ul style="margin: 0; padding-left: 12px; font-size: 8px; color: #64748b; line-height: 1.35;">
-                        <li>Laporan disajikan sebagai Neraca Keuangan Sederhana yang memuat rekapitulasi utama dan rincian transaksi harian omzet per outlet toko.</li>
+                        <li>Laporan disajikan sebagai Laporan Keuangan Sederhana yang memuat rekapitulasi utama dan rincian transaksi harian omzet per outlet toko.</li>
                         <li>Setiap outlet toko disajikan secara terpisah pada halaman cetak khusus untuk kenyamanan dan kejelasan audit data keuangan.</li>
                         <li>Sisi Aktiva mencatat penerimaan omzet kotor penjualan harian outlet, sedangkan Sisi Pasiva mencatat alokasi bagi hasil investor dan pengelola toko.</li>
                     </ul>
@@ -669,5 +669,5 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 
-$dompdf->stream("Laporan_Neraca_Sederhana_Investor_{$checkBulan}_{$checkTahun}.pdf", ["Attachment" => 0]);
+$dompdf->stream("Laporan_Keuangan_Sederhana_Investor_{$checkBulan}_{$checkTahun}.pdf", ["Attachment" => 0]);
 exit;

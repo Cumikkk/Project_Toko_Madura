@@ -629,7 +629,7 @@ html body .form-check-input:checked {
 
                         <!-- Tombol Cetak PDF Data Neraca Sederhana -->
                         <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
-                            <i class="fa-solid fa-file-pdf me-1"></i> Cetak Neraca PDF
+                            <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                         </a>
                     </div>
                 </div>

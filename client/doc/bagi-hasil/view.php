@@ -503,9 +503,9 @@ $countOutlet = count($rows);
                 <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
                     <i class="fa-solid fa-filter me-1"></i> Filter Data
                 </button>
-                <!-- Tombol Cetak PDF Bagi Hasil & Data Neraca Sederhana -->
+                <!-- Tombol Cetak PDF Bagi Hasil & Data Keuangan Sederhana -->
                 <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?outlet_id=<?= $selectedOutletId; ?>&tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
-                    <i class="fa-solid fa-file-pdf me-1"></i> Cetak Neraca PDF
+                    <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                 </a>
             </div>
         </div>
