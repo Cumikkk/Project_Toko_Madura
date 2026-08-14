@@ -897,7 +897,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Investor (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('investor')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="wizard_persen_bagian_investor" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -915,7 +915,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-4">
                                 <label class="form-label required" style="font-size: 11px;">Hak Outlet (%)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="wizard_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required oninput="balanceOutletSplit('outlet')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="wizard_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold" placeholder="50.00" value="50.00" required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden rounded-end-3 bg-body-tertiary">
                                         <div class="d-flex flex-column h-100" style="width: 22px;">
@@ -1099,7 +1099,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
                             <div class="input-group" style="height: 38px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required oninput="balanceEditOutletSplit('investor')">
+                                <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                     <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1118,7 +1118,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
                             <div class="input-group" style="height: 38px;">
-                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required oninput="balanceEditOutletSplit('outlet')">
+                                <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
                                 <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                 <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                     <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1410,7 +1410,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
                                 <div class="input-group" style="height: 38px;">
-                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1428,7 +1428,7 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
                                 <div class="input-group" style="height: 38px;">
-                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('outlet')">
+                                    <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required>
                                     <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
                                     <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
                                         <div class="d-flex flex-column h-100" style="width: 24px;">
@@ -1674,7 +1674,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceOutletSplit('investor');
     };
 
     window.stepOutlet = function(dir) {
@@ -1682,39 +1681,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceOutletSplit('outlet');
-    };
-
-    window.balanceOutletSplit = function(source) {
-        if (source === 'investor') {
-            const invVal = parseFloat($('#wizard_persen_bagian_investor').val());
-            if (!isNaN(invVal)) {
-                const outVal = Math.max(0, 100 - invVal);
-                $('#wizard_persen_bagian_outlet').val(outVal.toFixed(2));
-            }
-        } else {
-            const outVal = parseFloat($('#wizard_persen_bagian_outlet').val());
-            if (!isNaN(outVal)) {
-                const invVal = Math.max(0, 100 - outVal);
-                $('#wizard_persen_bagian_investor').val(invVal.toFixed(2));
-            }
-        }
-    };
-
-    window.balanceEditOutletSplit = function(source) {
-        if (source === 'investor') {
-            const invVal = parseFloat($('#edit_persen_bagian_investor').val());
-            if (!isNaN(invVal)) {
-                const outVal = Math.max(0, 100 - invVal);
-                $('#edit_persen_bagian_outlet').val(outVal.toFixed(2));
-            }
-        } else {
-            const outVal = parseFloat($('#edit_persen_bagian_outlet').val());
-            if (!isNaN(outVal)) {
-                const invVal = Math.max(0, 100 - outVal);
-                $('#edit_persen_bagian_investor').val(invVal.toFixed(2));
-            }
-        }
     };
 
     window.stepEditPotongan = function(dir) {
@@ -1729,7 +1695,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceEditOutletSplit('investor');
     };
 
     window.stepEditOutlet = function(dir) {
@@ -1737,7 +1702,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceEditOutletSplit('outlet');
     };
 
     // 0. Wizard Navigation Function for Modal Tambah Outlet (2 Sesi)
@@ -2239,7 +2203,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceResubmitSplit('investor');
     };
 
     window.stepResubmitOutlet = function(dir) {
@@ -2247,7 +2210,6 @@ $(document).ready(function() {
         let val = parseFloat(el.val()) || 0;
         val = Math.max(0, Math.min(100, val + dir));
         el.val(val.toFixed(2));
-        window.balanceResubmitSplit('outlet');
     };
 
     // Wizard Navigation for Modal Ajukan Ulang Pendaftaran (2 Sesi)
@@ -2382,28 +2344,6 @@ $(document).ready(function() {
 
         $('#modalPreviewBuktiPembayaran').modal('show');
     });
-
-    // Helper balance calculation for resubmit modal
-    window.balanceResubmitSplit = function(changedBy) {
-        const invInput = $('#resubmit_persen_bagian_investor');
-        const outInput = $('#resubmit_persen_bagian_outlet');
-        let invVal = parseFloat(invInput.val()) || 0;
-        let outVal = parseFloat(outInput.val()) || 0;
-
-        if (changedBy === 'investor') {
-            if (invVal > 100) invVal = 100;
-            if (invVal < 0) invVal = 0;
-            outVal = (100 - invVal).toFixed(2);
-            invInput.val(invVal);
-            outInput.val(outVal);
-        } else {
-            if (outVal > 100) outVal = 100;
-            if (outVal < 0) outVal = 0;
-            invVal = (100 - outVal).toFixed(2);
-            outInput.val(outVal);
-            invInput.val(invVal);
-        }
-    };
 
     // Handle Click Trigger Ajukan Ulang Pembayaran dari Modal Detail
     $(document).on('click', '.btn-trigger-ajukan-ulang', function() {
