@@ -282,11 +282,6 @@ $(document).ready(function() {
                             </small>
                         </div>
                     </div>
-                    <div class="mt-3 text-center">
-                        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger rounded-pill px-3 py-2 fw-bold w-100 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
-                            <i class="fa-solid fa-map-location-dot fs-6"></i> Buka Petunjuk Arah di Google Maps
-                        </a>
-                    </div>
                 </div>
             `,
             confirmButtonText: 'Tutup',
@@ -331,11 +326,6 @@ $(document).ready(function() {
                                 <i class="fa-solid fa-circle-info text-success me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps (Desktop / Aplikasi HP)
                             </small>
                         </div>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success rounded-pill px-3 py-2 fw-bold w-100 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
-                            <i class="fa-solid fa-map-location-dot fs-6"></i> Buka Petunjuk Arah di Google Maps
-                        </a>
                     </div>
                 </div>
             `,
@@ -2208,11 +2198,6 @@ $(document).ready(function() {
                                 <i class="fa-solid fa-circle-info text-danger me-1"></i>Klik teks alamat di atas untuk membuka lokasi langsung di Google Maps (Desktop / Aplikasi HP)
                             </small>
                         </div>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger rounded-pill px-3 py-2 fw-bold w-100 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
-                            <i class="fa-solid fa-map-location-dot fs-6"></i> Buka Petunjuk Arah di Google Maps
-                        </a>
                     </div>
                 </div>
             `,
