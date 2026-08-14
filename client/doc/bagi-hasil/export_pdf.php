@@ -538,7 +538,7 @@ ob_start();
             <!-- Pemisah Halaman Cetak Otomatis (Page Break Before Every Store) -->
             <div class="page-break-before"></div>
             
-            <div class="section-title">III. RINCIAN HARIAN OMZET &amp; BAGI HASIL - TOKO #<?= $outletNum; ?>: <?= htmlspecialchars($rOut['nama_outlet']); ?></div>
+            <div class="section-title">III. RINCIAN HARIAN OMZET &amp; BAGI HASIL &mdash; <span style="background-color: #7D0A0A; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10.5px; letter-spacing: 0.5px; display: inline-block;">TOKO #<?= $outletNum; ?>: <?= htmlspecialchars($rOut['nama_outlet']); ?></span></div>
             
             <!-- Ringkasan Keuangan Toko Ini -->
             <table class="meta-box" style="margin-bottom: 10px; background-color: #ffffff; border: 1px solid #cbd5e1;">
