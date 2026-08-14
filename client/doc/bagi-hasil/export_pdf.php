@@ -224,7 +224,7 @@ if ($resDaily) {
     }
 }
 
-// HTML Template for Dompdf (Data Neraca Sederhana & Rincian Harian)
+// HTML Template for Dompdf (Data Neraca Sederhana & Page Break Per Outlet)
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -240,6 +240,12 @@ ob_start();
             line-height: 1.35;
             margin: 0;
             padding: 0;
+        }
+        .page-break-before {
+            page-break-before: always;
+        }
+        .page-break-inside-avoid {
+            page-break-inside: avoid;
         }
         .header-table {
             width: 100%;
@@ -348,6 +354,9 @@ ob_start();
             vertical-align: middle;
             font-size: 9px;
         }
+        .data-table tr {
+            page-break-inside: avoid;
+        }
         .data-table tr:nth-child(even) {
             background-color: #f8fafc;
         }
@@ -359,8 +368,8 @@ ob_start();
             font-weight: bold;
             font-size: 10px;
             color: #0f172a;
-            margin-top: 10px;
-            margin-bottom: 4px;
+            margin-top: 5px;
+            margin-bottom: 6px;
         }
         .text-center { text-align: center; }
         .text-end { text-align: right; }
@@ -373,7 +382,7 @@ ob_start();
 </head>
 <body>
 
-    <!-- Kop Header Section -->
+    <!-- HALAMAN 1: KOP HEADER & SUMMARY NERACA KEUANGAN -->
     <table class="header-table">
         <tr>
             <td style="width: 65%;">
@@ -542,13 +551,23 @@ ob_start();
         <?php endif; ?>
     </table>
 
-    <!-- Bagian III: Tabel Rincian Transaksi Harian Per Outlet Toko -->
-    <div class="section-title">III. TABEL RINCIAN TRANSAKSI HARIAN PER OUTLET TOKO</div>
+    <!-- HALAMAN BARU / BEDAH KERTAS UNTUK SETIAP TOKO -->
+    <!-- Bagian III: Tabel Rincian Transaksi Harian Per Outlet Toko (Setiap Toko Dibuat Per Halaman Baru) -->
     <?php if (!empty($dailyByOutlet)) : ?>
-        <?php foreach ($dailyByOutlet as $idOut => $group) : ?>
+        <?php 
+        $outletNum = 0;
+        foreach ($dailyByOutlet as $idOut => $group) : 
+            $outletNum++;
+        ?>
+            <!-- Force Page Break Before Every Outlet Block -->
+            <div class="page-break-before"></div>
+            
+            <div class="section-title">III. TABEL RINCIAN TRANSAKSI HARIAN - OUTLET TOKO #<?= $outletNum; ?></div>
+            
             <div class="outlet-group-header">
-                OUTLET TOKO: <?= htmlspecialchars($group['nama_outlet']); ?> (<?= count($group['items']); ?> Transaksi Harian)
+                OUTLET TOKO: <?= htmlspecialchars($group['nama_outlet']); ?> (Total <?= count($group['items']); ?> Transaksi Harian)
             </div>
+            
             <table class="data-table">
                 <thead>
                     <tr>
@@ -605,22 +624,18 @@ ob_start();
                 </tfoot>
             </table>
         <?php endforeach; ?>
-    <?php else : ?>
-        <div style="text-align: center; padding: 12px; border: 1px solid #cbd5e1; border-radius: 4px; color: #64748b; background-color: #f8fafc;">
-            Belum ada rincian harian omzet pada periode ini.
-        </div>
     <?php endif; ?>
 
-    <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Neraca -->
-    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+    <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Neraca (Page Break Avoid) -->
+    <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
         <tr>
             <td style="width: 60%; vertical-align: top; padding-right: 15px;">
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
                     <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT NERACA HARIAN:</div>
                     <ul style="margin: 0; padding-left: 12px; font-size: 8px; color: #64748b; line-height: 1.35;">
-                        <li>Laporan disajikan sebagai Neraca Keuangan Sederhana yang memuat rekapitulasi utama dan rincian transaksi harian omzet per outlet.</li>
+                        <li>Laporan disajikan sebagai Neraca Keuangan Sederhana yang memuat rekapitulasi utama dan rincian transaksi harian omzet per outlet toko.</li>
+                        <li>Setiap outlet toko disajikan secara terpisah pada halaman cetak khusus untuk kenyamanan dan kejelasan audit data keuangan.</li>
                         <li>Sisi Aktiva mencatat penerimaan omzet kotor penjualan harian outlet, sedangkan Sisi Pasiva mencatat alokasi bagi hasil investor dan pengelola toko.</li>
-                        <li>Seluruh rincian transaksi harian pada dokumen ini ditarik secara sistematis dan telah diverifikasi dalam sistem Toko Madura.</li>
                     </ul>
                 </div>
             </td>
