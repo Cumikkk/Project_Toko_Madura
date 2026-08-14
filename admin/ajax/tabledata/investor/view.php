@@ -23,12 +23,13 @@ $dt->query("
         u.nama_lengkap as INV_NAME,
         u.username as INV_USER,
         u.no_hp as INV_HP,
-        u.kecamatan as INV_KECAMATAN,
+        mw.kecamatan as INV_KECAMATAN,
         u.alamat_lengkap as INV_ALAMAT,
         u_master.nama_lengkap as MASTER_NAME,
         i.id_investor as ID_INV
     FROM investor i
     JOIN users u ON (u.id_users = i.id_users)
+    LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
     LEFT JOIN users u_master ON (u_master.id_users = i.id_master)
     {$whereClause}
 ");

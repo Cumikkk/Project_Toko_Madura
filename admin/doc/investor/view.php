@@ -39,7 +39,7 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 <th class="text-center">Tanggal Bergabung</th>
                                 <th class="text-center">Nama Investor</th>
                                 <th class="text-center">No. HP</th>
-                                <th class="text-center">Kecamatan</th>
+                                <th class="text-center">Wilayah</th>
                                 <th class="text-center">Biaya Langganan / Outlet</th>
                                 <th class="text-center">Master Owner</th>
                                 <th class="text-center">Total Outlet Aktif</th>
@@ -60,11 +60,18 @@ $investors = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                         <td class="text-center">
                                             <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_investor'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" data-alamat = "<?= htmlspecialchars($row['alamat_investor']) ?>" title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" 
+                                                          data-nama="<?= htmlspecialchars($row['nama_lengkap']) ?>" 
+                                                          data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                          data-provinsi="<?= htmlspecialchars($row['provinsi'] ?? '') ?>"
+                                                          data-kabupaten="<?= htmlspecialchars($row['kabupaten'] ?? '') ?>"
+                                                          data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?? '') ?>"
+                                                          data-kelurahan="<?= htmlspecialchars($row['kelurahan'] ?? '') ?>"
+                                                          title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -129,11 +136,18 @@ $(document).ready(function() {
     $('.btn-lihat-alamat').on('click', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
+        let provinsi = $(this).data('provinsi');
+        let kabupaten = $(this).data('kabupaten');
+        let kecamatan = $(this).data('kecamatan');
+        let kelurahan = $(this).data('kelurahan');
+        
         let queryStr = encodeURIComponent(alamat);
         let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+        
         Swal.fire({
             title: 'Alamat Lengkap Investor',
             html: '<p class="text-start mb-2"><strong>Investor:</strong> ' + nama + '</p>' +
+                  '<p class="text-start mb-2"><strong>Wilayah:</strong> <span class="text-capitalize">Kel. ' + kelurahan.toLowerCase() + ', Kec. ' + kecamatan.toLowerCase() + ', Kab. ' + kabupaten.toLowerCase() + ', Prov. ' + provinsi.toLowerCase() + '</span></p>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +

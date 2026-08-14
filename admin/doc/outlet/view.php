@@ -117,7 +117,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Wilayah</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
@@ -158,11 +158,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -210,7 +210,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Jatuh Tempo Langganan</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Wilayah</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
@@ -241,11 +241,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -293,7 +293,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Tipe Request</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Wilayah</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
@@ -327,11 +327,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -387,7 +387,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                     <th class="text-center">Tipe Request</th>
                                     <th class="text-center">Nama Outlet</th>
                                     <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Kecamatan</th>
+                                    <th class="text-center">Wilayah</th>
                                     <th class="text-center">Investor</th>
                                     <th class="text-center">Biaya Langganan</th>
                                     <th class="text-center">Bukti Bayar</th>
@@ -422,11 +422,11 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></span>
+                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php else : ?>
                                                 <span class="text-muted">-</span>
@@ -523,13 +523,15 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
 // ============================================================
 // Show Alamat popup – called directly via onclick (no data-attr)
 // ============================================================
-function showAlamat(nama, alamat) {
-    let queryStr = encodeURIComponent(nama + ' ' + alamat);
+function showAlamat(nama, alamat, provinsi, kabupaten, kecamatan, kelurahan) {
+    let queryStr = encodeURIComponent(alamat);
     let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+    
     if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Alamat Lengkap Outlet',
             html: '<p class="text-start mb-2"><strong>Outlet:</strong> ' + nama + '</p>' +
+                  '<p class="text-start mb-2"><strong>Wilayah:</strong> <span class="text-capitalize">Kel. ' + (kelurahan || '').toLowerCase() + ', Kec. ' + (kecamatan || '').toLowerCase() + ', Kab. ' + (kabupaten || '').toLowerCase() + ', Prov. ' + (provinsi || '').toLowerCase() + '</span></p>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
@@ -541,7 +543,7 @@ function showAlamat(nama, alamat) {
             confirmButtonText: 'Tutup'
         });
     } else {
-        alert('Outlet: ' + nama + '\nAlamat: ' + alamat);
+        alert('Outlet: ' + nama + '\nWilayah: ' + wilayahLengkap + '\nAlamat: ' + alamat);
     }
 }
 

@@ -17,6 +17,73 @@ $listKomisi = Master::getAllKomisi();
     </div>
 </div>
 
+<!-- Filter Card -->
+<div class="row row-sm mb-3">
+    <div class="col-lg-12">
+        <div class="card custom-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Filter Data Komisi</h5>
+                    <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm" title="Reset semua filter komisi">
+                        <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Master Owner</label>
+                        <select id="filterMaster" class="form-select filter-select" data-placeholder="Semua Master Owner">
+                            <option value="">Semua Master Owner</option>
+                            <?php 
+                            $resMastersOpt = Master::getAllMasterOptions();
+                            if ($resMastersOpt && $resMastersOpt->num_rows > 0) :
+                                while ($m = $resMastersOpt->fetch_assoc()) :
+                            ?>
+                                <option value="<?= htmlspecialchars(strtoupper($m['nama_lengkap'])); ?>"><?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)</option>
+                            <?php 
+                                endwhile;
+                            endif; 
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Bulan</label>
+                        <select id="filterBulan" class="form-select filter-select" data-placeholder="Semua Bulan">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold">Filter Tahun</label>
+                        <select id="filterTahun" class="form-select filter-select" data-placeholder="Semua Tahun">
+                            <option value="">Semua Tahun</option>
+                            <?php
+                            $curYear = (int)date('Y');
+                            for ($y = $curYear; $y >= $curYear - 5; $y--) :
+                            ?>
+                                <option value="<?= $y; ?>"><?= $y; ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Table Card -->
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
@@ -33,19 +100,21 @@ $listKomisi = Master::getAllKomisi();
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-komisi-master">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 5%;">No</th>
-                                <th class="text-center">Tanggal Transfer</th>
-                                <th class="text-center">Nama Master</th>
-                                <th class="text-center">Nominal Komisi</th>
-                                <th class="text-center">Bukti Bayar</th>
-                                <th class="text-center">Catatan</th>
+                                <th class="text-center" style="width: 5%;">NO</th>
+                                <th class="text-center">TANGGAL TRANSFER</th>
+                                <th class="text-center">NAMA MASTER</th>
+                                <th class="text-center">NOMINAL KOMISI</th>
+                                <th class="text-center">BUKTI BAYAR</th>
+                                <th class="text-center">CATATAN</th>
                                 <th class="text-center" style="width: 12%;">#</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ($listKomisi && $listKomisi->num_rows > 0) : ?>
                                 <?php $no = 1; while ($row = $listKomisi->fetch_assoc()) : ?>
-                                    <tr>
+                                    <tr data-master="<?= htmlspecialchars(strtoupper($row['nama_master'] ?? '')) ?>"
+                                        data-bulan="<?= date('m', strtotime($row['tgl_transfer'])) ?>"
+                                        data-tahun="<?= date('Y', strtotime($row['tgl_transfer'])) ?>">
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-center"><?= date("d/m/Y H:i", strtotime($row['tgl_transfer'])) ?></td>
                                         <td class="text-start">
@@ -72,7 +141,7 @@ $listKomisi = Master::getAllKomisi();
                                                 <span class="badge bg-light text-dark">Belum ada</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-start"><small><?= htmlspecialchars($row['catatan'] ?? '-') ?></small></td>
+                                        <td class="text-start"><?= htmlspecialchars($row['catatan'] ?? '-') ?></td>
                                         <td class="text-center">
                                             <div class="action d-flex justify-content-center gap-2">
                                                 <?php if($adminPermissionCore->isHavePermission($moduleId, "create")) : ?>
@@ -90,7 +159,7 @@ $listKomisi = Master::getAllKomisi();
                                 <?php endwhile; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada riwayat komisi master terdaftar.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada riwayat komisi master terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -179,9 +248,66 @@ function deleteKomisi(id, master, nominal) {
     });
 }
 
+let tableKomisi = null;
+
+function initFilterSelect2(selector) {
+    let $el = $(selector);
+    let placeholder = $el.attr('data-placeholder') || 'Pilih...';
+    if ($el.data('select2')) {
+        $el.select2('destroy');
+    }
+    $el.select2({
+        width: '100%',
+        placeholder: placeholder,
+        allowClear: false,
+        language: { noResults: function() { return 'Tidak ada data ditemukan'; } }
+    });
+}
+
+function openNextFilterSelect2(selector) {
+    setTimeout(() => {
+        let $el = $(selector);
+        $el.select2('open');
+        let searchField = document.querySelector('.select2-container--open .select2-search__field');
+        if (searchField) {
+            searchField.focus();
+        }
+    }, 120);
+}
+
 $(document).ready(function() {
+    // Inisialisasi Select2 pada Filter
+    initFilterSelect2('#filterMaster');
+    initFilterSelect2('#filterBulan');
+    initFilterSelect2('#filterTahun');
+
+    // Auto focus search field saat Select2 filter dibuka
+    $(document).on('select2:open', function() {
+        setTimeout(() => {
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 10);
+    });
+
+    $('.filter-select').on('select2:close', function() {
+        let $container = $(this).next('.select2-container');
+        $container.find('.select2-selection').blur();
+    });
+
+    // Navigasi Otomatis Berurutan saat Filter Dipilih
+    $('#filterMaster').on('select2:select', function() {
+        openNextFilterSelect2('#filterBulan');
+    });
+
+    $('#filterBulan').on('select2:select', function() {
+        openNextFilterSelect2('#filterTahun');
+    });
+
+    // Inisialisasi DataTable Komisi
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-komisi-master')) {
-        $('#table-komisi-master').DataTable({
+        tableKomisi = $('#table-komisi-master').DataTable({
             processing: true,
             deferRender: true,
             scrollX: true,
@@ -196,5 +322,53 @@ $(document).ready(function() {
             order: [[1, 'desc']]
         });
     }
+
+    // Filter Custom DataTable untuk Komisi
+    $.fn.dataTable.ext.search.push(function(settings, searchData, index) {
+        if (settings.nTable.id !== 'table-komisi-master') {
+            return true;
+        }
+        if (!tableKomisi) {
+            return true;
+        }
+
+        let $row = $(tableKomisi.row(index).node());
+        let rowMaster = ($row.attr('data-master') || '').toUpperCase().trim();
+        let rowBulan  = ($row.attr('data-bulan') || '').trim();
+        let rowTahun  = ($row.attr('data-tahun') || '').trim();
+
+        let filterMaster = ($('#filterMaster').val() || '').toUpperCase().trim();
+        let filterBulan  = ($('#filterBulan').val() || '').trim();
+        let filterTahun  = ($('#filterTahun').val() || '').trim();
+
+        if (filterMaster && rowMaster !== filterMaster) {
+            return false;
+        }
+        if (filterBulan && rowBulan !== filterBulan) {
+            return false;
+        }
+        if (filterTahun && rowTahun !== filterTahun) {
+            return false;
+        }
+
+        return true;
+    });
+
+    // Event Trigger Filter Komisi
+    $('#filterMaster, #filterBulan, #filterTahun').on('change', function() {
+        if (tableKomisi) {
+            tableKomisi.draw();
+        }
+    });
+
+    // Reset Filter Button
+    $('#btnResetFilter').on('click', function() {
+        $('#filterMaster').val('').trigger('change');
+        $('#filterBulan').val('').trigger('change');
+        $('#filterTahun').val('').trigger('change');
+        if (tableKomisi) {
+            tableKomisi.draw();
+        }
+    });
 });
 </script>

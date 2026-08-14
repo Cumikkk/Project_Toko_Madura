@@ -13,10 +13,11 @@ class Master {
     public static function getAllMasters() {
         $db = Database::connect();
         $sql = "
-            SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat, u.created_at,
+            SELECT u.id_users, u.nama_lengkap, u.username, u.no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat, u.created_at,
                    COUNT(DISTINCT inv.id_investor) as total_investor,
                    COUNT(DISTINCT o.id_outlet) as total_outlet
             FROM users u
+            LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
             LEFT JOIN investor inv ON inv.id_master = u.id_users
             LEFT JOIN outlet o ON (o.id_investor = inv.id_investor AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE()))
             WHERE u.role = 'master'
@@ -28,7 +29,12 @@ class Master {
     public static function getMasterById($id_users) {
         $db = Database::connect();
         $id = intval($id_users);
-        $res = $db->query("SELECT * FROM users WHERE id_users = {$id} AND role = 'master' LIMIT 1");
+        $res = $db->query("
+            SELECT u.*, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, mw.kodepos
+            FROM users u
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
+            WHERE u.id_users = {$id} AND u.role = 'master' LIMIT 1
+        ");
         return ($res && $res->num_rows > 0) ? $res->fetch_assoc() : null;
     }
     public static function getAllMasterOptions() {
@@ -68,7 +74,7 @@ class Master {
         $username     = trim($data['username'] ?? '');
         $password     = trim($data['password'] ?? '');
         $no_hp        = !empty($data['no_hp']) ? trim($data['no_hp']) : null;
-        $kecamatan    = !empty($data['kecamatan']) ? trim($data['kecamatan']) : null;
+        $id_wilayah   = !empty($data['id_wilayah']) ? intval($data['id_wilayah']) : null;
         $alamat       = !empty($data['alamat']) ? trim($data['alamat']) : null;
 
         if (empty($nama_lengkap) || empty($username)) {
@@ -93,7 +99,7 @@ class Master {
         $nameSafe     = $db->real_escape_string($nama_lengkap);
         $usernameSafe = $db->real_escape_string($username);
         $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
-        $kecVal       = $kecamatan ? "'" . $db->real_escape_string($kecamatan) . "'" : "NULL";
+        $wilayahVal   = $id_wilayah ? $id_wilayah : "NULL";
         $alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
 
         if ($isEdit) {
@@ -105,9 +111,9 @@ class Master {
             if (!empty($password)) {
                 $hashedPass = password_hash($password, PASSWORD_BCRYPT);
                 $passSafe   = $db->real_escape_string($hashedPass);
-                $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
+                $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, id_wilayah = {$wilayahVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$idUsers} AND role = 'master'");
             } else {
-                $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$idUsers} AND role = 'master'");
+                $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, id_wilayah = {$wilayahVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$idUsers} AND role = 'master'");
             }
 
             return ['success' => true, 'message' => "Berhasil memperbarui data Master: {$nama_lengkap}"];
@@ -120,7 +126,7 @@ class Master {
             $hashedPass = password_hash($password, PASSWORD_BCRYPT);
             $passSafe   = $db->real_escape_string($hashedPass);
 
-            $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'master')");
+            $db->query("INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$wilayahVal}, {$alamatVal}, '{$passSafe}', 'master')");
 
             if ($db->affected_rows < 1) {
                 return ['success' => false, 'message' => "Gagal membuat akun Master: " . $db->error];

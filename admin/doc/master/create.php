@@ -68,16 +68,40 @@ if ($isEdit) {
                         </div>
 
                         <!-- BARIS 2: KECAMATAN & ALAMAT LENGKAP -->
-                        <div class="col-md-6 mb-3">
-                            <div class="form-group">
-                                <label for="kecamatan" class="form-label fw-bold">Kecamatan <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="kecamatan" name="kecamatan" placeholder="Contoh: Bangkalan" value="<?= htmlspecialchars($masterData['kecamatan'] ?? ''); ?>" required>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Wilayah / Desa <span class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <select class="form-select wilayah-select" id="provinsi" data-placeholder="Pilih Provinsi" required>
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <select class="form-select wilayah-select" id="kabupaten" data-placeholder="Pilih Kabupaten" required disabled>
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <select class="form-select wilayah-select" id="kecamatan" data-placeholder="Pilih Kecamatan" required disabled>
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <select class="form-select wilayah-select" id="id_wilayah" name="id_wilayah" data-placeholder="Pilih Kelurahan" required disabled>
+                                        <option value=""></option>
+                                        <?php if (!empty($masterData['id_wilayah'])) : ?>
+                                            <option value="<?= htmlspecialchars($masterData['id_wilayah']); ?>" selected>
+                                                <?= htmlspecialchars(ucwords(strtolower($masterData['kelurahan'] ?? 'Wilayah Terpilih'))); ?>
+                                            </option>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat" class="form-label fw-bold">Alamat Lengkap Master <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Contoh: Jl. Trunojoyo No. 10, Bangkalan" value="<?= htmlspecialchars($masterData['alamat_lengkap'] ?? ''); ?>" required>
+                                <textarea class="form-control" id="alamat" name="alamat" rows="3" placeholder="Contoh: Jl. Trunojoyo No. 10, RT 02 / RW 05, Bangkalan" required><?= htmlspecialchars($masterData['alamat_lengkap'] ?? ''); ?></textarea>
                             </div>
                         </div>
 
@@ -108,7 +132,234 @@ if ($isEdit) {
 </div>
 
 <script type="text/javascript">
+    var isEdit = <?= $isEdit ? 'true' : 'false' ?>;
+    var edit_provinsi = "<?= $isEdit ? ($masterData['provinsi'] ?? '') : '' ?>";
+    var edit_kabupaten = "<?= $isEdit ? ($masterData['kabupaten'] ?? '') : '' ?>";
+    var edit_kecamatan = "<?= $isEdit ? ($masterData['kecamatan'] ?? '') : '' ?>";
+    var edit_id_wilayah = "<?= $isEdit ? ($masterData['id_wilayah'] ?? '') : '' ?>";
+
     $(document).ready(function() {
+
+        const adminUrl = "<?= SystemInfo::app('ADMIN_URL') ?>";
+
+        // Inisialisasi Select2 manual untuk dropdown wilayah
+        function initWilayahSelect2(selector) {
+            let $el = $(selector);
+            let placeholder = $el.attr('data-placeholder') || 'Pilih...';
+            if ($el.data('select2')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                width: '100%',
+                placeholder: placeholder,
+                allowClear: false,
+                language: { noResults: function() { return 'Tidak ada hasil'; } }
+            });
+        }
+
+        let isInitialEditCascade = isEdit;
+
+        function openNextSelect2(selector) {
+            setTimeout(() => {
+                let $el = $(selector);
+                if ($el.length && !$el.prop('disabled')) {
+                    $el.select2('open');
+                }
+            }, 120);
+        }
+
+        $('.wilayah-select').on('select2:close', function() {
+            let $container = $(this).next('.select2-container');
+            $container.find('.select2-selection').blur();
+        });
+
+        $(document).on('select2:open', function() {
+            setTimeout(() => {
+                let searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) {
+                    searchField.focus();
+                }
+            }, 50);
+        });
+
+        // Inisialisasi semua 4 dropdown wilayah sejak awal
+        initWilayahSelect2('#provinsi');
+        initWilayahSelect2('#kabupaten');
+        initWilayahSelect2('#kecamatan');
+        initWilayahSelect2('#id_wilayah');
+
+        // Auto focus ke input pertama saat halaman dimuat
+        setTimeout(() => {
+            $('#nama_lengkap').focus();
+        }, 150);
+
+        function loadProvinsi() {
+            $.post(adminUrl + "/ajax/post/wilayah/get_provinsi", function(res) {
+                let options = '<option value=""></option>';
+                if (res.results) {
+                    res.results.forEach(item => {
+                        let selected = (item.id === edit_provinsi) ? 'selected' : '';
+                        options += `<option value="${item.id}" ${selected}>${item.text}</option>`;
+                    });
+                }
+                $('#provinsi').html(options).prop('disabled', false);
+                initWilayahSelect2('#provinsi');
+                if (isEdit && edit_provinsi) {
+                    $('#provinsi').trigger('change');
+                }
+            });
+        }
+
+        // Navigasi saat data TETAP dipilih (tidak berubah)
+        $('#provinsi').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
+                    openNextSelect2('#kabupaten');
+                }
+            }, 150);
+        });
+
+        $('#kabupaten').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
+                    openNextSelect2('#kecamatan');
+                }
+            }, 150);
+        });
+
+        $('#kecamatan').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
+                    openNextSelect2('#id_wilayah');
+                }
+            }, 150);
+        });
+
+        $('#id_wilayah').on('select2:select', function() {
+            setTimeout(() => {
+                $('#alamat').focus();
+            }, 150);
+        });
+
+        // Load Kabupaten
+        $('#provinsi').on('change', function() {
+            let prov = $(this).val();
+            $('#kabupaten').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#kabupaten');
+            $('#kecamatan').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#kecamatan');
+            $('#id_wilayah').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#id_wilayah');
+            
+            if (prov) {
+                $.post(adminUrl + "/ajax/post/wilayah/get_kabupaten", { provinsi: prov }, function(res) {
+                    let options = '<option value=""></option>';
+                    if (res.results) {
+                        res.results.forEach(item => {
+                            let selected = (item.id === edit_kabupaten) ? 'selected' : '';
+                            options += `<option value="${item.id}" ${selected}>${item.text}</option>`;
+                        });
+                    }
+                    $('#kabupaten').html(options).prop('disabled', false);
+                    initWilayahSelect2('#kabupaten');
+                    if (isInitialEditCascade && edit_kabupaten) {
+                        $('#kabupaten').trigger('change');
+                        edit_provinsi = "";
+                    } else {
+                        openNextSelect2('#kabupaten');
+                    }
+                });
+            }
+        });
+
+        // Load Kecamatan
+        $('#kabupaten').on('change', function() {
+            let prov = $('#provinsi').val();
+            let kab = $(this).val();
+            $('#kecamatan').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#kecamatan');
+            $('#id_wilayah').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#id_wilayah');
+
+            if (kab) {
+                $.post(adminUrl + "/ajax/post/wilayah/get_kecamatan", { provinsi: prov, kabupaten: kab }, function(res) {
+                    let options = '<option value=""></option>';
+                    if (res.results) {
+                        res.results.forEach(item => {
+                            let selected = (item.id === edit_kecamatan) ? 'selected' : '';
+                            options += `<option value="${item.id}" ${selected}>${item.text}</option>`;
+                        });
+                    }
+                    $('#kecamatan').html(options).prop('disabled', false);
+                    initWilayahSelect2('#kecamatan');
+                    if (isInitialEditCascade && edit_kecamatan) {
+                        $('#kecamatan').trigger('change');
+                        edit_kabupaten = "";
+                    } else {
+                        openNextSelect2('#kecamatan');
+                    }
+                });
+            }
+        });
+
+        // Load Kelurahan
+        $('#kecamatan').on('change', function() {
+            let prov = $('#provinsi').val();
+            let kab = $('#kabupaten').val();
+            let kec = $(this).val();
+            $('#id_wilayah').html('<option value=""></option>').prop('disabled', true);
+            initWilayahSelect2('#id_wilayah');
+
+            if (kec) {
+                $.post(adminUrl + "/ajax/post/wilayah/get_kelurahan", { provinsi: prov, kabupaten: kab, kecamatan: kec }, function(res) {
+                    let options = '<option value=""></option>';
+                    if (res.results) {
+                        res.results.forEach(item => {
+                            let selected = (item.id === edit_id_wilayah) ? 'selected' : '';
+                            options += `<option value="${item.id}" ${selected}>${item.text}</option>`;
+                        });
+                    }
+                    $('#id_wilayah').html(options).prop('disabled', false);
+                    initWilayahSelect2('#id_wilayah');
+                    if (isInitialEditCascade && edit_id_wilayah) {
+                        edit_kecamatan = "";
+                        edit_id_wilayah = "";
+                        isInitialEditCascade = false;
+                        setTimeout(() => {
+                            $('#nama_lengkap').focus();
+                        }, 100);
+                    } else {
+                        openNextSelect2('#id_wilayah');
+                    }
+                });
+            }
+        });
+
+        // Navigasi Enter antar input teks
+        $('#nama_lengkap').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#no_hp').focus();
+            }
+        });
+
+        $('#no_hp').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                openNextSelect2('#provinsi');
+            }
+        });
+
+        $('#username').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#password').focus();
+            }
+        });
+
+        // Initialize form
+        loadProvinsi();
+
         $('#form-create-master').on('submit', function(el) {
             el.preventDefault();
             let button = $(this).find('button[type="submit"]'), 

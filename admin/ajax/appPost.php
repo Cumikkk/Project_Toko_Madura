@@ -13,6 +13,7 @@ try {
     $parseUrl = ($ajaxPos !== false) ? substr($rawParseUrl, $ajaxPos) : $rawParseUrl;
     $requestUri = str_replace(['\*', '/ajax', '/post'], ['', '', '/postdata'], $parseUrl);
     $fileUrl = __DIR__ . $requestUri . ".php";
+    error_log("appPost.php processing: " . $_SERVER['REQUEST_URI'] . " -> " . $fileUrl);
 
     if(!file_exists($fileUrl)) {
         JsonResponse([
@@ -40,6 +41,7 @@ try {
     require_once $fileUrl;
 
 } catch (Exception $e) {
+    error_log("appPost.php Exception: " . $e->getMessage() . " on " . $e->getFile() . ":" . $e->getLine());
     if(ini_get("display_errors") == "1") {
         throw $e;
     }

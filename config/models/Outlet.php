@@ -38,10 +38,11 @@ class Outlet {
     public static function getActiveOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
                    u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
             WHERE o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
@@ -52,10 +53,11 @@ class Outlet {
     public static function getExpiredOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
                    u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
             WHERE (o.status = 'active' AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
@@ -66,10 +68,11 @@ class Outlet {
     public static function getPendingOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
                    u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
             WHERE o.status = 'pending'
@@ -80,10 +83,11 @@ class Outlet {
     public static function getRejectedOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.kecamatan, u_kasir.alamat_lengkap as alamat_outlet,
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
                    u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
             WHERE o.status = 'reject'
@@ -95,9 +99,10 @@ class Outlet {
         $db = Database::connect();
         $id = intval($idOutlet);
         $sql = "
-            SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp, u.kecamatan, u.alamat_lengkap as alamat_outlet
+            SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_outlet, u.id_wilayah
             FROM outlet o
             JOIN users u ON (u.id_users = o.id_users)
+            LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
             WHERE o.id_outlet = {$id}
             LIMIT 1
         ";
@@ -115,7 +120,7 @@ class Outlet {
 
         $nama_outlet         = trim($data['nama_outlet']         ?? '');
         $id_investor         = intval($data['id_investor']       ?? 0);
-        $kecamatan           = trim($data['kecamatan']           ?? '');
+        $id_wilayah          = !empty($data['id_wilayah']) ? intval($data['id_wilayah']) : null;
         $alamat_outlet       = trim($data['alamat_outlet']       ?? '');
         $persentase_potongan = floatval(str_replace(',', '.', $data['persentase_potongan'] ?? '10.00'));
         $persentase_hak_investor = floatval(str_replace(',', '.', $data['persentase_hak_investor'] ?? '50.00'));
@@ -141,7 +146,7 @@ class Outlet {
         }
 
         $namaSafe      = $db->real_escape_string($nama_outlet);
-        $kecamatanSafe = $db->real_escape_string($kecamatan);
+        $wilayahVal    = $id_wilayah ? $id_wilayah : "NULL";
         $alamatSafe    = $db->real_escape_string($alamat_outlet);
         $kasirNama     = $db->real_escape_string($kasir_nama);
         $kasirUser     = $db->real_escape_string($kasir_username);
@@ -165,9 +170,9 @@ class Outlet {
                 if (!empty($kasir_password)) {
                     $hashedPass = password_hash($kasir_password, PASSWORD_BCRYPT);
                     $hashSafe   = $db->real_escape_string($hashedPass);
-                    $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', kecamatan = '{$kecamatanSafe}', alamat_lengkap = '{$alamatSafe}', password = '{$hashSafe}' WHERE id_users = {$existingUser}");
+                    $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', id_wilayah = {$wilayahVal}, alamat_lengkap = '{$alamatSafe}', password = '{$hashSafe}' WHERE id_users = {$existingUser}");
                 } else {
-                    $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', kecamatan = '{$kecamatanSafe}', alamat_lengkap = '{$alamatSafe}' WHERE id_users = {$existingUser}");
+                    $db->query("UPDATE users SET nama_lengkap = '{$kasirNama}', username = '{$kasirUser}', no_hp = '{$kasirHp}', id_wilayah = {$wilayahVal}, alamat_lengkap = '{$alamatSafe}' WHERE id_users = {$existingUser}");
                 }
 
                 $tglClause = "";
@@ -190,7 +195,7 @@ class Outlet {
 
                 $hashedPass = password_hash($kasir_password, PASSWORD_BCRYPT);
                 $hashSafe   = $db->real_escape_string($hashedPass);
-                $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$kasirNama}', '{$kasirUser}', '{$kasirHp}', '{$kecamatanSafe}', '{$alamatSafe}', '{$hashSafe}', 'outlet')");
+                $db->query("INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$kasirNama}', '{$kasirUser}', '{$kasirHp}', {$wilayahVal}, '{$alamatSafe}', '{$hashSafe}', 'outlet')");
 
                 if ($db->affected_rows < 1) throw new Exception("Gagal membuat akun kasir baru: " . $db->error);
                 $newKasirId = $db->insert_id;

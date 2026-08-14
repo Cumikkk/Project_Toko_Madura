@@ -109,7 +109,7 @@ $resMasters = Master::getAllMasterOptions();
                                 <small class="text-muted">Upload foto struk transfer / bukti bayar komisi ke Master Owner (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
                                 <?php if (!empty($komisiData['bukti_pembayaran'])) : ?>
                                     <?php $fileExt = strtolower(pathinfo($komisiData['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
-                                    <div class="mt-2">
+                                    <div class="mt-2" id="existing-bukti-box">
                                         <span class="text-muted fs-13">Bukti saat ini: </span>
                                         <?php if ($fileExt === 'pdf') : ?>
                                             <a href="<?= SystemInfo::app('ADMIN_URL') ?>/image-proxy.php?file=<?= urlencode($komisiData['bukti_pembayaran']) ?>" target="_blank" class="btn btn-xs btn-outline-primary ms-1">
@@ -215,7 +215,58 @@ $(document).ready(function() {
     $(document).off('fileselect');
     $(':file').off('fileselect');
 
-    // SweetAlert2 Toast Notification on file select (replacing native browser alert)
+    // Inisialisasi Select2 untuk Master Owner
+    if ($.fn.select2) {
+        $('#id_master').select2({
+            width: '100%',
+            placeholder: '-- Pilih Master Owner --',
+            allowClear: false,
+            language: { noResults: function() { return 'Tidak ada master ditemukan'; } }
+        });
+    }
+
+    // Auto Focus ke input pertama saat form dibuka
+    setTimeout(() => {
+        let isEdit = <?= $isEdit ? 'true' : 'false' ?>;
+        if (!isEdit) {
+            $('#id_master').select2('open');
+        } else {
+            $('#tgl_transfer').focus();
+        }
+    }, 150);
+
+    // Auto focus search field saat Select2 dibuka
+    $(document).on('select2:open', function() {
+        setTimeout(() => {
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 50);
+    });
+
+    // Navigasi Enter Berurutan
+    $('#id_master').on('select2:select', function() {
+        setTimeout(() => {
+            $('#tgl_transfer').focus();
+        }, 120);
+    });
+
+    $('#tgl_transfer').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            $('#nominal').focus();
+        }
+    });
+
+    $('#nominal').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            $('#catatan').focus();
+        }
+    });
+
+    // Toast Notification saat file bukti transfer dipilih
     $('#bukti_pembayaran').on('change', function() {
         let file = this.files && this.files[0] ? this.files[0] : null;
         if (file) {

@@ -21,11 +21,12 @@ class Investor {
         }
 
         $sql = "
-            SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat_investor, u.created_at as tanggal_bergabung,
+            SELECT i.*, u.nama_lengkap, u.username, u.no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_investor, u.created_at as tanggal_bergabung,
                    u_master.nama_lengkap as nama_master,
                    COUNT(DISTINCT o.id_outlet) as total_outlet
             FROM investor i
             JOIN users u ON (u.id_users = i.id_users)
+            LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
             LEFT JOIN users u_master ON (u_master.id_users = i.id_master)
             LEFT JOIN outlet o ON (o.id_investor = i.id_investor AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE()))
             {$whereClause}
@@ -39,9 +40,10 @@ class Investor {
         $id = intval($idInvestor);
         
         $sql = "
-            SELECT i.*, u.nama_lengkap, u.username, u.no_hp, u.kecamatan, u.alamat_lengkap as alamat_investor
+            SELECT i.*, u.nama_lengkap, u.username, u.no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_investor, u.id_wilayah
             FROM investor i
             JOIN users u ON u.id_users = i.id_users
+            LEFT JOIN master_wilayah mw ON u.id_wilayah = mw.id_wilayah
             WHERE i.id_investor = {$id}
             LIMIT 1
         ";
@@ -61,7 +63,7 @@ class Investor {
         $username     = trim($data['username'] ?? '');
         $password     = trim($data['password'] ?? '');
         $no_hp        = !empty($data['no_hp']) ? trim($data['no_hp']) : null;
-        $kecamatan    = !empty($data['kecamatan']) ? trim($data['kecamatan']) : null;
+        $id_wilayah   = !empty($data['id_wilayah']) ? intval($data['id_wilayah']) : null;
         $alamat       = !empty($data['alamat_lengkap']) ? trim($data['alamat_lengkap']) : null;
         
         $biayaRaw        = preg_replace('/[^0-9]/', '', $data['biaya_langganan_outlet'] ?? '100000');
@@ -89,7 +91,7 @@ class Investor {
         $nameSafe     = $db->real_escape_string($nama_lengkap);
         $usernameSafe = $db->real_escape_string($username);
         $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
-        $kecVal       = $kecamatan ? "'" . $db->real_escape_string($kecamatan) . "'" : "NULL";
+        $wilayahVal   = $id_wilayah ? $id_wilayah : "NULL";
         $alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
         $idMaster     = intval($data['id_master'] ?? $currentUserId);
 
@@ -111,9 +113,9 @@ class Investor {
                 if (!empty($password)) {
                     $hashedPass = password_hash($password, PASSWORD_BCRYPT);
                     $passSafe   = $db->real_escape_string($hashedPass);
-                    $resUser = $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$userId}");
+                    $resUser = $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, id_wilayah = {$wilayahVal}, alamat_lengkap = {$alamatVal}, password = '{$passSafe}' WHERE id_users = {$userId}");
                 } else {
-                    $resUser = $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, kecamatan = {$kecVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$userId}");
+                    $resUser = $db->query("UPDATE users SET nama_lengkap = '{$nameSafe}', username = '{$usernameSafe}', no_hp = {$hpVal}, id_wilayah = {$wilayahVal}, alamat_lengkap = {$alamatVal} WHERE id_users = {$userId}");
                 }
 
                 if (!$resUser) throw new Exception("Gagal memperbarui data user: " . $db->error);
@@ -134,7 +136,7 @@ class Investor {
                 $hashedPass = password_hash($password, PASSWORD_BCRYPT);
                 $passSafe   = $db->real_escape_string($hashedPass);
 
-                $resUserInsert = $db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'investor')");
+                $resUserInsert = $db->query("INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$wilayahVal}, {$alamatVal}, '{$passSafe}', 'investor')");
 
                 if (!$resUserInsert || $db->affected_rows < 1) {
                     throw new Exception("Gagal membuat akun user investor: " . $db->error);

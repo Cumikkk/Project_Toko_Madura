@@ -90,7 +90,7 @@ $(function () {
          $('input', cell).removeProp('checked');
       }
    });
-   $('.select2').select2({
+   $('select.select2:not(.select2-hidden-accessible)').select2({
       placeholder: 'Choose one',
       searchInputPlaceholder: 'Search',
       minimumResultsForSearch: Infinity,

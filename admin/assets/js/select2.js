@@ -1,13 +1,13 @@
 $(function() {
 	
-	$('.select2').select2({
+	$('select.select2:not(.select2-hidden-accessible)').select2({
 		placeholder: 'Choose one',
 		searchInputPlaceholder: 'Search',
 		minimumResultsForSearch: Infinity,
 		width: '100%'
 	});
 
-	$('.select2-with-search').select2({
+	$('select.select2-with-search:not(.select2-hidden-accessible)').select2({
 		placeholder: 'Choose one',
 		searchInputPlaceholder: 'Search',
 		width: '100%'
@@ -23,7 +23,7 @@ $(function() {
 	 return $state;
 	};
 
-	$(".select2-flag-search").select2({
+	$("select.select2-flag-search:not(.select2-hidden-accessible)").select2({
 	  templateResult: formatState,
 	  templateSelection: formatState,
 	   escapeMarkup: function(m) { return m; }

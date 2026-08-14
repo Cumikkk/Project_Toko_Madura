@@ -3,7 +3,7 @@ $(function() {
 	$('.main-form-group .form-control').on('focusin focusout', function() {
 		$(this).parent().toggleClass('focus');
 	});
-	$('.select2').select2({
+	$('select.select2:not(.select2-hidden-accessible)').select2({
 			placeholder: 'Choose one'
 		});
 });
