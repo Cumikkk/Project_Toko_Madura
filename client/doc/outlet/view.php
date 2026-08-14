@@ -1079,27 +1079,57 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                         <!-- Potongan Omzet -->
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Potongan Omzet (%)</label>
-                            <div class="input-group">
+                            <div class="input-group" style="height: 38px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="edit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required>
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                    <div class="d-flex flex-column h-100" style="width: 24px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditPotongan(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Hak Investor -->
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
-                            <div class="input-group">
+                            <div class="input-group" style="height: 38px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="edit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required oninput="balanceEditOutletSplit('investor')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                    <div class="d-flex flex-column h-100" style="width: 24px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditInvestor(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Hak Outlet -->
                         <div class="col-md-4 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
-                            <div class="input-group">
+                            <div class="input-group" style="height: 38px;">
                                 <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="edit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" required oninput="balanceEditOutletSplit('outlet')">
-                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                    <div class="d-flex flex-column h-100" style="width: 24px;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepEditOutlet(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1358,28 +1388,58 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                 <input type="text" name="alamat_outlet" id="resubmit_alamat_outlet" class="form-control rounded-3 fs-14" style="height: 38px;" placeholder="Jl. Raya Taman No. 12" required>
                             </div>
 
-                            <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar) -->
+                            <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar dengan Spinner & Manual Input) -->
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Potongan Omzet (%)</label>
-                                <div class="input-group">
+                                <div class="input-group" style="height: 38px;">
                                     <input type="number" step="0.5" min="0" max="100" name="persentase_potongan" id="resubmit_persentase_potongan" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="10.00" value="10.00" required>
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitPotongan(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-text text-body-secondary mt-1 fs-12">Potongan harian dari omzet.</div>
                             </div>
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Investor (%)</label>
-                                <div class="input-group">
+                                <div class="input-group" style="height: 38px;">
                                     <input type="number" step="0.5" min="0" max="100" name="persentase_hak_investor" id="resubmit_persen_bagian_investor" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('investor')">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitInvestor(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-text text-body-secondary mt-1 fs-12">Porsi bagi hasil investor.</div>
                             </div>
                             <div class="col-md-4 col-12">
                                 <label class="form-label fw-semibold text-body-emphasis fs-13 required">Hak Outlet (%)</label>
-                                <div class="input-group">
+                                <div class="input-group" style="height: 38px;">
                                     <input type="number" step="0.5" min="0" max="100" name="persen_bagian_outlet" id="resubmit_persen_bagian_outlet" class="form-control rounded-start-3 fw-bold text-center fs-14" style="height: 38px;" placeholder="50.00" value="50.00" required oninput="balanceResubmitSplit('outlet')">
-                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5">%</span>
+                                    <span class="input-group-text bg-body-tertiary text-body-secondary fw-bold px-2.5 border-end-0">%</span>
+                                    <div class="input-group-text p-0 border-start-0 overflow-hidden bg-body-tertiary rounded-end-3" style="height: 38px;">
+                                        <div class="d-flex flex-column h-100" style="width: 24px;">
+                                            <button type="button" class="btn btn-sm btn-light border-0 rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(1)" style="font-size: 9px; line-height: 1;" title="Tambah (+1%)">
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light border-0 border-top rounded-0 p-0 text-body-secondary flex-fill d-flex align-items-center justify-content-center" onclick="stepResubmitOutlet(-1)" style="font-size: 9px; line-height: 1;" title="Kurangi (-1%)">
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-text text-body-secondary mt-1 fs-12">Porsi bagi hasil outlet.</div>
                             </div>
