@@ -422,6 +422,31 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
 ?>
 
 <style>
+/* Guarantee Modal Clearance from Fixed Topbar Navbar */
+.modal {
+    padding-top: 85px !important;
+    overflow-y: auto !important;
+    z-index: 1060 !important;
+}
+.modal-backdrop {
+    z-index: 1055 !important;
+}
+.modal-dialog {
+    margin-top: 0 !important;
+    margin-bottom: 30px !important;
+}
+.modal-dialog-centered {
+    min-height: calc(100vh - 110px) !important;
+    align-items: flex-start !important;
+}
+.modal-dialog-centered.modal-dialog-scrollable .modal-content {
+    max-height: calc(100vh - 120px) !important;
+}
+.modal-body {
+    max-height: calc(100vh - 240px) !important;
+    overflow-y: auto !important;
+}
+
 /* Custom Pill Filter Bar for Outlet View */
 .filter-pill-container {
     background-color: var(--bs-body-bg, #ffffff);
