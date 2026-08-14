@@ -207,7 +207,7 @@ if ($resDaily) {
     }
 }
 
-// HTML Template for Dompdf (Data Neraca Sederhana & Daily Breakdown Per Outlet)
+// HTML Template for Dompdf (Data Neraca Sederhana & Presisi Alignment Header Table)
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -316,10 +316,13 @@ ob_start();
             font-size: 9.5px;
             border-bottom: 1px solid #f1f5f9;
         }
+        
+        /* Strict Alignment & Grid Layout for Data Tables */
         .data-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 14px;
+            table-layout: fixed;
         }
         .data-table th {
             background-color: #7D0A0A;
@@ -327,12 +330,24 @@ ob_start();
             font-weight: bold;
             text-transform: uppercase;
             font-size: 8.5px;
-            padding: 6px 6px;
-            text-align: left;
+            padding: 7px 8px;
             border: 1px solid #7D0A0A;
+            vertical-align: middle;
+        }
+        .data-table th.text-center,
+        .data-table td.text-center {
+            text-align: center !important;
+        }
+        .data-table th.text-end,
+        .data-table td.text-end {
+            text-align: right !important;
+        }
+        .data-table th.text-start,
+        .data-table td.text-start {
+            text-align: left !important;
         }
         .data-table td {
-            padding: 5px 6px;
+            padding: 6px 8px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
             font-size: 9px;
@@ -343,19 +358,9 @@ ob_start();
         .data-table tr:nth-child(even) {
             background-color: #f8fafc;
         }
-        .outlet-group-header {
-            background-color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-left: 4px solid #7D0A0A;
-            padding: 6px 10px;
-            font-weight: bold;
-            font-size: 10px;
-            color: #0f172a;
-            margin-top: 5px;
-            margin-bottom: 6px;
-        }
-        .text-center { text-align: center; }
-        .text-end { text-align: right; }
+        .text-center { text-align: center !important; }
+        .text-end { text-align: right !important; }
+        .text-start { text-align: left !important; }
         .fw-bold { font-weight: bold; }
         .text-danger { color: #dc2626; }
         .text-success { color: #16a34a; }
@@ -473,18 +478,18 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Bagian II: Tabel Rekapitulasi Posisi Neraca Per Outlet Toko -->
+    <!-- Bagian II: Tabel Rekapitulasi Posisi Neraca Per Outlet Toko (Presisi Header & Body Alignment) -->
     <div class="section-title">II. TABEL REKAPITULASI POSISI NERACA PER OUTLET TOKO</div>
     <table class="data-table">
         <thead>
             <tr>
-                <th class="text-center" style="width: 30px;">No</th>
-                <th style="width: 170px;">Nama Outlet / Toko</th>
-                <th class="text-end">Aktiva Omzet (100%)</th>
-                <th class="text-end">Potongan Omzet</th>
-                <th class="text-end">Hak Investor</th>
-                <th class="text-end">Hak Outlet</th>
-                <th class="text-end">Saldo Bersih Toko</th>
+                <th class="text-center" style="width: 5%;">NO</th>
+                <th class="text-start" style="width: 25%;">NAMA OUTLET / TOKO</th>
+                <th class="text-end" style="width: 14%;">AKTIVA OMZET (100%)</th>
+                <th class="text-end" style="width: 14%;">POTONGAN OMZET</th>
+                <th class="text-end" style="width: 14%;">HAK INVESTOR</th>
+                <th class="text-end" style="width: 14%;">HAK OUTLET</th>
+                <th class="text-end" style="width: 14%;">SALDO BERSIH TOKO</th>
             </tr>
         </thead>
         <tbody>
@@ -492,7 +497,7 @@ ob_start();
                 <?php $no = 1; foreach ($rowsSummary as $r) : ?>
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
-                        <td>
+                        <td class="text-start">
                             <strong><?= htmlspecialchars($r['nama_outlet']); ?></strong>
                         </td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></td>
@@ -561,17 +566,17 @@ ob_start();
                 </tr>
             </table>
 
-            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini -->
+            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini (Presisi Alignment Header & Body) -->
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width: 30px;">No</th>
-                        <th class="text-center" style="width: 95px;">Tanggal Omzet</th>
-                        <th class="text-end">Omzet Kotor (100%)</th>
-                        <th class="text-end">Nominal Potongan</th>
-                        <th class="text-end">Hak Investor</th>
-                        <th class="text-end">Hak Outlet</th>
-                        <th class="text-end">Saldo Bersih Toko</th>
+                        <th class="text-center" style="width: 5%;">NO</th>
+                        <th class="text-center" style="width: 15%;">TANGGAL OMZET</th>
+                        <th class="text-end" style="width: 16%;">OMZET KOTOR (100%)</th>
+                        <th class="text-end" style="width: 16%;">NOMINAL POTONGAN</th>
+                        <th class="text-end" style="width: 16%;">HAK INVESTOR</th>
+                        <th class="text-end" style="width: 16%;">HAK OUTLET</th>
+                        <th class="text-end" style="width: 16%;">SALDO BERSIH TOKO</th>
                     </tr>
                 </thead>
                 <tbody>
