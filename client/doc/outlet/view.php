@@ -614,7 +614,7 @@ html body .form-check-input:checked {
                         <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
-                    <!-- Live Search & Tombol Filter Utama (Side-by-Side Flex Nowrap) -->
+                    <!-- Live Search & Tombol Action (Side-by-Side Flex Nowrap) -->
                     <div class="d-flex align-items-center gap-2 flex-nowrap ms-auto">
                         <!-- Live Search Input Box -->
                         <div class="input-group input-group-sm" style="width: 180px; sm:width: 220px;">
@@ -623,9 +623,14 @@ html body .form-check-input:checked {
                         </div>
 
                         <!-- Tombol Filter Utama (Membuka Modal Filter Data) -->
-                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet">
                             <i class="fa-solid fa-filter me-1"></i> Filter Data
                         </button>
+
+                        <!-- Tombol Cetak PDF Data Neraca Sederhana -->
+                        <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
+                            <i class="fa-solid fa-file-pdf me-1"></i> Cetak Neraca PDF
+                        </a>
                     </div>
                 </div>
 
