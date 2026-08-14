@@ -1316,7 +1316,7 @@ html body .form-check-input:checked {
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalPerpanjangOutletLabel">
-                    <i class="fa-solid fa-rotate-right me-1.5 text-danger"></i>Perpanjang Langganan Outlet
+                    <i class="fa-solid fa-rotate-right me-2 text-danger"></i>Perpanjang Langganan Outlet
                 </h6>
                 <button type="button" class="btn-close" style="font-size: 0.8rem;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -2093,7 +2093,7 @@ $(document).ready(function() {
                     $('#det_alamat').text(res.data.alamat_outlet || '-');
                     if (res.data.bukti_pembayaran) {
                         let fileUrl = '<?= SystemInfo::app("CLIENT_URL"); ?>/' + res.data.bukti_pembayaran;
-                        $('#det_bukti_container').html('<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-preview-image-lightbox" data-src="' + fileUrl + '" data-title="Bukti Pembayaran - ' + res.data.nama_outlet + '"><i class="fa-solid fa-expand me-1.5"></i> Lihat Bukti Bayar</button>');
+                        $('#det_bukti_container').html('<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-preview-image-lightbox" data-src="' + fileUrl + '" data-title="Bukti Pembayaran - ' + res.data.nama_outlet + '"><i class="fa-solid fa-expand me-2"></i> Lihat Bukti Bayar</button>');
                     } else {
                         $('#det_bukti_container').text('-');
                     }
@@ -2565,7 +2565,7 @@ $(document).ready(function() {
                 buktiContent = `
                     <div class="mt-2 text-center">
                         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3.5 py-1.5 fw-bold btn-preview-image-lightbox" data-src="${bukti}" data-title="Dokumen Bukti Pembayaran - ${nama}" style="font-size: 12px;">
-                            <i class="fa-solid fa-file-arrow-down me-1.5"></i>Lihat Dokumen Bukti Pembayaran
+                            <i class="fa-solid fa-file-arrow-down me-2"></i>Lihat Dokumen Bukti Pembayaran
                         </button>
                     </div>
                 `;

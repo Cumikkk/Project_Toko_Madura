@@ -739,7 +739,7 @@ $countOutlet = count($rows);
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel" style="font-size: 14px;">
-                    <i class="fa-solid fa-calendar-days me-1.5 text-danger"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger fw-bold"></span>
+                    <i class="fa-solid fa-calendar-days text-danger me-2" style="margin-right: 8px !important;"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger fw-bold"></span>
                 </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 10px;"></button>
             </div>
