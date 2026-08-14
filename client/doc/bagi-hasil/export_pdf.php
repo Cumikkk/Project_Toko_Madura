@@ -619,7 +619,7 @@ ob_start();
                 <?php if (!empty($items)) : ?>
                     <tfoot>
                         <tr style="background-color: #f1f5f9; font-weight: bold;">
-                            <td colspan="2" class="text-end" style="padding: 6px; font-size: 8.5px; text-transform: uppercase;">SUBTOTAL <?= htmlspecialchars($rOut['nama_outlet']); ?>:</td>
+                            <td colspan="2" class="text-end" style="padding: 6px; font-size: 8.5px; text-transform: uppercase;">SUBTOTAL:</td>
                             <td class="text-end" style="padding: 6px;">Rp <?= number_format($subOmzet, 0, ',', '.'); ?></td>
                             <td class="text-end text-danger" style="padding: 6px;">Rp <?= number_format($subPot, 0, ',', '.'); ?></td>
                             <td class="text-end text-success" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subInv, 0, ',', '.'); ?></td>
