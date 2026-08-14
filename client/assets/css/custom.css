@@ -1004,25 +1004,12 @@ html body.light-theme .dropdown-menu .dropdown-item.text-danger:focus {
     overflow-y: auto !important;
 }
 
-/* ========================================================================= */
-/* FIX CHECKBOX CHECKMARK VISIBILITY (HIGH CONTRAST BOLD WHITE CHECKMARK) */
-/* ========================================================================= */
-.form-check-input {
-    width: 20px !important;
-    height: 20px !important;
-    border: 2px solid #adb5bd !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    background-size: 14px 14px !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    transition: all 0.2s ease-in-out !important;
-}
-
-.form-check-input:checked {
+/* High-Contrast Checkbox Styling (Bold White Checkmark on Brand Maroon Background) */
+.form-check-input:checked,
+html body .form-check-input:checked {
     background-color: #7D0A0A !important;
     border-color: #7D0A0A !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3.2' d='M5 10l3.5 3.5L15 6'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
 }
 
 .form-check-input:focus {

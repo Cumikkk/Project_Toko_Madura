@@ -447,6 +447,19 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
     overflow-y: auto !important;
 }
 
+/* High-Contrast Checkbox Styling (Bold White Checkmark on Brand Maroon Background) */
+.form-check-input:checked,
+html body .form-check-input:checked {
+    background-color: #7D0A0A !important;
+    border-color: #7D0A0A !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.form-check-input:focus {
+    border-color: #7D0A0A !important;
+    box-shadow: 0 0 0 0.25rem rgba(125, 10, 10, 0.25) !important;
+}
+
 /* Custom Pill Filter Bar for Outlet View */
 .filter-pill-container {
     background-color: var(--bs-body-bg, #ffffff);
@@ -731,9 +744,6 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                             </td>
                                             <td class="text-center pe-3">
                                                 <div class="d-flex align-items-center justify-content-center gap-1">
-                                                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?id_outlet=<?= $row['id_outlet']; ?>" target="_blank" class="btn btn-sm btn-light border text-danger rounded-3 px-2 py-1" title="Cetak PDF Neraca Sederhana Toko">
-                                                        <i class="fa-solid fa-file-pdf"></i>
-                                                    </a>
                                                     <button type="button" class="btn btn-sm btn-light border text-warning btn-edit-outlet rounded-3 px-2 py-1" data-id="<?= $row['id_outlet']; ?>" title="Edit Outlet">
                                                         <i class="fa-light fa-pen-to-square"></i>
                                                     </button>
@@ -1226,11 +1236,8 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between align-items-center">
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-                <a id="det_btn_cetak_pdf" href="#" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3.5 py-1.5 fw-bold shadow-xs">
-                    <i class="fa-solid fa-file-pdf me-1"></i> Cetak Neraca PDF
-                </a>
             </div>
         </div>
     </div>
@@ -2027,7 +2034,6 @@ $(document).ready(function() {
                     }
                     $('#det_total_omzet').text('Rp ' + new Intl.NumberFormat('id-ID').format(res.data.total_omzet));
                     $('#det_total_laporan').text(res.data.total_laporan + ' Laporan');
-                    $('#det_btn_cetak_pdf').attr('href', '<?= SystemInfo::app("CLIENT_URL"); ?>/doc/outlet/export_pdf.php?id_outlet=' + idOutlet);
 
                     // Render Opsi B Action Banner inside Modal Detail
                     let statusText = res.data.status || 'active';
