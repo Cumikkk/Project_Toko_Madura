@@ -371,13 +371,13 @@ ob_start();
 </head>
 <body>
 
-    <!-- HALAMAN 1: KOP HEADER & IKHTISAR KEUANGAN GLOBAL INVESTOR -->
+    <!-- HALAMAN 1: KOP HEADER & RINGKASAN KEUANGAN GLOBAL INVESTOR -->
     <table class="header-table">
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
                 <div class="header-subtitle">LAPORAN KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
-                <div class="header-tagline">Ikhtisar Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
+                <div class="header-tagline">Ringkasan Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
                 <div style="font-size: 8.5px; color: #64748b;">Tanggal &amp; Waktu Cetak:</div>
@@ -420,8 +420,8 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Bagian I: Ikhtisar Posisi Keuangan -->
-    <div class="section-title">I. IKHTISAR POSISI KEUANGAN</div>
+    <!-- Bagian I: Ringkasan Posisi Keuangan -->
+    <div class="section-title">I. RINGKASAN POSISI KEUANGAN</div>
     <table class="balance-summary-table">
         <tr>
             <!-- SISI AKTIVA: ARUS OMZET & PENERIMAAN KAS -->
@@ -461,7 +461,7 @@ ob_start();
                             <td style="text-align: right; font-weight: bold; color: #16a34a;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #fafafa;">
-                            <td style="color: #d97706; font-weight: bold;">(+) Total Hak Bagi Hasil Outlet (Pengelola)</td>
+                            <td style="color: #d97706; font-weight: bold;">(+) Total Hak Bagi Hasil Outlet</td>
                             <td style="text-align: right; font-weight: bold; color: #d97706;">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f0fdf4; font-weight: bold;">
@@ -556,7 +556,7 @@ ob_start();
                         <div style="font-size: 10.5px; font-weight: bold; color: #16a34a; margin-top: 2px;">Rp <?= number_format($rOut['hak_investor'], 0, ',', '.'); ?></div>
                     </td>
                     <td style="width: 25%; padding: 6px 10px;">
-                        <div style="font-size: 8px; color: #d97706; font-weight: bold; text-transform: uppercase;">Hak Outlet (Pengelola)</div>
+                        <div style="font-size: 8px; color: #d97706; font-weight: bold; text-transform: uppercase;">Hak Outlet</div>
                         <div style="font-size: 10.5px; font-weight: bold; color: #d97706; margin-top: 2px;">Rp <?= number_format($rOut['hak_outlet'], 0, ',', '.'); ?></div>
                     </td>
                 </tr>
