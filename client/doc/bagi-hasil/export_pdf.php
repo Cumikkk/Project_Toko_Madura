@@ -58,7 +58,8 @@ $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
 
-$rows = [];
+$rowsSummary = [];
+$dailyByOutlet = [];
 $totOmzet = 0;
 $totPotongan10 = 0;
 $totHakInvestor = 0;
@@ -129,6 +130,7 @@ if (!empty($laporanJoinConds)) {
     $joinOnClause .= " AND " . implode(" AND ", $laporanJoinConds);
 }
 
+// 1. Query Rekap Per Outlet
 $sqlBagiHasil = "
     SELECT 
         o.id_outlet,
@@ -187,13 +189,42 @@ if ($resBagiHasil) {
         $totHakInvestor += $hakInvestor;
         $totHakOutlet += $hakOutlet;
 
-        $rows[] = $row;
+        $rowsSummary[] = $row;
     }
 }
 
-$countOutlet = count($rows);
+$countOutlet = count($rowsSummary);
 
-// HTML Template for Dompdf (Data Neraca Sederhana)
+// 2. Query Rincian Harian Per Outlet
+$whereDailySql = implode(" AND ", $whereConditions);
+$sqlDaily = "
+    SELECT 
+        l.id_laporan,
+        l.id_outlet,
+        o.nama_outlet,
+        l.tanggal_omzet,
+        l.nominal_omzet,
+        l.persentase_potongan,
+        l.nominal_potongan,
+        IFNULL(l.persentase_hak_investor, IFNULL(o.persentase_hak_investor, 50.00)) as persentase_hak_investor,
+        ROUND(l.nominal_potongan * (IFNULL(l.persentase_hak_investor, IFNULL(o.persentase_hak_investor, 50.00)) / 100.0), 2) as nominal_hak_investor,
+        ROUND(l.nominal_potongan * ((100.00 - IFNULL(l.persentase_hak_investor, IFNULL(o.persentase_hak_investor, 50.00))) / 100.0), 2) as nominal_hak_outlet
+    FROM laporan_omzet l
+    JOIN outlet o ON o.id_outlet = l.id_outlet
+    WHERE {$whereDailySql}
+    ORDER BY o.nama_outlet ASC, l.tanggal_omzet ASC
+";
+
+$resDaily = $db->query($sqlDaily);
+if ($resDaily) {
+    while ($rDaily = $resDaily->fetch_assoc()) {
+        $idOut = (int)$rDaily['id_outlet'];
+        $dailyByOutlet[$idOut]['nama_outlet'] = $rDaily['nama_outlet'];
+        $dailyByOutlet[$idOut]['items'][] = $rDaily;
+    }
+}
+
+// HTML Template for Dompdf (Data Neraca Sederhana & Rincian Harian)
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -204,36 +235,36 @@ ob_start();
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 10px;
+            font-size: 9.5px;
             color: #1e293b;
-            line-height: 1.4;
+            line-height: 1.35;
             margin: 0;
             padding: 0;
         }
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-bottom: 2px solid #7D0A0A;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
         .header-title {
             color: #7D0A0A;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
         }
         .header-subtitle {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: bold;
             color: #334155;
             text-transform: uppercase;
             margin-top: 2px;
         }
         .header-tagline {
-            font-size: 9px;
+            font-size: 8.5px;
             color: #64748b;
             margin-top: 1px;
         }
@@ -241,7 +272,7 @@ ob_start();
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
@@ -249,34 +280,35 @@ ob_start();
         .meta-box td {
             padding: 5px 8px;
             vertical-align: top;
-            font-size: 10px;
+            font-size: 9.5px;
             word-wrap: break-word;
         }
         .section-title {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: bold;
             color: #7D0A0A;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            padding-bottom: 3px;
-            border-bottom: 1px solid #e2e8f0;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            padding-bottom: 2px;
+            border-bottom: 1.5px solid #7D0A0A;
         }
         .balance-summary-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
         .balance-box {
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 5px;
             overflow: hidden;
             background-color: #ffffff;
         }
         .balance-box-header {
-            padding: 6px 10px;
+            padding: 5px 8px;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 9.5px;
             text-transform: uppercase;
             color: #ffffff;
         }
@@ -291,33 +323,44 @@ ob_start();
             border-collapse: collapse;
         }
         .balance-row-table td {
-            padding: 7px 10px;
-            font-size: 10px;
+            padding: 6px 8px;
+            font-size: 9.5px;
             border-bottom: 1px solid #f1f5f9;
         }
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
         .data-table th {
             background-color: #7D0A0A;
             color: #ffffff;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 9px;
-            padding: 8px 8px;
+            font-size: 8.5px;
+            padding: 6px 6px;
             text-align: left;
             border: 1px solid #7D0A0A;
         }
         .data-table td {
-            padding: 6px 8px;
+            padding: 5px 6px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
-            font-size: 9.5px;
+            font-size: 9px;
         }
         .data-table tr:nth-child(even) {
             background-color: #f8fafc;
+        }
+        .outlet-group-header {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #7D0A0A;
+            padding: 6px 10px;
+            font-weight: bold;
+            font-size: 10px;
+            color: #0f172a;
+            margin-top: 10px;
+            margin-bottom: 4px;
         }
         .text-center { text-align: center; }
         .text-end { text-align: right; }
@@ -335,14 +378,14 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN NERACA KEUANGAN SEDERHANA &amp; HAK INVESTOR</div>
-                <div class="header-tagline">Ikhtisar Posisi Aktiva Omzet, Potongan Skema, dan Distribusi Bagi Hasil</div>
+                <div class="header-subtitle">LAPORAN NERACA KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
+                <div class="header-tagline">Ikhtisar Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right;">
-                <div style="font-size: 8.5px; color: #64748b;">No. Dokumen Neraca:</div>
-                <div style="font-weight: bold; color: #7D0A0A; font-size: 11px;">FIN-NERACA-<?= date('Ymd'); ?>/<?= sprintf('%03d', $investorId); ?></div>
-                <div style="font-size: 8.5px; color: #64748b; margin-top: 4px;">Tanggal &amp; Waktu Cetak:</div>
-                <div style="font-weight: bold; color: #0f172a; font-size: 10px;"><?= date('d/m/Y H:i'); ?> WIB</div>
+                <div style="font-size: 8px; color: #64748b;">No. Dokumen Neraca:</div>
+                <div style="font-weight: bold; color: #7D0A0A; font-size: 10.5px;">FIN-NERACA-<?= date('Ymd'); ?>/<?= sprintf('%03d', $investorId); ?></div>
+                <div style="font-size: 8px; color: #64748b; margin-top: 3px;">Tanggal &amp; Waktu Cetak:</div>
+                <div style="font-weight: bold; color: #0f172a; font-size: 9.5px;"><?= date('d/m/Y H:i'); ?> WIB</div>
             </td>
         </tr>
     </table>
@@ -350,7 +393,7 @@ ob_start();
     <!-- Profil Metadata Neraca -->
     <table class="meta-box">
         <tr>
-            <td style="width: 50%; vertical-align: top; padding: 8px 12px; border-right: 1px dashed #cbd5e1;">
+            <td style="width: 50%; vertical-align: top; padding: 6px 10px; border-right: 1px dashed #cbd5e1;">
                 <table style="width: 100%; table-layout: fixed;">
                     <tr>
                         <td style="width: 38%; color: #64748b; font-weight: bold; padding: 2px 0;">Nama Investor</td>
@@ -369,7 +412,7 @@ ob_start();
                     </tr>
                 </table>
             </td>
-            <td style="width: 50%; vertical-align: top; padding: 8px 12px;">
+            <td style="width: 50%; vertical-align: top; padding: 6px 10px;">
                 <table style="width: 100%; table-layout: fixed;">
                     <tr>
                         <td style="width: 38%; color: #64748b; font-weight: bold; padding: 2px 0;">Periode Laporan</td>
@@ -412,7 +455,7 @@ ob_start();
                         </tr>
                         <tr style="background-color: #f8fafc; font-weight: bold;">
                             <td style="color: #0f172a;">TOTAL ARUS KAS BERSIH TOKO</td>
-                            <td style="text-align: right; color: #0d6efd; font-size: 11px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
+                            <td style="text-align: right; color: #0d6efd; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
@@ -437,7 +480,7 @@ ob_start();
                         </tr>
                         <tr style="background-color: #f0fdf4; font-weight: bold;">
                             <td style="color: #166534;">TOTAL HAK TERDISTRIBUSI KESELURUHAN</td>
-                            <td style="text-align: right; color: #166534; font-size: 11px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
+                            <td style="text-align: right; color: #166534; font-size: 10.5px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
@@ -445,8 +488,8 @@ ob_start();
         </tr>
     </table>
 
-    <!-- Bagian II: Tabel Rincian Posisi Neraca Per Outlet Toko -->
-    <div class="section-title">II. TABEL RINCIAN POSISI NERACA PER OUTLET TOKO</div>
+    <!-- Bagian II: Tabel Rekapitulasi Posisi Neraca Per Outlet Toko -->
+    <div class="section-title">II. TABEL REKAPITULASI POSISI NERACA PER OUTLET TOKO</div>
     <table class="data-table">
         <thead>
             <tr>
@@ -461,8 +504,8 @@ ob_start();
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($rows)) : ?>
-                <?php $no = 1; foreach ($rows as $r) : ?>
+            <?php if (!empty($rowsSummary)) : ?>
+                <?php $no = 1; foreach ($rowsSummary as $r) : ?>
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
                         <td>
@@ -478,45 +521,114 @@ ob_start();
                 <?php endforeach; ?>
             <?php else : ?>
                 <tr>
-                    <td colspan="8" class="text-center" style="padding: 15px; color: #64748b;">
+                    <td colspan="8" class="text-center" style="padding: 12px; color: #64748b;">
                         Belum ada data outlet / omzet pada periode ini.
                     </td>
                 </tr>
             <?php endif; ?>
         </tbody>
-        <?php if (!empty($rows)) : ?>
+        <?php if (!empty($rowsSummary)) : ?>
             <tfoot>
                 <tr style="background-color: #f1f5f9; font-weight: bold;">
-                    <td colspan="2" class="text-end" style="padding: 8px; font-size: 9.5px; text-transform: uppercase;">TOTAL KESELURUHAN:</td>
-                    <td class="text-end" style="padding: 8px;">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
-                    <td class="text-center" style="padding: 8px;">-</td>
-                    <td class="text-end text-danger" style="padding: 8px;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
-                    <td class="text-end text-success" style="padding: 8px; font-size: 10.5px;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
-                    <td class="text-end text-warning" style="padding: 8px; font-size: 10.5px;">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></td>
-                    <td class="text-end text-primary" style="padding: 8px; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10 + $totHakOutlet, 0, ',', '.'); ?></td>
+                    <td colspan="2" class="text-end" style="padding: 7px; font-size: 9px; text-transform: uppercase;">TOTAL REKAPITULASI:</td>
+                    <td class="text-end" style="padding: 7px;">Rp <?= number_format($totOmzet, 0, ',', '.'); ?></td>
+                    <td class="text-center" style="padding: 7px;">-</td>
+                    <td class="text-end text-danger" style="padding: 7px;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
+                    <td class="text-end text-success" style="padding: 7px; font-size: 10px;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
+                    <td class="text-end text-warning" style="padding: 7px; font-size: 10px;">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></td>
+                    <td class="text-end text-primary" style="padding: 7px; font-size: 10px;">Rp <?= number_format($totOmzet - $totPotongan10 + $totHakOutlet, 0, ',', '.'); ?></td>
                 </tr>
             </tfoot>
         <?php endif; ?>
     </table>
 
-    <!-- Bagian III: Catatan Keuangan & Pengesahan Lembar Neraca -->
+    <!-- Bagian III: Tabel Rincian Transaksi Harian Per Outlet Toko -->
+    <div class="section-title">III. TABEL RINCIAN TRANSAKSI HARIAN PER OUTLET TOKO</div>
+    <?php if (!empty($dailyByOutlet)) : ?>
+        <?php foreach ($dailyByOutlet as $idOut => $group) : ?>
+            <div class="outlet-group-header">
+                OUTLET TOKO: <?= htmlspecialchars($group['nama_outlet']); ?> (<?= count($group['items']); ?> Transaksi Harian)
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 25px;">No</th>
+                        <th class="text-center" style="width: 85px;">Tanggal Omzet</th>
+                        <th class="text-end">Omzet Kotor (100%)</th>
+                        <th class="text-center" style="width: 60px;">Skema Pot.</th>
+                        <th class="text-end">Nominal Potongan</th>
+                        <th class="text-end">Hak Investor</th>
+                        <th class="text-end">Hak Outlet</th>
+                        <th class="text-end">Saldo Bersih Toko</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $noD = 1; 
+                    $subOmzet = 0; $subPot = 0; $subInv = 0; $subOut = 0;
+                    foreach ($group['items'] as $item) :
+                        $nOmzet = (float)$item['nominal_omzet'];
+                        $nPot   = (float)$item['nominal_potongan'];
+                        $nInv   = (float)$item['nominal_hak_investor'];
+                        $nOut   = (float)$item['nominal_hak_outlet'];
+                        $nBersih = ($nOmzet - $nPot) + $nOut;
+
+                        $subOmzet += $nOmzet;
+                        $subPot   += $nPot;
+                        $subInv   += $nInv;
+                        $subOut   += $nOut;
+                        
+                        $tglFmt = date('d/m/Y', strtotime($item['tanggal_omzet']));
+                    ?>
+                        <tr>
+                            <td class="text-center fw-bold"><?= $noD++; ?></td>
+                            <td class="text-center fw-bold"><?= $tglFmt; ?></td>
+                            <td class="text-end fw-bold">Rp <?= number_format($nOmzet, 0, ',', '.'); ?></td>
+                            <td class="text-center fw-bold text-secondary"><?= number_format($item['persentase_potongan'], 2); ?>%</td>
+                            <td class="text-end text-danger fw-bold">Rp <?= number_format($nPot, 0, ',', '.'); ?></td>
+                            <td class="text-end text-success fw-bold">Rp <?= number_format($nInv, 0, ',', '.'); ?></td>
+                            <td class="text-end text-warning fw-bold">Rp <?= number_format($nOut, 0, ',', '.'); ?></td>
+                            <td class="text-end fw-bold">Rp <?= number_format($nBersih, 0, ',', '.'); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #f1f5f9; font-weight: bold;">
+                        <td colspan="2" class="text-end" style="padding: 6px; font-size: 8.5px; text-transform: uppercase;">SUBTOTAL <?= htmlspecialchars($group['nama_outlet']); ?>:</td>
+                        <td class="text-end" style="padding: 6px;">Rp <?= number_format($subOmzet, 0, ',', '.'); ?></td>
+                        <td class="text-center" style="padding: 6px;">-</td>
+                        <td class="text-end text-danger" style="padding: 6px;">Rp <?= number_format($subPot, 0, ',', '.'); ?></td>
+                        <td class="text-end text-success" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subInv, 0, ',', '.'); ?></td>
+                        <td class="text-end text-warning" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subOut, 0, ',', '.'); ?></td>
+                        <td class="text-end text-primary" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subOmzet - $subPot + $subOut, 0, ',', '.'); ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <div style="text-align: center; padding: 12px; border: 1px solid #cbd5e1; border-radius: 4px; color: #64748b; background-color: #f8fafc;">
+            Belum ada rincian harian omzet pada periode ini.
+        </div>
+    <?php endif; ?>
+
+    <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Neraca -->
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
         <tr>
             <td style="width: 60%; vertical-align: top; padding-right: 15px;">
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
-                    <div style="font-weight: bold; font-size: 9px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT NERACA:</div>
+                    <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT NERACA HARIAN:</div>
                     <ul style="margin: 0; padding-left: 12px; font-size: 8px; color: #64748b; line-height: 1.35;">
-                        <li>Laporan disajikan sebagai Neraca Keuangan Sederhana untuk memperhitungkan realisasi omzet kotor, potongan alokasi skema, dan porsi hak investor secara akurat.</li>
-                        <li>Sisi Aktiva mencatat penerimaan omzet kotor penjualan outlet, sedangkan Sisi Pasiva mencatat distribusi hak bagi hasil investor dan pengelola toko.</li>
-                        <li>Data neraca ini ditarik secara otomatis dari sistem Toko Madura yang telah diverifikasi dan siap digunakan sebagai bukti rekapitulasi keuangan.</li>
+                        <li>Laporan disajikan sebagai Neraca Keuangan Sederhana yang memuat rekapitulasi utama dan rincian transaksi harian omzet per outlet.</li>
+                        <li>Sisi Aktiva mencatat penerimaan omzet kotor penjualan harian outlet, sedangkan Sisi Pasiva mencatat alokasi bagi hasil investor dan pengelola toko.</li>
+                        <li>Seluruh rincian transaksi harian pada dokumen ini ditarik secara sistematis dan telah diverifikasi dalam sistem Toko Madura.</li>
                     </ul>
                 </div>
             </td>
             <td style="width: 40%; vertical-align: top; text-align: center;">
-                <div style="font-size: 9px; color: #64748b;">Disahkan &amp; Diverifikasi Oleh,</div>
-                <div style="font-weight: bold; font-size: 9.5px; color: #0f172a; margin-top: 1px;">MANAJEMEN TOKO MADURA</div>
-                <div style="height: 38px;"></div>
-                <div style="font-weight: bold; font-size: 9.5px; color: #7D0A0A; text-decoration: underline;"><?= htmlspecialchars($investorNama); ?></div>
+                <div style="font-size: 8.5px; color: #64748b;">Disahkan &amp; Diverifikasi Oleh,</div>
+                <div style="font-weight: bold; font-size: 9px; color: #0f172a; margin-top: 1px;">MANAJEMEN TOKO MADURA</div>
+                <div style="height: 35px;"></div>
+                <div style="font-weight: bold; font-size: 9px; color: #7D0A0A; text-decoration: underline;"><?= htmlspecialchars($investorNama); ?></div>
                 <div style="font-size: 8px; color: #64748b;">Pihak Investor / Pemilik Modal</div>
             </td>
         </tr>
