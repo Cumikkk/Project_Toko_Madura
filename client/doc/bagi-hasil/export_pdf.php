@@ -376,7 +376,7 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN NERACA KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
+                <div class="header-subtitle">LAPORAN KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
                 <div class="header-tagline">Ikhtisar Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
@@ -395,11 +395,6 @@ ob_start();
                         <td style="width: 38%; color: #64748b; font-weight: bold; padding: 2px 0;">Nama Investor</td>
                         <td style="width: 4%; color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($investorNama); ?></td>
-                    </tr>
-                    <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Akses Sistem</td>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
-                        <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= strtoupper($role); ?> PANEL</td>
                     </tr>
                     <tr>
                         <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
