@@ -38,8 +38,8 @@ class Outlet {
     public static function getActiveOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
@@ -53,8 +53,8 @@ class Outlet {
     public static function getExpiredOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
@@ -68,8 +68,8 @@ class Outlet {
     public static function getPendingOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
@@ -83,8 +83,8 @@ class Outlet {
     public static function getRejectedOutlets() {
         $db = Database::connect();
         $sql = "
-            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.no_hp as no_hp_investor
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
@@ -206,6 +206,10 @@ class Outlet {
                 if ($db->affected_rows < 1) {
                     throw new Exception("Gagal mendaftarkan cabang outlet baru: " . $db->error);
                 }
+                $newOutletId = $db->insert_id;
+
+                // Catat riwayat pendaftaran awal
+                $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request, tgl_disetujui) VALUES ({$newOutletId}, 'baru', 100000, '', 'active', NOW(), NOW())");
 
                 $db->commit();
                 return ['success' => true, 'message' => "Berhasil mendaftarkan toko cabang baru beserta akun kasir: {$nama_outlet}"];
@@ -233,6 +237,7 @@ class Outlet {
         $db->begin_transaction();
         try {
             $db->query("DELETE FROM laporan_omzet WHERE id_outlet = {$id}");
+            $db->query("DELETE FROM riwayat_langganan WHERE id_outlet = {$id}");
             $db->query("DELETE FROM outlet WHERE id_outlet = {$id}");
             if ($userId > 0) {
                 $db->query("DELETE FROM users WHERE id_users = {$userId}");
@@ -257,9 +262,24 @@ class Outlet {
         $id = intval($idOutlet);
         if ($id <= 0) return ['success' => false, 'message' => "ID Outlet tidak valid"];
 
+        $resOut = $db->query("SELECT * FROM outlet WHERE id_outlet = {$id} LIMIT 1");
+        if (!$resOut || $resOut->num_rows === 0) {
+            return ['success' => false, 'message' => "Outlet tidak ditemukan"];
+        }
+        $out = $resOut->fetch_assoc();
+
         $sql = "UPDATE outlet SET status = 'active', tgl_disetujui = NOW(), tgl_jatuh_tempo = DATE_ADD(GREATEST(NOW(), IFNULL(tgl_jatuh_tempo, NOW())), INTERVAL 1 MONTH) WHERE id_outlet = {$id}";
         if ($db->query($sql)) {
             $db->query("UPDATE riwayat_langganan SET status = 'active', tgl_disetujui = NOW() WHERE id_outlet = {$id} AND status = 'pending' ORDER BY id_riwayat DESC LIMIT 1");
+            
+            if ($db->affected_rows === 0) {
+                $nominal = (int)($out['nominal_transfer'] ?? 100000);
+                if ($nominal <= 0) $nominal = 100000;
+                $bukti = $db->real_escape_string($out['bukti_pembayaran'] ?? '');
+                $tipe = ($out['tipe_request'] ?? 'baru') === 'perpanjangan' ? 'perpanjangan' : 'baru';
+                $tglReq = !empty($out['tgl_request']) ? "'{$out['tgl_request']}'" : "NOW()";
+                $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request, tgl_disetujui) VALUES ({$id}, '{$tipe}', {$nominal}, '{$bukti}', 'active', {$tglReq}, NOW())");
+            }
             return ['success' => true, 'message' => 'Request outlet & pembayaran berhasil disetujui. Outlet kini resmi aktif!'];
         }
         return ['success' => false, 'message' => 'Gagal mengaktifkan outlet: ' . $db->error];
@@ -269,10 +289,25 @@ class Outlet {
         $id = intval($idOutlet);
         if ($id <= 0) return ['success' => false, 'message' => "ID Outlet tidak valid"];
 
+        $resOut = $db->query("SELECT * FROM outlet WHERE id_outlet = {$id} LIMIT 1");
+        if (!$resOut || $resOut->num_rows === 0) {
+            return ['success' => false, 'message' => "Outlet tidak ditemukan"];
+        }
+        $out = $resOut->fetch_assoc();
+
         $escapedAlasan = $db->real_escape_string(trim($alasan));
         $sql = "UPDATE outlet SET status = 'reject', alasan_penolakan = '{$escapedAlasan}', tgl_ditolak = NOW() WHERE id_outlet = {$id}";
         if ($db->query($sql)) {
             $db->query("UPDATE riwayat_langganan SET status = 'reject', alasan_penolakan = '{$escapedAlasan}' WHERE id_outlet = {$id} AND status = 'pending' ORDER BY id_riwayat DESC LIMIT 1");
+            
+            if ($db->affected_rows === 0) {
+                $nominal = (int)($out['nominal_transfer'] ?? 100000);
+                if ($nominal <= 0) $nominal = 100000;
+                $bukti = $db->real_escape_string($out['bukti_pembayaran'] ?? '');
+                $tipe = ($out['tipe_request'] ?? 'baru') === 'perpanjangan' ? 'perpanjangan' : 'baru';
+                $tglReq = !empty($out['tgl_request']) ? "'{$out['tgl_request']}'" : "NOW()";
+                $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, alasan_penolakan, tgl_request, tgl_disetujui) VALUES ({$id}, '{$tipe}', {$nominal}, '{$bukti}', 'reject', '{$escapedAlasan}', {$tglReq}, NOW())");
+            }
             return ['success' => true, 'message' => 'Request outlet & pembayaran berhasil ditolak.'];
         }
         return ['success' => false, 'message' => 'Gagal menolak outlet: ' . $db->error];

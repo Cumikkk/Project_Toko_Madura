@@ -33,7 +33,7 @@ $nama_lengkap = trim($data['nama_lengkap'] ?? '');
 $username     = trim($data['username'] ?? '');
 $password     = trim($data['password'] ?? '');
 $no_hp        = !empty($data['no_hp']) ? trim($data['no_hp']) : null;
-$kecamatan    = !empty($data['kecamatan']) ? trim($data['kecamatan']) : null;
+$id_wilayah   = !empty($data['id_wilayah']) ? intval($data['id_wilayah']) : null;
 $alamat       = !empty($data['alamat_investor']) ? trim($data['alamat_investor']) : null;
 
 if (empty($nama_lengkap) || empty($username) || empty($password)) {
@@ -67,7 +67,7 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 $nameSafe     = $db->real_escape_string($nama_lengkap);
 $usernameSafe = $db->real_escape_string($username);
 $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
-$kecVal       = $kecamatan ? "'" . $db->real_escape_string($kecamatan) . "'" : "NULL";
+$wilayahVal   = $id_wilayah ? $id_wilayah : "NULL";
 $alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
 
 // Check username uniqueness
@@ -84,8 +84,8 @@ if ($sql_check && $sql_check->num_rows > 0) {
 $hashedPass = password_hash($password, PASSWORD_BCRYPT);
 $passSafe   = $db->real_escape_string($hashedPass);
 
-// Insert into users table (termasuk kecamatan & alamat)
-$db->query("INSERT INTO users (nama_lengkap, username, no_hp, kecamatan, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$kecVal}, {$alamatVal}, '{$passSafe}', 'investor')");
+// Insert into users table (termasuk id_wilayah & alamat_lengkap)
+$db->query("INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$nameSafe}', '{$usernameSafe}', {$hpVal}, {$wilayahVal}, {$alamatVal}, '{$passSafe}', 'investor')");
 
 if ($db->affected_rows < 1) {
     JsonResponse([

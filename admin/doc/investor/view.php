@@ -21,51 +21,6 @@ $masterOptions = Master::getAllMasterOptions();
     </div>
 </div>
 
-<!-- Filter Card -->
-<div class="row row-sm mb-3">
-    <div class="col-lg-12">
-        <div class="card custom-card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">Filter Data Wilayah & Master</h5>
-                    <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm" title="Reset semua filter">
-                        <i class="fe fe-refresh-cw me-1"></i> Reset Filter
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label fw-bold">Filter Master Owner</label>
-                        <select id="filterMaster" class="form-select filter-select" data-placeholder="Semua Master Owner">
-                            <option value="">Semua Master Owner</option>
-                            <?php if ($masterOptions && $masterOptions->num_rows > 0) : ?>
-                                <?php while ($m = $masterOptions->fetch_assoc()) : ?>
-                                    <option value="<?= htmlspecialchars(strtoupper($m['nama_lengkap'])); ?>">
-                                        <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)
-                                    </option>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label fw-bold">Filter Provinsi</label>
-                        <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
-                            <option value="">Semua Provinsi</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <label class="form-label fw-bold">Filter Kabupaten / Kota</label>
-                        <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
-                            <option value="">Semua Kabupaten</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Main Table Card -->
 <div class="row row-sm">
     <div class="col-lg-12">
@@ -79,6 +34,42 @@ $masterOptions = Master::getAllMasterOptions();
                 </div>
             </div>
             <div class="card-body">
+                <!-- Toolbar Filter Data Wilayah & Master Terintegrasi -->
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-4 col-md-4">
+                            <label class="form-label small fw-bold mb-1">Filter Master Owner</label>
+                            <select id="filterMaster" class="form-select filter-select" data-placeholder="Semua Master Owner">
+                                <option value="">Semua Master Owner</option>
+                                <?php if ($masterOptions && $masterOptions->num_rows > 0) : ?>
+                                    <?php while ($m = $masterOptions->fetch_assoc()) : ?>
+                                        <option value="<?= htmlspecialchars(strtoupper($m['nama_lengkap'])); ?>">
+                                            <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)
+                                        </option>
+                                    <?php endwhile; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <label class="form-label small fw-bold mb-1">Filter Provinsi</label>
+                            <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
+                                <option value="">Semua Provinsi</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <label class="form-label small fw-bold mb-1">Filter Kabupaten / Kota</label>
+                            <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
+                                <option value="">Semua Kabupaten</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2">
+                            <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm w-100 d-flex align-items-center justify-content-center" style="height: 38px;" title="Reset semua filter">
+                                <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="investor-table">
                         <thead>
@@ -224,9 +215,10 @@ $(document).ready(function() {
             deferRender: true,
             scrollX: true,
             lengthMenu: [
-                [10, 50, 100, -1],
-                [10, 50, 100, "All"]
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "All"]
             ],
+            pageLength: 5,
             language: {
                 searchPlaceholder: 'Cari investor...',
                 sSearch: '',
@@ -241,6 +233,15 @@ $(document).ready(function() {
             },
             order: [[1, 'desc']]
         });
+
+        if ($.fn.select2) {
+            setTimeout(function() {
+                $('#investor-table_wrapper .dataTables_length select').select2({
+                    minimumResultsForSearch: Infinity,
+                    width: 'auto'
+                });
+            }, 50);
+        }
     }
 
     // Load Provinsi untuk Filter

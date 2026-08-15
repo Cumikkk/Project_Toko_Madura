@@ -21,7 +21,7 @@ $bulanIndo = [
 ];
 
 // Get Outlet Record for Logged-In User
-$resOutlet = $db->query("SELECT o.*, u_inv.alamat_lengkap as alamat_investor, u_inv.nama_lengkap as nama_investor, u_kasir.alamat_lengkap as alamat_outlet, u_kasir.kecamatan, u_kasir.nama_lengkap as nama_pengelola, COALESCE(NULLIF(o.nama_outlet, ''), u_kasir.nama_lengkap) as nama_outlet FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users WHERE o.id_users = {$userId} LIMIT 1");
+$resOutlet = $db->query("SELECT o.*, u_inv.alamat_lengkap as alamat_investor, u_inv.nama_lengkap as nama_investor, u_kasir.alamat_lengkap as alamat_outlet, mw_kasir.kecamatan, mw_kasir.kabupaten, mw_kasir.provinsi, u_kasir.nama_lengkap as nama_pengelola, COALESCE(NULLIF(o.nama_outlet, ''), u_kasir.nama_lengkap) as nama_outlet FROM outlet o LEFT JOIN investor i ON o.id_investor = i.id_investor LEFT JOIN users u_inv ON i.id_users = u_inv.id_users LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users LEFT JOIN master_wilayah mw_kasir ON u_kasir.id_wilayah = mw_kasir.id_wilayah WHERE o.id_users = {$userId} LIMIT 1");
 $outlet = $resOutlet ? $resOutlet->fetch_assoc() : null;
 
 // Get Current Cut Percentage directly from Outlet record (set during registration by Investor)

@@ -14,9 +14,20 @@ if ($resRiwayat) {
     }
 }
 
+$outletInfo = null;
+$resOutlet = $db->query("SELECT o.id_outlet, o.nama_outlet, o.tgl_jatuh_tempo, o.status, u.nama_lengkap as nama_investor, u.username as username_investor
+    FROM outlet o
+    LEFT JOIN investor i ON o.id_investor = i.id_investor
+    LEFT JOIN users u ON i.id_users = u.id_users
+    WHERE o.id_outlet = {$idOutlet} LIMIT 1");
+if ($resOutlet && $resOutlet->num_rows > 0) {
+    $outletInfo = $resOutlet->fetch_assoc();
+}
+
 JsonResponse([
     'code' => 200,
     'success' => true,
+    'outlet' => $outletInfo,
     'data' => $riwayat
 ]);
 exit;

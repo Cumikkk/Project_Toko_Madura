@@ -445,13 +445,109 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         // Initialize form
         loadProvinsi();
 
-        // Auto populate Bagi Hasil Investor when selecting an investor
-        $('#id_investor').on('change', function() {
+        // Auto Focus & Enter Navigation
+        if (!isEdit) {
+            setTimeout(function() {
+                $('#id_investor').select2('open');
+            }, 200);
+        } else {
+            $('#nama_outlet').focus();
+        }
+
+        // Auto populate Bagi Hasil Investor when selecting an investor & move focus
+        $('#id_investor').on('change select2:select', function(e) {
             let selectedOption = $(this).find('option:selected');
             let persen = selectedOption.data('persen');
             if (persen !== undefined && persen !== '') {
                 $('#persentase_hak_investor').val(persen);
                 window.balanceAdminOutletSplit('investor');
+            }
+            if (e.type === 'select2:select') {
+                setTimeout(function() {
+                    $('#nama_outlet').focus();
+                }, 100);
+            }
+        });
+
+        $('#nama_outlet').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#provinsi').select2('open');
+            }
+        });
+
+        $('#id_wilayah').on('select2:select', function() {
+            setTimeout(function() {
+                $('#alamat_outlet').focus();
+            }, 100);
+        });
+
+        $('#alamat_outlet').on('keydown', function(e) {
+            if (e.which === 13 && !e.shiftKey) {
+                e.preventDefault();
+                $('#persentase_potongan').focus();
+            }
+        });
+
+        $('#persentase_potongan').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#persentase_hak_investor').focus();
+            }
+        });
+
+        $('#persentase_hak_investor').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#persen_bagian_outlet').focus();
+            }
+        });
+
+        $('#persen_bagian_outlet').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                if ($('#tgl_jatuh_tempo').length) {
+                    $('#tgl_jatuh_tempo').focus();
+                } else {
+                    $('#kasir_nama').focus();
+                }
+            }
+        });
+
+        if ($('#tgl_jatuh_tempo').length) {
+            $('#tgl_jatuh_tempo').on('keydown', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#kasir_nama').focus();
+                }
+            });
+        }
+
+        $('#kasir_nama').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#kasir_no_hp').focus();
+            }
+        });
+
+        $('#kasir_no_hp').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#kasir_username').focus();
+            }
+        });
+
+        $('#kasir_username').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#kasir_password').focus();
+            }
+        });
+
+        $('#kasir_password').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#form-create-outlet').trigger('submit');
             }
         });
 

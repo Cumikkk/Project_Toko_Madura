@@ -4,13 +4,13 @@ use Config\Core\SystemInfo;
 use App\Models\Helper;
 
 $db = Database::connect();
-$userId = (int) $user['MBR_ID'];
+$userId = (int) ($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
 // Validate input
 $nama = Helper::form_input($_POST['nama_lengkap'] ?? '');
 $username = Helper::form_input($_POST['username'] ?? '');
 $noHp = Helper::form_input($_POST['no_hp'] ?? '');
-$kecamatan = Helper::form_input($_POST['kecamatan'] ?? '');
+$idWilayah = !empty($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : null;
 $alamat = Helper::form_input($_POST['alamat_lengkap'] ?? '');
 $password = Helper::form_input($_POST['password'] ?? '');
 
@@ -41,13 +41,13 @@ try {
     if (!empty($password)) {
         // Hash the new password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET nama_lengkap = ?, username = ?, no_hp = ?, kecamatan = ?, alamat_lengkap = ?, password = ? WHERE id_users = ?";
+        $sql = "UPDATE users SET nama_lengkap = ?, username = ?, no_hp = ?, id_wilayah = ?, alamat_lengkap = ?, password = ? WHERE id_users = ?";
         $stmt = $db->prepare($sql);
-        $stmt->bind_param("ssssssi", $nama, $username, $noHp, $kecamatan, $alamat, $hashedPassword, $userId);
+        $stmt->bind_param("sssissi", $nama, $username, $noHp, $idWilayah, $alamat, $hashedPassword, $userId);
     } else {
-        $sql = "UPDATE users SET nama_lengkap = ?, username = ?, no_hp = ?, kecamatan = ?, alamat_lengkap = ? WHERE id_users = ?";
+        $sql = "UPDATE users SET nama_lengkap = ?, username = ?, no_hp = ?, id_wilayah = ?, alamat_lengkap = ? WHERE id_users = ?";
         $stmt = $db->prepare($sql);
-        $stmt->bind_param("sssssi", $nama, $username, $noHp, $kecamatan, $alamat, $userId);
+        $stmt->bind_param("sssisi", $nama, $username, $noHp, $idWilayah, $alamat, $userId);
     }
 
     if (!$stmt->execute()) {

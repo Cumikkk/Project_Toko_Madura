@@ -17,38 +17,6 @@ $masters = Master::getAllMasters();
     </div>
 </div>
 
-<!-- Filter Card -->
-<div class="row row-sm mb-3">
-    <div class="col-lg-12">
-        <div class="card custom-card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title">Filter Data Wilayah</h5>
-                    <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm" title="Reset semua filter wilayah">
-                        <i class="fe fe-refresh-cw me-1"></i> Reset Filter
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Filter Provinsi</label>
-                        <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
-                            <option value="">Semua Provinsi</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Filter Kabupaten / Kota</label>
-                        <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
-                            <option value="">Semua Kabupaten</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Main Table Card -->
 <div class="row row-sm">
     <div class="col-lg-12">
@@ -62,18 +30,41 @@ $masters = Master::getAllMasters();
                 </div>
             </div>
             <div class="card-body">
+                <!-- Toolbar Filter Data Wilayah Terintegrasi -->
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-5 col-md-5">
+                            <label class="form-label small fw-bold mb-1">Filter Provinsi</label>
+                            <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
+                                <option value="">Semua Provinsi</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-5 col-md-5">
+                            <label class="form-label small fw-bold mb-1">Filter Kabupaten / Kota</label>
+                            <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
+                                <option value="">Semua Kabupaten</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2">
+                            <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm w-100 d-flex align-items-center justify-content-center" style="height: 38px;" title="Reset semua filter wilayah">
+                                <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-master">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 5%;">No</th>
-                                <th class="text-center">Tanggal Bergabung</th>
-                                <th class="text-center">Nama Master</th>
-                                <th class="text-center">No. HP</th>
-                                <th class="text-center">Wilayah</th>
-                                <th class="text-center">Total Investor</th>
-                                <th class="text-center">Total Outlet Aktif</th>
-                                <th class="text-center" style="width: 15%;">#</th>
+                                <th class="text-center" style="width: 5%;">NO</th>
+                                <th class="text-center">TANGGAL BERGABUNG</th>
+                                <th class="text-center">NAMA MASTER</th>
+                                <th class="text-center">NO. HP</th>
+                                <th class="text-center">WILAYAH</th>
+                                <th class="text-center">TOTAL INVESTOR</th>
+                                <th class="text-center">TOTAL OUTLET AKTIF</th>
+                                <th class="text-center" style="width: 10%;">#</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -237,7 +228,8 @@ $(document).ready(function() {
             processing: true,
             deferRender: true,
             scrollX: true,
-            lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            pageLength: 5,
             language: {
                 searchPlaceholder: 'Cari master...',
                 sSearch: '',
@@ -247,6 +239,15 @@ $(document).ready(function() {
             },
             order: [[1, 'desc']]
         });
+
+        if ($.fn.select2) {
+            setTimeout(function() {
+                $('#table-master_wrapper .dataTables_length select').select2({
+                    minimumResultsForSearch: Infinity,
+                    width: 'auto'
+                });
+            }, 50);
+        }
     }
 
     // Load filter Provinsi

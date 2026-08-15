@@ -95,10 +95,10 @@ $recentRequests = Dashboard::getRecentRequests();
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-top-omzet">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 8%;">No</th>
-                                <th class="text-center">Nama Outlet</th>
-                                <th class="text-center">Investor</th>
-                                <th class="text-center">Total Omzet</th>
+                                <th class="text-center" style="width: 8%;">NO</th>
+                                <th class="text-center">NAMA OUTLET</th>
+                                <th class="text-center">INVESTOR</th>
+                                <th class="text-center">TOTAL OMZET</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,33 +108,41 @@ $recentRequests = Dashboard::getRecentRequests();
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                            <?php if (!empty($row['kecamatan'])) : ?>
+                                            <?php if (!empty($row['kecamatan_outlet']) && $row['kecamatan_outlet'] !== '-') : ?>
                                                 <br>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs mt-0.5" style="cursor: pointer; font-size: 11px;" 
+                                                    <span class="badge bg-light text-dark border btn-detail-alamat-outlet shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" 
                                                           data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
-                                                          data-alamat = "<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                          data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                          data-provinsi="<?= htmlspecialchars($row['provinsi_outlet'] ?? '') ?>"
+                                                          data-kabupaten="<?= htmlspecialchars($row['kabupaten_outlet'] ?? '') ?>"
+                                                          data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?? '') ?>"
+                                                          data-kelurahan="<?= htmlspecialchars($row['kelurahan_outlet'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-start">
-                                            <span><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></span>
-                                            <?php if (!empty($row['kecamatan_investor'])) : ?>
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
+                                            <?php if (!empty($row['kecamatan_investor']) && $row['kecamatan_investor'] !== '-') : ?>
                                                 <br>
                                                 <?php if (!empty($row['alamat_investor'])) : ?>
-                                                    <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs mt-0.5" style="cursor: pointer; font-size: 11px;" 
+                                                    <span class="badge bg-light text-dark border btn-detail-alamat-investor shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" 
                                                           data-nama="<?= htmlspecialchars($row['nama_investor'] ?? '-') ?>" 
-                                                          data-alamat = "<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                          data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                          data-provinsi="<?= htmlspecialchars($row['provinsi_investor'] ?? '') ?>"
+                                                          data-kabupaten="<?= htmlspecialchars($row['kabupaten_investor'] ?? '') ?>"
+                                                          data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?? '') ?>"
+                                                          data-kelurahan="<?= htmlspecialchars($row['kelurahan_investor'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_investor'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?></small>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_investor'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         </td>
@@ -163,11 +171,11 @@ $recentRequests = Dashboard::getRecentRequests();
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-recent-requests">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width: 8%;">No</th>
-                                <th class="text-center">Tanggal Request</th>
-                                <th class="text-center">Nama Outlet</th>
-                                <th class="text-center">Investor</th>
-                                <th class="text-center">Status</th>
+                                <th class="text-center" style="width: 8%;">NO</th>
+                                <th class="text-center">TANGGAL REQUEST</th>
+                                <th class="text-center">NAMA OUTLET</th>
+                                <th class="text-center">INVESTOR</th>
+                                <th class="text-center">STATUS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,33 +188,41 @@ $recentRequests = Dashboard::getRecentRequests();
                                         </td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
-                                            <?php if (!empty($row['kecamatan'])) : ?>
+                                            <?php if (!empty($row['kecamatan_outlet']) && $row['kecamatan_outlet'] !== '-') : ?>
                                                 <br>
                                                 <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs mt-0.5" style="cursor: pointer; font-size: 11px;" 
+                                                    <span class="badge bg-light text-dark border btn-detail-alamat-outlet shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" 
                                                           data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>" 
-                                                          data-alamat = "<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                          data-alamat="<?= htmlspecialchars($row['alamat_outlet']) ?>" 
+                                                          data-provinsi="<?= htmlspecialchars($row['provinsi_outlet'] ?? '') ?>"
+                                                          data-kabupaten="<?= htmlspecialchars($row['kabupaten_outlet'] ?? '') ?>"
+                                                          data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?? '') ?>"
+                                                          data-kelurahan="<?= htmlspecialchars($row['kelurahan_outlet'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan']) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan']) ?></small>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-start">
-                                            <span><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></span>
-                                            <?php if (!empty($row['kecamatan_investor'])) : ?>
+                                            <strong class="text-primary"><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
+                                            <?php if (!empty($row['kecamatan_investor']) && $row['kecamatan_investor'] !== '-') : ?>
                                                 <br>
                                                 <?php if (!empty($row['alamat_investor'])) : ?>
-                                                    <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs mt-0.5" style="cursor: pointer; font-size: 11px;" 
+                                                    <span class="badge bg-light text-dark border btn-detail-alamat-investor shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" 
                                                           data-nama="<?= htmlspecialchars($row['nama_investor'] ?? '-') ?>" 
-                                                          data-alamat = "<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                          data-alamat="<?= htmlspecialchars($row['alamat_investor']) ?>" 
+                                                          data-provinsi="<?= htmlspecialchars($row['provinsi_investor'] ?? '') ?>"
+                                                          data-kabupaten="<?= htmlspecialchars($row['kabupaten_investor'] ?? '') ?>"
+                                                          data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?? '') ?>"
+                                                          data-kelurahan="<?= htmlspecialchars($row['kelurahan_investor'] ?? '') ?>"
                                                           title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?>
+                                                        <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_investor'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
-                                                    <small class="text-muted"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars($row['kecamatan_investor']) ?></small>
+                                                    <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan_investor'] ?? ''))) ?></span>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         </td>
@@ -284,12 +300,31 @@ $(document).ready(function() {
     $(document).on('click', '.btn-detail-alamat-outlet', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
-        let queryStr = encodeURIComponent(nama + ' ' + alamat);
+        let provinsi = $(this).data('provinsi') || '';
+        let kabupaten = $(this).data('kabupaten') || '';
+        let kecamatan = $(this).data('kecamatan') || '';
+        let kelurahan = $(this).data('kelurahan') || '';
+
+        let queryStr = encodeURIComponent(alamat);
         let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+
+        let wilayahStr = '';
+        if (kelurahan) wilayahStr += kelurahan.toLowerCase() + ', ';
+        if (kecamatan) wilayahStr += 'Kec. ' + kecamatan.toLowerCase() + ', ';
+        if (kabupaten) wilayahStr += 'Kab. ' + kabupaten.toLowerCase() + ', ';
+        if (provinsi) wilayahStr += 'Prov. ' + provinsi.toLowerCase();
+        wilayahStr = wilayahStr.replace(/,\s*$/, '');
 
         Swal.fire({
             title: 'Alamat Lengkap Outlet',
-            html: '<p class="text-start mb-2"><strong>Outlet:</strong> ' + nama + '</p>' +
+            html: '<div class="text-start mb-3" style="display: grid; grid-template-columns: max-content auto 1fr; column-gap: 8px; row-gap: 8px; font-size: 15px; line-height: 1.6;">' +
+                    '<div class="fw-bold text-dark">Outlet</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-dark">' + nama + '</div>' +
+                    '<div class="fw-bold text-dark">Wilayah</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-capitalize text-dark">' + wilayahStr + '</div>' +
+                  '</div>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
@@ -305,12 +340,31 @@ $(document).ready(function() {
     $(document).on('click', '.btn-detail-alamat-investor', function() {
         let nama = $(this).data('nama');
         let alamat = $(this).data('alamat');
+        let provinsi = $(this).data('provinsi') || '';
+        let kabupaten = $(this).data('kabupaten') || '';
+        let kecamatan = $(this).data('kecamatan') || '';
+        let kelurahan = $(this).data('kelurahan') || '';
+
         let queryStr = encodeURIComponent(alamat);
         let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
 
+        let wilayahStr = '';
+        if (kelurahan) wilayahStr += kelurahan.toLowerCase() + ', ';
+        if (kecamatan) wilayahStr += 'Kec. ' + kecamatan.toLowerCase() + ', ';
+        if (kabupaten) wilayahStr += 'Kab. ' + kabupaten.toLowerCase() + ', ';
+        if (provinsi) wilayahStr += 'Prov. ' + provinsi.toLowerCase();
+        wilayahStr = wilayahStr.replace(/,\s*$/, '');
+
         Swal.fire({
             title: 'Alamat Lengkap Investor',
-            html: '<p class="text-start mb-2"><strong>Investor:</strong> ' + nama + '</p>' +
+            html: '<div class="text-start mb-3" style="display: grid; grid-template-columns: max-content auto 1fr; column-gap: 8px; row-gap: 8px; font-size: 15px; line-height: 1.6;">' +
+                    '<div class="fw-bold text-dark">Investor</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-dark">' + nama + '</div>' +
+                    '<div class="fw-bold text-dark">Wilayah</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-capitalize text-dark">' + wilayahStr + '</div>' +
+                  '</div>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +

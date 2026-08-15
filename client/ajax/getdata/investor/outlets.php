@@ -18,12 +18,16 @@ $sql = "
         o.id_outlet,
         o.nama_outlet,
         u.alamat_lengkap as alamat_outlet,
-        u.kecamatan,
+        mw.provinsi,
+        mw.kabupaten,
+        mw.kecamatan,
+        mw.kelurahan,
         o.status,
         DATE_FORMAT(o.tgl_request, '%d/%m/%Y %H:%i') as tanggal_bergabung,
         DATE_FORMAT(o.tgl_disetujui, '%d/%m/%Y %H:%i') as tgl_disetujui
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
+    LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
     WHERE o.id_investor = {$idInvestor}
       AND o.status = 'active'
       AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= CURRENT_DATE())

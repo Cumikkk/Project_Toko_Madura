@@ -26,13 +26,16 @@ if ($role === 'master') {
     $totalPagesM   = ceil($totalRecordsM / $limitM);
 
     $listMasterOutlets = $db->query("
-        SELECT o.id_outlet, o.nama_outlet, u_out.kecamatan as kecamatan_outlet, u_out.alamat as alamat_outlet, o.tgl_request as tanggal_bergabung,
-               o.status, o.tgl_jatuh_tempo, o.tipe_request,
-               u_inv.nama_lengkap as nama_investor, u_inv.kecamatan as kecamatan_investor, u_inv.alamat as alamat_investor, u_out.username as username_outlet
+        SELECT o.id_outlet, o.nama_outlet, 
+               mw_out.provinsi as provinsi_outlet, mw_out.kabupaten as kabupaten_outlet, mw_out.kecamatan as kecamatan_outlet, mw_out.kelurahan as kelurahan_outlet, u_out.alamat_lengkap as alamat_outlet, 
+               o.tgl_request as tanggal_bergabung, o.status, o.tgl_jatuh_tempo, o.tipe_request,
+               u_inv.nama_lengkap as nama_investor, mw_inv.provinsi as provinsi_investor, mw_inv.kabupaten as kabupaten_investor, mw_inv.kecamatan as kecamatan_investor, mw_inv.kelurahan as kelurahan_investor, u_inv.alamat_lengkap as alamat_investor, u_out.username as username_outlet
         FROM outlet o
         JOIN investor i ON i.id_investor = o.id_investor
         JOIN users u_inv ON u_inv.id_users = i.id_users
+        LEFT JOIN master_wilayah mw_inv ON mw_inv.id_wilayah = u_inv.id_wilayah
         LEFT JOIN users u_out ON u_out.id_users = o.id_users
+        LEFT JOIN master_wilayah mw_out ON mw_out.id_wilayah = u_out.id_wilayah
         WHERE i.id_master = {$userId} OR i.id_master IS NULL
         ORDER BY o.id_outlet DESC
         LIMIT {$limitM} OFFSET {$offsetM}
@@ -116,14 +119,17 @@ if ($role === 'master') {
                                                     <?php if (!empty($row['alamat_outlet'])) : ?>
                                                         <span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet shadow-xs cursor-pointer" style="font-size: 11px; cursor: pointer;"
                                                               data-nama="<?= htmlspecialchars($row['nama_outlet']) ?>"
-                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?: '-') ?>"
-                                                              data-alamat = "<?= htmlspecialchars($row['alamat_outlet'] ?: '-') ?>"
+                                                              data-provinsi="<?= htmlspecialchars($row['provinsi_outlet'] ?? '') ?>"
+                                                              data-kabupaten="<?= htmlspecialchars($row['kabupaten_outlet'] ?? '') ?>"
+                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_outlet'] ?? '') ?>"
+                                                              data-kelurahan="<?= htmlspecialchars($row['kelurahan_outlet'] ?? '') ?>"
+                                                              data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?? '') ?>"
                                                               title="Klik untuk lihat detail alamat">
-                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'N/A') ?>
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= !empty($row['kecamatan_outlet']) ? htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) . ', Kec. ' . htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet']))) : 'N/A' ?>
                                                         </span>
                                                     <?php else : ?>
                                                         <span class="badge bg-light text-body-secondary border" style="font-size: 11px;">
-                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_outlet'] ?: 'N/A') ?>
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= !empty($row['kecamatan_outlet']) ? htmlspecialchars(ucwords(strtolower($row['kelurahan_outlet'] ?? ''))) . ', Kec. ' . htmlspecialchars(ucwords(strtolower($row['kecamatan_outlet']))) : 'N/A' ?>
                                                         </span>
                                                     <?php endif; ?>
                                                 </div>
@@ -134,14 +140,17 @@ if ($role === 'master') {
                                                     <?php if (!empty($row['alamat_investor'])) : ?>
                                                         <span class="badge bg-light text-body-secondary border btn-detail-alamat-investor shadow-xs cursor-pointer" style="font-size: 10px; cursor: pointer;"
                                                               data-nama="<?= htmlspecialchars($row['nama_investor']) ?>"
-                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?: '-') ?>"
-                                                              data-alamat = "<?= htmlspecialchars($row['alamat_investor'] ?: '-') ?>"
+                                                              data-provinsi="<?= htmlspecialchars($row['provinsi_investor'] ?? '') ?>"
+                                                              data-kabupaten="<?= htmlspecialchars($row['kabupaten_investor'] ?? '') ?>"
+                                                              data-kecamatan="<?= htmlspecialchars($row['kecamatan_investor'] ?? '') ?>"
+                                                              data-kelurahan="<?= htmlspecialchars($row['kelurahan_investor'] ?? '') ?>"
+                                                              data-alamat="<?= htmlspecialchars($row['alamat_investor'] ?? '') ?>"
                                                               title="Klik untuk lihat detail alamat">
-                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?>
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= !empty($row['kecamatan_investor']) ? htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) . ', Kec. ' . htmlspecialchars(ucwords(strtolower($row['kecamatan_investor']))) : 'N/A' ?>
                                                         </span>
                                                     <?php else : ?>
                                                         <span class="badge bg-light text-body-secondary border" style="font-size: 10px;">
-                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars($row['kecamatan_investor'] ?: 'Kecamatan N/A') ?>
+                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= !empty($row['kecamatan_investor']) ? htmlspecialchars(ucwords(strtolower($row['kelurahan_investor'] ?? ''))) . ', Kec. ' . htmlspecialchars(ucwords(strtolower($row['kecamatan_investor']))) : 'N/A' ?>
                                                         </span>
                                                     <?php endif; ?>
                                                 </div>
@@ -248,32 +257,108 @@ if ($role === 'master') {
 $(document).ready(function() {
 
     $(document).on('click', '.btn-detail-alamat-investor', function() {
-        const nama = $(this).data('nama');
-        const kec = $(this).data('kecamatan');
-        const alamat = $(this).data('alamat');
-        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
-        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        let provinsi = $(this).data('provinsi') || '';
+        let kabupaten = $(this).data('kabupaten') || '';
+        let kecamatan = $(this).data('kecamatan') || '';
+        let kelurahan = $(this).data('kelurahan') || '';
+
+        let cleanKel = kelurahan ? kelurahan.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
+        let cleanKec = kecamatan ? (kecamatan.toLowerCase().startsWith('kec') ? kecamatan : 'Kec. ' + kecamatan) : '';
+        let cleanKab = kabupaten ? (kabupaten.toLowerCase().startsWith('kab') || kabupaten.toLowerCase().startsWith('kota') ? kabupaten : 'Kab. ' + kabupaten) : '';
+        let cleanProv = provinsi ? (provinsi.toLowerCase().startsWith('prov') ? provinsi : 'Prov. ' + provinsi) : '';
+        
+        let wilayahStr = [cleanKel, cleanKec, cleanKab, cleanProv].filter(Boolean).join(', ') || '-';
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat || '');
+
         Swal.fire({
-            title: 'Detail Alamat Investor',
-            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Investor:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-primary-subtle text-primary rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><div class="fw-semibold mb-0 bg-body p-2 rounded border"><a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i></a><small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small></div></div></div></div>`,
-            icon: 'info',
+            title: `<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-location-dot me-2"></i>Detail Lokasi Investor</div>`,
+            html: `
+                <div class="text-start bg-light p-3.5 p-md-4 rounded-4 border border-secondary-subtle mt-2 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-user-tie text-danger me-2 fs-6"></i>Nama Investor
+                        </span>
+                        <strong class="text-dark fs-6 ms-2 text-end text-break">${nama || '-'}</strong>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-map-pin text-danger me-2 fs-6"></i>Wilayah
+                        </span>
+                        <strong class="text-dark ms-2 text-end text-break" style="font-size: 13.5px; line-height: 1.4;">${wilayahStr}</strong>
+                    </div>
+                    <div>
+                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center text-nowrap" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-house-chimney text-danger me-2 fs-6"></i>Alamat Lengkap (Jalan / Geotag)
+                        </div>
+                        <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
+                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Buka di Google Maps">
+                                ${alamat || '-'} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
+                            </a>
+                            <small class="text-muted d-block text-start mt-1.5" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
+                        </div>
+                    </div>
+                </div>
+            `,
             confirmButtonText: 'Tutup',
-            confirmButtonColor: '#7D0A0A'
+            confirmButtonColor: '#7D0A0A',
+            customClass: {
+                popup: 'rounded-4'
+            }
         });
     });
 
     $(document).on('click', '.btn-detail-alamat-outlet', function() {
-        const nama = $(this).data('nama');
-        const kec = $(this).data('kecamatan');
-        const alamat = $(this).data('alamat');
-        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + alamat);
-        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
+        let nama = $(this).data('nama');
+        let alamat = $(this).data('alamat');
+        let provinsi = $(this).data('provinsi') || '';
+        let kabupaten = $(this).data('kabupaten') || '';
+        let kecamatan = $(this).data('kecamatan') || '';
+        let kelurahan = $(this).data('kelurahan') || '';
+
+        let cleanKel = kelurahan ? kelurahan.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
+        let cleanKec = kecamatan ? (kecamatan.toLowerCase().startsWith('kec') ? kecamatan : 'Kec. ' + kecamatan) : '';
+        let cleanKab = kabupaten ? (kabupaten.toLowerCase().startsWith('kab') || kabupaten.toLowerCase().startsWith('kota') ? kabupaten : 'Kab. ' + kabupaten) : '';
+        let cleanProv = provinsi ? (provinsi.toLowerCase().startsWith('prov') ? provinsi : 'Prov. ' + provinsi) : '';
+        
+        let wilayahStr = [cleanKel, cleanKec, cleanKab, cleanProv].filter(Boolean).join(', ') || '-';
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat || '');
+
         Swal.fire({
-            title: 'Detail Alamat Outlet',
-            html: `<div class="text-start fs-14"><div class="bg-body-tertiary p-3 rounded-3 border mb-3"><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Outlet:</span><span class="fw-bold">${nama}</span></div><div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom"><span class="text-body-secondary">Kecamatan:</span><span class="badge bg-success-subtle text-success rounded-pill px-3">${kec}</span></div><div><span class="text-body-secondary d-block mb-1">Alamat Lengkap:</span><div class="fw-semibold mb-0 bg-body p-2 rounded border"><a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">${alamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i></a><small class="text-muted d-block text-start mt-1" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small></div></div></div></div>`,
-            icon: 'info',
+            title: `<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-location-dot me-2"></i>Detail Alamat Outlet</div>`,
+            html: `
+                <div class="text-start bg-light p-3.5 p-md-4 rounded-4 border border-secondary-subtle mt-2 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Outlet
+                        </span>
+                        <strong class="text-dark fs-6 ms-2 text-end text-break">${nama || '-'}</strong>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-map-pin text-danger me-2 fs-6"></i>Wilayah
+                        </span>
+                        <strong class="text-dark ms-2 text-end text-break" style="font-size: 13.5px; line-height: 1.4;">${wilayahStr}</strong>
+                    </div>
+                    <div>
+                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center text-nowrap" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-house-chimney text-danger me-2 fs-6"></i>Alamat Lengkap Toko
+                        </div>
+                        <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
+                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Buka di Google Maps">
+                                ${alamat || '-'} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
+                            </a>
+                            <small class="text-muted d-block text-start mt-1.5" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
+                        </div>
+                    </div>
+                </div>
+            `,
             confirmButtonText: 'Tutup',
-            confirmButtonColor: '#198754'
+            confirmButtonColor: '#7D0A0A',
+            customClass: {
+                popup: 'rounded-4'
+            }
         });
     });
 });
@@ -379,7 +464,11 @@ $sqlOutlets = "
     SELECT 
         o.id_outlet,
         o.nama_outlet,
-        u.kecamatan,
+        mw.provinsi,
+        mw.kabupaten,
+        mw.kecamatan,
+        mw.kelurahan,
+        u.id_wilayah,
         u.alamat_lengkap as alamat_outlet,
         o.persentase_potongan,
         o.persentase_hak_investor,
@@ -396,6 +485,7 @@ $sqlOutlets = "
         u.username
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
+    LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
     {$whereOutletSql}
     ORDER BY o.tgl_request DESC, o.id_outlet DESC
     LIMIT {$limit} OFFSET {$offset}
@@ -623,8 +713,11 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-3 py-1.5 btn-detail-alamat shadow-xs fw-bold" 
                                                     data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                    data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
-                                                    data-alamat = "<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-provinsi="<?= htmlspecialchars($row['provinsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-kabupaten="<?= htmlspecialchars($row['kabupaten'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-kecamatan="<?= htmlspecialchars($row['kecamatan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-kelurahan="<?= htmlspecialchars($row['kelurahan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-alamat="<?= htmlspecialchars($row['alamat_outlet'] ?: '-', ENT_QUOTES, 'UTF-8'); ?>"
                                                     style="font-size: 11px;">
                                                     <i class="fa-solid fa-location-dot me-1 text-danger"></i>Detail Alamat
                                                 </button>
@@ -2244,31 +2337,45 @@ $(document).ready(function() {
     $(document).on('click', '.btn-detail-alamat', function(e) {
         e.preventDefault();
         const nama = $(this).data('nama');
-        const kec = $(this).data('kecamatan');
         const alamat = $(this).data('alamat');
+        const provinsi = $(this).data('provinsi') || '';
+        const kabupaten = $(this).data('kabupaten') || '';
+        const kecamatan = $(this).data('kecamatan') || '';
+        const kelurahan = $(this).data('kelurahan') || '';
+
+        let cleanKel = kelurahan ? kelurahan.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
+        let cleanKec = kecamatan ? (kecamatan.toLowerCase().startsWith('kec') ? kecamatan : 'Kec. ' + kecamatan) : '';
+        let cleanKab = kabupaten ? (kabupaten.toLowerCase().startsWith('kab') || kabupaten.toLowerCase().startsWith('kota') ? kabupaten : 'Kab. ' + kabupaten) : '';
+        let cleanProv = provinsi ? (provinsi.toLowerCase().startsWith('prov') ? provinsi : 'Prov. ' + provinsi) : '';
+        
+        let wilayahStr = [cleanKel, cleanKec, cleanKab, cleanProv].filter(Boolean).join(', ') || kecamatan || '-';
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat || '');
 
         Swal.fire({
             title: `<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-location-dot me-2"></i>Detail Alamat Toko</div>`,
             html: `
-                <div class="text-start bg-light p-4 rounded-4 border border-secondary-subtle mt-3 mb-1 shadow-sm">
-                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
-                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                <div class="text-start bg-light p-3.5 p-md-4 rounded-4 border border-secondary-subtle mt-2 mb-1 shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
                             <i class="fa-solid fa-store text-danger me-2 fs-6"></i>Nama Outlet
                         </span>
-                        <strong class="text-dark fs-6 ms-2 text-end">${nama}</strong>
+                        <strong class="text-dark fs-6 ms-2 text-end text-break">${nama || '-'}</strong>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom">
-                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
-                            <i class="fa-solid fa-map-pin text-danger me-2 fs-6"></i>Kecamatan
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2.5 border-bottom gap-2">
+                        <span class="text-secondary small fw-bold text-uppercase d-inline-flex align-items-center text-nowrap flex-shrink-0" style="font-size: 11px; letter-spacing: 0.5px;">
+                            <i class="fa-solid fa-map-pin text-danger me-2 fs-6"></i>Wilayah
                         </span>
-                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill fw-bold ms-2" style="font-size: 12px;">${kec}</span>
+                        <strong class="text-dark ms-2 text-end text-break" style="font-size: 13.5px; line-height: 1.4;">${wilayahStr}</strong>
                     </div>
                     <div>
-                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center" style="font-size: 11px; letter-spacing: 0.5px;">
+                        <div class="text-secondary small fw-bold mb-2 text-uppercase d-inline-flex align-items-center text-nowrap" style="font-size: 11px; letter-spacing: 0.5px;">
                             <i class="fa-solid fa-house-chimney text-danger me-2 fs-6"></i>Alamat Lengkap Toko
                         </div>
                         <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
-                            ${alamat}
+                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Buka di Google Maps">
+                                ${alamat || '-'} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
+                            </a>
+                            <small class="text-muted d-block text-start mt-1.5" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
                         </div>
                     </div>
                 </div>

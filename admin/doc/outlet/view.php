@@ -23,6 +23,9 @@ $pendingOutlets = Outlet::getPendingOutlets();
 // 5. Fetch Rejected Outlets
 $rejectedOutlets = Outlet::getRejectedOutlets();
 
+// Fetch list of Investors for filter dropdown
+$investorFilterOptions = $db->query("SELECT inv.id_investor, u.nama_lengkap, u.username FROM investor inv JOIN users u ON u.id_users = inv.id_users ORDER BY u.nama_lengkap ASC");
+
 // Helper: safely encode alamat for JS variable
 function safeJsonAlamat($str) {
     return json_encode(trim(preg_replace('/\s+/', ' ', $str ?? '')));
@@ -106,26 +109,64 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                 </div>
             </div>
             <div class="card-body">
+                <!-- Toolbar Filter Data Wilayah & Investor Terintegrasi -->
+                <div class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-4 col-md-4">
+                            <label class="form-label small fw-bold mb-1">Filter Investor</label>
+                            <select id="filterInvestor" class="form-select filter-select" data-placeholder="Semua Investor">
+                                <option value="">Semua Investor</option>
+                                <?php if ($investorFilterOptions && $investorFilterOptions->num_rows > 0) : ?>
+                                    <?php while ($inv = $investorFilterOptions->fetch_assoc()) : ?>
+                                        <option value="<?= htmlspecialchars(strtoupper($inv['nama_lengkap'])); ?>">
+                                            <?= htmlspecialchars($inv['nama_lengkap']); ?> (@<?= htmlspecialchars($inv['username']); ?>)
+                                        </option>
+                                    <?php endwhile; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <label class="form-label small fw-bold mb-1">Filter Provinsi</label>
+                            <select id="filterProvinsi" class="form-select filter-select" data-placeholder="Semua Provinsi">
+                                <option value="">Semua Provinsi</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <label class="form-label small fw-bold mb-1">Filter Kabupaten / Kota</label>
+                            <select id="filterKabupaten" class="form-select filter-select" data-placeholder="Semua Kabupaten" disabled>
+                                <option value="">Semua Kabupaten</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2">
+                            <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm w-100 d-flex align-items-center justify-content-center" style="height: 38px;" title="Reset semua filter">
+                                <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- TAB 1: OUTLET AKTIF -->
                 <div id="tab-active" class="outlet-tab-section">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-active">
                             <thead>
                                 <tr class="text-center">
-                                    <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Tanggal Disetujui</th>
-                                    <th class="text-center">Jatuh Tempo Langganan</th>
-                                    <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Wilayah</th>
-                                    <th class="text-center">Investor</th>
+                                    <th class="text-center" style="width: 5%;">NO</th>
+                                    <th class="text-center">TANGGAL DISETUJUI</th>
+                                    <th class="text-center">JATUH TEMPO LANGGANAN</th>
+                                    <th class="text-center">NAMA OUTLET</th>
+                                    <th class="text-center">PENGELOLA OUTLET</th>
+                                    <th class="text-center">WILAYAH</th>
+                                    <th class="text-center">INVESTOR</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if ($activeOutlets && $activeOutlets->num_rows > 0) : ?>
                                     <?php $no = 1; while ($row = $activeOutlets->fetch_assoc()) : ?>
-                                        <tr>
+                                        <tr data-investor="<?= htmlspecialchars(strtoupper($row['nama_investor'] ?? '')) ?>"
+                                            data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>"
+                                            data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>">
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center"><?= !empty($row['tgl_disetujui']) ? date("d/m/Y H:i", strtotime($row['tgl_disetujui'])) : (!empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-') ?></td>
                                             <td class="text-center">
@@ -150,29 +191,49 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-start"><strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
-                                                <?php if (!empty($row['no_hp_toko'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <strong class="text-primary"><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['username_kasir']) || !empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted">
+                                                        <?php if (!empty($row['username_kasir'])) : ?>
+                                                            <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
+                                                            <span class="mx-1">•</span>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                            <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
+                                                        <?php endif; ?>
+                                                    </small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
-                                                <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
-                                                    </span>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                            <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted">-</span>
                                                 <?php endif; ?>
-                                            <?php else : ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <strong><?= htmlspecialchars($row['nama_investor']) ?></strong>
-                                                    <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                        <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['username_investor']) || !empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted">
+                                                            <?php if (!empty($row['username_investor'])) : ?>
+                                                                <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
+                                                                <span class="mx-1">•</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                                <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
+                                                            <?php endif; ?>
+                                                        </small>
                                                     <?php endif; ?>
                                                 <?php else : ?>
                                                     <span class="text-muted">Belum Ada Investor</span>
@@ -205,20 +266,22 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-expired">
                             <thead>
                                 <tr class="text-center">
-                                    <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Tanggal Disetujui</th>
-                                    <th class="text-center">Jatuh Tempo Langganan</th>
-                                    <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Wilayah</th>
-                                    <th class="text-center">Investor</th>
+                                    <th class="text-center" style="width: 5%;">NO</th>
+                                    <th class="text-center">TANGGAL DISETUJUI</th>
+                                    <th class="text-center">JATUH TEMPO LANGGANAN</th>
+                                    <th class="text-center">NAMA OUTLET</th>
+                                    <th class="text-center">PENGELOLA OUTLET</th>
+                                    <th class="text-center">WILAYAH</th>
+                                    <th class="text-center">INVESTOR</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if ($expiredOutlets && $expiredOutlets->num_rows > 0) : ?>
                                     <?php $no = 1; while ($row = $expiredOutlets->fetch_assoc()) : ?>
-                                        <tr>
+                                        <tr data-investor="<?= htmlspecialchars(strtoupper($row['nama_investor'] ?? '')) ?>"
+                                            data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>"
+                                            data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>">
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center"><?= !empty($row['tgl_disetujui']) ? date("d/m/Y H:i", strtotime($row['tgl_disetujui'])) : (!empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-') ?></td>
                                             <td class="text-center">
@@ -233,29 +296,49 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-start"><strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong></td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
-                                                <?php if (!empty($row['no_hp_toko'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <strong class="text-primary"><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['username_kasir']) || !empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted">
+                                                        <?php if (!empty($row['username_kasir'])) : ?>
+                                                            <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
+                                                            <span class="mx-1">•</span>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                            <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
+                                                        <?php endif; ?>
+                                                    </small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
-                                                <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
-                                                    </span>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                            <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted">-</span>
                                                 <?php endif; ?>
-                                            <?php else : ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
                                                 <?php if (!empty($row['nama_investor'])) : ?>
-                                                    <strong><?= htmlspecialchars($row['nama_investor']) ?></strong>
-                                                    <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                        <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['username_investor']) || !empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted">
+                                                            <?php if (!empty($row['username_investor'])) : ?>
+                                                                <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
+                                                                <span class="mx-1">•</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                                <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
+                                                            <?php endif; ?>
+                                                        </small>
                                                     <?php endif; ?>
                                                 <?php else : ?>
                                                     <span class="text-muted">Belum Ada Investor</span>
@@ -288,22 +371,24 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-pending">
                             <thead>
                                 <tr class="text-center">
-                                    <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Tanggal Request</th>
-                                    <th class="text-center">Tipe Request</th>
-                                    <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Wilayah</th>
-                                    <th class="text-center">Investor</th>
-                                    <th class="text-center">Biaya Langganan</th>
-                                    <th class="text-center">Bukti Bayar</th>
+                                    <th class="text-center" style="width: 5%;">NO</th>
+                                    <th class="text-center">TANGGAL REQUEST</th>
+                                    <th class="text-center">TIPE REQUEST</th>
+                                    <th class="text-center">NAMA OUTLET</th>
+                                    <th class="text-center">PENGELOLA OUTLET</th>
+                                    <th class="text-center">WILAYAH</th>
+                                    <th class="text-center">INVESTOR</th>
+                                    <th class="text-center">BIAYA LANGGANAN</th>
+                                    <th class="text-center">BUKTI BAYAR</th>
                                     <th class="text-center" style="width: 15%;">#</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if ($pendingOutlets && $pendingOutlets->num_rows > 0) : ?>
                                     <?php $no = 1; while ($row = $pendingOutlets->fetch_assoc()) : ?>
-                                        <tr>
+                                        <tr data-investor="<?= htmlspecialchars(strtoupper($row['nama_investor'] ?? '')) ?>"
+                                            data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>"
+                                            data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>">
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center">
                                                 <?= !empty($row['tgl_request']) ? date("d/m/Y H:i", strtotime($row['tgl_request'])) : '-' ?>
@@ -319,28 +404,52 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             </td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
-                                                <?php if (!empty($row['no_hp_toko'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <strong class="text-primary"><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['username_kasir']) || !empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted">
+                                                        <?php if (!empty($row['username_kasir'])) : ?>
+                                                            <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
+                                                            <span class="mx-1">•</span>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                            <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
+                                                        <?php endif; ?>
+                                                    </small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
-                                                <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
-                                                    </span>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                            <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted">-</span>
                                                 <?php endif; ?>
-                                            <?php else : ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
-                                                <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                <?php if (!empty($row['nama_investor'])) : ?>
+                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['username_investor']) || !empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted">
+                                                            <?php if (!empty($row['username_investor'])) : ?>
+                                                                <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
+                                                                <span class="mx-1">•</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                                <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
+                                                            <?php endif; ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                <?php else : ?>
+                                                    <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end fw-bold text-success">
@@ -382,23 +491,25 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                         <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-outlet-reject">
                             <thead>
                                 <tr class="text-center">
-                                    <th class="text-center" style="width: 5%;">No</th>
-                                    <th class="text-center">Tanggal Ditolak</th>
-                                    <th class="text-center">Tipe Request</th>
-                                    <th class="text-center">Nama Outlet</th>
-                                    <th class="text-center">Pengelola Outlet</th>
-                                    <th class="text-center">Wilayah</th>
-                                    <th class="text-center">Investor</th>
-                                    <th class="text-center">Biaya Langganan</th>
-                                    <th class="text-center">Bukti Bayar</th>
-                                    <th class="text-center">Alasan Penolakan</th>
+                                    <th class="text-center" style="width: 5%;">NO</th>
+                                    <th class="text-center">TANGGAL DITOLAK</th>
+                                    <th class="text-center">TIPE REQUEST</th>
+                                    <th class="text-center">NAMA OUTLET</th>
+                                    <th class="text-center">PENGELOLA OUTLET</th>
+                                    <th class="text-center">WILAYAH</th>
+                                    <th class="text-center">INVESTOR</th>
+                                    <th class="text-center">BIAYA LANGGANAN</th>
+                                    <th class="text-center">BUKTI BAYAR</th>
+                                    <th class="text-center">ALASAN PENOLAKAN</th>
                                     <th class="text-center" style="width: 10%;">#</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if ($rejectedOutlets && $rejectedOutlets->num_rows > 0) : ?>
                                     <?php $no = 1; while ($row = $rejectedOutlets->fetch_assoc()) : ?>
-                                        <tr>
+                                        <tr data-investor="<?= htmlspecialchars(strtoupper($row['nama_investor'] ?? '')) ?>"
+                                            data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>"
+                                            data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>">
                                             <td class="text-center"><?= $no++ ?></td>
                                             <td class="text-center">
                                                 <?= !empty($row['tgl_ditolak']) ? date("d/m/Y H:i", strtotime($row['tgl_ditolak'])) : '-' ?>
@@ -414,28 +525,52 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                 <strong class="text-danger"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             </td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
-                                                <?php if (!empty($row['no_hp_toko'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?></small>
+                                                <strong class="text-primary"><?= htmlspecialchars($row['pengelola_toko'] ?? 'Belum Diatur') ?></strong>
+                                                <?php if (!empty($row['username_kasir']) || !empty($row['no_hp_toko'])) : ?>
+                                                    <br><small class="text-muted">
+                                                        <?php if (!empty($row['username_kasir'])) : ?>
+                                                            <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
+                                                            <span class="mx-1">•</span>
+                                                        <?php endif; ?>
+                                                        <?php if (!empty($row['no_hp_toko'])) : ?>
+                                                            <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
+                                                        <?php endif; ?>
+                                                    </small>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['kecamatan']) && $row['kecamatan'] !== '-') : ?>
-                                                <?php if (!empty($row['alamat_outlet'])) : ?>
-                                                    <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs" style="cursor: pointer; font-size: 11px;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
-                                                        <i class="fa fa-map-marker text-danger me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?>
-                                                    </span>
+                                                    <?php if (!empty($row['alamat_outlet'])) : ?>
+                                                        <span class="badge bg-light text-dark border btn-lihat-alamat shadow-xs mt-1 py-1 px-2" style="cursor: pointer; font-size: 13px; font-weight: 500;" onclick='showAlamat(<?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alamat_outlet']) ?>, <?= safeJsonAlamat($row['provinsi'] ?? "") ?>, <?= safeJsonAlamat($row['kabupaten'] ?? "") ?>, <?= safeJsonAlamat($row['kecamatan'] ?? "") ?>, <?= safeJsonAlamat($row['kelurahan'] ?? "") ?>)' title="Klik untuk lihat detail alamat">
+                                                            <i class="fa fa-map-marker text-danger me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>
+                                                        </span>
+                                                    <?php else : ?>
+                                                        <span class="text-muted" style="font-size: 13px;"><i class="fa fa-map-marker me-1"></i><?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?></span>
+                                                    <?php endif; ?>
                                                 <?php else : ?>
-                                                    <span class="text-muted"><i class="fa fa-map-marker me-1"></i>Kel. <?= htmlspecialchars(ucwords(strtolower($row['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($row['kecamatan'] ?? ''))) ?>, Kab. <?= htmlspecialchars(ucwords(strtolower($row['kabupaten'] ?? ''))) ?>, Prov. <?= htmlspecialchars(ucwords(strtolower($row['provinsi'] ?? ''))) ?></span>
+                                                    <span class="text-muted">-</span>
                                                 <?php endif; ?>
-                                            <?php else : ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
                                             </td>
                                             <td class="text-start">
-                                                <strong><?= htmlspecialchars($row['nama_investor'] ?? '-') ?></strong>
-                                                <?php if (!empty($row['no_hp_investor'])) : ?>
-                                                    <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?></small>
+                                                <?php if (!empty($row['nama_investor'])) : ?>
+                                                    <strong class="text-primary"><?= htmlspecialchars($row['nama_investor']) ?></strong>
+                                                    <?php if (!empty($row['username_investor']) || !empty($row['no_hp_investor'])) : ?>
+                                                        <br><small class="text-muted">
+                                                            <?php if (!empty($row['username_investor'])) : ?>
+                                                                <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
+                                                                <span class="mx-1">•</span>
+                                                            <?php endif; ?>
+                                                            <?php if (!empty($row['no_hp_investor'])) : ?>
+                                                                <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
+                                                            <?php endif; ?>
+                                                        </small>
+                                                    <?php endif; ?>
+                                                <?php else : ?>
+                                                    <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end text-muted">
@@ -482,32 +617,54 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalHistoriLabel">
+                <h5 class="modal-title d-flex align-items-center" id="modalHistoriLabel">
                     <i class="fas fa-history me-2 text-primary"></i>
-                    Histori Pembayaran Langganan
-                    &mdash; <small class="text-muted fw-normal" id="historiNamaOutlet">-</small>
+                    <span>Histori Pembayaran Langganan</span>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="historiInfoBadge" class="mb-3 d-none">
-                    <span class="badge bg-secondary me-1" id="badgeTotalHistori">0 Transaksi</span>
+                <!-- Info Summary Box -->
+                <div id="historiInfoCard" class="p-3 bg-light rounded-3 border mb-3">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="fa fa-building text-primary me-2" style="width: 18px; text-align:center;"></i>
+                                <span class="text-muted small me-1">Outlet:</span>
+                                <strong class="text-dark" id="historiNamaOutlet">-</strong>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-user-tie text-info me-2" style="width: 18px; text-align:center;"></i>
+                                <span class="text-muted small me-1">Investor:</span>
+                                <span class="text-dark" id="historiInvestor">-</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                            <div class="mb-1">
+                                <span class="text-muted small">Jatuh Tempo:</span>
+                                <strong class="text-danger ms-1" id="historiTempo">-</strong>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary rounded-pill px-3" id="badgeTotalHistori">0 Transaksi</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered text-nowrap w-100 align-middle">
-                        <thead class="table-secondary text-center">
-                            <tr>
-                                <th style="width:5%">No</th>
-                                <th>Tanggal Request</th>
-                                <th>Tipe</th>
-                                <th class="text-end">Nominal</th>
-                                <th>Status</th>
-                                <th>Jatuh Tempo</th>
-                                <th>Bukti</th>
+                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-histori-langganan">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="text-center" style="width:5%">NO</th>
+                                <th class="text-center">TANGGAL REQUEST</th>
+                                <th class="text-center">TIPE REQUEST</th>
+                                <th class="text-center">NOMINAL</th>
+                                <th class="text-center">STATUS</th>
+                                <th class="text-center">JATUH TEMPO</th>
+                                <th class="text-center" style="width:10%">BUKTI BAYAR</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyHistori">
-                            <tr><td colspan="7" class="text-center py-3 text-muted">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -527,11 +684,24 @@ function showAlamat(nama, alamat, provinsi, kabupaten, kecamatan, kelurahan) {
     let queryStr = encodeURIComponent(alamat);
     let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + queryStr;
     
+    let wilayahStr = '';
+    if (kelurahan) wilayahStr += kelurahan.toLowerCase() + ', ';
+    if (kecamatan) wilayahStr += 'Kec. ' + kecamatan.toLowerCase() + ', ';
+    if (kabupaten) wilayahStr += 'Kab. ' + kabupaten.toLowerCase() + ', ';
+    if (provinsi) wilayahStr += 'Prov. ' + provinsi.toLowerCase();
+    wilayahStr = wilayahStr.replace(/,\s*$/, '');
+
     if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Alamat Lengkap Outlet',
-            html: '<p class="text-start mb-2"><strong>Outlet:</strong> ' + nama + '</p>' +
-                  '<p class="text-start mb-2"><strong>Wilayah:</strong> <span class="text-capitalize">Kel. ' + (kelurahan || '').toLowerCase() + ', Kec. ' + (kecamatan || '').toLowerCase() + ', Kab. ' + (kabupaten || '').toLowerCase() + ', Prov. ' + (provinsi || '').toLowerCase() + '</span></p>' +
+            html: '<div class="text-start mb-3" style="display: grid; grid-template-columns: max-content auto 1fr; column-gap: 8px; row-gap: 8px; font-size: 15px; line-height: 1.6;">' +
+                    '<div class="fw-bold text-dark">Outlet</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-dark">' + nama + '</div>' +
+                    '<div class="fw-bold text-dark">Wilayah</div>' +
+                    '<div class="fw-bold text-dark">:</div>' +
+                    '<div class="text-capitalize text-dark">' + wilayahStr + '</div>' +
+                  '</div>' +
                   '<div class="p-3 bg-light rounded text-start border">' +
                     '<i class="fa fa-map-marker-alt me-2 text-danger"></i>' +
                     '<a href="' + mapsUrl + '" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Klik untuk membuka Geotag Google Maps">' +
@@ -543,7 +713,7 @@ function showAlamat(nama, alamat, provinsi, kabupaten, kecamatan, kelurahan) {
             confirmButtonText: 'Tutup'
         });
     } else {
-        alert('Outlet: ' + nama + '\nWilayah: ' + wilayahLengkap + '\nAlamat: ' + alamat);
+        alert('Outlet: ' + nama + '\nWilayah: ' + wilayahStr + '\nAlamat: ' + alamat);
     }
 }
 
@@ -560,7 +730,8 @@ function initDataTable(tabKey) {
                 processing: true,
                 deferRender: true,
                 scrollX: true,
-                lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                pageLength: 5,
                 language: {
                     searchPlaceholder: 'Cari outlet...',
                     sSearch: '',
@@ -667,6 +838,144 @@ function switchOutletTab(tabKey) {
 }
 
 $(document).ready(function() {
+    const adminUrl = "<?= SystemInfo::app('ADMIN_URL') ?>";
+
+    function initFilterSelect2(selector) {
+        let $el = $(selector);
+        let placeholder = $el.attr('data-placeholder') || 'Pilih...';
+        if ($el.data('select2')) {
+            $el.select2('destroy');
+        }
+        $el.select2({
+            width: '100%',
+            placeholder: placeholder,
+            allowClear: false,
+            language: { noResults: function() { return 'Tidak ada hasil'; } }
+        });
+    }
+
+    function openNextFilterSelect2(selector) {
+        setTimeout(() => {
+            let $el = $(selector);
+            $el.select2('open');
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 120);
+    }
+
+    $('.filter-select').on('select2:close', function() {
+        let $container = $(this).next('.select2-container');
+        $container.find('.select2-selection').blur();
+    });
+
+    $(document).on('select2:open', function() {
+        setTimeout(() => {
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 10);
+    });
+
+    // Inisialisasi filter Select2
+    initFilterSelect2('#filterInvestor');
+    initFilterSelect2('#filterProvinsi');
+    initFilterSelect2('#filterKabupaten');
+
+    // Load Provinsi untuk Filter
+    $.post(adminUrl + "/ajax/post/wilayah/get_provinsi", function(res) {
+        let options = '<option value="">Semua Provinsi</option>';
+        if (res.results) {
+            res.results.forEach(item => {
+                options += `<option value="${item.id}">${item.text}</option>`;
+            });
+        }
+        $('#filterProvinsi').html(options);
+        initFilterSelect2('#filterProvinsi');
+    });
+
+    // Custom filtering function across all 4 DataTables
+    $.fn.dataTable.ext.search.push(function(settings, searchData, index) {
+        if (!settings.nTable || !settings.nTable.id || !settings.nTable.id.startsWith('table-outlet-')) {
+            return true;
+        }
+        let table = $(settings.nTable).DataTable();
+        let $row = $(table.row(index).node());
+        let rowInvestor = ($row.attr('data-investor') || '').toUpperCase().trim();
+        let rowProv = ($row.attr('data-provinsi') || '').toUpperCase().trim();
+        let rowKab = ($row.attr('data-kabupaten') || '').toUpperCase().trim();
+        
+        let filterInvestor = ($('#filterInvestor').val() || '').toUpperCase().trim();
+        let filterProv = ($('#filterProvinsi').val() || '').toUpperCase().trim();
+        let filterKab = ($('#filterKabupaten').val() || '').toUpperCase().trim();
+        
+        if (filterInvestor && rowInvestor !== filterInvestor) {
+            return false;
+        }
+        if (filterProv && rowProv !== filterProv) {
+            return false;
+        }
+        if (filterKab && rowKab !== filterKab) {
+            return false;
+        }
+        return true;
+    });
+
+    function redrawAllTables() {
+        ['active', 'expired', 'pending', 'reject'].forEach(function(tabKey) {
+            let tableId = '#table-outlet-' + tabKey;
+            if ($.fn.DataTable.isDataTable(tableId)) {
+                $(tableId).DataTable().draw();
+            }
+        });
+    }
+
+    // Event filter Investor
+    $('#filterInvestor').on('change select2:select', function(e) {
+        if (e.type === 'select2:select' && $(this).val()) {
+            openNextFilterSelect2('#filterProvinsi');
+        }
+        redrawAllTables();
+    });
+
+    // Event filter Provinsi
+    $('#filterProvinsi').on('change', function() {
+        let prov = $(this).val();
+        $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
+        initFilterSelect2('#filterKabupaten');
+        
+        if (prov) {
+            $.post(adminUrl + "/ajax/post/wilayah/get_kabupaten", { provinsi: prov }, function(res) {
+                let options = '<option value="">Semua Kabupaten</option>';
+                if (res.results) {
+                    res.results.forEach(item => {
+                        options += `<option value="${item.id}">${item.text}</option>`;
+                    });
+                }
+                $('#filterKabupaten').html(options).prop('disabled', false);
+                initFilterSelect2('#filterKabupaten');
+                openNextFilterSelect2('#filterKabupaten');
+            });
+        }
+        redrawAllTables();
+    });
+
+    // Event filter Kabupaten
+    $('#filterKabupaten').on('change', function() {
+        redrawAllTables();
+    });
+
+    // Reset Filter Button
+    $('#btnResetFilter').on('click', function() {
+        $('#filterInvestor').val('').trigger('change');
+        $('#filterProvinsi').val('').trigger('change');
+        $('#filterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
+        initFilterSelect2('#filterKabupaten');
+        redrawAllTables();
+    });
+
     // Initialize default visible tab (active) on load
     initDataTable('active');
 
@@ -897,63 +1206,140 @@ function deleteOutlet(id, nama) {
     });
 }
 
-// ============================================================
-// Histori Pembayaran
-// ============================================================
+var dtHistori = null;
+
 function showHistori(id, nama) {
     $('#historiNamaOutlet').text(nama);
-    $('#historiInfoBadge').addClass('d-none');
-    $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
+    $('#historiInvestor').text('Memuat...');
+    $('#historiTempo').text('Memuat...');
+    $('#badgeTotalHistori').text('0 Transaksi');
+
+    // Destroy DataTable instance lama jika ada
+    if ($.fn.DataTable.isDataTable('#table-histori-langganan')) {
+        $('#table-histori-langganan').DataTable().clear().destroy();
+    }
+    $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
     $('#modalHistoriPembayaran').modal('show');
 
     $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/get_histori", { id_outlet: id }, function(resp) {
         if (resp.success) {
+            if (resp.outlet) {
+                if (resp.outlet.nama_outlet) $('#historiNamaOutlet').text(resp.outlet.nama_outlet);
+                if (resp.outlet.nama_investor) {
+                    let invText = resp.outlet.nama_investor;
+                    if (resp.outlet.username_investor) invText += ' (@' + resp.outlet.username_investor + ')';
+                    $('#historiInvestor').text(invText);
+                } else {
+                    $('#historiInvestor').text('-');
+                }
+                if (resp.outlet.tgl_jatuh_tempo) {
+                    let parts = resp.outlet.tgl_jatuh_tempo.split(' ')[0].split('-');
+                    if (parts.length === 3) {
+                        $('#historiTempo').text(parts[2] + '/' + parts[1] + '/' + parts[0]);
+                    } else {
+                        $('#historiTempo').text(resp.outlet.tgl_jatuh_tempo);
+                    }
+                } else {
+                    $('#historiTempo').text('Belum Diatur');
+                }
+            }
+
             let html = '';
             if (resp.data && resp.data.length > 0) {
                 $('#badgeTotalHistori').text(resp.data.length + ' Transaksi');
-                $('#historiInfoBadge').removeClass('d-none');
                 resp.data.forEach(function(r, idx) {
                     let rNo = idx + 1;
-                    let rTgl = r.tgl_request ? r.tgl_request.split(' ')[0] : '-';
+                    let rTgl = '-';
+                    if (r.tgl_request) {
+                        let dt = r.tgl_request.split(' ');
+                        let p = dt[0].split('-');
+                        rTgl = (p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : dt[0]) + (dt[1] ? ' ' + dt[1].substring(0,5) : '');
+                    }
                     let rTipe = r.tipe_request === 'baru'
-                        ? '<span class="badge bg-info text-white">Pendaftaran Baru</span>'
-                        : '<span class="badge bg-warning text-dark">Perpanjangan</span>';
-                    let rNominal = 'Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer);
-                    let rJatuhTempo = r.tgl_jatuh_tempo ? r.tgl_jatuh_tempo.split(' ')[0] : '<span class="text-muted">-</span>';
+                        ? '<span class="badge bg-info text-white"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>'
+                        : '<span class="badge bg-warning text-dark"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>';
+                    let rNominal = '<span class="text-success fw-bold">Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer || 0) + '</span>';
+                    
+                    let rJatuhTempo = '-';
+                    if (r.tgl_jatuh_tempo) {
+                        let jt = r.tgl_jatuh_tempo.split(' ')[0].split('-');
+                        rJatuhTempo = jt.length === 3 ? jt[2] + '/' + jt[1] + '/' + jt[0] : r.tgl_jatuh_tempo;
+                    }
 
                     let rStatus = '';
-                    if (r.status === 'pending') rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
-                    else if (r.status === 'active') rStatus = '<span class="badge bg-success">Disetujui</span>';
-                    else if (r.status === 'reject') rStatus = '<span class="badge bg-danger">Ditolak</span>';
+                    if (r.status === 'pending') {
+                        rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
+                    } else if (r.status === 'active') {
+                        rStatus = '<span class="badge bg-success">Disetujui</span>';
+                    } else if (r.status === 'reject') {
+                        let alasanAttr = (r.alasan_penolakan || '').replace(/"/g, '&quot;');
+                        rStatus = '<span class="badge bg-danger" title="' + alasanAttr + '">Ditolak</span>';
+                    }
 
                     let rBukti = '<span class="text-muted">-</span>';
                     if (r.bukti_pembayaran) {
-                        let encodedPath = encodeURIComponent(r.bukti_pembayaran);
-                        let adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
-                        let proxyUrl = adminUrl + '/image-proxy.php?file=' + encodedPath;
-                        rBukti = '<a href="' + proxyUrl + '" target="_blank" class="btn btn-outline-info btn-sm py-0 px-2" title="Lihat Bukti Bayar"><i class="fas fa-image me-1"></i>Lihat</a>';
+                        let safeOutlet = (nama || '').replace(/'/g, "\\'");
+                        let safeInv = ($('#historiInvestor').text() || '').replace(/'/g, "\\'");
+                        let safeBiaya = new Intl.NumberFormat('id-ID').format(r.nominal_transfer || 0);
+                        rBukti = '<button type="button" class="btn btn-outline-info btn-sm py-1 px-2" onclick="previewBukti(\'' + r.bukti_pembayaran + '\', \'' + safeOutlet + '\', \'' + safeInv + '\', \'' + safeBiaya + '\')">'
+                            + '<i class="fas fa-image me-1"></i>Lihat Bukti'
+                            + '</button>';
                     }
 
                     html += '<tr class="text-center">'
-                        + '<td class="fw-semibold text-muted">' + rNo + '</td>'
-                        + '<td>' + rTgl + '</td>'
-                        + '<td>' + rTipe + '</td>'
-                        + '<td class="text-end fw-semibold text-success">' + rNominal + '</td>'
-                        + '<td>' + rStatus + '</td>'
-                        + '<td class="text-muted">' + rJatuhTempo + '</td>'
-                        + '<td>' + rBukti + '</td>'
+                        + '<td class="text-center fw-semibold text-muted">' + rNo + '</td>'
+                        + '<td class="text-center">' + rTgl + '</td>'
+                        + '<td class="text-center">' + rTipe + '</td>'
+                        + '<td class="text-center">' + rNominal + '</td>'
+                        + '<td class="text-center">' + rStatus + '</td>'
+                        + '<td class="text-center text-muted">' + rJatuhTempo + '</td>'
+                        + '<td class="text-center">' + rBukti + '</td>'
                         + '</tr>';
                 });
+                $('#tbodyHistori').html(html);
             } else {
-                html = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-inbox me-2"></i>Belum ada histori pembayaran untuk outlet ini.</td></tr>';
+                $('#tbodyHistori').html('');
             }
-            $('#tbodyHistori').html(html);
+
+            // Inisialisasi DataTable untuk modal histori
+            if ($.fn.DataTable) {
+                dtHistori = $('#table-histori-langganan').DataTable({
+                    processing: true,
+                    deferRender: true,
+                    scrollX: true,
+                    lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
+                    language: {
+                        searchPlaceholder: 'Cari riwayat...',
+                        sSearch: '',
+                        lengthMenu: 'Show _MENU_ entries',
+                        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                        paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
+                        emptyTable: 'Belum ada histori pembayaran untuk outlet ini.'
+                    },
+                    order: [[1, 'desc']]
+                });
+
+                if ($.fn.select2) {
+                    setTimeout(function() {
+                        $('#table-histori-langganan_wrapper .dataTables_length select').select2({
+                            minimumResultsForSearch: Infinity,
+                            width: 'auto'
+                        });
+                    }, 50);
+                }
+            }
         } else {
-            $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data.</td></tr>');
+            $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data histori.</td></tr>');
         }
     }, 'json').fail(function() {
-        $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
+        $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
     });
 }
+
+$('#modalHistoriPembayaran').on('shown.bs.modal', function() {
+    if ($.fn.DataTable.isDataTable('#table-histori-langganan')) {
+        $('#table-histori-langganan').DataTable().columns.adjust().draw(false);
+    }
+});
 
 </script>
