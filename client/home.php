@@ -35,19 +35,23 @@ if ($role === 'outlet') {
         $stData = $sqlStatus->fetch_assoc();
         $today = date('Y-m-d');
         $jt = !empty($stData['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($stData['tgl_jatuh_tempo'])) : null;
+        $isStillActivePeriod = ($jt && $today <= $jt);
 
         if ($stData['status'] !== 'active') {
-            User::logout();
             $isRenew = (($stData['tipe_request'] ?? '') === 'perpanjangan');
-            if ($stData['status'] === 'reject') {
-                $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Akun";
-                $msg = $label . " outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui');
-            } else {
-                $msg = $isRenew 
-                    ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
-                    : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+            // If it is an early renewal request/rejection BUT current subscription is still active ($today <= $jt), allow access!
+            if (!($isRenew && $isStillActivePeriod)) {
+                User::logout();
+                if ($stData['status'] === 'reject') {
+                    $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Akun";
+                    $msg = $label . " outlet Anda telah ditolak oleh Admin. Alasan: " . ($stData['alasan_penolakan'] ?: 'Tidak disetujui');
+                } else {
+                    $msg = $isRenew 
+                        ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
+                        : "Akun outlet Anda masih menunggu konfirmasi dari Admin.";
+                }
+                die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
             }
-            die("<script>alert('" . addslashes($msg) . "'); location.href = '" . SystemInfo::app('CLIENT_URL') . "';</script>");
         } elseif ($jt && $today > $jt) {
             User::logout();
             $msg = "Masa langganan outlet Anda telah berakhir pada tanggal " . date('d/m/Y', strtotime($jt)) . ". Silakan hubungi Investor/Admin untuk perpanjangan.";
