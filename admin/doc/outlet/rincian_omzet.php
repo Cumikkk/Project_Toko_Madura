@@ -24,6 +24,20 @@ if (!$outlet) {
     return;
 }
 
+$db = Database::connect();
+$resTahunRincian = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND tanggal_omzet IS NOT NULL AND tanggal_omzet != '0000-00-00' ORDER BY tahun DESC");
+$listTahunRincian = [];
+if ($resTahunRincian && $resTahunRincian->num_rows > 0) {
+    while ($rowT = $resTahunRincian->fetch_assoc()) {
+        if (!empty($rowT['tahun'])) {
+            $listTahunRincian[] = intval($rowT['tahun']);
+        }
+    }
+}
+if (empty($listTahunRincian)) {
+    $listTahunRincian[] = intval(date('Y'));
+}
+
 $namaBulan = [
     1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
     7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
@@ -126,12 +140,9 @@ if ($selectedBulan > 0 && $selectedTahun > 0) {
                                     </select>
                                     <select name="tahun" class="form-select">
                                         <option value="0" <?= $selectedTahun === 0 ? 'selected' : '' ?>>Semua Tahun</option>
-                                        <?php
-                                        $curYear = (int)date('Y');
-                                        for ($y = $curYear; $y >= $curYear - 3; $y--) :
-                                        ?>
+                                        <?php foreach ($listTahunRincian as $y) : ?>
                                             <option value="<?= $y ?>" <?= $selectedTahun === $y ? 'selected' : '' ?>><?= $y ?></option>
-                                        <?php endfor; ?>
+                                        <?php endforeach; ?>
                                     </select>
                                     <button type="submit" class="btn btn-primary btn-sm">
                                         <i class="fe fe-filter"></i>

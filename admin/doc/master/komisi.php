@@ -4,6 +4,23 @@ use App\Models\Master;
 
 // Fetch all Komisi records
 $listKomisi = Master::getAllKomisi();
+$rowsKomisi = [];
+$daftarTahunKomisi = [];
+if ($listKomisi && $listKomisi->num_rows > 0) {
+    while ($r = $listKomisi->fetch_assoc()) {
+        $rowsKomisi[] = $r;
+        if (!empty($r['tgl_transfer'])) {
+            $y = date('Y', strtotime($r['tgl_transfer']));
+            if (!in_array($y, $daftarTahunKomisi)) {
+                $daftarTahunKomisi[] = $y;
+            }
+        }
+    }
+    rsort($daftarTahunKomisi);
+}
+if (empty($daftarTahunKomisi)) {
+    $daftarTahunKomisi[] = date('Y');
+}
 ?>
 
 <div class="page-header">
@@ -71,12 +88,9 @@ $listKomisi = Master::getAllKomisi();
                             <label class="form-label small fw-bold mb-1">Filter Tahun</label>
                             <select id="filterTahun" class="form-select filter-select" data-placeholder="Semua Tahun">
                                 <option value="">Semua Tahun</option>
-                                <?php
-                                $curYear = (int)date('Y');
-                                for ($y = $curYear; $y >= $curYear - 5; $y--) :
-                                ?>
+                                <?php foreach ($daftarTahunKomisi as $y) : ?>
                                     <option value="<?= $y; ?>"><?= $y; ?></option>
-                                <?php endfor; ?>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-lg-2 col-md-2">
@@ -101,8 +115,8 @@ $listKomisi = Master::getAllKomisi();
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($listKomisi && $listKomisi->num_rows > 0) : ?>
-                                <?php $no = 1; while ($row = $listKomisi->fetch_assoc()) : ?>
+                            <?php if (!empty($rowsKomisi)) : ?>
+                                <?php $no = 1; foreach ($rowsKomisi as $row) : ?>
                                     <tr data-master="<?= htmlspecialchars(strtoupper($row['nama_master'] ?? '')) ?>"
                                         data-bulan="<?= date('m', strtotime($row['tgl_transfer'])) ?>"
                                         data-tahun="<?= date('Y', strtotime($row['tgl_transfer'])) ?>">
@@ -147,7 +161,7 @@ $listKomisi = Master::getAllKomisi();
                                             </div>
                                         </td>
                                     </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             <?php else : ?>
                                 <tr>
                                     <td colspan="7" class="text-center text-muted py-4">Belum ada riwayat komisi master terdaftar.</td>

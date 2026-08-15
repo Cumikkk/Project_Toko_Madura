@@ -13,6 +13,20 @@ $selectedTahun = isset($_GET['tahun']) ? intval($_GET['tahun']) : 0;
 $omzetData = Outlet::getOutletOmzetMonitoring($selectedBulan, $selectedTahun);
 $outlets   = $omzetData['outlets'] ?? [];
 
+// Ambil daftar tahun dinamis dari data laporan omzet
+$resTahunOmzet = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE tanggal_omzet IS NOT NULL AND tanggal_omzet != '0000-00-00' ORDER BY tahun DESC");
+$listTahunOmzet = [];
+if ($resTahunOmzet && $resTahunOmzet->num_rows > 0) {
+    while ($rowT = $resTahunOmzet->fetch_assoc()) {
+        if (!empty($rowT['tahun'])) {
+            $listTahunOmzet[] = intval($rowT['tahun']);
+        }
+    }
+}
+if (empty($listTahunOmzet)) {
+    $listTahunOmzet[] = intval(date('Y'));
+}
+
 // Ambil opsi filter investor
 $investorOptions = $db->query("
     SELECT inv.id_investor, u.nama_lengkap, u.username 
@@ -71,12 +85,9 @@ function safeJsonAlamatOmzet($str) {
                             <label class="form-label small fw-bold mb-1">Filter Tahun</label>
                             <select id="filterTahun" class="form-select filter-select" data-placeholder="Semua Tahun">
                                 <option value="0" <?= $selectedTahun === 0 ? 'selected' : '' ?>>Semua Tahun</option>
-                                <?php
-                                $curYear = (int)date('Y');
-                                for ($y = $curYear; $y >= $curYear - 3; $y--) :
-                                ?>
+                                <?php foreach ($listTahunOmzet as $y) : ?>
                                     <option value="<?= $y ?>" <?= $selectedTahun === $y ? 'selected' : '' ?>><?= $y ?></option>
-                                <?php endfor; ?>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-lg-2 col-md-4">
