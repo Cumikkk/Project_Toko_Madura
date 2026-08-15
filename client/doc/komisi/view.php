@@ -87,7 +87,7 @@ $bulanIndo = [
                         <i class="fa-solid fa-trophy fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Komisi (Sesuai Filter)</div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Komisi</div>
                         <div class="fs-4 fw-bold text-success mb-0" id="metricTotalKomisi">Rp <?= number_format($totalOverallKomisi, 0, ',', '.'); ?></div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ $bulanIndo = [
                         <i class="fa-solid fa-calendar-check fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Komisi Bulan Ini (<?= date('F Y'); ?>)</div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Komisi Bulan Ini</div>
                         <div class="fs-4 fw-bold text-primary mb-0" id="metricKomisiBulanIni">Rp <?= number_format($totalKomisiBulanIni, 0, ',', '.'); ?></div>
                     </div>
                 </div>
@@ -124,32 +124,36 @@ $bulanIndo = [
                             </h5>
                             <p class="text-body-secondary small mb-0">Pantau seluruh riwayat bukti transfer & komisi dari Admin</p>
                         </div>
-
-                        <!-- Active Filter Badges Container -->
-                        <div class="d-flex align-items-center gap-1.5 flex-wrap" id="activeFilterBadgesKomisi"></div>
                     </div>
 
                     <!-- INSTANT INLINE FILTER TOOLBAR (No Page Reload) -->
                     <div class="mt-3 pt-3 border-top border-body-subtle" id="toolbarFilterKomisi">
                         <div class="row g-2 align-items-end">
-                            <!-- 1. Periode Cepat -->
+                            <!-- 1. Filter Bulan & Tahun Transfer -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
-                                    <i class="fa-solid fa-bolt text-danger me-1"></i>Pilihan Periode
+                                    <i class="fa-solid fa-calendar-days text-danger me-1"></i>Periode Transfer
                                 </label>
-                                <select id="filterPresetKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="all">Semua Waktu</option>
-                                    <option value="this_month">Bulan Ini (<?= date('F'); ?>)</option>
-                                    <option value="last_month">Bulan Lalu</option>
-                                    <option value="this_year">Tahun Ini (<?= date('Y'); ?>)</option>
-                                    <option value="custom">Rentang Tanggal...</option>
-                                </select>
+                                <div class="input-group input-group-sm">
+                                    <select id="filterBulanKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                                        <option value="0">Semua Bulan</option>
+                                        <?php foreach ($bulanIndo as $mNum => $mName) : ?>
+                                            <option value="<?= $mNum; ?>"><?= $mName; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <select id="filterTahunKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
+                                        <option value="0">Semua Tahun</option>
+                                        <?php foreach ($availableYears as $y) : ?>
+                                            <option value="<?= $y; ?>"><?= $y; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
 
-                            <!-- 2. Rentang Tanggal -->
+                            <!-- 2. Rentang Tanggal Spesifik (Opsional) -->
                             <div class="col-lg-3 col-md-6 col-12" id="wrapRangeDate">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
-                                    <i class="fa-solid fa-calendar-range text-danger me-1"></i>Rentang Tanggal Transfer
+                                    <i class="fa-solid fa-calendar-range text-danger me-1"></i>Rentang Tanggal (Opsional)
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <input type="date" id="filterTglMulai" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" title="Tanggal Mulai" style="height: 38px;">
@@ -288,46 +292,22 @@ $bulanIndo = [
 <script type="text/javascript">
 $(document).ready(function() {
 
-    const currentYear = <?= (int)date('Y'); ?>;
-    const currentMonth = <?= (int)date('n'); ?>;
-    const lastMonth = (currentMonth === 1) ? 12 : (currentMonth - 1);
-    const lastMonthYear = (currentMonth === 1) ? (currentYear - 1) : currentYear;
-
     // INSTANT CLIENT-SIDE FILTER (0 Milidetik, Tanpa Reload Halaman)
     function applyInstantFilterKomisi() {
-        let preset = $('#filterPresetKomisi').val();
+        let bulan = parseInt($('#filterBulanKomisi').val()) || 0;
+        let tahun = parseInt($('#filterTahunKomisi').val()) || 0;
         let tglMulai = $('#filterTglMulai').val();
         let tglSelesai = $('#filterTglSelesai').val();
         let sort = $('#filterSortKomisi').val();
         let search = ($('#liveSearchKomisi').val() || '').toLowerCase().trim();
 
-        let hasActiveFilter = (preset !== 'all' || tglMulai !== '' || tglSelesai !== '' || sort !== 'newest' || search !== '');
+        let hasActiveFilter = (bulan > 0 || tahun > 0 || tglMulai !== '' || tglSelesai !== '' || sort !== 'newest' || search !== '');
 
         if (hasActiveFilter) {
             $('#btnResetFilterKomisi').removeClass('d-none').addClass('d-inline-flex');
         } else {
             $('#btnResetFilterKomisi').removeClass('d-inline-flex').addClass('d-none');
         }
-
-        // Render Active Filter Badges
-        let badgeHtml = '';
-        if (preset === 'this_month') {
-            badgeHtml += '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-check me-1"></i>Bulan Ini</span>';
-        } else if (preset === 'last_month') {
-            badgeHtml += '<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-days me-1"></i>Bulan Lalu</span>';
-        } else if (preset === 'this_year') {
-            badgeHtml += `<span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar me-1"></i>Tahun ${currentYear}</span>`;
-        } else if (tglMulai || tglSelesai) {
-            let mText = tglMulai || 'Awal';
-            let sText = tglSelesai || 'Akhir';
-            badgeHtml += `<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-range me-1"></i>${mText} s/d ${sText}</span>`;
-        }
-        if (sort === 'highest') {
-            badgeHtml += '<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-arrow-down-wide-short me-1"></i>Nominal Terbesar</span>';
-        } else if (sort === 'lowest') {
-            badgeHtml += '<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-arrow-up-short-wide me-1"></i>Nominal Terkecil</span>';
-        }
-        $('#activeFilterBadgesKomisi').html(badgeHtml);
 
         // Sorting Rows in DOM
         let $tbody = $('#tbodyKomisi');
@@ -354,9 +334,13 @@ $(document).ready(function() {
             $tbody.append(row);
         });
 
-        // Filter Rows
+        // Filter Rows & Calculate Metrics
         let visibleCount = 0;
         let totalSum = 0;
+        let thisMonthSum = 0;
+        let now = new Date();
+        let nowMonth = now.getMonth() + 1;
+        let nowYear  = now.getFullYear();
 
         $('.komisi-data-row').each(function() {
             let $row = $(this);
@@ -366,24 +350,20 @@ $(document).ready(function() {
             let rowNominal = parseFloat($row.attr('data-nominal')) || 0;
             let rowText = $row.text().toLowerCase();
 
-            let matchPreset = true;
-            if (preset === 'this_month') {
-                matchPreset = (rowMonth === currentMonth && rowYear === currentYear);
-            } else if (preset === 'last_month') {
-                matchPreset = (rowMonth === lastMonth && rowYear === lastMonthYear);
-            } else if (preset === 'this_year') {
-                matchPreset = (rowYear === currentYear);
-            } else if (preset === 'custom' || tglMulai || tglSelesai) {
-                if (tglMulai && rowDate < tglMulai) matchPreset = false;
-                if (tglSelesai && rowDate > tglSelesai) matchPreset = false;
-            }
-
+            let matchMonth = (bulan === 0 || rowMonth === bulan);
+            let matchYear = (tahun === 0 || rowYear === tahun);
+            let matchDateRange = true;
+            if (tglMulai && rowDate < tglMulai) matchDateRange = false;
+            if (tglSelesai && rowDate > tglSelesai) matchDateRange = false;
             let matchSearch = (!search || rowText.indexOf(search) > -1);
 
-            if (matchPreset && matchSearch) {
+            if (matchMonth && matchYear && matchDateRange && matchSearch) {
                 $row.show();
                 visibleCount++;
                 totalSum += rowNominal;
+                if (rowMonth === nowMonth && rowYear === nowYear) {
+                    thisMonthSum += rowNominal;
+                }
                 $row.find('.row-index-num').text(visibleCount);
             } else {
                 $row.hide();
@@ -391,6 +371,7 @@ $(document).ready(function() {
         });
 
         $('#metricTotalKomisi').text('Rp ' + totalSum.toLocaleString('id-ID'));
+        $('#metricKomisiBulanIni').text('Rp ' + thisMonthSum.toLocaleString('id-ID'));
         $('#footerCountVisibleKomisi').text(visibleCount);
 
         if (visibleCount === 0) {
@@ -401,19 +382,11 @@ $(document).ready(function() {
     }
 
     // Attach Instant Events
-    $('#filterPresetKomisi, #filterSortKomisi').on('change', function() {
-        let val = $('#filterPresetKomisi').val();
-        if (val !== 'custom') {
-            $('#filterTglMulai').val('');
-            $('#filterTglSelesai').val('');
-        }
+    $('#filterBulanKomisi, #filterTahunKomisi, #filterSortKomisi').on('change', function() {
         applyInstantFilterKomisi();
     });
 
     $('#filterTglMulai, #filterTglSelesai').on('change', function() {
-        if ($('#filterTglMulai').val() || $('#filterTglSelesai').val()) {
-            $('#filterPresetKomisi').val('custom');
-        }
         applyInstantFilterKomisi();
     });
 
@@ -422,7 +395,8 @@ $(document).ready(function() {
     });
 
     $('#btnResetFilterKomisi').on('click', function() {
-        $('#filterPresetKomisi').val('all');
+        $('#filterBulanKomisi').val('0');
+        $('#filterTahunKomisi').val('0');
         $('#filterTglMulai').val('');
         $('#filterTglSelesai').val('');
         $('#filterSortKomisi').val('newest');

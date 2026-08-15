@@ -39,12 +39,24 @@ class Outlet {
         $db = Database::connect();
         $sql = "
             SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
+                   inv.id_investor, inv.biaya_langganan_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor,
+                   COALESCE(omz.total_omzet_bulan_ini, 0) as omzet_bulan_ini,
+                   COALESCE(omz.total_transaksi_bulan_ini, 0) as transaksi_bulan_ini
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+            LEFT JOIN (
+                SELECT id_outlet, 
+                       SUM(nominal_omzet) as total_omzet_bulan_ini,
+                       COUNT(*) as total_transaksi_bulan_ini
+                FROM laporan_omzet
+                WHERE MONTH(tanggal_omzet) = MONTH(CURRENT_DATE()) 
+                  AND YEAR(tanggal_omzet) = YEAR(CURRENT_DATE())
+                GROUP BY id_outlet
+            ) omz ON omz.id_outlet = o.id_outlet
             WHERE (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
             ORDER BY o.nama_outlet ASC
         ";
@@ -54,12 +66,24 @@ class Outlet {
         $db = Database::connect();
         $sql = "
             SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
-                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
+                   inv.id_investor, inv.biaya_langganan_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor,
+                   COALESCE(omz.total_omzet_bulan_ini, 0) as omzet_bulan_ini,
+                   COALESCE(omz.total_transaksi_bulan_ini, 0) as transaksi_bulan_ini
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+            LEFT JOIN (
+                SELECT id_outlet, 
+                       SUM(nominal_omzet) as total_omzet_bulan_ini,
+                       COUNT(*) as total_transaksi_bulan_ini
+                FROM laporan_omzet
+                WHERE MONTH(tanggal_omzet) = MONTH(CURRENT_DATE()) 
+                  AND YEAR(tanggal_omzet) = YEAR(CURRENT_DATE())
+                GROUP BY id_outlet
+            ) omz ON omz.id_outlet = o.id_outlet
             WHERE ((o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
             ORDER BY o.tgl_jatuh_tempo DESC, o.nama_outlet ASC
         ";
@@ -326,5 +350,185 @@ class Outlet {
             return ['success' => true, 'message' => 'Alasan penolakan outlet berhasil diperbarui.'];
         }
         return ['success' => false, 'message' => 'Gagal memperbarui alasan penolakan: ' . $db->error];
+    }
+
+    // ==============================================
+    // OMZET & SUBSCRIPTION FEE MONITORING METHODS
+    // ==============================================
+    public static function getOutletOmzetDetail($idOutlet, $bulan = 0, $tahun = 0) {
+        $db = Database::connect();
+        $id = intval($idOutlet);
+        if ($id <= 0) return ['outlet' => null, 'transaksi' => [], 'summary' => []];
+
+        // 1. Fetch Outlet & Investor Info
+        $resOutlet = $db->query("
+            SELECT o.id_outlet, o.nama_outlet, o.persentase_potongan, o.persentase_hak_investor, o.status,
+                   u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko, u_kasir.alamat_lengkap as alamat_outlet,
+                   mw.kelurahan, mw.kecamatan, mw.kabupaten, mw.provinsi,
+                   inv.id_investor, inv.biaya_langganan_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
+            FROM outlet o
+            LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
+            LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+            LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+            WHERE o.id_outlet = {$id}
+            LIMIT 1
+        ");
+        $outletInfo = ($resOutlet && $resOutlet->num_rows > 0) ? $resOutlet->fetch_assoc() : null;
+
+        // 2. Build Where Clause for Laporan Omzet
+        $where = ["id_outlet = {$id}"];
+        if ($bulan > 0) {
+            $where[] = "MONTH(tanggal_omzet) = " . intval($bulan);
+        }
+        if ($tahun > 0) {
+            $where[] = "YEAR(tanggal_omzet) = " . intval($tahun);
+        }
+        $whereSql = implode(" AND ", $where);
+
+        // 3. Fetch Transactions
+        $sqlTrx = "
+            SELECT id_laporan, id_outlet, tanggal_omzet, nominal_omzet, persentase_potongan, persentase_hak_investor, nominal_potongan, created_at
+            FROM laporan_omzet
+            WHERE {$whereSql}
+            ORDER BY tanggal_omzet DESC, id_laporan DESC
+        ";
+        $resTrx = $db->query($sqlTrx);
+        $transaksi = [];
+        $totalOmzet = 0;
+        $totalPotongan = 0;
+        $totalHakInvestor = 0;
+        $totalHakOutlet = 0;
+
+        if ($resTrx && $resTrx->num_rows > 0) {
+            while ($row = $resTrx->fetch_assoc()) {
+                $omzet = (float)($row['nominal_omzet'] ?? 0);
+                $pctPot = (float)($row['persentase_potongan'] ?? 0);
+                $pctInv = (float)($row['persentase_hak_investor'] ?? 0);
+                
+                $nomPotongan = (float)($row['nominal_potongan'] ?? (($omzet * $pctPot) / 100));
+                $omzetBersih = max(0, $omzet - $nomPotongan);
+                $nomHakInvestor = ($omzetBersih * $pctInv) / 100;
+                $nomHakOutlet = $omzetBersih - $nomHakInvestor;
+
+                $row['nominal_hak_investor'] = $nomHakInvestor;
+                $row['nominal_hak_outlet'] = $nomHakOutlet;
+
+                $transaksi[] = $row;
+                $totalOmzet += $omzet;
+                $totalPotongan += $nomPotongan;
+                $totalHakInvestor += $nomHakInvestor;
+                $totalHakOutlet += $nomHakOutlet;
+            }
+        }
+
+        $summary = [
+            'total_omzet'        => $totalOmzet,
+            'total_potongan'     => $totalPotongan,
+            'total_hak_investor' => $totalHakInvestor,
+            'total_hak_outlet'   => $totalHakOutlet,
+            'total_transaksi'    => count($transaksi),
+            'rata_rata_omzet'    => count($transaksi) > 0 ? ($totalOmzet / count($transaksi)) : 0
+        ];
+
+        return [
+            'outlet'    => $outletInfo,
+            'transaksi' => $transaksi,
+            'summary'   => $summary
+        ];
+    }
+
+    public static function getOutletOmzetMonitoring($bulan = 0, $tahun = 0) {
+        $db = Database::connect();
+        $bulan = intval($bulan);
+        $tahun = intval($tahun);
+
+        $whereOmzet = "1=1";
+        if ($bulan > 0) {
+            $whereOmzet .= " AND MONTH(tanggal_omzet) = {$bulan}";
+        }
+        if ($tahun > 0) {
+            $whereOmzet .= " AND YEAR(tanggal_omzet) = {$tahun}";
+        }
+
+        $sql = "
+            SELECT o.*, u_kasir.nama_lengkap as pengelola_toko, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_toko, 
+                   mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet,
+                   inv.id_investor, inv.biaya_langganan_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor,
+                   COALESCE(omz.total_omzet, 0) as omzet_periode,
+                   COALESCE(omz.total_transaksi, 0) as transaksi_periode,
+                   COALESCE(omz.total_potongan, 0) as potongan_periode,
+                   COALESCE(omz.total_hak_investor, 0) as hak_investor_periode,
+                   COALESCE(omz.total_hak_outlet, 0) as hak_outlet_periode
+            FROM outlet o
+            LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
+            LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+            LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+            LEFT JOIN (
+                SELECT id_outlet, 
+                       SUM(nominal_omzet) as total_omzet,
+                       COUNT(*) as total_transaksi,
+                       SUM(nominal_potongan) as total_potongan,
+                       SUM((nominal_omzet - nominal_potongan) * (persentase_hak_investor / 100)) as total_hak_investor,
+                       SUM((nominal_omzet - nominal_potongan) * (1 - (persentase_hak_investor / 100))) as total_hak_outlet
+                FROM laporan_omzet
+                WHERE {$whereOmzet}
+                GROUP BY id_outlet
+            ) omz ON omz.id_outlet = o.id_outlet
+            WHERE (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan'))
+            ORDER BY omzet_periode DESC, o.nama_outlet ASC
+        ";
+
+        $res = $db->query($sql);
+        $outlets = [];
+        $grandTotalOmzet = 0;
+        $grandTotalPotongan = 0;
+        $grandTotalHakInvestor = 0;
+        $grandTotalHakOutlet = 0;
+        $grandTotalTransaksi = 0;
+
+        if ($res && $res->num_rows > 0) {
+            while ($row = $res->fetch_assoc()) {
+                $grandTotalOmzet += (float)$row['omzet_periode'];
+                $grandTotalPotongan += (float)$row['potongan_periode'];
+                $grandTotalHakInvestor += (float)$row['hak_investor_periode'];
+                $grandTotalHakOutlet += (float)$row['hak_outlet_periode'];
+                $grandTotalTransaksi += (int)$row['transaksi_periode'];
+                $outlets[] = $row;
+            }
+        }
+
+        return [
+            'outlets' => $outlets,
+            'summary' => [
+                'grand_total_omzet'        => $grandTotalOmzet,
+                'grand_total_potongan'     => $grandTotalPotongan,
+                'grand_total_hak_investor' => $grandTotalHakInvestor,
+                'grand_total_hak_outlet'   => $grandTotalHakOutlet,
+                'grand_total_transaksi'    => $grandTotalTransaksi,
+                'total_outlet'             => count($outlets),
+                'rata_rata_omzet'          => count($outlets) > 0 ? ($grandTotalOmzet / count($outlets)) : 0
+            ]
+        ];
+    }
+
+    public static function updateBiayaLanggananInvestor($idInvestor, $biayaBaru) {
+        $db = Database::connect();
+        $id = intval($idInvestor);
+        $biaya = intval($biayaBaru);
+        if ($id <= 0) return ['success' => false, 'message' => "ID Investor tidak valid"];
+        if ($biaya < 0) return ['success' => false, 'message' => "Biaya langganan tidak boleh bernilai negatif"];
+
+        $sql = "UPDATE investor SET biaya_langganan_outlet = {$biaya} WHERE id_investor = {$id}";
+        if ($db->query($sql)) {
+            return [
+                'success' => true, 
+                'message' => 'Tarif biaya langganan outlet berhasil diperbarui menjadi Rp ' . number_format($biaya, 0, ',', '.') . ' / bulan'
+            ];
+        }
+        return ['success' => false, 'message' => 'Gagal memperbarui biaya langganan: ' . $db->error];
     }
 }

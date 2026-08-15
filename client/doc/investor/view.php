@@ -135,8 +135,8 @@ $bulanIndo = [
                         <i class="fa-solid fa-users-gear fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Investor (Sesuai Filter)</div>
-                        <div class="fs-4 fw-bold text-body-emphasis mb-0" id="metricTotalInvestor"><?= number_format($totalOverallInvestors); ?> Investor</div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Investor</div>
+                        <div class="fs-4 fw-bold text-body-emphasis mb-0" id="metricTotalInvestor"><?= number_format($totalOverallInvestors); ?></div>
                     </div>
                 </div>
             </div>
@@ -150,8 +150,8 @@ $bulanIndo = [
                         <i class="fa-solid fa-store fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Toko Aktif (Sesuai Filter)</div>
-                        <div class="fs-4 fw-bold text-success mb-0" id="metricTotalOutlet"><?= number_format($totalOverallActiveOutlets); ?> Outlet Aktif</div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Toko Aktif</div>
+                        <div class="fs-4 fw-bold text-success mb-0" id="metricTotalOutlet"><?= number_format($totalOverallActiveOutlets); ?></div>
                     </div>
                 </div>
             </div>
@@ -172,9 +172,6 @@ $bulanIndo = [
                             </h5>
                             <p class="text-body-secondary small mb-0">Informasi profil investor, wilayah kemitraan, dan jumlah outlet aktif</p>
                         </div>
-
-                        <!-- Active Filter Badges Container -->
-                        <div class="d-flex align-items-center gap-1.5 flex-wrap" id="activeFilterBadges"></div>
                     </div>
 
                     <!-- INSTANT INLINE FILTER TOOLBAR (No Page Reload) -->
@@ -337,20 +334,20 @@ $bulanIndo = [
 <script type="text/javascript">
 $(document).ready(function() {
 
-    const bulanNames = {
-        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5 => 'Mei', 6: 'Juni',
+    var bulanNames = {
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
         7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
     };
 
     // INSTANT CLIENT-SIDE FILTER (0 Milidetik, Tanpa Reload Halaman)
     function applyInstantFilterInvestor() {
-        let status = $('#filterStatusOutlet').val();
-        let kabupaten = ($('#filterKabupaten').val() || '').toUpperCase().trim();
-        let bulan = parseInt($('#filterBulan').val()) || 0;
-        let tahun = parseInt($('#filterTahun').val()) || 0;
+        let filterStatus = $('#filterStatusOutlet').val();
+        let filterKab = ($('#filterKabupaten').val() || '').toUpperCase().trim();
+        let filterBulan = parseInt($('#filterBulan').val()) || 0;
+        let filterTahun = parseInt($('#filterTahun').val()) || 0;
         let search = ($('#liveSearchInvestor').val() || '').toLowerCase().trim();
 
-        let hasActiveFilter = (status !== 'all' || kabupaten !== '' || bulan !== 0 || tahun !== 0 || search !== '');
+        let hasActiveFilter = (filterStatus !== 'all' || filterKab !== '' || filterBulan > 0 || filterTahun > 0 || search !== '');
 
         if (hasActiveFilter) {
             $('#btnResetFilterInvestor').removeClass('d-none').addClass('d-inline-flex');
@@ -358,26 +355,8 @@ $(document).ready(function() {
             $('#btnResetFilterInvestor').removeClass('d-inline-flex').addClass('d-none');
         }
 
-        // Render Active Filter Badges
-        let badgeHtml = '';
-        if (status === 'active') {
-            badgeHtml += '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-store me-1"></i>Punya Outlet Aktif</span>';
-        } else if (status === 'empty') {
-            badgeHtml += '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-store-slash me-1"></i>Belum Ada Outlet</span>';
-        }
-        if (kabupaten) {
-            badgeHtml += `<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-location-dot me-1"></i>${kabupaten}</span>`;
-        }
-        if (bulan > 0 || tahun > 0) {
-            let bText = bulan > 0 ? (bulanNames[bulan] || `Bulan ${bulan}`) : '';
-            let tText = tahun > 0 ? tahun : '';
-            badgeHtml += `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-day me-1"></i>${bText} ${tText}</span>`;
-        }
-        $('#activeFilterBadges').html(badgeHtml);
-
-        // Filter Rows
         let visibleCount = 0;
-        let totalOutletsVisible = 0;
+        let totalVisibleOutlets = 0;
 
         $('.investor-data-row').each(function() {
             let $row = $(this);
@@ -385,28 +364,27 @@ $(document).ready(function() {
             let rowKab = ($row.attr('data-kabupaten') || '').toUpperCase().trim();
             let rowBulan = parseInt($row.attr('data-bulan')) || 0;
             let rowTahun = parseInt($row.attr('data-tahun')) || 0;
-            let rowOutletsCount = parseInt($row.attr('data-outlets-count')) || 0;
+            let rowOutlets = parseInt($row.attr('data-outlets-count')) || 0;
             let rowText = $row.text().toLowerCase();
 
-            let matchStatus = (status === 'all' || rowStatus === status);
-            let matchKab = (!kabupaten || rowKab.indexOf(kabupaten) > -1);
-            let matchBulan = (bulan === 0 || rowBulan === bulan);
-            let matchTahun = (tahun === 0 || rowTahun === tahun);
+            let matchStatus = (filterStatus === 'all' || rowStatus === filterStatus);
+            let matchKab = (!filterKab || rowKab === filterKab);
+            let matchBulan = (filterBulan === 0 || rowBulan === filterBulan);
+            let matchTahun = (filterTahun === 0 || rowTahun === filterTahun);
             let matchSearch = (!search || rowText.indexOf(search) > -1);
 
             if (matchStatus && matchKab && matchBulan && matchTahun && matchSearch) {
                 $row.show();
                 visibleCount++;
-                totalOutletsVisible += rowOutletsCount;
+                totalVisibleOutlets += rowOutlets;
                 $row.find('.row-index-num').text(visibleCount);
             } else {
                 $row.hide();
             }
         });
 
-        // Update Dynamic Metrics Counter
-        $('#metricTotalInvestor').text(visibleCount + ' Investor');
-        $('#metricTotalOutlet').text(totalOutletsVisible + ' Outlet Aktif');
+        $('#metricTotalInvestor').text(visibleCount.toLocaleString('id-ID'));
+        $('#metricTotalOutlet').text(totalVisibleOutlets.toLocaleString('id-ID'));
         $('#footerCountVisible').text(visibleCount);
 
         if (visibleCount === 0) {
@@ -515,7 +493,7 @@ $(document).ready(function() {
                 let safeProv = item.provinsi ? item.provinsi : '';
                 let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-                let cleanKel = safeKel.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
+                let cleanKel = safeKel ? safeKel.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
                 let wilayahBadgeText = (cleanKel ? cleanKel + ', Kec. ' + safeKec : (safeKec ? 'Kec. ' + safeKec : '-'));
                 let locColHtml = item.alamat_outlet ? 
                     `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" onclick="$(this).closest('tr').next('.detail-lokasi-row').fadeToggle(200);" title="Klik untuk lihat/tutup detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${wilayahBadgeText} <i class="fa-solid fa-caret-down ms-1"></i></span>` :

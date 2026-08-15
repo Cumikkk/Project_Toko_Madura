@@ -198,7 +198,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                             <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
-                                                            <span class="mx-1">•</span>
+                                                            <span class="mx-1">&bull;</span>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['no_hp_toko'])) : ?>
                                                             <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
@@ -228,7 +228,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                                 <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
-                                                                <span class="mx-1">•</span>
+                                                                <span class="mx-1">&bull;</span>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['no_hp_investor'])) : ?>
                                                                 <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
@@ -241,7 +241,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/histori?id=<?= $row['id_outlet'] ?>" class="btn btn-info btn-sm text-white" title="Riwayat Pembayaran"><i class="fas fa-history"></i></a>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
@@ -303,7 +303,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                             <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
-                                                            <span class="mx-1">•</span>
+                                                            <span class="mx-1">&bull;</span>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['no_hp_toko'])) : ?>
                                                             <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
@@ -333,7 +333,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                                 <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
-                                                                <span class="mx-1">•</span>
+                                                                <span class="mx-1">&bull;</span>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['no_hp_investor'])) : ?>
                                                                 <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
@@ -346,7 +346,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/histori?id=<?= $row['id_outlet'] ?>" class="btn btn-info btn-sm text-white" title="Riwayat Pembayaran"><i class="fas fa-history"></i></a>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/create?id=<?= $row['id_outlet'] ?>" class="btn btn-success btn-sm text-white btn-edit" title="Edit Outlet"><i class="fas fa-edit"></i></a>
                                                     <?php endif; ?>
@@ -411,7 +411,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                             <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
-                                                            <span class="mx-1">•</span>
+                                                            <span class="mx-1">&bull;</span>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['no_hp_toko'])) : ?>
                                                             <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
@@ -441,7 +441,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                                 <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
-                                                                <span class="mx-1">•</span>
+                                                                <span class="mx-1">&bull;</span>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['no_hp_investor'])) : ?>
                                                                 <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
@@ -466,7 +466,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/histori?id=<?= $row['id_outlet'] ?>" class="btn btn-info btn-sm text-white" title="Riwayat Pembayaran"><i class="fas fa-history"></i></a>
                                                     <button type="button" class="btn btn-success btn-sm btn-accept" data-id="<?= $row['id_outlet'] ?>" data-nama="<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>" title="Setujui">
                                                         <i class="fas fa-check"></i>
                                                     </button>
@@ -532,7 +532,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                             <code>@<?= htmlspecialchars($row['username_kasir']) ?></code>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['username_kasir']) && !empty($row['no_hp_toko'])) : ?>
-                                                            <span class="mx-1">•</span>
+                                                            <span class="mx-1">&bull;</span>
                                                         <?php endif; ?>
                                                         <?php if (!empty($row['no_hp_toko'])) : ?>
                                                             <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_toko']) ?>
@@ -562,7 +562,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                                 <code>@<?= htmlspecialchars($row['username_investor']) ?></code>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['username_investor']) && !empty($row['no_hp_investor'])) : ?>
-                                                                <span class="mx-1">•</span>
+                                                                <span class="mx-1">&bull;</span>
                                                             <?php endif; ?>
                                                             <?php if (!empty($row['no_hp_investor'])) : ?>
                                                                 <i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($row['no_hp_investor']) ?>
@@ -590,7 +590,7 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                             </td>
                                             <td class="text-center">
                                                 <div class="action d-flex justify-content-center gap-2">
-                                                    <button type="button" class="btn btn-info btn-sm text-white" title="Histori Pembayaran" onclick="showHistori(<?= $row['id_outlet'] ?>, '<?= htmlspecialchars($row['nama_outlet'], ENT_QUOTES, 'UTF-8') ?>')"><i class="fas fa-history"></i></button>
+                                                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/histori?id=<?= $row['id_outlet'] ?>" class="btn btn-info btn-sm text-white" title="Riwayat Pembayaran"><i class="fas fa-history"></i></a>
                                                     <?php if($adminPermissionCore->isHavePermission($moduleId, "update")) : ?>
                                                         <button type="button" class="btn btn-success btn-sm text-white btn-edit" onclick='editAlasanPenolakan(<?= $row['id_outlet'] ?>, <?= safeJsonAlamat($row['nama_outlet']) ?>, <?= safeJsonAlamat($row['alasan_penolakan'] ?? '') ?>)' title="Edit Alasan Penolakan">
                                                             <i class="fas fa-edit"></i>
@@ -612,69 +612,6 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
     </div>
 </div>
 
-<!-- MODAL HISTORI PEMBAYARAN -->
-<div class="modal fade" id="modalHistoriPembayaran" tabindex="-1" aria-labelledby="modalHistoriLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title d-flex align-items-center" id="modalHistoriLabel">
-                    <i class="fas fa-history me-2 text-primary"></i>
-                    <span>Histori Pembayaran Langganan</span>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Info Summary Box -->
-                <div id="historiInfoCard" class="p-3 bg-light rounded-3 border mb-3">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-sm-6">
-                            <div class="d-flex align-items-center mb-1">
-                                <i class="fa fa-building text-primary me-2" style="width: 18px; text-align:center;"></i>
-                                <span class="text-muted small me-1">Outlet:</span>
-                                <strong class="text-dark" id="historiNamaOutlet">-</strong>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-user-tie text-info me-2" style="width: 18px; text-align:center;"></i>
-                                <span class="text-muted small me-1">Investor:</span>
-                                <span class="text-dark" id="historiInvestor">-</span>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
-                            <div class="mb-1">
-                                <span class="text-muted small">Jatuh Tempo:</span>
-                                <strong class="text-danger ms-1" id="historiTempo">-</strong>
-                            </div>
-                            <div>
-                                <span class="badge bg-primary rounded-pill px-3" id="badgeTotalHistori">0 Transaksi</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle mb-0" id="table-histori-langganan">
-                        <thead>
-                            <tr class="text-center">
-                                <th class="text-center" style="width:5%">NO</th>
-                                <th class="text-center">TANGGAL REQUEST</th>
-                                <th class="text-center">TIPE REQUEST</th>
-                                <th class="text-center">NOMINAL</th>
-                                <th class="text-center">STATUS</th>
-                                <th class="text-center">JATUH TEMPO</th>
-                                <th class="text-center" style="width:10%">BUKTI BAYAR</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyHistori">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript">
 // ============================================================
@@ -1205,141 +1142,4 @@ function deleteOutlet(id, nama) {
         }
     });
 }
-
-var dtHistori = null;
-
-function showHistori(id, nama) {
-    $('#historiNamaOutlet').text(nama);
-    $('#historiInvestor').text('Memuat...');
-    $('#historiTempo').text('Memuat...');
-    $('#badgeTotalHistori').text('0 Transaksi');
-
-    // Destroy DataTable instance lama jika ada
-    if ($.fn.DataTable.isDataTable('#table-histori-langganan')) {
-        $('#table-histori-langganan').DataTable().clear().destroy();
-    }
-    $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data histori...</td></tr>');
-    $('#modalHistoriPembayaran').modal('show');
-
-    $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/get_histori", { id_outlet: id }, function(resp) {
-        if (resp.success) {
-            if (resp.outlet) {
-                if (resp.outlet.nama_outlet) $('#historiNamaOutlet').text(resp.outlet.nama_outlet);
-                if (resp.outlet.nama_investor) {
-                    let invText = resp.outlet.nama_investor;
-                    if (resp.outlet.username_investor) invText += ' (@' + resp.outlet.username_investor + ')';
-                    $('#historiInvestor').text(invText);
-                } else {
-                    $('#historiInvestor').text('-');
-                }
-                if (resp.outlet.tgl_jatuh_tempo) {
-                    let parts = resp.outlet.tgl_jatuh_tempo.split(' ')[0].split('-');
-                    if (parts.length === 3) {
-                        $('#historiTempo').text(parts[2] + '/' + parts[1] + '/' + parts[0]);
-                    } else {
-                        $('#historiTempo').text(resp.outlet.tgl_jatuh_tempo);
-                    }
-                } else {
-                    $('#historiTempo').text('Belum Diatur');
-                }
-            }
-
-            let html = '';
-            if (resp.data && resp.data.length > 0) {
-                $('#badgeTotalHistori').text(resp.data.length + ' Transaksi');
-                resp.data.forEach(function(r, idx) {
-                    let rNo = idx + 1;
-                    let rTgl = '-';
-                    if (r.tgl_request) {
-                        let dt = r.tgl_request.split(' ');
-                        let p = dt[0].split('-');
-                        rTgl = (p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : dt[0]) + (dt[1] ? ' ' + dt[1].substring(0,5) : '');
-                    }
-                    let rTipe = r.tipe_request === 'baru'
-                        ? '<span class="badge bg-info text-white"><i class="fas fa-plus-circle me-1"></i>Pendaftaran Baru</span>'
-                        : '<span class="badge bg-warning text-dark"><i class="fas fa-sync-alt me-1"></i>Perpanjangan</span>';
-                    let rNominal = '<span class="text-success fw-bold">Rp ' + new Intl.NumberFormat('id-ID').format(r.nominal_transfer || 0) + '</span>';
-                    
-                    let rJatuhTempo = '-';
-                    if (r.tgl_jatuh_tempo) {
-                        let jt = r.tgl_jatuh_tempo.split(' ')[0].split('-');
-                        rJatuhTempo = jt.length === 3 ? jt[2] + '/' + jt[1] + '/' + jt[0] : r.tgl_jatuh_tempo;
-                    }
-
-                    let rStatus = '';
-                    if (r.status === 'pending') {
-                        rStatus = '<span class="badge bg-warning text-dark">Pending</span>';
-                    } else if (r.status === 'active') {
-                        rStatus = '<span class="badge bg-success">Disetujui</span>';
-                    } else if (r.status === 'reject') {
-                        let alasanAttr = (r.alasan_penolakan || '').replace(/"/g, '&quot;');
-                        rStatus = '<span class="badge bg-danger" title="' + alasanAttr + '">Ditolak</span>';
-                    }
-
-                    let rBukti = '<span class="text-muted">-</span>';
-                    if (r.bukti_pembayaran) {
-                        let safeOutlet = (nama || '').replace(/'/g, "\\'");
-                        let safeInv = ($('#historiInvestor').text() || '').replace(/'/g, "\\'");
-                        let safeBiaya = new Intl.NumberFormat('id-ID').format(r.nominal_transfer || 0);
-                        rBukti = '<button type="button" class="btn btn-outline-info btn-sm py-1 px-2" onclick="previewBukti(\'' + r.bukti_pembayaran + '\', \'' + safeOutlet + '\', \'' + safeInv + '\', \'' + safeBiaya + '\')">'
-                            + '<i class="fas fa-image me-1"></i>Lihat Bukti'
-                            + '</button>';
-                    }
-
-                    html += '<tr class="text-center">'
-                        + '<td class="text-center fw-semibold text-muted">' + rNo + '</td>'
-                        + '<td class="text-center">' + rTgl + '</td>'
-                        + '<td class="text-center">' + rTipe + '</td>'
-                        + '<td class="text-center">' + rNominal + '</td>'
-                        + '<td class="text-center">' + rStatus + '</td>'
-                        + '<td class="text-center text-muted">' + rJatuhTempo + '</td>'
-                        + '<td class="text-center">' + rBukti + '</td>'
-                        + '</tr>';
-                });
-                $('#tbodyHistori').html(html);
-            } else {
-                $('#tbodyHistori').html('');
-            }
-
-            // Inisialisasi DataTable untuk modal histori
-            if ($.fn.DataTable) {
-                dtHistori = $('#table-histori-langganan').DataTable({
-                    processing: true,
-                    deferRender: true,
-                    scrollX: true,
-                    lengthMenu: [[10, 50, 100, -1], [10, 50, 100, "All"]],
-                    language: {
-                        searchPlaceholder: 'Cari riwayat...',
-                        sSearch: '',
-                        lengthMenu: 'Show _MENU_ entries',
-                        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-                        paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
-                        emptyTable: 'Belum ada histori pembayaran untuk outlet ini.'
-                    },
-                    order: [[1, 'desc']]
-                });
-
-                if ($.fn.select2) {
-                    setTimeout(function() {
-                        $('#table-histori-langganan_wrapper .dataTables_length select').select2({
-                            minimumResultsForSearch: Infinity,
-                            width: 'auto'
-                        });
-                    }, 50);
-                }
-            }
-        } else {
-            $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data histori.</td></tr>');
-        }
-    }, 'json').fail(function() {
-        $('#tbodyHistori').html('<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Terjadi kesalahan server.</td></tr>');
-    });
-}
-
-$('#modalHistoriPembayaran').on('shown.bs.modal', function() {
-    if ($.fn.DataTable.isDataTable('#table-histori-langganan')) {
-        $('#table-histori-langganan').DataTable().columns.adjust().draw(false);
-    }
-});
-
 </script>
