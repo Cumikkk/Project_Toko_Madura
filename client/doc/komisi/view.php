@@ -124,6 +124,11 @@ $bulanIndo = [
                             </h5>
                             <p class="text-body-secondary small mb-0">Pantau seluruh riwayat bukti transfer & komisi dari Admin</p>
                         </div>
+                        <div>
+                            <button type="button" id="btnResetFilterKomisi" class="btn btn-outline-danger btn-sm d-none align-items-center gap-1.5 rounded-pill px-3 shadow-xs" title="Reset Semua Filter">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                            </button>
+                        </div>
                     </div>
 
                     <!-- INSTANT INLINE FILTER TOOLBAR (No Page Reload) -->
@@ -136,13 +141,13 @@ $bulanIndo = [
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <select id="filterBulanKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                        <option value="0">Semua Bulan</option>
+                                        <option value="0" hidden selected>Semua Bulan</option>
                                         <?php foreach ($bulanIndo as $mNum => $mName) : ?>
                                             <option value="<?= $mNum; ?>"><?= $mName; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <select id="filterTahunKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                        <option value="0">Semua Tahun</option>
+                                        <option value="0" hidden selected>Semua Tahun</option>
                                         <?php foreach ($availableYears as $y) : ?>
                                             <option value="<?= $y; ?>"><?= $y; ?></option>
                                         <?php endforeach; ?>
@@ -168,23 +173,18 @@ $bulanIndo = [
                                     <i class="fa-solid fa-arrow-down-a-z text-danger me-1"></i>Urutkan
                                 </label>
                                 <select id="filterSortKomisi" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="newest">Terbaru (Default)</option>
+                                    <option value="newest">Default</option>
                                     <option value="highest">Nominal Terbesar</option>
                                     <option value="lowest">Nominal Terkecil</option>
                                 </select>
                             </div>
 
-                            <!-- 4. Cari & Tombol Reset -->
+                            <!-- 4. Cari Catatan / Nominal -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
                                     <i class="fa-solid fa-magnifying-glass text-danger me-1"></i>Cari Catatan / Nominal
                                 </label>
-                                <div class="d-flex gap-1.5">
-                                    <input type="text" id="liveSearchKomisi" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik catatan / nominal..." style="height: 38px;">
-                                    <button type="button" id="btnResetFilterKomisi" class="btn btn-light border btn-sm px-2.5 d-none align-items-center justify-content-center text-danger fw-semibold text-nowrap" style="height: 38px;" title="Reset Semua Filter">
-                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
-                                    </button>
-                                </div>
+                                <input type="text" id="liveSearchKomisi" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik catatan / nominal..." style="height: 38px;">
                             </div>
                         </div>
                     </div>
@@ -386,8 +386,17 @@ $(document).ready(function() {
         applyInstantFilterKomisi();
     });
 
-    $('#filterTglMulai, #filterTglSelesai').on('change', function() {
+    $('#filterTglMulai, #filterTglSelesai').on('change input', function() {
         applyInstantFilterKomisi();
+    });
+
+    // Buka popup kalender saat input tanggal diklik (tetap bisa ketik manual)
+    $('#filterTglMulai, #filterTglSelesai').on('click', function() {
+        try {
+            if (typeof this.showPicker === 'function') {
+                this.showPicker();
+            }
+        } catch (e) {}
     });
 
     $('#liveSearchKomisi').on('keyup search', function() {

@@ -445,15 +445,6 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         // Initialize form
         loadProvinsi();
 
-        // Auto Focus & Enter Navigation
-        if (!isEdit) {
-            setTimeout(function() {
-                $('#id_investor').select2('open');
-            }, 200);
-        } else {
-            $('#nama_outlet').focus();
-        }
-
         // Auto populate Bagi Hasil Investor when selecting an investor & move focus
         $('#id_investor').on('change select2:select', function(e) {
             let selectedOption = $(this).find('option:selected');

@@ -225,16 +225,6 @@ $(document).ready(function() {
         });
     }
 
-    // Auto Focus ke input pertama saat form dibuka
-    setTimeout(() => {
-        let isEdit = <?= $isEdit ? 'true' : 'false' ?>;
-        if (!isEdit) {
-            $('#id_master').select2('open');
-        } else {
-            $('#tgl_transfer').focus();
-        }
-    }, 150);
-
     // Auto focus search field saat Select2 dibuka
     $(document).on('select2:open', function() {
         setTimeout(() => {
@@ -242,20 +232,20 @@ $(document).ready(function() {
             if (searchField) {
                 searchField.focus();
             }
-        }, 50);
+        }, 10);
     });
 
-    // Navigasi Enter Berurutan
+    // Navigasi Enter Berurutan Antar Form
     $('#id_master').on('select2:select', function() {
         setTimeout(() => {
             $('#tgl_transfer').focus();
-        }, 120);
+        }, 100);
     });
 
     $('#tgl_transfer').on('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            $('#nominal').focus();
+            $('#nominal').focus().select();
         }
     });
 
@@ -263,6 +253,20 @@ $(document).ready(function() {
         if (e.key === 'Enter') {
             e.preventDefault();
             $('#catatan').focus();
+        }
+    });
+
+    $('#catatan').on('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $('#bukti_pembayaran').focus();
+        }
+    });
+
+    $('#bukti_pembayaran').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            $('#btn-submit-komisi').focus();
         }
     });
 

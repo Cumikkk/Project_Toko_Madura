@@ -172,6 +172,11 @@ $bulanIndo = [
                             </h5>
                             <p class="text-body-secondary small mb-0">Informasi profil investor, wilayah kemitraan, dan jumlah outlet aktif</p>
                         </div>
+                        <div>
+                            <button type="button" id="btnResetFilterInvestor" class="btn btn-outline-danger btn-sm d-none align-items-center gap-1.5 rounded-pill px-3 shadow-xs" title="Reset Semua Filter">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                            </button>
+                        </div>
                     </div>
 
                     <!-- INSTANT INLINE FILTER TOOLBAR (No Page Reload) -->
@@ -183,9 +188,9 @@ $bulanIndo = [
                                     <i class="fa-solid fa-store text-danger me-1"></i>Status Outlet
                                 </label>
                                 <select id="filterStatusOutlet" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="all">Semua Status Outlet</option>
-                                    <option value="active">Punya Outlet Aktif (&gt; 0)</option>
-                                    <option value="empty">Belum Punya Outlet (0)</option>
+                                    <option value="all" hidden selected>Semua Status Outlet</option>
+                                    <option value="active">Punya Outlet Aktif</option>
+                                    <option value="empty">Belum Punya Outlet</option>
                                 </select>
                             </div>
 
@@ -195,7 +200,7 @@ $bulanIndo = [
                                     <i class="fa-solid fa-map-location-dot text-danger me-1"></i>Kabupaten / Kota
                                 </label>
                                 <select id="filterKabupaten" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="">Semua Kabupaten / Kota</option>
+                                    <option value="" hidden selected>Semua Kabupaten / Kota</option>
                                     <?php foreach ($availableKabupaten as $kab) : ?>
                                         <option value="<?= htmlspecialchars(strtoupper($kab)); ?>"><?= htmlspecialchars(ucwords(strtolower($kab))); ?></option>
                                     <?php endforeach; ?>
@@ -209,13 +214,13 @@ $bulanIndo = [
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <select id="filterBulan" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                        <option value="0">Semua Bulan</option>
+                                        <option value="0" hidden selected>Semua Bulan</option>
                                         <?php foreach ($bulanIndo as $mNum => $mName) : ?>
                                             <option value="<?= $mNum; ?>"><?= $mName; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <select id="filterTahun" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                        <option value="0">Semua Tahun</option>
+                                        <option value="0" hidden selected>Semua Tahun</option>
                                         <?php foreach ($availableYears as $y) : ?>
                                             <option value="<?= $y; ?>"><?= $y; ?></option>
                                         <?php endforeach; ?>
@@ -223,17 +228,12 @@ $bulanIndo = [
                                 </div>
                             </div>
 
-                            <!-- 4. Live Search Input & Reset Button -->
+                            <!-- 4. Live Search Input -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
                                     <i class="fa-solid fa-magnifying-glass text-danger me-1"></i>Cari Nama / No. HP
                                 </label>
-                                <div class="d-flex gap-1.5">
-                                    <input type="text" id="liveSearchInvestor" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik nama / no. hp..." style="height: 38px;">
-                                    <button type="button" id="btnResetFilterInvestor" class="btn btn-light border btn-sm px-2.5 d-none align-items-center justify-content-center text-danger fw-semibold text-nowrap" style="height: 38px;" title="Reset Semua Filter">
-                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
-                                    </button>
-                                </div>
+                                <input type="text" id="liveSearchInvestor" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik nama / no. hp..." style="height: 38px;">
                             </div>
                         </div>
                     </div>
@@ -403,6 +403,7 @@ $(document).ready(function() {
         applyInstantFilterInvestor();
     });
 
+    // Reset Semua Filter
     $('#btnResetFilterInvestor').on('click', function() {
         $('#filterStatusOutlet').val('all');
         $('#filterKabupaten').val('');
