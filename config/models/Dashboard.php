@@ -19,7 +19,7 @@ class Dashboard {
     public static function getOutletCount(): int {
         try {
             $db = Database::connect();
-            $query = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active' AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
+            $query = $db->query("SELECT COUNT(*) as total FROM outlet WHERE (status = 'active' OR (status IN ('pending', 'reject') AND tipe_request = 'perpanjangan')) AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
             return (int)($query->fetch_assoc()['total'] ?? 0);
         } catch (Exception $e) {
             return 0;

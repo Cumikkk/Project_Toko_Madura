@@ -334,8 +334,8 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
             }
         ?>
 
-        <!-- Banner Info / Warning Masa Langganan -->
-        <?php if (!$isInvestor && ($outlet['status'] ?? '') === 'pending' && ($outlet['tipe_request'] ?? '') === 'perpanjangan') : ?>
+        <!-- Banner Information / Warning Masa Langganan -->
+        <?php if (!$isInvestor && ($outlet['status'] ?? '') === 'pending' && ($outlet['tipe_request'] ?? '') === 'perpanjangan' && $daysRemaining !== null && $daysRemaining >= 0) : ?>
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="alert alert-info border border-info-subtle shadow-sm rounded-4 p-3 mb-0 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(13, 202, 240, 0.1);">
@@ -344,11 +344,11 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold text-info-emphasis mb-1" style="font-size: 13.5px;">
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 13.5px;">
                                     Pengajuan Perpanjangan Sedang Diverifikasi Admin
                                 </h6>
                                 <p class="text-body-secondary mb-0" style="font-size: 12px;">
-                                    Permohonan perpanjangan langganan toko Anda telah terkirim dan sedang diverifikasi oleh Admin. Anda tetap dapat menggunakan aplikasi &amp; bertransaksi seperti biasa hingga tanggal <strong><?= $jtFormatted; ?></strong>.
+                                    Permohonan perpanjangan langganan toko Anda telah dikirim dan sedang diverifikasi oleh Admin. Anda tetap dapat menggunakan aplikasi hingga tanggal <strong><?= $jtFormatted; ?></strong>.
                                 </p>
                             </div>
                         </div>

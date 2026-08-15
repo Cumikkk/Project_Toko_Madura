@@ -19,7 +19,7 @@ class Master {
                    COUNT(DISTINCT o.id_outlet) as total_outlet
             FROM users u
             LEFT JOIN investor inv ON inv.id_master = u.id_users
-            LEFT JOIN outlet o ON (o.id_investor = inv.id_investor AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE()))
+            LEFT JOIN outlet o ON (o.id_investor = inv.id_investor AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE()))
             WHERE u.role = 'master'
             GROUP BY u.id_users
             ORDER BY u.id_users DESC

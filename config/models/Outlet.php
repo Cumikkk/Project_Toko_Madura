@@ -21,12 +21,12 @@ class Outlet {
             'rejectCount' => 0
         ];
 
-        $resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE status = 'active' AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
+        $resActive = $db->query("SELECT COUNT(*) as total FROM outlet WHERE (status = 'active' OR (status IN ('pending', 'reject') AND tipe_request = 'perpanjangan')) AND (tgl_jatuh_tempo IS NULL OR DATE(tgl_jatuh_tempo) >= CURRENT_DATE())");
         if ($resActive && $resActive->num_rows > 0) {
             $stats['activeCount'] = (int)$resActive->fetch_assoc()['total'];
         }
 
-        $resExpired = $db->query("SELECT COUNT(*) as total FROM outlet WHERE (status = 'active' AND DATE(tgl_jatuh_tempo) < CURRENT_DATE()) OR status = 'inactive'");
+        $resExpired = $db->query("SELECT COUNT(*) as total FROM outlet WHERE ((status = 'active' OR (status IN ('pending', 'reject') AND tipe_request = 'perpanjangan')) AND DATE(tgl_jatuh_tempo) < CURRENT_DATE()) OR (status = 'pending' AND tipe_request = 'baru') OR status = 'inactive'");
         if ($resExpired && $resExpired->num_rows > 0) {
             $stats['expiredCount'] = (int)$resExpired->fetch_assoc()['total'];
         }
@@ -46,7 +46,7 @@ class Outlet {
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-            WHERE o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
+            WHERE (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR DATE(o.tgl_jatuh_tempo) >= CURRENT_DATE())
             ORDER BY o.nama_outlet ASC
         ";
         return $db->query($sql);
@@ -61,7 +61,7 @@ class Outlet {
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN investor inv ON inv.id_investor = o.id_investor
             LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-            WHERE (o.status = 'active' AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
+            WHERE ((o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND DATE(o.tgl_jatuh_tempo) < CURRENT_DATE()) OR o.status = 'inactive'
             ORDER BY o.tgl_jatuh_tempo DESC, o.nama_outlet ASC
         ";
         return $db->query($sql);

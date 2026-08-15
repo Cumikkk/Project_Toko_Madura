@@ -65,7 +65,7 @@ $resTotalActiveOut = $db->query("
     FROM outlet o
     JOIN investor i ON i.id_investor = o.id_investor
     WHERE (i.id_master = {$userId} OR i.id_master IS NULL)
-      AND o.status = 'active'
+      AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan'))
       AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
 ");
 $sumOutlets = ($resTotalActiveOut && $rowAO = $resTotalActiveOut->fetch_assoc()) ? (int)$rowAO['total'] : 0;
@@ -95,7 +95,7 @@ $sqlInv = "
         u.alamat_lengkap as alamat_investor,
         u.created_at as tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet,
-        SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
+        SUM(CASE WHEN (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
     FROM investor i
     JOIN users u ON u.id_users = i.id_users
     LEFT JOIN outlet o ON o.id_investor = i.id_investor
@@ -115,7 +115,9 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                           o.tgl_disetujui as tanggal_bergabung 
                    FROM outlet o 
                    JOIN users u ON u.id_users = o.id_users 
-                   WHERE o.id_investor = {$invId} AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
+                   WHERE o.id_investor = {$invId} 
+                     AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) 
+                     AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
                    ORDER BY o.id_outlet DESC";
         $resOut = $db->query($sqlOut);
         if ($resOut) {
