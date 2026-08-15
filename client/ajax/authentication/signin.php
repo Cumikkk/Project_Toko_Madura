@@ -49,28 +49,35 @@ if ($userData['role'] === 'outlet') {
     $sqlOutlet = $db->query("SELECT status, tipe_request, alasan_penolakan, tgl_jatuh_tempo FROM outlet WHERE id_users = {$memberId} LIMIT 1");
     if ($sqlOutlet && $sqlOutlet->num_rows > 0) {
         $outletInfo = $sqlOutlet->fetch_assoc();
+        $today = date('Y-m-d');
+        $jt = !empty($outletInfo['tgl_jatuh_tempo']) ? date('Y-m-d', strtotime($outletInfo['tgl_jatuh_tempo'])) : null;
+        $isUnexpired = ($jt && $today <= $jt);
+        $isRenew = (($outletInfo['tipe_request'] ?? '') === 'perpanjangan');
+
         if ($outletInfo['status'] === 'pending') {
-            $isRenew = (($outletInfo['tipe_request'] ?? '') === 'perpanjangan');
-            $msg = $isRenew
-                ? "Pengajuan perpanjangan langganan outlet Anda sedang dalam proses verifikasi oleh Admin."
-                : "Request pendaftaran outlet Anda masih dalam proses peninjauan / persetujuan oleh Admin.";
-            JsonResponse([
-                'success' => false,
-                'message' => $msg,
-                'data' => []
-            ]);
+            // Allow login if it's an early renewal submission and current subscription has not expired yet
+            if (!($isRenew && $isUnexpired)) {
+                $msg = $isRenew
+                    ? "Masa langganan outlet Anda telah berakhir dan pengajuan perpanjangan sedang dalam proses verifikasi oleh Admin."
+                    : "Request pendaftaran outlet Anda masih dalam proses peninjauan / persetujuan oleh Admin.";
+                JsonResponse([
+                    'success' => false,
+                    'message' => $msg,
+                    'data' => []
+                ]);
+            }
         } elseif ($outletInfo['status'] === 'reject') {
-            $isRenew = (($outletInfo['tipe_request'] ?? '') === 'perpanjangan');
-            $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Request pendaftaran";
-            $alasan = !empty($outletInfo['alasan_penolakan']) ? " Alasan penolakan: " . $outletInfo['alasan_penolakan'] : "";
-            JsonResponse([
-                'success' => false,
-                'message' => $label . " outlet Anda ditolak oleh Admin." . $alasan,
-                'data' => []
-            ]);
+            // Allow login if it's a renewal rejection but current subscription has not expired yet
+            if (!($isRenew && $isUnexpired)) {
+                $label = $isRenew ? "Pengajuan perpanjangan langganan" : "Request pendaftaran";
+                $alasan = !empty($outletInfo['alasan_penolakan']) ? " Alasan penolakan: " . $outletInfo['alasan_penolakan'] : "";
+                JsonResponse([
+                    'success' => false,
+                    'message' => $label . " outlet Anda ditolak oleh Admin." . $alasan,
+                    'data' => []
+                ]);
+            }
         } elseif ($outletInfo['status'] === 'active' && !empty($outletInfo['tgl_jatuh_tempo'])) {
-            $today = date('Y-m-d');
-            $jt = date('Y-m-d', strtotime($outletInfo['tgl_jatuh_tempo']));
             if ($today > $jt) {
                 JsonResponse([
                     'success' => false,

@@ -971,3 +971,48 @@ html body.light-theme .dropdown-menu .dropdown-item.text-danger:focus {
     background-color: rgba(220, 53, 69, 0.1) !important;
     color: #dc3545 !important;
 }
+
+/* ========================================================================= */
+/* FIX MODAL OVERLAP & TOPBAR NAVBAR CLEARANCE (Z-INDEX & TOP OFFSET) */
+/* ========================================================================= */
+.modal {
+    padding-top: 85px !important;
+    overflow-y: auto !important;
+    z-index: 1060 !important;
+}
+
+.modal-backdrop {
+    z-index: 1055 !important;
+}
+
+.modal-dialog {
+    margin-top: 0 !important;
+    margin-bottom: 30px !important;
+}
+
+.modal-dialog-centered {
+    min-height: calc(100vh - 110px) !important;
+    align-items: flex-start !important;
+}
+
+.modal-dialog-centered.modal-dialog-scrollable .modal-content {
+    max-height: calc(100vh - 120px) !important;
+}
+
+.modal-body {
+    max-height: calc(100vh - 240px) !important;
+    overflow-y: auto !important;
+}
+
+/* High-Contrast Checkbox Styling (Bold White Checkmark on Brand Maroon Background) */
+.form-check-input:checked,
+html body .form-check-input:checked {
+    background-color: #7D0A0A !important;
+    border-color: #7D0A0A !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.form-check-input:focus {
+    border-color: #7D0A0A !important;
+    box-shadow: 0 0 0 0.25rem rgba(125, 10, 10, 0.25) !important;
+}

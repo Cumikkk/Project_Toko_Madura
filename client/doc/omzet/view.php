@@ -334,8 +334,28 @@ $totalBersihOutlet = $totalOmzet - $totalPotonganBulanan;
             }
         ?>
 
-        <!-- Banner Warning Masa Langganan (Mendekati Expired H-7 s.d H-0) -->
-        <?php if (!$isInvestor && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 7) : ?>
+        <!-- Banner Information / Warning Masa Langganan -->
+        <?php if (!$isInvestor && ($outlet['status'] ?? '') === 'pending' && ($outlet['tipe_request'] ?? '') === 'perpanjangan' && $daysRemaining !== null && $daysRemaining >= 0) : ?>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-info border border-info-subtle shadow-sm rounded-4 p-3 mb-0 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(13, 202, 240, 0.1);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; font-size: 18px;">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 13.5px;">
+                                    Pengajuan Perpanjangan Sedang Diverifikasi Admin
+                                </h6>
+                                <p class="text-body-secondary mb-0" style="font-size: 12px;">
+                                    Permohonan perpanjangan langganan toko Anda telah dikirim dan sedang diverifikasi oleh Admin. Anda tetap dapat menggunakan aplikasi hingga tanggal <strong><?= $jtFormatted; ?></strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php elseif (!$isInvestor && $daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 7) : ?>
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="alert alert-warning border border-warning-subtle shadow-sm rounded-4 p-3 mb-0 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(255, 193, 7, 0.1);">

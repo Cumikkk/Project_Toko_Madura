@@ -29,7 +29,7 @@ $sql = "
     JOIN users u ON o.id_users = u.id_users
     LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
     WHERE o.id_investor = {$idInvestor}
-      AND o.status = 'active'
+      AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan'))
       AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= CURRENT_DATE())
     ORDER BY o.id_outlet DESC
 ";

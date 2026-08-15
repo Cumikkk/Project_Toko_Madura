@@ -503,7 +503,7 @@ $countOutlet = count($rows);
                 <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterBagiHasil">
                     <i class="fa-solid fa-filter me-1"></i> Filter Data
                 </button>
-                <!-- Tombol Cetak PDF Bagi Hasil -->
+                <!-- Tombol Cetak PDF Bagi Hasil & Data Keuangan Sederhana -->
                 <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/bagi-hasil/export_pdf.php?outlet_id=<?= $selectedOutletId; ?>&tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
                     <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                 </a>
@@ -739,7 +739,7 @@ $countOutlet = count($rows);
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel" style="font-size: 14px;">
-                    <i class="fa-solid fa-calendar-days me-1.5 text-danger"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger fw-bold"></span>
+                    <i class="fa-solid fa-calendar-days text-danger me-2" style="margin-right: 8px !important;"></i>Rincian Omzet Harian: <span id="lblModalNamaOutlet" class="text-danger fw-bold"></span>
                 </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 10px;"></button>
             </div>

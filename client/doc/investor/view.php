@@ -58,7 +58,7 @@ $sqlInv = "
         u.alamat_lengkap as alamat_investor,
         u.created_at as tanggal_bergabung,
         COUNT(o.id_outlet) as total_outlet,
-        SUM(CASE WHEN o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
+        SUM(CASE WHEN (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
     FROM investor i
     JOIN users u ON u.id_users = i.id_users
     LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
@@ -82,7 +82,9 @@ if ($resInvestors && $resInvestors->num_rows > 0) {
                    FROM outlet o 
                    JOIN users u ON u.id_users = o.id_users 
                    LEFT JOIN master_wilayah mw_out ON mw_out.id_wilayah = u.id_wilayah
-                   WHERE o.id_investor = {$invId} AND o.status = 'active' AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
+                   WHERE o.id_investor = {$invId} 
+                     AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) 
+                     AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
                    ORDER BY o.id_outlet DESC";
         $resOut = $db->query($sqlOut);
         if ($resOut) {
@@ -104,7 +106,7 @@ $bulanIndo = [
 ?>
 
 <div class="main-content-inner py-3 py-md-4">
-    <!-- Header Banner Card -->
+    <!-- 1. Header Banner Card (Maroon Gradient Style) -->
     <div class="row mb-3 mb-md-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="border-radius: 16px; background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%); color: #fff;">
@@ -114,8 +116,8 @@ $bulanIndo = [
                             <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                                 <i class="fa-solid fa-shield-check me-1"></i> Master Access
                             </span>
-                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor</h2>
-                            <p class="text-white-50 small mb-0">Memantau daftar seluruh investor dan toko yang berada di bawah naungan Master Owner.</p>
+                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor & Kemitraan</h2>
+                            <p class="text-white-50 small mb-0">Pantau seluruh investor di bawah jaringan Anda beserta persebaran toko aktif yang dikelola.</p>
                         </div>
                     </div>
                 </div>
@@ -123,25 +125,24 @@ $bulanIndo = [
         </div>
     </div>
 
-    <!-- Summary Metrics Card -->
+    <!-- 2. Metrics Summary Cards -->
     <div class="row g-2 g-md-3 mb-4">
+        <!-- Card 1: Total Investor Terdaftar -->
         <div class="col-md-6 col-12">
             <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 16px;">
                 <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
-                    <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-xs" style="width: 48px; height: 48px; background: linear-gradient(135deg, #7D0A0A 0%, #4D0709 100%);">
-                        <i class="fa-solid fa-user-tie fs-4"></i>
+                    <div class="rounded-3 p-3 text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-xs" style="width: 48px; height: 48px; background: linear-gradient(135deg, #7D0A0A 0%, #500606 100%);">
+                        <i class="fa-solid fa-users-gear fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Investor Saya</div>
-                        <div class="fs-4 fw-extrabold text-danger mb-0">
-                            <span id="metricTotalInvestor"><?= number_format($totalOverallInvestors, 0, ',', '.'); ?></span> 
-                            <span class="fs-6 fw-normal text-body-secondary">Investor</span>
-                        </div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Investor (Sesuai Filter)</div>
+                        <div class="fs-4 fw-bold text-body-emphasis mb-0" id="metricTotalInvestor"><?= number_format($totalOverallInvestors); ?> Investor</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Card 2: Total Toko Aktif -->
         <div class="col-md-6 col-12">
             <div class="card border border-body-subtle shadow-sm h-100" style="border-radius: 16px;">
                 <div class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
@@ -149,18 +150,15 @@ $bulanIndo = [
                         <i class="fa-solid fa-store fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Outlet Aktif</div>
-                        <div class="fs-4 fw-extrabold text-success mb-0">
-                            <span id="metricTotalOutlet"><?= number_format($totalOverallActiveOutlets, 0, ',', '.'); ?></span> 
-                            <span class="fs-6 fw-normal text-body-secondary">Outlet</span>
-                        </div>
+                        <div class="text-body-secondary text-uppercase fw-bold small mb-1">Total Toko Aktif (Sesuai Filter)</div>
+                        <div class="fs-4 fw-bold text-success mb-0" id="metricTotalOutlet"><?= number_format($totalOverallActiveOutlets); ?> Outlet Aktif</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Data Table Card with Integrated Instant Filter Toolbar -->
+    <!-- 3. Table Card with Integrated Instant Filter Toolbar -->
     <div class="row">
         <div class="col-12">
             <div class="card border border-body-subtle shadow-sm" style="border-radius: 16px;">
@@ -170,47 +168,47 @@ $bulanIndo = [
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div>
                             <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
-                                <i class="fa-solid fa-users me-2 text-danger"></i>Daftar Investor Terdaftar
+                                <i class="fa-solid fa-list-check me-2 text-danger"></i>Daftar Investor Kemitraan
                             </h5>
-                            <p class="text-body-secondary small mb-0">Kelola dan pantau seluruh data investor di bawah naungan Master Owner</p>
+                            <p class="text-body-secondary small mb-0">Informasi profil investor, wilayah kemitraan, dan jumlah outlet aktif</p>
                         </div>
-                        
-                        <!-- Active Live Filter Badges Container -->
+
+                        <!-- Active Filter Badges Container -->
                         <div class="d-flex align-items-center gap-1.5 flex-wrap" id="activeFilterBadges"></div>
                     </div>
 
                     <!-- INSTANT INLINE FILTER TOOLBAR (No Page Reload) -->
-                    <div class="mt-3 pt-3 border-top border-body-subtle" id="toolbarFilterInvestor">
+                    <div class="mt-3 pt-3 border-top border-body-subtle" id="toolbarFilter">
                         <div class="row g-2 align-items-end">
-                            <!-- 1. Status Outlet -->
+                            <!-- 1. Filter Status Outlet -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
                                     <i class="fa-solid fa-store text-danger me-1"></i>Status Outlet
                                 </label>
                                 <select id="filterStatusOutlet" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="all">Semua Status Investor</option>
-                                    <option value="active">Memiliki Outlet Aktif</option>
-                                    <option value="empty">Belum Ada / Non-Aktif</option>
+                                    <option value="all">Semua Status Outlet</option>
+                                    <option value="active">Punya Outlet Aktif (&gt; 0)</option>
+                                    <option value="empty">Belum Punya Outlet (0)</option>
                                 </select>
                             </div>
 
-                            <!-- 2. Wilayah Kabupaten -->
+                            <!-- 2. Filter Kabupaten / Kota -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
                                     <i class="fa-solid fa-map-location-dot text-danger me-1"></i>Kabupaten / Kota
                                 </label>
                                 <select id="filterKabupaten" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                    <option value="">Semua Wilayah</option>
+                                    <option value="">Semua Kabupaten / Kota</option>
                                     <?php foreach ($availableKabupaten as $kab) : ?>
-                                        <option value="<?= htmlspecialchars(strtoupper($kab)); ?>"><?= htmlspecialchars($kab); ?></option>
+                                        <option value="<?= htmlspecialchars(strtoupper($kab)); ?>"><?= htmlspecialchars(ucwords(strtolower($kab))); ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
 
-                            <!-- 3. Bulan & Tahun Join -->
+                            <!-- 3. Filter Bulan & Tahun Bergabung -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
-                                    <i class="fa-solid fa-calendar-days text-danger me-1"></i>Bulan & Tahun Join
+                                    <i class="fa-solid fa-calendar-days text-danger me-1"></i>Periode Bergabung
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <select id="filterBulan" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
@@ -220,7 +218,7 @@ $bulanIndo = [
                                         <?php endforeach; ?>
                                     </select>
                                     <select id="filterTahun" class="form-select form-select-sm bg-body-tertiary border-body-subtle fw-semibold" style="height: 38px;">
-                                        <option value="0">Semua Thn</option>
+                                        <option value="0">Semua Tahun</option>
                                         <?php foreach ($availableYears as $y) : ?>
                                             <option value="<?= $y; ?>"><?= $y; ?></option>
                                         <?php endforeach; ?>
@@ -228,13 +226,13 @@ $bulanIndo = [
                                 </div>
                             </div>
 
-                            <!-- 4. Cari & Tombol Reset -->
+                            <!-- 4. Live Search Input & Reset Button -->
                             <div class="col-lg-3 col-md-6 col-12">
                                 <label class="form-label text-body-secondary small fw-bold mb-1" style="font-size: 11px;">
-                                    <i class="fa-solid fa-magnifying-glass text-danger me-1"></i>Cari Nama / No HP
+                                    <i class="fa-solid fa-magnifying-glass text-danger me-1"></i>Cari Nama / No. HP
                                 </label>
                                 <div class="d-flex gap-1.5">
-                                    <input type="text" id="liveSearchInvestor" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik nama / no hp..." style="height: 38px;">
+                                    <input type="text" id="liveSearchInvestor" class="form-control form-control-sm bg-body-tertiary border-body-subtle fw-semibold" placeholder="Ketik nama / no. hp..." style="height: 38px;">
                                     <button type="button" id="btnResetFilterInvestor" class="btn btn-light border btn-sm px-2.5 d-none align-items-center justify-content-center text-danger fw-semibold text-nowrap" style="height: 38px;" title="Reset Semua Filter">
                                         <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </button>
@@ -280,13 +278,13 @@ $bulanIndo = [
                                             <td class="text-center">
                                                 <?php if (!empty($inv['kecamatan']) && $inv['kecamatan'] !== '-') : ?>
                                                     <span class="badge bg-light text-dark border btn-detail-alamat-investor shadow-xs py-1.5 px-2.5" style="cursor: pointer; font-size: 13px; font-weight: 500;"
-                                                          data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                          data-provinsi="<?= htmlspecialchars($inv['provinsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                          data-kabupaten="<?= htmlspecialchars($inv['kabupaten'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                          data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                          data-kelurahan="<?= htmlspecialchars($inv['kelurahan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                          data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                                                          title="Klik untuk lihat detail lokasi">
+                                                           data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-provinsi="<?= htmlspecialchars($inv['provinsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-kabupaten="<?= htmlspecialchars($inv['kabupaten'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-kelurahan="<?= htmlspecialchars($inv['kelurahan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                           title="Klik untuk lihat detail lokasi">
                                                         <i class="fa-solid fa-location-dot me-1 text-danger"></i><?= htmlspecialchars(ucwords(strtolower($inv['kelurahan'] ?? ''))) ?>, Kec. <?= htmlspecialchars(ucwords(strtolower($inv['kecamatan'] ?? ''))) ?>
                                                     </span>
                                                 <?php else : ?>
@@ -317,7 +315,7 @@ $bulanIndo = [
                                 <tr id="noMatchingFilterRow" style="display: none;">
                                     <td colspan="5" class="text-center py-5 text-body-secondary">
                                         <i class="fa-solid fa-filter-circle-xmark fs-1 text-danger opacity-50 mb-2 d-block"></i>
-                                        Tidak ada investor yang sesuai dengan kriteria filter saat ini.
+                                        Tidak ada data investor yang sesuai dengan kriteria filter saat ini.
                                     </td>
                                 </tr>
                             </tbody>
@@ -327,7 +325,7 @@ $bulanIndo = [
                     <!-- Record Summary Footer -->
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
                         <div class="small text-body-secondary fw-semibold ms-1">
-                            Menampilkan <span class="text-body-emphasis fw-bold" id="footerCountVisible"><?= count($investorList); ?></span> dari <span class="text-body-emphasis fw-bold"><?= count($investorList); ?></span> investor terdaftar
+                            Menampilkan <span class="text-body-emphasis fw-bold" id="footerCountVisible"><?= count($investorList); ?></span> dari <span class="text-body-emphasis fw-bold"><?= count($investorList); ?></span> investor
                         </div>
                     </div>
                 </div>
@@ -339,20 +337,20 @@ $bulanIndo = [
 <script type="text/javascript">
 $(document).ready(function() {
 
-    var bulanNames = {
-        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+    const bulanNames = {
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5 => 'Mei', 6: 'Juni',
         7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
     };
 
     // INSTANT CLIENT-SIDE FILTER (0 Milidetik, Tanpa Reload Halaman)
     function applyInstantFilterInvestor() {
-        let filterStatus = $('#filterStatusOutlet').val();
-        let filterKab = ($('#filterKabupaten').val() || '').toUpperCase().trim();
-        let filterBulan = parseInt($('#filterBulan').val()) || 0;
-        let filterTahun = parseInt($('#filterTahun').val()) || 0;
+        let status = $('#filterStatusOutlet').val();
+        let kabupaten = ($('#filterKabupaten').val() || '').toUpperCase().trim();
+        let bulan = parseInt($('#filterBulan').val()) || 0;
+        let tahun = parseInt($('#filterTahun').val()) || 0;
         let search = ($('#liveSearchInvestor').val() || '').toLowerCase().trim();
 
-        let hasActiveFilter = (filterStatus !== 'all' || filterKab !== '' || filterBulan > 0 || filterTahun > 0 || search !== '');
+        let hasActiveFilter = (status !== 'all' || kabupaten !== '' || bulan !== 0 || tahun !== 0 || search !== '');
 
         if (hasActiveFilter) {
             $('#btnResetFilterInvestor').removeClass('d-none').addClass('d-inline-flex');
@@ -362,24 +360,24 @@ $(document).ready(function() {
 
         // Render Active Filter Badges
         let badgeHtml = '';
-        if (filterStatus === 'active') {
-            badgeHtml += '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-store me-1"></i>Punya Outlet Aktif</span>';
-        } else if (filterStatus === 'empty') {
+        if (status === 'active') {
+            badgeHtml += '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-store me-1"></i>Punya Outlet Aktif</span>';
+        } else if (status === 'empty') {
             badgeHtml += '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-store-slash me-1"></i>Belum Ada Outlet</span>';
         }
-        if (filterKab) {
-            let kabText = $('#filterKabupaten option:selected').text();
-            badgeHtml += `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-map-location-dot me-1"></i>${kabText}</span>`;
+        if (kabupaten) {
+            badgeHtml += `<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-location-dot me-1"></i>${kabupaten}</span>`;
         }
-        if (filterBulan > 0 || filterTahun > 0) {
-            let mText = filterBulan > 0 ? $('#filterBulan option:selected').text() : 'Semua Bulan';
-            let yText = filterTahun > 0 ? filterTahun : '';
-            badgeHtml += `<span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-day me-1"></i>${mText} ${yText}</span>`;
+        if (bulan > 0 || tahun > 0) {
+            let bText = bulan > 0 ? (bulanNames[bulan] || `Bulan ${bulan}`) : '';
+            let tText = tahun > 0 ? tahun : '';
+            badgeHtml += `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold"><i class="fa-solid fa-calendar-day me-1"></i>${bText} ${tText}</span>`;
         }
         $('#activeFilterBadges').html(badgeHtml);
 
+        // Filter Rows
         let visibleCount = 0;
-        let totalVisibleOutlets = 0;
+        let totalOutletsVisible = 0;
 
         $('.investor-data-row').each(function() {
             let $row = $(this);
@@ -387,27 +385,28 @@ $(document).ready(function() {
             let rowKab = ($row.attr('data-kabupaten') || '').toUpperCase().trim();
             let rowBulan = parseInt($row.attr('data-bulan')) || 0;
             let rowTahun = parseInt($row.attr('data-tahun')) || 0;
-            let rowOutlets = parseInt($row.attr('data-outlets-count')) || 0;
+            let rowOutletsCount = parseInt($row.attr('data-outlets-count')) || 0;
             let rowText = $row.text().toLowerCase();
 
-            let matchStatus = (filterStatus === 'all' || rowStatus === filterStatus);
-            let matchKab = (!filterKab || rowKab === filterKab);
-            let matchBulan = (filterBulan === 0 || rowBulan === filterBulan);
-            let matchTahun = (filterTahun === 0 || rowTahun === filterTahun);
+            let matchStatus = (status === 'all' || rowStatus === status);
+            let matchKab = (!kabupaten || rowKab.indexOf(kabupaten) > -1);
+            let matchBulan = (bulan === 0 || rowBulan === bulan);
+            let matchTahun = (tahun === 0 || rowTahun === tahun);
             let matchSearch = (!search || rowText.indexOf(search) > -1);
 
             if (matchStatus && matchKab && matchBulan && matchTahun && matchSearch) {
                 $row.show();
                 visibleCount++;
-                totalVisibleOutlets += rowOutlets;
+                totalOutletsVisible += rowOutletsCount;
                 $row.find('.row-index-num').text(visibleCount);
             } else {
                 $row.hide();
             }
         });
 
-        $('#metricTotalInvestor').text(visibleCount.toLocaleString('id-ID'));
-        $('#metricTotalOutlet').text(totalVisibleOutlets.toLocaleString('id-ID'));
+        // Update Dynamic Metrics Counter
+        $('#metricTotalInvestor').text(visibleCount + ' Investor');
+        $('#metricTotalOutlet').text(totalOutletsVisible + ' Outlet Aktif');
         $('#footerCountVisible').text(visibleCount);
 
         if (visibleCount === 0) {
@@ -457,7 +456,8 @@ $(document).ready(function() {
         let cleanProv = provinsi ? (provinsi.toLowerCase().startsWith('prov') ? provinsi : 'Prov. ' + provinsi) : '';
         
         let wilayahStr = [cleanKel, cleanKec, cleanKab, cleanProv].filter(Boolean).join(', ') || '-';
-        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(alamat || '');
+        let queryStr = encodeURIComponent((nama ? nama + ' ' : '') + (kecamatan && kecamatan !== '-' ? 'Kec. ' + kecamatan + ' ' : '') + (alamat && alamat !== '-' ? alamat : ''));
+        let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + (alamat ? encodeURIComponent(alamat) : queryStr);
 
         Swal.fire({
             title: `<div class="text-danger fw-extrabold fs-5 mb-0"><i class="fa-solid fa-location-dot me-2"></i>Detail Lokasi Investor</div>`,
@@ -480,10 +480,12 @@ $(document).ready(function() {
                             <i class="fa-solid fa-house-chimney text-danger me-2 fs-6"></i>Alamat Lengkap (Jalan / Geotag)
                         </div>
                         <div class="p-3 bg-white rounded-3 border border-secondary-subtle text-dark fw-semibold" style="font-size: 13.5px; line-height: 1.6; text-align: left; word-break: break-word;">
-                            <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" title="Buka di Google Maps">
-                                ${alamat || '-'} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 11px;"></i>
+                            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-underline fw-bold d-block mb-1" title="Klik untuk membuka lokasi di Google Maps">
+                                ${alamat || '-'} <i class="fa-solid fa-arrow-up-right-from-square ms-1 text-primary" style="font-size: 11px;"></i>
                             </a>
-                            <small class="text-muted d-block text-start mt-1.5" style="font-size: 11px; font-weight: normal;"><i class="fas fa-info-circle me-1"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps</small>
+                            <small class="text-muted d-block text-start mt-2 pt-2 border-top" style="font-size: 11px; font-weight: normal;">
+                                <i class="fa-solid fa-circle-info me-1 text-danger"></i>Klik teks alamat di atas untuk membuka lokasi di Google Maps (Desktop / Aplikasi HP)
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -513,7 +515,7 @@ $(document).ready(function() {
                 let safeProv = item.provinsi ? item.provinsi : '';
                 let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-                let cleanKel = safeKel.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim();
+                let cleanKel = safeKel.replace(/^Kel\.\s*/i, '').replace(/^Desa\s*/i, '').trim() : '';
                 let wilayahBadgeText = (cleanKel ? cleanKel + ', Kec. ' + safeKec : (safeKec ? 'Kec. ' + safeKec : '-'));
                 let locColHtml = item.alamat_outlet ? 
                     `<span class="badge bg-light text-body-secondary border btn-detail-alamat-outlet-item shadow-xs" style="font-size: 11px; cursor: pointer;" onclick="$(this).closest('tr').next('.detail-lokasi-row').fadeToggle(200);" title="Klik untuk lihat/tutup detail alamat"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${wilayahBadgeText} <i class="fa-solid fa-caret-down ms-1"></i></span>` :
@@ -544,9 +546,12 @@ $(document).ready(function() {
                                 <div class="flex-grow-1 text-start">
                                     <span class="d-block text-body-secondary small fw-bold mb-1">Wilayah: <strong class="text-dark">${fullWilayahOutlet || '-'}</strong></span>
                                     <span class="d-block text-body-secondary small fw-bold mb-1">Alamat Lengkap:</span>
-                                    <a href="${mapsUrl}" target="_blank" class="text-primary text-decoration-underline fw-semibold" style="font-size: 13px;" title="Buka di Google Maps">
-                                        ${safeAlamat} <i class="fas fa-external-link-alt ms-1 text-muted" style="font-size: 10px;"></i>
+                                    <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-underline fw-bold d-inline-block mb-1" style="font-size: 13px;" title="Klik untuk membuka lokasi di Google Maps">
+                                        ${safeAlamat} <i class="fa-solid fa-arrow-up-right-from-square ms-1 text-primary" style="font-size: 10px;"></i>
                                     </a>
+                                    <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                                        <i class="fa-solid fa-circle-info text-danger me-1"></i>Klik teks alamat untuk petunjuk arah di Google Maps (Desktop / Aplikasi HP)
+                                    </small>
                                 </div>
                             </div>
                         </td>
