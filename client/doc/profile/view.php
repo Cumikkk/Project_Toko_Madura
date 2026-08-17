@@ -375,7 +375,7 @@ if (!empty($userData['kecamatan']) && $userData['kecamatan'] !== '-') {
                 <div class="card card-profile-section bg-body p-4">
                     <h6 class="section-header-title">
                         <i class="fa-solid fa-map-location-dot text-danger"></i>
-                        Wilayah Administrasi & Domisili
+                        Wilayah
                     </h6>
 
                     <div class="row g-3">
@@ -384,7 +384,7 @@ if (!empty($userData['kecamatan']) && $userData['kecamatan'] !== '-') {
                             <label class="form-label fw-bold text-body-emphasis small mb-1">
                                 Provinsi
                             </label>
-                            <select class="wilayah-select" id="selectProvinsi" name="provinsi" data-placeholder="Pilih Provinsi...">
+                            <select class="wilayah-select" id="selectProvinsi" name="provinsi" data-placeholder="Pilih Provinsi..." disabled>
                                 <option value=""></option>
                             </select>
                         </div>
@@ -422,7 +422,7 @@ if (!empty($userData['kecamatan']) && $userData['kecamatan'] !== '-') {
                         <!-- Alamat Lengkap -->
                         <div class="col-12">
                             <label class="form-label fw-bold text-body-emphasis small mb-1">
-                                Detail Alamat Lengkap (Jalan / Geotag)
+                                Detail Alamat Lengkap
                             </label>
                             <div class="input-group form-custom-group">
                                 <span class="input-group-text align-items-start pt-2"><i class="fa-solid fa-location-dot"></i></span>
@@ -514,7 +514,7 @@ $(document).ready(function() {
                 try { $('#selectProvinsi').select2('destroy'); } catch(e) {}
             }
             $('#selectProvinsi').parent().find('> .select2-container').remove();
-            $('#selectProvinsi').html(options).prop('disabled', false);
+            $('#selectProvinsi').html(options).prop('disabled', true);
             initWilayahSelect2('#selectProvinsi');
 
             if (isInitialCascade && edit_provinsi) {
@@ -549,13 +549,11 @@ $(document).ready(function() {
                     try { $('#selectKabupaten').select2('destroy'); } catch(e) {}
                 }
                 $('#selectKabupaten').parent().find('> .select2-container').remove();
-                $('#selectKabupaten').html(options).prop('disabled', false);
+                $('#selectKabupaten').html(options).prop('disabled', true);
                 initWilayahSelect2('#selectKabupaten');
 
                 if (isInitialCascade && edit_kabupaten) {
                     $('#selectKabupaten').trigger('change');
-                } else if (!isInitialCascade) {
-                    openNextSelect2('#selectKabupaten');
                 }
             });
         }
@@ -588,13 +586,11 @@ $(document).ready(function() {
                     try { $('#selectKecamatan').select2('destroy'); } catch(e) {}
                 }
                 $('#selectKecamatan').parent().find('> .select2-container').remove();
-                $('#selectKecamatan').html(options).prop('disabled', false);
+                $('#selectKecamatan').html(options).prop('disabled', true);
                 initWilayahSelect2('#selectKecamatan');
 
                 if (isInitialCascade && edit_kecamatan) {
                     $('#selectKecamatan').trigger('change');
-                } else if (!isInitialCascade) {
-                    openNextSelect2('#selectKecamatan');
                 }
             });
         }
@@ -626,13 +622,11 @@ $(document).ready(function() {
                     try { $('#selectKelurahan').select2('destroy'); } catch(e) {}
                 }
                 $('#selectKelurahan').parent().find('> .select2-container').remove();
-                $('#selectKelurahan').html(options).prop('disabled', false);
+                $('#selectKelurahan').html(options).prop('disabled', true);
                 initWilayahSelect2('#selectKelurahan');
 
                 if (isInitialCascade) {
                     isInitialCascade = false; // Initial cascade finished!
-                } else {
-                    openNextSelect2('#selectKelurahan');
                 }
             });
         }
