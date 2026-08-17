@@ -750,14 +750,9 @@ html body .form-check-input:checked {
                             <input type="text" id="liveSearchOutlet" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" placeholder="Cari nama outlet..." title="Live Search Nama Outlet">
                         </div>
 
-                        <!-- Tombol Filter Data (Rentang Tanggal) -->
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet" title="Filter berdasarkan rentang tanggal">
-                            <i class="fa-solid fa-calendar-range me-1"></i> Filter Data
-                        </button>
-
-                        <!-- Tombol Filter Outlet (Wilayah) -->
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterWilayah" title="Filter berdasarkan wilayah/lokasi outlet">
-                            <i class="fa-solid fa-map-location-dot me-1"></i> Filter Outlet
+                        <!-- Tombol Filter Utama (Membuka Modal Filter Tanggal & Wilayah Unified) -->
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet" title="Filter data outlet berdasarkan tanggal & lokasi wilayah">
+                            <i class="fa-solid fa-filter me-1"></i> Filter Data
                         </button>
 
                         <!-- Tombol Cetak PDF Data Neraca Sederhana -->
@@ -1773,134 +1768,101 @@ html body .form-check-input:checked {
 
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
-<!-- ========================================================================= -->
-<!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
-<!-- ========================================================================= -->
-<!-- ========================================================================= -->
-<!-- MODAL 1: FILTER DATA (Rentang Tanggal Pendaftaran) -->
+<!-- MODAL: FILTER DATA OUTLET (Unified Modal: Rentang Tanggal & Lokasi Wilayah) -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px;">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 500px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterOutletLabel">
-                        <i class="fa-solid fa-calendar-range me-2 text-danger"></i>Filter Data & Rentang Tanggal
+                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Data Outlet
                     </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih tanggal mulai dan tanggal selesai pendaftaran outlet</small>
+                    <small class="text-body-secondary" style="font-size: 11px;">Saring data berdasarkan tanggal pendaftaran & lokasi wilayah outlet</small>
                 </div>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
+            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" id="formFilterOutletUnified">
                 <input type="hidden" name="a" value="outlet">
-                <?php if (!empty($selectedProvinsi)) : ?><input type="hidden" name="provinsi" value="<?= htmlspecialchars($selectedProvinsi); ?>"><?php endif; ?>
-                <?php if (!empty($selectedKabupaten)) : ?><input type="hidden" name="kabupaten" value="<?= htmlspecialchars($selectedKabupaten); ?>"><?php endif; ?>
-                <?php if (!empty($selectedKecamatan)) : ?><input type="hidden" name="kecamatan" value="<?= htmlspecialchars($selectedKecamatan); ?>"><?php endif; ?>
                 <div class="modal-body p-4">
-                    <!-- Header Label & Reset Tanggal Button -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label small fw-bold text-body-secondary mb-0">
-                            <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)
-                        </label>
-                        <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetTanggalFilterOutlet" style="font-size: 11px;">
-                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Tanggal
-                        </button>
-                    </div>
+                    <!-- BAGIAN 1: RENTANG TANGGAL -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label small fw-bold text-body-secondary mb-0">
+                                <i class="fa-solid fa-calendar-range me-1 text-danger"></i>1. Rentang Tanggal Pendaftaran
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetTanggalFilterOutlet" style="font-size: 11px;">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Reset Tanggal
+                            </button>
+                        </div>
+                        <div class="row g-2">
+                            <!-- Tanggal Mulai -->
+                            <div class="col-6">
+                                <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
+                                <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                    <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                    <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
+                            </div>
 
-                    <div class="row g-2">
-                        <!-- Tanggal Mulai -->
-                        <div class="col-6">
-                            <label for="filter_tgl_mulai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Mulai</label>
-                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_mulai" id="filter_tgl_mulai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglMulai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                            <!-- Tanggal Selesai -->
+                            <div class="col-6">
+                                <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
+                                <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
+                                    <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
+                                    <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Tanggal Selesai -->
-                        <div class="col-6">
-                            <label for="filter_tgl_selesai" class="text-body-secondary small d-block mb-1 cursor-pointer">Tanggal Selesai</label>
-                            <div class="input-group input-group-sm cursor-pointer date-picker-wrapper">
-                                <span class="input-group-text bg-body-tertiary border-body-subtle text-danger"><i class="fa-solid fa-calendar-days"></i></span>
-                                <input type="date" name="tgl_selesai" id="filter_tgl_selesai" class="form-control bg-body border-body-subtle text-body-emphasis fw-semibold cursor-pointer" value="<?= htmlspecialchars($selectedTglSelesai); ?>" onclick="if(this.showPicker){this.showPicker();}">
+                    <!-- BAGIAN 2: LOKASI WILAYAH TOKO -->
+                    <div class="pt-3 border-top border-body-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label small fw-bold text-body-secondary mb-0">
+                                <i class="fa-solid fa-map-location-dot me-1 text-danger"></i>2. Lokasi Wilayah Outlet
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetWilayahFilterOutlet" style="font-size: 11px;">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Reset Wilayah
+                            </button>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Provinsi</label>
+                                <select id="modalFilterProvinsi" name="provinsi" class="form-select form-select-sm rounded-3">
+                                    <option value="">Semua Provinsi</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kabupaten / Kota</label>
+                                <select id="modalFilterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-3" disabled>
+                                    <option value="">Semua Kabupaten</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kecamatan</label>
+                                <select id="modalFilterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-3" disabled>
+                                    <option value="">Semua Kecamatan</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-text text-body-secondary small mt-3">
-                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan seluruh data outlet tanpa batasan periode.
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Anda dapat memilih rentang tanggal, wilayah, atau keduanya secara bersamaan.
                     </div>
                 </div>
-                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- ========================================================================= -->
-<!-- MODAL 2: FILTER OUTLET (Wilayah / Lokasi Outlet Toko) -->
-<!-- ========================================================================= -->
-<div class="modal fade" id="modalFilterWilayah" tabindex="-1" aria-labelledby="modalFilterWilayahLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px;">
-        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
-            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterWilayahLabel">
-                        <i class="fa-solid fa-map-location-dot me-2 text-danger"></i>Filter Wilayah Outlet Toko
-                    </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih lokasi provinsi, kabupaten, dan kecamatan outlet</small>
-                </div>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
-                <input type="hidden" name="a" value="outlet">
-                <?php if (!empty($selectedTglMulai)) : ?><input type="hidden" name="tgl_mulai" value="<?= htmlspecialchars($selectedTglMulai); ?>"><?php endif; ?>
-                <?php if (!empty($selectedTglSelesai)) : ?><input type="hidden" name="tgl_selesai" value="<?= htmlspecialchars($selectedTglSelesai); ?>"><?php endif; ?>
-                <div class="modal-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label small fw-bold text-body-secondary mb-0">
-                            <i class="fa-solid fa-city me-1 text-danger"></i>Pilih Lokasi Wilayah
-                        </label>
-                        <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetWilayahFilterOutlet" style="font-size: 11px;">
-                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Wilayah
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-between align-items-center">
+                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 fw-bold shadow-2xs" style="font-size: 12px;" title="Hapus semua filter">
+                        <i class="fa-solid fa-rotate-left me-1"></i> Reset Semua
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light btn-sm rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                        <button type="submit" class="btn btn-danger btn-sm rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
                         </button>
                     </div>
-
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Provinsi</label>
-                            <select id="modalFilterProvinsi" name="provinsi" class="form-select form-select-sm rounded-3">
-                                <option value="">Semua Provinsi</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kabupaten / Kota</label>
-                            <select id="modalFilterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-3" disabled>
-                                <option value="">Semua Kabupaten</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kecamatan</label>
-                            <select id="modalFilterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-3" disabled>
-                                <option value="">Semua Kecamatan</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-text text-body-secondary small mt-3">
-                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Wilayah</strong> untuk menampilkan seluruh outlet tanpa batasan lokasi.
-                    </div>
-                </div>
-                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
-                    </button>
                 </div>
             </form>
         </div>
