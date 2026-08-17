@@ -212,6 +212,24 @@ if (!empty($userData['kecamatan']) && $userData['kecamatan'] !== '-') {
         right: 8px !important;
         top: 0 !important;
     }
+    /* Hide dropdown arrow icon for disabled Wilayah selects / Select2 */
+    .select2-container--disabled .select2-selection__arrow,
+    select.wilayah-select:disabled {
+        display: none !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+    }
+    .select2-container--disabled .select2-selection--single {
+        background-color: var(--bs-body-bg, #f8fafc) !important;
+        border-color: var(--bs-border-color, #dee2e6) !important;
+        cursor: not-allowed !important;
+    }
+    .select2-container--disabled .select2-selection--single .select2-selection__rendered {
+        padding-right: 12px !important;
+        color: var(--bs-body-color, #212529) !important;
+        opacity: 0.85;
+    }
     .select2-container--default .select2-selection--single .select2-selection__clear {
         display: none !important;
     }
