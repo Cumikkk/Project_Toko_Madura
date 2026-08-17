@@ -719,81 +719,52 @@ html body .form-check-input:checked {
                 <!-- Header with Title & Filter Trigger Button -->
                 <div class="card-header bg-body py-3 px-3 px-md-4 d-flex align-items-center justify-content-between border-bottom border-body-subtle flex-wrap gap-2">
                     <div>
-                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
-                            <i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar
+                        <h5 class="fw-bold text-body-emphasis mb-1 fs-6 d-flex align-items-center flex-wrap gap-1">
+                            <span><i class="fa-solid fa-store me-2 text-danger"></i>Daftar Outlet Terdaftar</span>
                             <?php if (!empty($selectedTglMulai) || !empty($selectedTglSelesai)) : ?>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2 fw-bold" style="font-size: 10px;">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold" style="font-size: 10px;">
                                     <i class="fa-solid fa-calendar-range me-1"></i>
                                     <?= !empty($selectedTglMulai) ? date('d/m/Y', strtotime($selectedTglMulai)) : 'Awal'; ?> s/d <?= !empty($selectedTglSelesai) ? date('d/m/Y', strtotime($selectedTglSelesai)) : 'Akhir'; ?>
                                 </span>
+                            <?php endif; ?>
+                            <?php if (!empty($selectedProvinsi) || !empty($selectedKabupaten) || !empty($selectedKecamatan)) : ?>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" style="font-size: 10px;">
+                                    <i class="fa-solid fa-map-location-dot me-1"></i>
+                                    <?= htmlspecialchars(implode(', ', array_filter([$selectedKecamatan, $selectedKabupaten, $selectedProvinsi]))); ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($selectedTglMulai) || !empty($selectedTglSelesai) || !empty($selectedProvinsi) || !empty($selectedKabupaten) || !empty($selectedKecamatan)) : ?>
+                                <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-xs btn-outline-secondary rounded-pill fw-bold py-0 px-2 text-nowrap" style="font-size: 10px;" title="Reset Semua Filter">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>Reset Filter
+                                </a>
                             <?php endif; ?>
                         </h5>
                         <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
                     <!-- Live Search & Tombol Action (Side-by-Side Flex Nowrap) -->
-                    <div class="d-flex align-items-center gap-2 flex-nowrap ms-auto">
+                    <div class="d-flex align-items-center gap-2 flex-wrap flex-sm-nowrap ms-auto">
                         <!-- Live Search Input Box -->
                         <div class="input-group input-group-sm" style="width: 180px; sm:width: 220px;">
                             <span class="input-group-text bg-body border-danger-subtle rounded-start-pill text-body-secondary"><i class="fa-light fa-magnifying-glass"></i></span>
                             <input type="text" id="liveSearchOutlet" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" placeholder="Cari nama outlet..." title="Live Search Nama Outlet">
                         </div>
 
-                        <!-- Tombol Filter Utama (Membuka Modal Filter Data) -->
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet">
-                            <i class="fa-solid fa-filter me-1"></i> Filter Data
+                        <!-- Tombol Filter Data (Rentang Tanggal) -->
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet" title="Filter berdasarkan rentang tanggal">
+                            <i class="fa-solid fa-calendar-range me-1"></i> Filter Data
+                        </button>
+
+                        <!-- Tombol Filter Outlet (Wilayah) -->
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap" data-bs-toggle="modal" data-bs-target="#modalFilterWilayah" title="Filter berdasarkan wilayah/lokasi outlet">
+                            <i class="fa-solid fa-map-location-dot me-1"></i> Filter Outlet
                         </button>
 
                         <!-- Tombol Cetak PDF Data Neraca Sederhana -->
-                        <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
+                        <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>&provinsi=<?= urlencode($selectedProvinsi); ?>&kabupaten=<?= urlencode($selectedKabupaten); ?>&kecamatan=<?= urlencode($selectedKecamatan); ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
                             <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                         </a>
                     </div>
-                </div>
-
-                <!-- Bar Filter Wilayah Outlet (Provinsi, Kabupaten, Kecamatan) -->
-                <div class="px-3 px-md-4 pt-3 pb-0">
-                    <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" id="formFilterWilayahBar">
-                        <input type="hidden" name="a" value="outlet">
-                        <?php if (!empty($selectedTglMulai)) : ?><input type="hidden" name="tgl_mulai" value="<?= htmlspecialchars($selectedTglMulai); ?>"><?php endif; ?>
-                        <?php if (!empty($selectedTglSelesai)) : ?><input type="hidden" name="tgl_selesai" value="<?= htmlspecialchars($selectedTglSelesai); ?>"><?php endif; ?>
-                        <div class="p-3 bg-body-tertiary border border-body-subtle rounded-4 shadow-2xs">
-                            <div class="row g-2 align-items-end">
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label small fw-bold text-body-secondary mb-1">
-                                        <i class="fa-solid fa-map-location-dot text-danger me-1"></i>Filter Provinsi
-                                    </label>
-                                    <select id="filterProvinsi" name="provinsi" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle">
-                                        <option value="">Semua Provinsi</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label small fw-bold text-body-secondary mb-1">
-                                        <i class="fa-solid fa-city text-danger me-1"></i>Filter Kabupaten / Kota
-                                    </label>
-                                    <select id="filterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle" disabled>
-                                        <option value="">Semua Kabupaten</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label small fw-bold text-body-secondary mb-1">
-                                        <i class="fa-solid fa-map-pin text-danger me-1"></i>Filter Kecamatan
-                                    </label>
-                                    <select id="filterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle" disabled>
-                                        <option value="">Semua Kecamatan</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-3 d-flex gap-2">
-                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 fw-bold flex-fill shadow-xs d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 12px;">
-                                        <i class="fa-solid fa-filter me-1"></i> Filter
-                                    </button>
-                                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 fw-bold shadow-xs text-nowrap d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 12px;" title="Reset Filter">
-                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
                 </div>
 
                 <div class="card-body p-2 p-md-4">
@@ -1805,13 +1776,16 @@ html body .form-check-input:checked {
 <!-- ========================================================================= -->
 <!-- MODAL: FILTER DATA OUTLET (Rentang Tanggal Pendaftaran) -->
 <!-- ========================================================================= -->
+<!-- ========================================================================= -->
+<!-- MODAL 1: FILTER DATA (Rentang Tanggal Pendaftaran) -->
+<!-- ========================================================================= -->
 <div class="modal fade" id="modalFilterOutlet" tabindex="-1" aria-labelledby="modalFilterOutletLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px;">
         <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
             <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterOutletLabel">
-                        <i class="fa-solid fa-filter me-2 text-danger"></i>Filter Rentang Tanggal Outlet
+                        <i class="fa-solid fa-calendar-range me-2 text-danger"></i>Filter Data & Rentang Tanggal
                     </h6>
                     <small class="text-body-secondary" style="font-size: 11px;">Pilih tanggal mulai dan tanggal selesai pendaftaran outlet</small>
                 </div>
@@ -1819,8 +1793,11 @@ html body .form-check-input:checked {
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
                 <input type="hidden" name="a" value="outlet">
+                <?php if (!empty($selectedProvinsi)) : ?><input type="hidden" name="provinsi" value="<?= htmlspecialchars($selectedProvinsi); ?>"><?php endif; ?>
+                <?php if (!empty($selectedKabupaten)) : ?><input type="hidden" name="kabupaten" value="<?= htmlspecialchars($selectedKabupaten); ?>"><?php endif; ?>
+                <?php if (!empty($selectedKecamatan)) : ?><input type="hidden" name="kecamatan" value="<?= htmlspecialchars($selectedKecamatan); ?>"><?php endif; ?>
                 <div class="modal-body p-4">
-                    <!-- Header Label & Reset Tanggal Button (Matched with Bagi Hasil Modal) -->
+                    <!-- Header Label & Reset Tanggal Button -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label small fw-bold text-body-secondary mb-0">
                             <i class="fa-regular fa-calendar-range me-1 text-danger"></i>Pilih Rentang Tanggal (Bebas)
@@ -1850,35 +1827,73 @@ html body .form-check-input:checked {
                         </div>
                     </div>
 
-                    <div class="form-text text-body-secondary small mt-2">
-                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh data outlet</strong> tanpa batasan periode.
+                    <div class="form-text text-body-secondary small mt-3">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan seluruh data outlet tanpa batasan periode.
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1.5 fw-bold shadow-sm" style="font-size: 12px;">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tampilkan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL 2: FILTER OUTLET (Wilayah / Lokasi Outlet Toko) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalFilterWilayah" tabindex="-1" aria-labelledby="modalFilterWilayahLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable mx-auto" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow-lg bg-body" style="border-radius: 20px;">
+            <div class="modal-header border-bottom border-body-subtle py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterWilayahLabel">
+                        <i class="fa-solid fa-map-location-dot me-2 text-danger"></i>Filter Wilayah Outlet Toko
+                    </h6>
+                    <small class="text-body-secondary" style="font-size: 11px;">Pilih lokasi provinsi, kabupaten, dan kecamatan outlet</small>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
+                <input type="hidden" name="a" value="outlet">
+                <?php if (!empty($selectedTglMulai)) : ?><input type="hidden" name="tgl_mulai" value="<?= htmlspecialchars($selectedTglMulai); ?>"><?php endif; ?>
+                <?php if (!empty($selectedTglSelesai)) : ?><input type="hidden" name="tgl_selesai" value="<?= htmlspecialchars($selectedTglSelesai); ?>"><?php endif; ?>
+                <div class="modal-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label small fw-bold text-body-secondary mb-0">
+                            <i class="fa-solid fa-city me-1 text-danger"></i>Pilih Lokasi Wilayah
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 fw-bold px-2 py-0" id="btnResetWilayahFilterOutlet" style="font-size: 11px;">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Wilayah
+                        </button>
                     </div>
 
-                    <!-- Filter Wilayah Toko (Provinsi, Kabupaten, Kecamatan) -->
-                    <div class="mt-3 pt-3 border-top border-body-subtle">
-                        <label class="form-label small fw-bold text-body-secondary mb-2">
-                            <i class="fa-solid fa-map-location-dot me-1 text-danger"></i>Filter Wilayah Toko
-                        </label>
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <label class="text-body-secondary small d-block mb-1">Provinsi</label>
-                                <select id="modalFilterProvinsi" name="provinsi" class="form-select form-select-sm rounded-3">
-                                    <option value="">Semua Provinsi</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="text-body-secondary small d-block mb-1">Kabupaten / Kota</label>
-                                <select id="modalFilterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-3" disabled>
-                                    <option value="">Semua Kabupaten</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="text-body-secondary small d-block mb-1">Kecamatan</label>
-                                <select id="modalFilterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-3" disabled>
-                                    <option value="">Semua Kecamatan</option>
-                                </select>
-                            </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Provinsi</label>
+                            <select id="modalFilterProvinsi" name="provinsi" class="form-select form-select-sm rounded-3">
+                                <option value="">Semua Provinsi</option>
+                            </select>
                         </div>
+                        <div class="col-12">
+                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kabupaten / Kota</label>
+                            <select id="modalFilterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-3" disabled>
+                                <option value="">Semua Kabupaten</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kecamatan</label>
+                            <select id="modalFilterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-3" disabled>
+                                <option value="">Semua Kecamatan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-text text-body-secondary small mt-3">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Wilayah</strong> untuk menampilkan seluruh outlet tanpa batasan lokasi.
                     </div>
                 </div>
                 <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
@@ -1995,12 +2010,11 @@ $(document).ready(function() {
         }
     }
 
-    // Inisialisasi Wilayah Filter Bar Top & Modal Filter
+    // Inisialisasi Wilayah Modal Filter Outlet
     const curProv = '<?= addslashes($selectedProvinsi); ?>';
     const curKab  = '<?= addslashes($selectedKabupaten); ?>';
     const curKec  = '<?= addslashes($selectedKecamatan); ?>';
 
-    initWilayahCascade('#filterProvinsi', '#filterKabupaten', '#filterKecamatan', null, curProv, curKab, curKec);
     initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', null, curProv, curKab, curKec);
 
     // Inisialisasi Wilayah untuk Wizard Tambah Outlet saat modal dibuka
@@ -2012,6 +2026,13 @@ $(document).ready(function() {
     $('#btnResetTanggalFilterOutlet').on('click', function() {
         $('#filter_tgl_mulai').val('');
         $('#filter_tgl_selesai').val('');
+    });
+
+    // Reset Wilayah Filter Event
+    $('#btnResetWilayahFilterOutlet').on('click', function() {
+        $('#modalFilterProvinsi').val('');
+        $('#modalFilterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
+        $('#modalFilterKecamatan').html('<option value="">Semua Kecamatan</option>').prop('disabled', true);
     });
 
     // 0. Live Search Real-Time Filter for Outlet Table
