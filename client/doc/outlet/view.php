@@ -416,8 +416,25 @@ $bankNama       = $sysSettings['bank_nama'] ?? 'BCA';
 $bankNoRek      = $sysSettings['bank_no_rekening'] ?? '123-456-7890';
 $bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 
-// Build WHERE clause for Outlet Registration Date & Ownership
+$selectedProvinsi  = trim($_GET['provinsi'] ?? '');
+$selectedKabupaten = trim($_GET['kabupaten'] ?? '');
+$selectedKecamatan = trim($_GET['kecamatan'] ?? '');
+
+// Build WHERE clause for Outlet Registration Date, Wilayah, & Ownership
 $whereOutletConds = ["o.id_investor = {$investorId}"];
+
+if (!empty($selectedProvinsi)) {
+    $safeProv = $db->real_escape_string($selectedProvinsi);
+    $whereOutletConds[] = "mw.provinsi = '{$safeProv}'";
+}
+if (!empty($selectedKabupaten)) {
+    $safeKab = $db->real_escape_string($selectedKabupaten);
+    $whereOutletConds[] = "mw.kabupaten = '{$safeKab}'";
+}
+if (!empty($selectedKecamatan)) {
+    $safeKec = $db->real_escape_string($selectedKecamatan);
+    $whereOutletConds[] = "(mw.kecamatan = '{$safeKec}' OR u.kecamatan = '{$safeKec}')";
+}
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
     $safeMulai = $db->real_escape_string($selectedTglMulai);
@@ -451,6 +468,7 @@ $sqlCount = "
     SELECT COUNT(*) as total
     FROM outlet o
     JOIN users u ON o.id_users = u.id_users
+    LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
     {$whereOutletSql}
 ";
 $resCount = $db->query($sqlCount);
@@ -509,10 +527,13 @@ if ($resOutlets) {
 $resTotalAll = $db->query("SELECT COUNT(*) as cnt FROM outlet WHERE id_investor = {$investorId}");
 $totalOutlet = $resTotalAll ? (int)$resTotalAll->fetch_assoc()['cnt'] : 0;
 
-function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai) {
+function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi = '', $selectedKabupaten = '', $selectedKecamatan = '') {
     $params = ['page' => $pageNum];
     if (!empty($selectedTglMulai)) $params['tgl_mulai'] = $selectedTglMulai;
     if (!empty($selectedTglSelesai)) $params['tgl_selesai'] = $selectedTglSelesai;
+    if (!empty($selectedProvinsi)) $params['provinsi'] = $selectedProvinsi;
+    if (!empty($selectedKabupaten)) $params['kabupaten'] = $selectedKabupaten;
+    if (!empty($selectedKecamatan)) $params['kecamatan'] = $selectedKecamatan;
     return SystemInfo::app('CLIENT_URL') . '/outlet?' . http_build_query($params);
 }
 ?>
@@ -730,6 +751,50 @@ html body .form-check-input:checked {
                     </div>
                 </div>
 
+                <!-- Bar Filter Wilayah Outlet (Provinsi, Kabupaten, Kecamatan) -->
+                <div class="px-3 px-md-4 pt-3 pb-0">
+                    <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" id="formFilterWilayahBar">
+                        <?php if (!empty($selectedTglMulai)) : ?><input type="hidden" name="tgl_mulai" value="<?= htmlspecialchars($selectedTglMulai); ?>"><?php endif; ?>
+                        <?php if (!empty($selectedTglSelesai)) : ?><input type="hidden" name="tgl_selesai" value="<?= htmlspecialchars($selectedTglSelesai); ?>"><?php endif; ?>
+                        <div class="p-3 bg-body-tertiary border border-body-subtle rounded-4 shadow-2xs">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label small fw-bold text-body-secondary mb-1">
+                                        <i class="fa-solid fa-map-location-dot text-danger me-1"></i>Filter Provinsi
+                                    </label>
+                                    <select id="filterProvinsi" name="provinsi" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle">
+                                        <option value="">Semua Provinsi</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label small fw-bold text-body-secondary mb-1">
+                                        <i class="fa-solid fa-city text-danger me-1"></i>Filter Kabupaten / Kota
+                                    </label>
+                                    <select id="filterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle" disabled>
+                                        <option value="">Semua Kabupaten</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label small fw-bold text-body-secondary mb-1">
+                                        <i class="fa-solid fa-map-pin text-danger me-1"></i>Filter Kecamatan
+                                    </label>
+                                    <select id="filterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-pill fw-semibold bg-body border-secondary-subtle" disabled>
+                                        <option value="">Semua Kecamatan</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-3 d-flex gap-2">
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 fw-bold flex-fill shadow-xs d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 12px;">
+                                        <i class="fa-solid fa-filter me-1"></i> Filter
+                                    </button>
+                                    <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 fw-bold shadow-xs text-nowrap d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 12px;" title="Reset Filter">
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="card-body p-2 p-md-4">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0 w-100" id="tableDataOutlet">
@@ -885,7 +950,7 @@ html body .form-check-input:checked {
                                     <ul class="pagination pagination-sm mb-0">
                                         <!-- Previous Page -->
                                         <li class="page-item <?= ($page <= 1) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTglMulai, $selectedTglSelesai); ?>">
+                                            <a class="page-link rounded-start-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page - 1, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi, $selectedKabupaten, $selectedKecamatan); ?>">
                                                 <i class="fa-solid fa-chevron-left me-1"></i> Prev
                                             </a>
                                         </li>
@@ -893,13 +958,13 @@ html body .form-check-input:checked {
                                         <!-- Page Numbers -->
                                         <?php for ($p = 1; $p <= $totalPages; $p++) : ?>
                                             <li class="page-item <?= ($p === $page) ? 'active' : ''; ?>">
-                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTglMulai, $selectedTglSelesai); ?>"><?= $p; ?></a>
+                                                <a class="page-link <?= ($p === $page) ? 'bg-danger border-danger text-white fw-bold' : 'text-body-emphasis'; ?>" href="<?= buildOutletPageUrl($p, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi, $selectedKabupaten, $selectedKecamatan); ?>"><?= $p; ?></a>
                                             </li>
                                         <?php endfor; ?>
 
                                         <!-- Next Page -->
                                         <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : ''; ?>">
-                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTglMulai, $selectedTglSelesai); ?>">
+                                            <a class="page-link rounded-end-pill text-body-emphasis px-3" href="<?= buildOutletPageUrl($page + 1, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi, $selectedKabupaten, $selectedKecamatan); ?>">
                                                 Next <i class="fa-solid fa-chevron-right ms-1"></i>
                                             </a>
                                         </li>
@@ -982,14 +1047,37 @@ html body .form-check-input:checked {
                                 <input type="text" name="no_hp" id="wizard_no_hp" class="form-control rounded-3" placeholder="081234567890" required>
                             </div>
 
-                            <!-- Kecamatan & Alamat Lengkap Toko (Strict 50%-50%) -->
-                            <div class="col-6">
-                                <label class="form-label required">Kecamatan</label>
-                                <input type="text" name="kecamatan" id="wizard_kecamatan" class="form-control rounded-3" placeholder="Taman" required>
+                            <!-- Wilayah Toko (Cascading Select: Provinsi -> Kabupaten -> Kecamatan -> Kelurahan) -->
+                            <div class="col-12">
+                                <label class="form-label required">Wilayah / Lokasi Outlet Toko</label>
+                                <div class="row g-2">
+                                    <div class="col-6 col-md-3">
+                                        <select class="form-select form-select-sm rounded-3 wilayah-select" id="wizard_provinsi" name="provinsi" data-placeholder="Pilih Provinsi" required>
+                                            <option value="">Pilih Provinsi</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <select class="form-select form-select-sm rounded-3 wilayah-select" id="wizard_kabupaten" name="kabupaten" data-placeholder="Pilih Kabupaten" required disabled>
+                                            <option value="">Pilih Kabupaten</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <select class="form-select form-select-sm rounded-3 wilayah-select" id="wizard_kecamatan_select" name="kecamatan" data-placeholder="Pilih Kecamatan" required disabled>
+                                            <option value="">Pilih Kecamatan</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <select class="form-select form-select-sm rounded-3 wilayah-select" id="wizard_id_wilayah" name="id_wilayah" data-placeholder="Pilih Kelurahan" required disabled>
+                                            <option value="">Pilih Kelurahan</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-6">
+
+                            <!-- Alamat Lengkap Toko -->
+                            <div class="col-12">
                                 <label class="form-label required">Alamat Lengkap Toko</label>
-                                <input type="text" name="alamat_outlet" id="wizard_alamat_outlet" class="form-control rounded-3" placeholder="Jl. Raya Taman No. 12" required>
+                                <input type="text" name="alamat_outlet" id="wizard_alamat_outlet" class="form-control rounded-3" placeholder="Contoh: Jl. Raya Taman No. 12, RT 02 / RW 05" required>
                             </div>
 
                             <!-- Persentase Potongan & Pembagian Hak (3 Kolom Sejajar dengan Spinner) -->
@@ -1160,12 +1248,35 @@ html body .form-check-input:checked {
                             <input type="text" name="nama_outlet" id="edit_nama_outlet" class="form-control rounded-3 fs-14" style="height: 38px;" required>
                         </div>
                         <div class="col-md-6 col-12">
-                            <label class="form-label fw-semibold text-body-emphasis fs-14 required">Kecamatan Domisili</label>
-                            <input type="text" name="kecamatan" id="edit_kecamatan" class="form-control rounded-3 fs-14" style="height: 38px;" required>
-                        </div>
-                        <div class="col-md-6 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-14 required">Nama Pengelola / Kasir</label>
                             <input type="text" name="nama_pengelola" id="edit_nama_pengelola" class="form-control rounded-3 fs-14" style="height: 38px;" required>
+                        </div>
+
+                        <!-- Wilayah Outlet Toko (Cascading Select: Provinsi -> Kabupaten -> Kecamatan -> Kelurahan) -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-body-emphasis fs-14 required">Wilayah / Lokasi Toko</label>
+                            <div class="row g-2">
+                                <div class="col-6 col-md-3">
+                                    <select class="form-select form-select-sm rounded-3 wilayah-select" id="edit_provinsi" name="provinsi" data-placeholder="Pilih Provinsi" required>
+                                        <option value="">Pilih Provinsi</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <select class="form-select form-select-sm rounded-3 wilayah-select" id="edit_kabupaten" name="kabupaten" data-placeholder="Pilih Kabupaten" required disabled>
+                                        <option value="">Pilih Kabupaten</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <select class="form-select form-select-sm rounded-3 wilayah-select" id="edit_kecamatan_select" name="kecamatan" data-placeholder="Pilih Kecamatan" required disabled>
+                                        <option value="">Pilih Kecamatan</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <select class="form-select form-select-sm rounded-3 wilayah-select" id="edit_id_wilayah" name="id_wilayah" data-placeholder="Pilih Kelurahan" required disabled>
+                                        <option value="">Pilih Kelurahan</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-14 required">No. HP / WhatsApp</label>
@@ -1740,6 +1851,33 @@ html body .form-check-input:checked {
                     <div class="form-text text-body-secondary small mt-2">
                         <i class="fa-solid fa-circle-info me-1 text-primary"></i>*Klik <strong>Reset Tanggal</strong> untuk menghapus filter tanggal dan menampilkan <strong>seluruh data outlet</strong> tanpa batasan periode.
                     </div>
+
+                    <!-- Filter Wilayah Toko (Provinsi, Kabupaten, Kecamatan) -->
+                    <div class="mt-3 pt-3 border-top border-body-subtle">
+                        <label class="form-label small fw-bold text-body-secondary mb-2">
+                            <i class="fa-solid fa-map-location-dot me-1 text-danger"></i>Filter Wilayah Toko
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="text-body-secondary small d-block mb-1">Provinsi</label>
+                                <select id="modalFilterProvinsi" name="provinsi" class="form-select form-select-sm rounded-3">
+                                    <option value="">Semua Provinsi</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-body-secondary small d-block mb-1">Kabupaten / Kota</label>
+                                <select id="modalFilterKabupaten" name="kabupaten" class="form-select form-select-sm rounded-3" disabled>
+                                    <option value="">Semua Kabupaten</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-body-secondary small d-block mb-1">Kecamatan</label>
+                                <select id="modalFilterKecamatan" name="kecamatan" class="form-select form-select-sm rounded-3" disabled>
+                                    <option value="">Semua Kecamatan</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-top border-body-subtle py-3 px-4 d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-light rounded-pill px-3 py-1.5 fw-semibold" data-bs-dismiss="modal" style="font-size: 12px;">Batal</button>
@@ -1756,6 +1894,117 @@ html body .form-check-input:checked {
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
     const CLIENT_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>';
+
+    // Helper Wilayah Cascading Dropdown Loader
+    function initWilayahCascade(provId, kabId, kecId, kelId, defaultProv = '', defaultKab = '', defaultKec = '', defaultIdWilayah = '') {
+        // 1. Load Provinsi
+        $.post(CLIENT_URL + '/ajax/post/wilayah/get_provinsi', function(res) {
+            let options = '<option value="">' + ($(provId).data('placeholder') || 'Pilih / Semua Provinsi') + '</option>';
+            if (res && res.results) {
+                res.results.forEach(item => {
+                    let sel = ((defaultProv || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
+                    options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                });
+            }
+            $(provId).html(options).prop('disabled', false);
+
+            if (defaultProv) {
+                $(provId).trigger('change');
+            }
+        });
+
+        // 2. On Provinsi Change -> Load Kabupaten
+        $(provId).off('change.wilayah').on('change.wilayah', function() {
+            let prov = $(this).val();
+            $(kabId).html('<option value="">Pilih / Semua Kabupaten</option>').prop('disabled', true);
+            if (kecId) $(kecId).html('<option value="">Pilih / Semua Kecamatan</option>').prop('disabled', true);
+            if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+
+            if (prov) {
+                $.post(CLIENT_URL + '/ajax/post/wilayah/get_kabupaten', { provinsi: prov }, function(res) {
+                    let options = '<option value="">Pilih / Semua Kabupaten</option>';
+                    if (res && res.results) {
+                        res.results.forEach(item => {
+                            let sel = ((defaultKab || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
+                            options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                        });
+                    }
+                    $(kabId).html(options).prop('disabled', false);
+
+                    if (defaultKab) {
+                        $(kabId).trigger('change');
+                        defaultProv = ''; // reset after cascade trigger
+                    }
+                });
+            }
+        });
+
+        // 3. On Kabupaten Change -> Load Kecamatan
+        if (kecId) {
+            $(kabId).off('change.wilayah').on('change.wilayah', function() {
+                let prov = $(provId).val();
+                let kab = $(this).val();
+                $(kecId).html('<option value="">Pilih / Semua Kecamatan</option>').prop('disabled', true);
+                if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+
+                if (prov && kab) {
+                    $.post(CLIENT_URL + '/ajax/post/wilayah/get_kecamatan', { provinsi: prov, kabupaten: kab }, function(res) {
+                        let options = '<option value="">Pilih / Semua Kecamatan</option>';
+                        if (res && res.results) {
+                            res.results.forEach(item => {
+                                let sel = ((defaultKec || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
+                                options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                            });
+                        }
+                        $(kecId).html(options).prop('disabled', false);
+
+                        if (defaultKec) {
+                            $(kecId).trigger('change');
+                            defaultKab = ''; // reset after cascade trigger
+                        }
+                    });
+                }
+            });
+        }
+
+        // 4. On Kecamatan Change -> Load Kelurahan
+        if (kelId) {
+            $(kecId).off('change.wilayah').on('change.wilayah', function() {
+                let prov = $(provId).val();
+                let kab = $(kabId).val();
+                let kec = $(this).val();
+                $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+
+                if (prov && kab && kec) {
+                    $.post(CLIENT_URL + '/ajax/post/wilayah/get_kelurahan', { provinsi: prov, kabupaten: kab, kecamatan: kec }, function(res) {
+                        let options = '<option value="">Pilih Kelurahan</option>';
+                        if (res && res.results) {
+                            res.results.forEach(item => {
+                                let sel = (defaultIdWilayah && item.id == defaultIdWilayah) ? 'selected' : '';
+                                options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                            });
+                        }
+                        $(kelId).html(options).prop('disabled', false);
+                        defaultKec = '';
+                        defaultIdWilayah = '';
+                    });
+                }
+            });
+        }
+    }
+
+    // Inisialisasi Wilayah Filter Bar Top & Modal Filter
+    const curProv = '<?= addslashes($selectedProvinsi); ?>';
+    const curKab  = '<?= addslashes($selectedKabupaten); ?>';
+    const curKec  = '<?= addslashes($selectedKecamatan); ?>';
+
+    initWilayahCascade('#filterProvinsi', '#filterKabupaten', '#filterKecamatan', null, curProv, curKab, curKec);
+    initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', null, curProv, curKab, curKec);
+
+    // Inisialisasi Wilayah untuk Wizard Tambah Outlet saat modal dibuka
+    $('#modalTambahOutlet').on('show.bs.modal', function() {
+        initWilayahCascade('#wizard_provinsi', '#wizard_kabupaten', '#wizard_kecamatan_select', '#wizard_id_wilayah');
+    });
 
     // Reset Tanggal Filter Event
     $('#btnResetTanggalFilterOutlet').on('click', function() {
@@ -1851,7 +2100,10 @@ $(document).ready(function() {
             const nama = $('#wizard_nama_outlet').val().trim();
             const pengelola = $('#wizard_nama_pengelola').val().trim();
             const noHp = $('#wizard_no_hp').val().trim();
-            const kec = $('#wizard_kecamatan').val().trim();
+            const prov = $('#wizard_provinsi').val();
+            const kab = $('#wizard_kabupaten').val();
+            const kec = $('#wizard_kecamatan_select').val();
+            const kel = $('#wizard_id_wilayah').val();
             const alamat = $('#wizard_alamat_outlet').val().trim();
             const potongan = $('#wizard_persentase_potongan').val().trim();
 
@@ -1882,13 +2134,13 @@ $(document).ready(function() {
                 }).then(() => $('#wizard_no_hp').focus());
                 return;
             }
-            if (!kec) {
+            if (!prov || !kab || !kec || !kel) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Form Belum Lengkap',
-                    text: 'Harap isi Kecamatan outlet terlebih dahulu.',
+                    title: 'Wilayah Belum Lengkap',
+                    text: 'Harap pilih Provinsi, Kabupaten, Kecamatan, dan Kelurahan outlet terlebih dahulu.',
                     confirmButtonColor: '#7D0A0A'
-                }).then(() => $('#wizard_kecamatan').focus());
+                });
                 return;
             }
             if (!alamat) {
@@ -2073,8 +2325,19 @@ $(document).ready(function() {
                 if (res.success) {
                     $('#edit_id_outlet').val(res.data.id_outlet);
                     $('#edit_nama_outlet').val(res.data.nama_outlet);
-                    $('#edit_kecamatan').val(res.data.kecamatan);
                     $('#edit_alamat_outlet').val(res.data.alamat_outlet);
+                    
+                    initWilayahCascade(
+                        '#edit_provinsi',
+                        '#edit_kabupaten',
+                        '#edit_kecamatan_select',
+                        '#edit_id_wilayah',
+                        res.data.provinsi,
+                        res.data.kabupaten,
+                        res.data.kecamatan,
+                        res.data.id_wilayah
+                    );
+
                     $('#edit_persentase_potongan').val(parseFloat(res.data.persentase_potongan).toFixed(2));
                     
                     const invPct = parseFloat(res.data.persentase_hak_investor) || 50.00;
