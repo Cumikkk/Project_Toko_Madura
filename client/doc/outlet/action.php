@@ -105,7 +105,7 @@ try {
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
 
-        $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, kecamatan, alamat_lengkap, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', {$wilayahVal}, '{$kecamatan}', '{$alamatOutlet}', '{$escapedHash}', 'outlet')";
+        $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', {$wilayahVal}, '{$alamatOutlet}', '{$escapedHash}', 'outlet')";
         if (!$db->query($sqlUser)) {
             JsonResponse(['success' => false, 'message' => 'Gagal membuat akun user outlet: ' . $db->error]);
         }
@@ -300,13 +300,12 @@ try {
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
 
-        // Update User Account (id_wilayah, kecamatan, alamat, nama_lengkap, no_hp, username, password)
+        // Update User Account (id_wilayah, alamat, nama_lengkap, no_hp, username, password)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
                 id_wilayah = {$wilayahVal},
-                kecamatan = '{$safeKecamatan}',
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -316,7 +315,6 @@ try {
         } else {
             $db->query("UPDATE users SET 
                 id_wilayah = {$wilayahVal},
-                kecamatan = '{$safeKecamatan}',
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -445,13 +443,12 @@ try {
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
 
-        // Update User Account (id_wilayah, kecamatan & alamat stored in users table)
+        // Update User Account (id_wilayah & alamat stored in users table)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
                 id_wilayah = {$wilayahVal},
-                kecamatan = '{$safeKecamatan}',
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -461,7 +458,6 @@ try {
         } else {
             $db->query("UPDATE users SET 
                 id_wilayah = {$wilayahVal},
-                kecamatan = '{$safeKecamatan}',
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 

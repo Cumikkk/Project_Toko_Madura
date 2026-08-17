@@ -433,7 +433,7 @@ if (!empty($selectedKabupaten)) {
 }
 if (!empty($selectedKecamatan)) {
     $safeKec = $db->real_escape_string($selectedKecamatan);
-    $whereOutletConds[] = "(mw.kecamatan = '{$safeKec}' OR u.kecamatan = '{$safeKec}')";
+    $whereOutletConds[] = "mw.kecamatan = '{$safeKec}'";
 }
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
@@ -754,6 +754,7 @@ html body .form-check-input:checked {
                 <!-- Bar Filter Wilayah Outlet (Provinsi, Kabupaten, Kecamatan) -->
                 <div class="px-3 px-md-4 pt-3 pb-0">
                     <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet" id="formFilterWilayahBar">
+                        <input type="hidden" name="a" value="outlet">
                         <?php if (!empty($selectedTglMulai)) : ?><input type="hidden" name="tgl_mulai" value="<?= htmlspecialchars($selectedTglMulai); ?>"><?php endif; ?>
                         <?php if (!empty($selectedTglSelesai)) : ?><input type="hidden" name="tgl_selesai" value="<?= htmlspecialchars($selectedTglSelesai); ?>"><?php endif; ?>
                         <div class="p-3 bg-body-tertiary border border-body-subtle rounded-4 shadow-2xs">
@@ -1817,6 +1818,7 @@ html body .form-check-input:checked {
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="<?= SystemInfo::app('CLIENT_URL'); ?>/outlet">
+                <input type="hidden" name="a" value="outlet">
                 <div class="modal-body p-4">
                     <!-- Header Label & Reset Tanggal Button (Matched with Bagi Hasil Modal) -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
