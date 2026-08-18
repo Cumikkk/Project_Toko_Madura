@@ -452,8 +452,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-end fw-bold text-success">
-                                                Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?>
+                                            <td class="text-center">
+                                                <strong>Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?></strong><small class="text-muted"> / Bln</small>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>
@@ -573,8 +573,8 @@ $clientBaseUrl = $_protocol . $_host . $_projectDir . '/client';
                                                     <span class="text-muted">Belum Ada Investor</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-end text-muted">
-                                                Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?>
+                                            <td class="text-center">
+                                                <strong>Rp <?= number_format($row['nominal_transfer'], 0, ',', '.') ?></strong><small class="text-muted"> / Bln</small>
                                             </td>
                                             <td class="text-center">
                                                 <?php if (!empty($row['bukti_pembayaran'])) : ?>

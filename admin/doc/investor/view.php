@@ -120,7 +120,9 @@ $masterOptions = Master::getAllMasterOptions();
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-center">Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?> / Bln</td>
+                                        <td class="text-center">
+                                            <strong>Rp <?= number_format($row['biaya_langganan_outlet'] ?? 100000, 0, ',', '.') ?></strong><small class="text-muted"> / Bln</small>
+                                        </td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_master'] ?? 'Master Owner') ?></strong>
                                             <?php if (!empty($row['username_master'])) : ?>
