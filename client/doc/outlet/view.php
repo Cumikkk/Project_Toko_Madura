@@ -580,12 +580,12 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai, $s
         margin-bottom: 20px !important;
     }
 }
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
     #liveSearchOutletGroup {
         margin-bottom: 12px !important;
     }
 }
-@media (min-width: 576px) {
+@media (min-width: 768px) {
     #liveSearchOutletGroup {
         width: 220px !important;
         margin-bottom: 0 !important;
@@ -772,28 +772,28 @@ html body .form-check-input:checked {
                         <p class="text-body-secondary small mb-0">Kelola dan pantau daftar akun outlet di bawah kepemilikan Anda</p>
                     </div>
 
-                    <!-- Live Search & Tombol Action (Responsive 2-Row Layout on Mobile with Spacing, 1 Row on Desktop) -->
-                    <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100 w-sm-auto ms-sm-auto mt-3 mt-sm-0">
+                    <!-- Live Search & Tombol Action (Stacked on Mobile, Flushed Right in 1 Row on Desktop PC) -->
+                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center w-100 w-md-auto ms-md-auto mt-3 mt-md-0">
                         <!-- Live Search Input Box (Explicit Margin Bottom on Mobile) -->
-                        <div class="input-group input-group-sm w-100 flex-sm-shrink-0 mb-2.5 mb-sm-0" style="max-width: 100%;" id="liveSearchOutletGroup">
+                        <div class="input-group input-group-sm w-100 flex-md-shrink-0 mb-2.5 mb-md-0" style="max-width: 100%;" id="liveSearchOutletGroup">
                             <span class="input-group-text bg-body border-danger-subtle rounded-start-pill text-body-secondary"><i class="fa-light fa-magnifying-glass"></i></span>
                             <input type="text" id="liveSearchOutlet" class="form-control border-danger-subtle rounded-end-pill fw-semibold text-body bg-body shadow-sm" placeholder="Cari nama outlet..." title="Live Search Nama Outlet">
                         </div>
 
-                        <!-- Action Buttons Group (3 Buttons with Breathing Spacing on Mobile) -->
-                        <div class="d-flex align-items-center gap-2 w-100 w-sm-auto ms-sm-2">
+                        <!-- Action Buttons Group (3 Buttons) -->
+                        <div class="d-flex align-items-center gap-2 w-100 w-md-auto ms-md-2">
                             <!-- Tombol Filter Data (Rentang Tanggal) -->
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2 px-sm-3 py-1.5 shadow-sm fw-bold flex-fill flex-sm-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet" title="Filter berdasarkan rentang tanggal">
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2 px-md-3 py-1.5 shadow-sm fw-bold flex-fill flex-md-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#modalFilterOutlet" title="Filter berdasarkan rentang tanggal">
                                 <i class="fa-solid fa-calendar-range me-1"></i> Filter Data
                             </button>
 
                             <!-- Tombol Filter Outlet (Wilayah) -->
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2 px-sm-3 py-1.5 shadow-sm fw-bold flex-fill flex-sm-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#modalFilterWilayah" title="Filter berdasarkan wilayah/lokasi outlet">
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2 px-md-3 py-1.5 shadow-sm fw-bold flex-fill flex-md-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;" data-bs-toggle="modal" data-bs-target="#modalFilterWilayah" title="Filter berdasarkan wilayah/lokasi outlet">
                                 <i class="fa-solid fa-map-location-dot me-1"></i> Filter Outlet
                             </button>
 
                             <!-- Tombol Cetak PDF Data Neraca Sederhana -->
-                            <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>&provinsi=<?= urlencode($selectedProvinsi); ?>&kabupaten=<?= urlencode($selectedKabupaten); ?>&kecamatan=<?= urlencode($selectedKecamatan); ?>&kelurahan=<?= urlencode($selectedKelurahan); ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-2 px-sm-3 py-1.5 shadow-sm fw-bold flex-fill flex-sm-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;">
+                            <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>&provinsi=<?= urlencode($selectedProvinsi); ?>&kabupaten=<?= urlencode($selectedKabupaten); ?>&kecamatan=<?= urlencode($selectedKecamatan); ?>&kelurahan=<?= urlencode($selectedKelurahan); ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-2 px-md-3 py-1.5 shadow-sm fw-bold flex-fill flex-md-grow-0 d-inline-flex align-items-center justify-content-center gap-1 text-nowrap" style="font-size: 11.5px;">
                                 <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                             </a>
                         </div>
