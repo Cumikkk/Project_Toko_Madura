@@ -2397,8 +2397,8 @@ $(document).ready(function() {
                         icon: 'success',
                         title: 'Berhasil!',
                         text: res.message,
-                        timer: 2000,
-                        showConfirmButton: false
+                        confirmButtonColor: '#7D0A0A',
+                        confirmButtonText: 'OK'
                     }).then(() => {
                         location.reload();
                     });
@@ -2635,8 +2635,8 @@ $(document).ready(function() {
                                 icon: 'success',
                                 title: 'Terhapus!',
                                 text: res.message,
-                                timer: 2000,
-                                showConfirmButton: false
+                                confirmButtonColor: '#7D0A0A',
+                                confirmButtonText: 'OK'
                             }).then(() => {
                                 location.reload();
                             });

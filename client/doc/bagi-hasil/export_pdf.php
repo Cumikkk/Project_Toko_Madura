@@ -376,7 +376,7 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
+                <div class="header-subtitle">LAPORAN KEUANGAN &amp; RINCIAN HARIAN</div>
                 <div class="header-tagline">Ringkasan Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
@@ -421,7 +421,7 @@ ob_start();
     </table>
 
     <!-- Bagian I: Ringkasan Posisi Keuangan -->
-    <div class="section-title">I. RINGKASAN POSISI KEUANGAN</div>
+    <div class="section-title">I. RINGKASAN KEUANGAN</div>
     <table class="balance-summary-table">
         <tr>
             <!-- SISI AKTIVA: ARUS OMZET & PENERIMAAN KAS -->
@@ -475,7 +475,7 @@ ob_start();
     </table>
 
     <!-- Bagian II: Tabel Rekapitulasi Posisi Keuangan Per Outlet Toko -->
-    <div class="section-title">II. TABEL REKAPITULASI POSISI KEUANGAN PER OUTLET TOKO</div>
+    <div class="section-title">II. TABEL REKAPITULASI KEUANGAN PER OUTLET TOKO</div>
     <table class="data-table">
         <thead>
             <tr>
@@ -667,11 +667,11 @@ ob_start();
                 </div>
             </td>
             <td style="width: 40%; vertical-align: top; text-align: center;">
-                <div style="font-size: 8.5px; color: #64748b;">Disahkan &amp; Diverifikasi Oleh,</div>
+               
                 <div style="font-weight: bold; font-size: 9px; color: #0f172a; margin-top: 1px;">MANAJEMEN TOKO MADURA</div>
                 <div style="height: 35px;"></div>
                 <div style="font-weight: bold; font-size: 9px; color: #7D0A0A; text-decoration: underline;"><?= htmlspecialchars($investorNama); ?></div>
-                <div style="font-size: 8px; color: #64748b;">Pihak Investor / Pemilik Modal</div>
+                <div style="font-size: 8px; color: #64748b;">Pihak Investor</div>
             </td>
         </tr>
     </table>
