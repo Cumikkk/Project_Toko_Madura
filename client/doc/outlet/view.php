@@ -548,13 +548,31 @@ function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai, $s
 .modal-backdrop {
     z-index: 1055 !important;
 }
+.modal {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
 .modal-dialog {
-    margin-top: 0 !important;
+    margin-top: 15px !important;
     margin-bottom: 30px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 .modal-dialog-centered {
-    min-height: calc(100vh - 110px) !important;
+    min-height: calc(100vh - 60px) !important;
+    display: flex !important;
     align-items: flex-start !important;
+    justify-content: center !important;
+}
+@media (max-width: 767.98px) {
+    .modal-dialog {
+        width: calc(100% - 1.25rem) !important;
+        max-width: calc(100% - 1.25rem) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 10px !important;
+        margin-bottom: 20px !important;
+    }
 }
 .modal-dialog-centered.modal-dialog-scrollable .modal-content {
     max-height: calc(100vh - 120px) !important;
