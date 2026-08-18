@@ -10,30 +10,43 @@ $selectedBulan = 0;
 $selectedTahun = 0;
 
 // Query data omzet & keuangan outlet (default: semua periode)
-$omzetData = Outlet::getOutletOmzetMonitoring(0, 0);
-$outlets   = $omzetData['outlets'] ?? [];
+try {
+    $omzetData = Outlet::getOutletOmzetMonitoring(0, 0);
+} catch (\Throwable $e) {
+    $omzetData = ['outlets' => [], 'summary' => []];
+}
+$outlets = $omzetData['outlets'] ?? [];
 
 // Ambil daftar tahun dinamis dari data laporan omzet
-$resTahunOmzet = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE tanggal_omzet IS NOT NULL AND tanggal_omzet != '0000-00-00' ORDER BY tahun DESC");
 $listTahunOmzet = [];
-if ($resTahunOmzet && $resTahunOmzet->num_rows > 0) {
-    while ($rowT = $resTahunOmzet->fetch_assoc()) {
-        if (!empty($rowT['tahun'])) {
-            $listTahunOmzet[] = intval($rowT['tahun']);
+try {
+    $resTahunOmzet = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE tanggal_omzet IS NOT NULL AND tanggal_omzet > '1970-01-01' ORDER BY tahun DESC");
+    if ($resTahunOmzet && $resTahunOmzet->num_rows > 0) {
+        while ($rowT = $resTahunOmzet->fetch_assoc()) {
+            if (!empty($rowT['tahun'])) {
+                $listTahunOmzet[] = intval($rowT['tahun']);
+            }
         }
     }
+} catch (\Throwable $e) {
+    // Fallback: hanya tampilkan tahun sekarang
 }
 if (empty($listTahunOmzet)) {
     $listTahunOmzet[] = intval(date('Y'));
 }
 
 // Ambil opsi filter investor
-$investorOptions = $db->query("
+$investorOptions = null;
+try {
+    $investorOptions = $db->query("
     SELECT inv.id_investor, u.nama_lengkap, u.username 
     FROM investor inv 
     JOIN users u ON u.id_users = inv.id_users 
     ORDER BY u.nama_lengkap ASC
 ");
+} catch (\Throwable $e) {
+    // Fallback: tidak ada opsi investor
+}
 
 // Daftar nama bulan dalam bahasa Indonesia
 $namaBulan = [
