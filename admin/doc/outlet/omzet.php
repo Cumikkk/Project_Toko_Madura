@@ -83,8 +83,10 @@ if (!empty($outlets)) {
 }
 $avgOmzetPerOutlet = ($totalOutletsCount > 0) ? ($totalOmzetPeriode / $totalOutletsCount) : 0;
 
-function safeJsonAlamatOmzet($str) {
-    return json_encode(trim(preg_replace('/\s+/', ' ', $str ?? '')));
+if (!function_exists('safeJsonAlamatOmzet')) {
+    function safeJsonAlamatOmzet($str) {
+        return json_encode(trim(preg_replace('/\s+/', ' ', $str ?? '')));
+    }
 }
 ?>
 
@@ -391,11 +393,14 @@ $(document).ready(function() {
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+
     // ============================================================
     // DataTables dengan Penomoran Dinamis
     // ============================================================
+    var tableOmzet = null;
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-omzet-monitoring')) {
         tableOmzet = $('#table-omzet-monitoring').DataTable({
+
             processing: true,
             deferRender: true,
             scrollX: true,
