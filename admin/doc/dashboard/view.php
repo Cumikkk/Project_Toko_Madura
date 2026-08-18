@@ -264,7 +264,17 @@ $(document).ready(function() {
                     paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
                     emptyTable: 'Belum ada data omzet.'
                 },
-                order: [[3, 'desc']]
+                order: [[3, 'desc']],
+                columnDefs: [
+                    { orderable: false, targets: 0 }
+                ],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var startIndex = api.context[0]._iDisplayStart;
+                    api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = startIndex + i + 1;
+                    });
+                }
             });
         }
 
@@ -283,7 +293,17 @@ $(document).ready(function() {
                     paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
                     emptyTable: 'Belum ada request outlet.'
                 },
-                order: [[1, 'desc']]
+                order: [[1, 'desc']],
+                columnDefs: [
+                    { orderable: false, targets: 0 }
+                ],
+                drawCallback: function (settings) {
+                    var api = this.api();
+                    var startIndex = api.context[0]._iDisplayStart;
+                    api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = startIndex + i + 1;
+                    });
+                }
             });
         }
 

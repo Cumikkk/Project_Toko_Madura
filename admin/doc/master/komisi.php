@@ -325,7 +325,17 @@ $(document).ready(function() {
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                 paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
             },
-            order: [[1, 'desc']]
+            order: [[1, 'desc']],
+            columnDefs: [
+                { orderable: false, targets: 0 }
+            ],
+            drawCallback: function (settings) {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;
+                api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+            }
         });
 
         if ($.fn.select2) {

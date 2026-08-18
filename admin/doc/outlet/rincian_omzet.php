@@ -5,186 +5,207 @@ use App\Models\Helper;
 use App\Models\Outlet;
 
 $queryParam = Helper::getSafeInput($_GET);
-$idOutlet     = intval($queryParam['id'] ?? 0);
-$selectedBulan = isset($queryParam['bulan']) ? intval($queryParam['bulan']) : 0;
-$selectedTahun = isset($queryParam['tahun']) ? intval($queryParam['tahun']) : 0;
+$idOutlet   = intval($queryParam['id'] ?? 0);
 
 if ($idOutlet <= 0) {
-    echo '<div class="alert alert-danger"><i class="fa fa-exclamation-circle me-2"></i>ID Outlet tidak valid.</div>';
+    echo '<div class="alert alert-danger"><i class="fe fe-alert-circle me-2"></i>ID Outlet tidak valid.</div>';
     return;
 }
 
-$result  = Outlet::getOutletOmzetDetail($idOutlet, $selectedBulan, $selectedTahun);
-$outlet  = $result['outlet'] ?? null;
-$summary = $result['summary'] ?? [];
+// Fetch detail outlet & seluruh transaksi omzet (default: 0, 0 untuk semua periode agar filter client-side DataTables mulus tanpa reload)
+$result    = Outlet::getOutletOmzetDetail($idOutlet, 0, 0);
+$outlet    = $result['outlet'] ?? null;
 $transaksi = $result['transaksi'] ?? [];
+$summary   = $result['summary'] ?? [];
 
 if (!$outlet) {
-    echo '<div class="alert alert-danger"><i class="fa fa-exclamation-circle me-2"></i>Outlet tidak ditemukan.</div>';
+    echo '<div class="alert alert-danger"><i class="fe fe-alert-circle me-2"></i>Outlet tidak ditemukan.</div>';
     return;
 }
 
 $db = Database::connect();
-$resTahunRincian = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE id_outlet = {$idOutlet} AND tanggal_omzet IS NOT NULL AND tanggal_omzet != '0000-00-00' ORDER BY tahun DESC");
-$listTahunRincian = [];
-if ($resTahunRincian && $resTahunRincian->num_rows > 0) {
-    while ($rowT = $resTahunRincian->fetch_assoc()) {
-        if (!empty($rowT['tahun'])) {
-            $listTahunRincian[] = intval($rowT['tahun']);
+
+// Ekstrak daftar tahun unik secara dinamis dari data transaksi
+$daftarTahun = [];
+if (!empty($transaksi)) {
+    foreach ($transaksi as $t) {
+        if (!empty($t['tanggal_omzet'])) {
+            $y = date('Y', strtotime($t['tanggal_omzet']));
+            if (!in_array($y, $daftarTahun)) {
+                $daftarTahun[] = $y;
+            }
         }
     }
+    rsort($daftarTahun);
 }
-if (empty($listTahunRincian)) {
-    $listTahunRincian[] = intval(date('Y'));
+if (empty($daftarTahun)) {
+    $daftarTahun[] = date('Y');
 }
 
 $namaBulan = [
-    1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
-    7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 
-if ($selectedBulan > 0 && $selectedTahun > 0) {
-    $periodeLabel = ($namaBulan[$selectedBulan] ?? '-') . ' ' . $selectedTahun;
-} elseif ($selectedBulan > 0) {
-    $periodeLabel = ($namaBulan[$selectedBulan] ?? '-') . ' (Semua Tahun)';
-} elseif ($selectedTahun > 0) {
-    $periodeLabel = 'Semua Bulan ' . $selectedTahun;
-} else {
-    $periodeLabel = 'Semua Periode';
-}
+$tarifNom = (int)($outlet['biaya_langganan_outlet'] ?? 100000);
+$totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
 ?>
+
+<style>
+/* Rapatkan & Gabungkan Baris Total Footer agar Menyatu Rapat dengan Tabel */
+#table-rincian-omzet_wrapper .dataTables_scrollBody table {
+    margin-bottom: 0 !important;
+    border-bottom: none !important;
+}
+#table-rincian-omzet_wrapper .dataTables_scrollFoot {
+    background-color: #f1f5f9 !important;
+    border-top: 2px solid #cbd5e1 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+#table-rincian-omzet_wrapper .dataTables_scrollFoot table {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-top: none !important;
+    background-color: #f1f5f9 !important;
+}
+#table-rincian-omzet_wrapper .dataTables_scrollFoot tfoot tr {
+    background-color: #f1f5f9 !important;
+}
+#table-rincian-omzet_wrapper .dataTables_scrollFoot tfoot td {
+    padding: 10px 8px !important;
+    background-color: #f1f5f9 !important;
+    border-top: none !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    vertical-align: middle !important;
+    font-size: 13.5px;
+}
+</style>
 
 <div class="page-header">
     <div>
         <h2 class="main-content-title tx-24 mg-b-5">Rincian Omzet Outlet</h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/dashboard">Home</a></li>
-            <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/omzet?bulan=<?= $selectedBulan ?>&tahun=<?= $selectedTahun ?>">Monitoring Omzet</a></li>
+            <li class="breadcrumb-item"><a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/omzet">Monitoring Omzet</a></li>
             <li class="breadcrumb-item active" aria-current="page">Rincian Omzet</li>
         </ol>
     </div>
 </div>
 
+<!-- 1. Tiga Kartu Summary di Luar Card Utama -->
+<div class="row row-sm mb-3">
+    <!-- Card 1: Informasi Outlet -->
+    <div class="col-lg-4 col-md-6 col-12 mb-2">
+        <div class="card custom-card h-100 mb-0">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-muted">Informasi Outlet</h6>
+                    <i class="fa fa-building text-primary fs-16"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1 text-truncate"><?= htmlspecialchars($outlet['nama_outlet']) ?></h5>
+                <div class="small text-muted text-truncate" style="font-size: 12.5px;">
+                    <strong class="text-dark"><?= htmlspecialchars($outlet['pengelola_toko'] ?? '-') ?></strong>
+                    <?php if (!empty($outlet['no_hp_toko'])) : ?>
+                        <span class="mx-1">&bull;</span>
+                        <span><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($outlet['no_hp_toko']) ?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Investor Yang Menaungi -->
+    <div class="col-lg-4 col-md-6 col-12 mb-2">
+        <div class="card custom-card h-100 mb-0">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-muted">Investor Yang Menaungi</h6>
+                    <i class="fa fa-handshake-o text-warning fs-16"></i>
+                </div>
+                <?php if (!empty($outlet['nama_investor'])) : ?>
+                    <h5 class="fw-bold mb-1 text-truncate" style="color: #6f42c1;"><?= htmlspecialchars($outlet['nama_investor']) ?></h5>
+                    <div class="small text-muted text-truncate" style="font-size: 12.5px;">
+                        <?php if (!empty($outlet['username_investor'])) : ?>
+                            <code style="color: #d63384; font-size: 12px;">@<?= htmlspecialchars($outlet['username_investor']) ?></code>
+                        <?php else : ?>
+                            <span>-</span>
+                        <?php endif; ?>
+                        <?php if (!empty($outlet['no_hp_investor'])) : ?>
+                            <span class="mx-1">&bull;</span>
+                            <span><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($outlet['no_hp_investor']) ?></span>
+                        <?php endif; ?>
+                    </div>
+                <?php else : ?>
+                    <h5 class="fw-bold text-muted mb-1">Belum Ada Investor</h5>
+                    <div class="small text-muted" style="font-size: 12.5px;">Outlet mandiri tanpa naungan investor</div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Tarif & Total Omzet -->
+    <div class="col-lg-4 col-md-12 col-12 mb-2">
+        <div class="card custom-card h-100 mb-0">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-muted">Tarif & Performa Omzet</h6>
+                    <i class="fa fa-money text-success fs-16"></i>
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                    <h5 class="fw-bold mb-0 me-2 text-dark">Rp <?= number_format($tarifNom, 0, ',', '.') ?><small class="text-muted fw-normal fs-12"> / Bln</small></h5>
+                    <?php if ($totalOmzetAll >= 10000000) : ?>
+                        <span class="badge bg-success" style="font-size: 10.5px;"><i class="fa fa-arrow-up me-1"></i>Rekomen Naik</span>
+                    <?php endif; ?>
+                </div>
+                <div class="small text-muted text-truncate" style="font-size: 12.5px;">
+                    Total Omzet Terdata: <strong class="text-success">Rp <?= number_format($totalOmzetAll, 0, ',', '.') ?></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Main Table Card dengan Toolbar Filter di Dalamnya -->
 <div class="row row-sm">
     <div class="col-lg-12">
         <div class="card custom-card overflow-hidden">
             <div class="card-header">
-                <div class="d-flex justify-content-between mb-2">
-                    <h5 class="card-title mb-0">
-                        <i class="fa fa-bar-chart me-2 text-info"></i>
-                        <?= htmlspecialchars($outlet['nama_outlet']) ?>
-                        <small class="text-muted fw-normal ms-2">— Periode: <?= $periodeLabel ?></small>
-                    </h5>
-                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/omzet?bulan=<?= $selectedBulan ?>&tahun=<?= $selectedTahun ?>" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i> Kembali
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">Daftar Rincian Transaksi Omzet</h5>
+                    <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/omzet" class="btn btn-secondary btn-sm">
+                        <i class="fe fe-arrow-left me-1"></i> Kembali
                     </a>
                 </div>
             </div>
             <div class="card-body">
 
-                <!-- Filter Periode -->
+                <!-- Toolbar Filter di Dalam Card -->
                 <div class="p-3 bg-light rounded-3 border mb-3">
                     <div class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <div class="d-flex align-items-start mb-2">
-                                <i class="fa fa-building text-primary me-2 mt-1" style="width:18px;"></i>
-                                <div>
-                                    <div class="text-muted small">Outlet</div>
-                                    <strong class="text-dark"><?= htmlspecialchars($outlet['nama_outlet']) ?></strong>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <i class="fa fa-user text-info me-2 mt-1" style="width:18px;"></i>
-                                <div>
-                                    <div class="text-muted small">Pengelola</div>
-                                    <span class="text-dark"><?= htmlspecialchars($outlet['pengelola_toko'] ?? '-') ?></span>
-                                    <?php if (!empty($outlet['no_hp_toko'])) : ?>
-                                        <br><small class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i><?= htmlspecialchars($outlet['no_hp_toko']) ?></small>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                        <div class="col-lg-5 col-md-5">
+                            <label class="form-label small fw-bold mb-1">Filter Bulan</label>
+                            <select id="filterBulan" class="form-select filter-select" data-placeholder="Semua Bulan">
+                                <option value="">Semua Bulan</option>
+                                <?php foreach ($namaBulan as $mNum => $mName) : ?>
+                                    <option value="<?= sprintf('%02d', $mNum) ?>"><?= $mName ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <div class="d-flex align-items-start mb-2">
-                                <i class="fa fa-handshake-o text-success me-2 mt-1" style="width:18px;"></i>
-                                <div>
-                                    <div class="text-muted small">Investor</div>
-                                    <?php if (!empty($outlet['nama_investor'])) : ?>
-                                        <strong class="text-primary"><?= htmlspecialchars($outlet['nama_investor']) ?></strong>
-                                        <?php if (!empty($outlet['username_investor'])) : ?>
-                                            <br><small class="text-muted"><code>@<?= htmlspecialchars($outlet['username_investor']) ?></code></small>
-                                        <?php endif; ?>
-                                    <?php else : ?>
-                                        <span class="text-muted">Belum Ada Investor</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <i class="fa fa-money text-warning me-2 mt-1" style="width:18px;"></i>
-                                <div>
-                                    <div class="text-muted small">Tarif Langganan</div>
-                                    <strong class="text-success">Rp <?= number_format($outlet['biaya_langganan_outlet'] ?? 0, 0, ',', '.') ?> / Bln</strong>
-                                </div>
-                            </div>
+                        <div class="col-lg-5 col-md-5">
+                            <label class="form-label small fw-bold mb-1">Filter Tahun</label>
+                            <select id="filterTahun" class="form-select filter-select" data-placeholder="Semua Tahun">
+                                <option value="">Semua Tahun</option>
+                                <?php foreach ($daftarTahun as $y) : ?>
+                                    <option value="<?= $y ?>"><?= $y ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <form method="GET" action="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/rincian_omzet">
-                                <input type="hidden" name="id" value="<?= $idOutlet ?>">
-                                <label class="form-label small fw-bold mb-1">Ganti Periode</label>
-                                <div class="input-group input-group-sm">
-                                    <select name="bulan" class="form-select">
-                                        <option value="0" <?= $selectedBulan === 0 ? 'selected' : '' ?>>Semua Bulan</option>
-                                        <?php foreach ($namaBulan as $mNum => $mName) : ?>
-                                            <option value="<?= $mNum ?>" <?= $selectedBulan === $mNum ? 'selected' : '' ?>><?= $mName ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <select name="tahun" class="form-select">
-                                        <option value="0" <?= $selectedTahun === 0 ? 'selected' : '' ?>>Semua Tahun</option>
-                                        <?php foreach ($listTahunRincian as $y) : ?>
-                                            <option value="<?= $y ?>" <?= $selectedTahun === $y ? 'selected' : '' ?>><?= $y ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="fe fe-filter"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4 Stat Cards -->
-                <div class="row row-sm g-2 mb-3">
-                    <div class="col-6 col-md-3">
-                        <div class="card custom-card mb-0">
-                            <div class="card-body p-3 text-center">
-                                <h6 class="text-muted tx-12 mb-1">Total Omzet</h6>
-                                <h5 class="text-success fw-bold mb-0">Rp <?= number_format($summary['total_omzet'] ?? 0, 0, ',', '.') ?></h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card custom-card mb-0">
-                            <div class="card-body p-3 text-center">
-                                <h6 class="text-muted tx-12 mb-1">Potongan Sistem</h6>
-                                <h5 class="text-danger fw-bold mb-0">Rp <?= number_format($summary['total_potongan'] ?? 0, 0, ',', '.') ?></h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card custom-card mb-0">
-                            <div class="card-body p-3 text-center">
-                                <h6 class="text-muted tx-12 mb-1">Hak Investor</h6>
-                                <h5 class="text-primary fw-bold mb-0">Rp <?= number_format($summary['total_hak_investor'] ?? 0, 0, ',', '.') ?></h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card custom-card mb-0">
-                            <div class="card-body p-3 text-center">
-                                <h6 class="text-muted tx-12 mb-1">Hak Outlet</h6>
-                                <h5 class="text-warning fw-bold mb-0">Rp <?= number_format($summary['total_hak_outlet'] ?? 0, 0, ',', '.') ?></h5>
-                            </div>
+                        <div class="col-lg-2 col-md-2">
+                            <button type="button" id="btnResetFilter" class="btn btn-secondary btn-sm w-100 d-flex align-items-center justify-content-center" style="height: 38px;" title="Reset semua filter periode">
+                                <i class="fe fe-refresh-cw me-1"></i> Reset Filter
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -194,44 +215,76 @@ if ($selectedBulan > 0 && $selectedTahun > 0) {
                     <table class="table table-bordered table-striped table-hover key-buttons text-nowrap w-100 align-middle" id="table-rincian-omzet">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-center" style="width:5%">NO</th>
+                                <th class="text-center" style="width: 5%;">NO</th>
                                 <th class="text-center">TANGGAL OMZET</th>
                                 <th class="text-center">OMZET KOTOR</th>
-                                <th class="text-center">POTONGAN SISTEM</th>
+                                <th class="text-center">PERSENTASE POTONGAN</th>
                                 <th class="text-center">HAK INVESTOR</th>
                                 <th class="text-center">HAK OUTLET</th>
+                                <th class="text-center">BERSIH OUTLET TOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!empty($transaksi)) : ?>
                                 <?php $no = 1; foreach ($transaksi as $t) :
-                                    $tgl = !empty($t['tanggal_omzet'])
-                                        ? implode('/', array_reverse(explode('-', $t['tanggal_omzet'])))
-                                        : '-';
+                                    $tglTs = !empty($t['tanggal_omzet']) ? strtotime($t['tanggal_omzet']) : 0;
+                                    $tglFormatted = $tglTs > 0 ? date("d/m/Y", $tglTs) : '-';
+                                    $blnVal = $tglTs > 0 ? date('m', $tglTs) : '';
+                                    $thnVal = $tglTs > 0 ? date('Y', $tglTs) : '';
+                                    $pctInv = (float)($t['persentase_hak_investor'] ?? 50);
+                                    $pctOutlet = 100 - $pctInv;
+                                    $nomOmzet = (float)($t['nominal_omzet'] ?? 0);
+                                    $nomPotongan = (float)($t['nominal_potongan'] ?? 0);
+                                    $nomHakInvestor = (float)($t['nominal_hak_investor'] ?? 0);
+                                    $nomHakOutlet = (float)($t['nominal_hak_outlet'] ?? 0);
+                                    $nomBersih = max(0, $nomOmzet - $nomHakInvestor);
                                 ?>
-                                    <tr class="text-center">
-                                        <td><?= $no++ ?></td>
-                                        <td><strong><?= $tgl ?></strong></td>
-                                        <td class="text-end text-success fw-bold">Rp <?= number_format($t['nominal_omzet'] ?? 0, 0, ',', '.') ?></td>
+                                    <tr data-bulan="<?= $blnVal ?>" 
+                                        data-tahun="<?= $thnVal ?>"
+                                        data-omzet="<?= $nomOmzet ?>"
+                                        data-potongan="<?= $nomPotongan ?>"
+                                        data-investor="<?= $nomHakInvestor ?>"
+                                        data-outlet="<?= $nomHakOutlet ?>"
+                                        data-bersih="<?= $nomBersih ?>">
+                                        <td class="text-center"><?= $no++ ?></td>
+                                        <td class="text-center"><?= $tglFormatted ?></td>
+                                        <td class="text-end fw-bold text-success">
+                                            Rp <?= number_format($nomOmzet, 0, ',', '.') ?>
+                                        </td>
                                         <td class="text-end text-danger">
-                                            Rp <?= number_format($t['nominal_potongan'] ?? 0, 0, ',', '.') ?>
+                                            Rp <?= number_format($nomPotongan, 0, ',', '.') ?>
                                             <small class="text-muted">(<?= number_format($t['persentase_potongan'] ?? 0, 0) ?>%)</small>
                                         </td>
-                                        <td class="text-end text-primary fw-bold">
-                                            Rp <?= number_format($t['nominal_hak_investor'] ?? 0, 0, ',', '.') ?>
-                                            <small class="text-muted">(<?= number_format($t['persentase_hak_investor'] ?? 0, 0) ?>%)</small>
+                                        <td class="text-end fw-bold text-primary">
+                                            Rp <?= number_format($nomHakInvestor, 0, ',', '.') ?>
+                                            <small class="text-muted">(<?= number_format($pctInv, 0) ?>%)</small>
                                         </td>
-                                        <td class="text-end text-warning fw-bold">Rp <?= number_format($t['nominal_hak_outlet'] ?? 0, 0, ',', '.') ?></td>
+                                        <td class="text-end fw-bold text-warning">
+                                            Rp <?= number_format($nomHakOutlet, 0, ',', '.') ?>
+                                            <small class="text-muted">(<?= number_format($pctOutlet, 0) ?>%)</small>
+                                        </td>
+                                        <td class="text-end fw-bold text-dark">
+                                            Rp <?= number_format($nomBersih, 0, ',', '.') ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
-                                        <i class="fa fa-info-circle me-2"></i>Tidak ada transaksi omzet pada periode <?= $periodeLabel ?>.
-                                    </td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada transaksi omzet tercatat untuk outlet ini.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr class="align-middle">
+                                <td class="text-center fw-bold py-2"></td>
+                                <td class="text-center text-uppercase fw-bold py-2">TOTAL KESELURUHAN:</td>
+                                <td class="text-end text-success fw-bold py-2" id="footTotalOmzet">Rp 0</td>
+                                <td class="text-end text-danger fw-bold py-2" id="footTotalPotongan">Rp 0</td>
+                                <td class="text-end text-primary fw-bold py-2" id="footTotalInvestor">Rp 0</td>
+                                <td class="text-end text-warning fw-bold py-2" id="footTotalOutlet">Rp 0</td>
+                                <td class="text-end text-dark fw-bold py-2" id="footTotalBersih">Rp 0</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 
@@ -241,9 +294,68 @@ if ($selectedBulan > 0 && $selectedTahun > 0) {
 </div>
 
 <script type="text/javascript">
+let tableRincian = null;
+
+function initFilterSelect2(selector) {
+    let $el = $(selector);
+    let placeholder = $el.attr('data-placeholder') || 'Pilih...';
+    if ($el.data('select2')) {
+        $el.select2('destroy');
+    }
+    $el.select2({
+        width: '100%',
+        placeholder: placeholder,
+        allowClear: false,
+        templateResult: function(data) {
+            // Sembunyikan opsi "Semua" dari daftar dropdown yang bisa dipilih
+            if (!data.id || data.id === '') {
+                return null;
+            }
+            return data.text;
+        },
+        language: { noResults: function() { return 'Tidak ada data ditemukan'; } }
+    });
+}
+
+function openNextFilterSelect2(selector) {
+    setTimeout(() => {
+        let $el = $(selector);
+        $el.select2('open');
+        let searchField = document.querySelector('.select2-container--open .select2-search__field');
+        if (searchField) {
+            searchField.focus();
+        }
+    }, 120);
+}
+
 $(document).ready(function() {
+    // Inisialisasi Select2 pada Filter
+    initFilterSelect2('#filterBulan');
+    initFilterSelect2('#filterTahun');
+
+    // Auto focus search field saat Select2 filter dibuka
+    $(document).on('select2:open', function() {
+        setTimeout(() => {
+            let searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 10);
+    });
+
+    $('.filter-select').on('select2:close', function() {
+        let $container = $(this).next('.select2-container');
+        $container.find('.select2-selection').blur();
+    });
+
+    // Navigasi Otomatis Berurutan saat Filter Dipilih
+    $('#filterBulan').on('select2:select', function() {
+        openNextFilterSelect2('#filterTahun');
+    });
+
+    // Inisialisasi DataTable Rincian Omzet dengan footerCallback dinamis
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-rincian-omzet')) {
-        var dtRincian = $('#table-rincian-omzet').DataTable({
+        tableRincian = $('#table-rincian-omzet').DataTable({
             processing: true,
             deferRender: true,
             scrollX: true,
@@ -254,10 +366,48 @@ $(document).ready(function() {
                 sSearch: '',
                 lengthMenu: 'Show _MENU_ entries',
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-                paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' },
-                emptyTable: 'Tidak ada transaksi omzet pada periode ini.'
+                paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
             },
-            order: [[1, 'desc']]
+            order: [[1, 'desc']],
+            columnDefs: [
+                { orderable: false, targets: 0 }
+            ],
+            drawCallback: function (settings) {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;
+                api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+            },
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+
+                var formatRupiah = function (num) {
+                    return 'Rp ' + Number(Math.round(num) || 0).toLocaleString('id-ID');
+                };
+
+                var totalOmzet = 0;
+                var totalPotongan = 0;
+                var totalInvestor = 0;
+                var totalOutlet = 0;
+                var totalBersih = 0;
+
+                // Hitung total hanya untuk baris yang lolos filter / pencarian
+                display.forEach(function (index) {
+                    var $row = $(api.row(index).node());
+                    totalOmzet += parseFloat($row.attr('data-omzet')) || 0;
+                    totalPotongan += parseFloat($row.attr('data-potongan')) || 0;
+                    totalInvestor += parseFloat($row.attr('data-investor')) || 0;
+                    totalOutlet += parseFloat($row.attr('data-outlet')) || 0;
+                    totalBersih += parseFloat($row.attr('data-bersih')) || 0;
+                });
+
+                $('#footTotalOmzet').html(formatRupiah(totalOmzet));
+                $('#footTotalPotongan').html(formatRupiah(totalPotongan));
+                $('#footTotalInvestor').html(formatRupiah(totalInvestor));
+                $('#footTotalOutlet').html(formatRupiah(totalOutlet));
+                $('#footTotalBersih').html(formatRupiah(totalBersih));
+            }
         });
 
         if ($.fn.select2) {
@@ -269,5 +419,50 @@ $(document).ready(function() {
             }, 50);
         }
     }
+
+    // Filter Custom DataTable untuk Rincian Omzet
+    $.fn.dataTable.ext.search.push(function(settings, searchData, index) {
+        if (settings.nTable.id !== 'table-rincian-omzet') {
+            return true;
+        }
+        if (!tableRincian) {
+            return true;
+        }
+
+        let $row = $(tableRincian.row(index).node());
+        let rowBulan = ($row.attr('data-bulan') || '').trim();
+        let rowTahun = ($row.attr('data-tahun') || '').trim();
+
+        let filterBulan = ($('#filterBulan').val() || '').trim();
+        let filterTahun = ($('#filterTahun').val() || '').trim();
+
+        if (filterBulan && rowBulan !== filterBulan) {
+            return false;
+        }
+        if (filterTahun && rowTahun !== filterTahun) {
+            return false;
+        }
+
+        return true;
+    });
+
+    // Event Trigger Filter
+    $('#filterBulan, #filterTahun').on('change', function() {
+        if (tableRincian) {
+            tableRincian.draw();
+        }
+    });
+
+    // Reset Filter Button
+    $('#btnResetFilter').on('click', function() {
+        $('#filterBulan').val('').trigger('change.select2');
+        $('#filterTahun').val('').trigger('change.select2');
+        initFilterSelect2('#filterBulan');
+        initFilterSelect2('#filterTahun');
+        if (tableRincian) {
+            tableRincian.draw();
+        }
+    });
 });
 </script>
+

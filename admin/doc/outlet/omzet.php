@@ -138,7 +138,7 @@ function safeJsonAlamatOmzet($str) {
                                 <?php if ($investorOptions && $investorOptions->num_rows > 0) : ?>
                                     <?php while ($inv = $investorOptions->fetch_assoc()) : ?>
                                         <option value="<?= htmlspecialchars(strtoupper($inv['nama_lengkap'])) ?>">
-                                            <?= htmlspecialchars($inv['nama_lengkap']) ?> (@<?= htmlspecialchars($inv['username']) ?>)
+                                             <?= htmlspecialchars($inv['nama_lengkap']) ?> (@<?= htmlspecialchars($inv['username']) ?>)
                                         </option>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
@@ -173,11 +173,10 @@ function safeJsonAlamatOmzet($str) {
                                 <th class="text-center">NAMA OUTLET</th>
                                 <th class="text-center">INVESTOR</th>
                                 <th class="text-center">WILAYAH</th>
-                                <th class="text-center">TRANSAKSI</th>
                                 <th class="text-center">OMZET KOTOR</th>
-                                <th class="text-center">POTONGAN SISTEM</th>
+                                <th class="text-center">PERSENTASE POTONGAN</th>
                                 <th class="text-center">HAK INVESTOR</th>
-                                <th class="text-center">TARIF LANGGANAN</th>
+                                <th class="text-center">BIAYA LANGGANAN</th>
                                 <th class="text-center" style="width: 8%;">#</th>
                             </tr>
                         </thead>
@@ -185,7 +184,6 @@ function safeJsonAlamatOmzet($str) {
                             <?php if (!empty($outlets)) : ?>
                                 <?php $no = 1; foreach ($outlets as $row) :
                                     $omzetNom = (float)($row['omzet_periode'] ?? 0);
-                                    $trxNom   = (int)($row['transaksi_periode'] ?? 0);
                                     $potNom   = (float)($row['potongan_periode'] ?? 0);
                                     $invNom   = (float)($row['hak_investor_periode'] ?? 0);
                                     $tarifNom = (int)($row['biaya_langganan_outlet'] ?? 100000);
@@ -193,8 +191,11 @@ function safeJsonAlamatOmzet($str) {
                                     <tr id="outlet-row-<?= $row['id_outlet'] ?>"
                                         data-investor="<?= htmlspecialchars(strtoupper($row['nama_investor'] ?? '')) ?>"
                                         data-provinsi="<?= htmlspecialchars(strtoupper($row['provinsi'] ?? '')) ?>"
-                                        data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>">
-                                        <td class="text-center"><?= $no++ ?></td>
+                                        data-kabupaten="<?= htmlspecialchars(strtoupper($row['kabupaten'] ?? '')) ?>"
+                                        data-omzet="<?= $omzetNom ?>"
+                                        data-potongan="<?= $potNom ?>"
+                                        data-investor-nom="<?= $invNom ?>">
+                                        <td class="text-center col-no"><?= $no++ ?></td>
                                         <td class="text-start">
                                             <strong class="text-primary"><?= htmlspecialchars($row['nama_outlet']) ?></strong>
                                             <?php if (!empty($row['pengelola_toko']) || !empty($row['no_hp_toko'])) : ?>
@@ -247,20 +248,13 @@ function safeJsonAlamatOmzet($str) {
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-center col-trx">
-                                            <?php if ($trxNom > 0) : ?>
-                                                <span class="badge bg-primary"><?= number_format($trxNom) ?> Trx</span>
-                                            <?php else : ?>
-                                                <span class="text-muted">0 Trx</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="text-end fw-bold col-omzet <?= $omzetNom > 0 ? 'text-success' : 'text-muted' ?>">
+                                        <td class="text-end fw-bold col-omzet <?= $omzetNom > 0 ? 'text-success' : 'text-muted' ?>" data-order="<?= $omzetNom ?>">
                                             Rp <?= number_format($omzetNom, 0, ',', '.') ?>
                                         </td>
-                                        <td class="text-end text-danger col-pot">
+                                        <td class="text-end text-danger col-pot" data-order="<?= $potNom ?>">
                                             Rp <?= number_format($potNom, 0, ',', '.') ?>
                                         </td>
-                                        <td class="text-end text-primary fw-bold col-inv">
+                                        <td class="text-end text-primary fw-bold col-inv" data-order="<?= $invNom ?>">
                                             Rp <?= number_format($invNom, 0, ',', '.') ?>
                                         </td>
                                         <td class="text-center col-tarif">
@@ -270,14 +264,14 @@ function safeJsonAlamatOmzet($str) {
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/rincian_omzet?id=<?= $row['id_outlet'] ?>&bulan=0&tahun=0" class="btn btn-outline-info btn-sm py-1 px-2.5 shadow-xs btn-rincian" title="Rincian Omzet Outlet">
+                                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/rincian_omzet?id=<?= $row['id_outlet'] ?>" class="btn btn-outline-info btn-sm py-1 px-2.5 shadow-xs btn-rincian" title="Rincian Omzet Outlet">
                                                 <i class="fa fa-bar-chart me-1"></i>Rincian
                                             </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else : ?>
-                                <tr><td colspan="10" class="text-center text-muted py-4">Belum ada data outlet pada periode ini.</td></tr>
+                                <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data outlet pada periode ini.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -398,9 +392,8 @@ $(document).ready(function() {
     }
 
     // ============================================================
-    // DataTables
+    // DataTables dengan Penomoran Dinamis
     // ============================================================
-    var tableOmzet = null;
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#table-omzet-monitoring')) {
         tableOmzet = $('#table-omzet-monitoring').DataTable({
             processing: true,
@@ -415,7 +408,17 @@ $(document).ready(function() {
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                 paginate: { first: 'First', last: 'Last', next: 'Next', previous: 'Previous' }
             },
-            order: [[5, 'desc']]
+            order: [[4, 'desc']],
+            columnDefs: [
+                { orderable: false, targets: [0, 8] }
+            ],
+            drawCallback: function (settings) {
+                var api = this.api();
+                var startIndex = api.context[0]._iDisplayStart;
+                api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = startIndex + i + 1;
+                });
+            }
         });
 
         if ($.fn.select2) {
@@ -467,21 +470,6 @@ $(document).ready(function() {
     function formatNumber(num) {
         return Number(num || 0).toLocaleString('id-ID');
     }
-    function escapeHtml(text) {
-        if (!text) return '';
-        return String(text)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-    function capitalizeWords(str) {
-        if (!str) return '';
-        return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-            return letter.toUpperCase();
-        });
-    }
 
     // ============================================================
     // AJAX Dynamic Update Data Omzet Tanpa Reload Halaman
@@ -493,12 +481,10 @@ $(document).ready(function() {
                     let $tr = $('#outlet-row-' + row.id_outlet);
                     if ($tr.length) {
                         let omzetNom = parseFloat(row.omzet_periode) || 0;
-                        let trxNom   = parseInt(row.transaksi_periode) || 0;
                         let potNom   = parseFloat(row.potongan_periode) || 0;
                         let invNom   = parseFloat(row.hak_investor_periode) || 0;
                         let tarifNom = parseInt(row.biaya_langganan_outlet) || 100000;
 
-                        let trxHtml = (trxNom > 0) ? `<span class="badge bg-primary">${formatNumber(trxNom)} Trx</span>` : `<span class="text-muted">0 Trx</span>`;
                         let omzetHtml = `Rp ${formatNumber(omzetNom)}`;
                         let potHtml = `Rp ${formatNumber(potNom)}`;
                         let invHtml = `Rp ${formatNumber(invNom)}`;
@@ -508,16 +494,23 @@ $(document).ready(function() {
                             tarifHtml += `<br><span class="badge bg-success mt-1" style="font-size: 10.5px;"><i class="fa fa-arrow-up me-1"></i>Rekomen Naik</span>`;
                         }
 
-                        let rincianUrl = `${adminUrl}/outlet/rincian_omzet?id=${row.id_outlet}&bulan=${bulan}&tahun=${tahun}`;
+                        let rincianUrl = `${adminUrl}/outlet/rincian_omzet?id=${row.id_outlet}`;
 
-                        $tr.find('.col-trx').html(trxHtml);
-                        $tr.find('.col-omzet').html(omzetHtml).removeClass('text-success text-muted').addClass(omzetNom > 0 ? 'text-success' : 'text-muted');
-                        $tr.find('.col-pot').html(potHtml);
-                        $tr.find('.col-inv').html(invHtml);
+                        $tr.attr('data-omzet', omzetNom);
+                        $tr.attr('data-potongan', potNom);
+                        $tr.attr('data-investor-nom', invNom);
+
+                        $tr.find('.col-omzet').html(omzetHtml).attr('data-order', omzetNom).removeClass('text-success text-muted').addClass(omzetNom > 0 ? 'text-success' : 'text-muted');
+                        $tr.find('.col-pot').html(potHtml).attr('data-order', potNom);
+                        $tr.find('.col-inv').html(invHtml).attr('data-order', invNom);
                         $tr.find('.col-tarif').html(tarifHtml);
                         $tr.find('.btn-rincian').attr('href', rincianUrl);
                     }
                 });
+
+                if (tableOmzet) {
+                    tableOmzet.rows().invalidate().draw(false);
+                }
             }
         });
     }
