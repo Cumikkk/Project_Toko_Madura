@@ -376,7 +376,7 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN KEUANGAN SEDERHANA &amp; RINCIAN HARIAN INVESTOR</div>
+                <div class="header-subtitle">LAPORAN KEUANGAN &amp; RINCIAN HARIAN</div>
                 <div class="header-tagline">Ringkasan Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
@@ -421,7 +421,7 @@ ob_start();
     </table>
 
     <!-- Bagian I: Ringkasan Posisi Keuangan -->
-    <div class="section-title">I. RINGKASAN POSISI KEUANGAN</div>
+    <div class="section-title">I. RINGKASAN KEUANGAN</div>
     <table class="balance-summary-table">
         <tr>
             <!-- SISI AKTIVA: ARUS OMZET & PENERIMAAN KAS -->
@@ -475,7 +475,7 @@ ob_start();
     </table>
 
     <!-- Bagian II: Tabel Rekapitulasi Posisi Keuangan Per Outlet Toko -->
-    <div class="section-title">II. TABEL REKAPITULASI POSISI KEUANGAN PER OUTLET TOKO</div>
+    <div class="section-title">II. TABEL REKAPITULASI KEUANGAN PER OUTLET TOKO</div>
     <table class="data-table">
         <thead>
             <tr>
@@ -573,18 +573,20 @@ ob_start();
                 </tr>
             </table>
 
-            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini (Termasuk Kolom Skema Pot. %) -->
+            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini (10 Kolom Rapi Termasuk % Hak Investor & Outlet) -->
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width: 4%;">NO</th>
-                        <th class="text-center" style="width: 13%;">TANGGAL OMZET</th>
-                        <th class="text-end" style="width: 14%;">OMZET KOTOR (100%)</th>
-                        <th class="text-center" style="width: 10%;">SKEMA POT.</th>
-                        <th class="text-end" style="width: 14%;">NOMINAL POTONGAN</th>
-                        <th class="text-end" style="width: 15%;">HAK INVESTOR</th>
-                        <th class="text-end" style="width: 15%;">HAK OUTLET</th>
-                        <th class="text-end" style="width: 15%;">SALDO BERSIH TOKO</th>
+                        <th class="text-center" style="width: 3%;">NO</th>
+                        <th class="text-center" style="width: 10%;">TANGGAL OMZET</th>
+                        <th class="text-end" style="width: 12%;">OMZET KOTOR (100%)</th>
+                        <th class="text-center" style="width: 6%;">POT. (%)</th>
+                        <th class="text-end" style="width: 12%;">NOMINAL POTONGAN</th>
+                        <th class="text-center" style="width: 6%;">INV. (%)</th>
+                        <th class="text-end" style="width: 12%;">HAK INVESTOR</th>
+                        <th class="text-center" style="width: 6%;">OUT. (%)</th>
+                        <th class="text-end" style="width: 12%;">HAK OUTLET</th>
+                        <th class="text-end" style="width: 11%;">SALDO BERSIH</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -605,21 +607,28 @@ ob_start();
                             $subOut   += $nOut;
                             
                             $tglFmt = date('d/m/Y', strtotime($item['tanggal_omzet']));
+                            $pctPot = (float)$item['persentase_potongan'];
+                            $pctInv = (float)($item['persentase_hak_investor'] ?? 50.00);
+                            $pctOut = 100.00 - $pctInv;
+                            $fmtInv = (floor($pctInv) == $pctInv) ? number_format($pctInv, 0) . '%' : number_format($pctInv, 2) . '%';
+                            $fmtOut = (floor($pctOut) == $pctOut) ? number_format($pctOut, 0) . '%' : number_format($pctOut, 2) . '%';
                         ?>
                             <tr>
                                 <td class="text-center fw-bold"><?= $noD++; ?></td>
                                 <td class="text-center fw-bold"><?= $tglFmt; ?></td>
                                 <td class="text-end fw-bold">Rp <?= number_format($nOmzet, 0, ',', '.'); ?></td>
-                                <td class="text-center fw-bold text-secondary"><?= number_format($item['persentase_potongan'], 2); ?>%</td>
+                                <td class="text-center fw-bold text-secondary"><?= number_format($pctPot, 2); ?>%</td>
                                 <td class="text-end text-danger fw-bold">Rp <?= number_format($nPot, 0, ',', '.'); ?></td>
+                                <td class="text-center fw-bold text-success" style="font-size: 8px;"><?= $fmtInv; ?></td>
                                 <td class="text-end text-success fw-bold">Rp <?= number_format($nInv, 0, ',', '.'); ?></td>
+                                <td class="text-center fw-bold text-warning" style="font-size: 8px;"><?= $fmtOut; ?></td>
                                 <td class="text-end text-warning fw-bold">Rp <?= number_format($nOut, 0, ',', '.'); ?></td>
                                 <td class="text-end fw-bold">Rp <?= number_format($nBersih, 0, ',', '.'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="8" class="text-center" style="padding: 15px; color: #64748b;">
+                            <td colspan="10" class="text-center" style="padding: 15px; color: #64748b;">
                                 Belum ada rincian transaksi harian omzet untuk toko <strong><?= htmlspecialchars($rOut['nama_outlet']); ?></strong> pada periode ini.
                             </td>
                         </tr>
@@ -632,7 +641,9 @@ ob_start();
                             <td class="text-end" style="padding: 6px;">Rp <?= number_format($subOmzet, 0, ',', '.'); ?></td>
                             <td class="text-center" style="padding: 6px;">-</td>
                             <td class="text-end text-danger" style="padding: 6px;">Rp <?= number_format($subPot, 0, ',', '.'); ?></td>
+                            <td class="text-center" style="padding: 6px;">-</td>
                             <td class="text-end text-success" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subInv, 0, ',', '.'); ?></td>
+                            <td class="text-center" style="padding: 6px;">-</td>
                             <td class="text-end text-warning" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subOut, 0, ',', '.'); ?></td>
                             <td class="text-end text-primary" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($subOmzet - $subPot + $subOut, 0, ',', '.'); ?></td>
                         </tr>
@@ -656,11 +667,11 @@ ob_start();
                 </div>
             </td>
             <td style="width: 40%; vertical-align: top; text-align: center;">
-                <div style="font-size: 8.5px; color: #64748b;">Disahkan &amp; Diverifikasi Oleh,</div>
+               
                 <div style="font-weight: bold; font-size: 9px; color: #0f172a; margin-top: 1px;">MANAJEMEN TOKO MADURA</div>
                 <div style="height: 35px;"></div>
                 <div style="font-weight: bold; font-size: 9px; color: #7D0A0A; text-decoration: underline;"><?= htmlspecialchars($investorNama); ?></div>
-                <div style="font-size: 8px; color: #64748b;">Pihak Investor / Pemilik Modal</div>
+                <div style="font-size: 8px; color: #64748b;">Pihak Investor</div>
             </td>
         </tr>
     </table>
