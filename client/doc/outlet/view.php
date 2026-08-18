@@ -419,6 +419,7 @@ $bankAtasNama   = $sysSettings['bank_atas_nama'] ?? 'Toko Madura Pusat';
 $selectedProvinsi  = trim($_GET['provinsi'] ?? '');
 $selectedKabupaten = trim($_GET['kabupaten'] ?? '');
 $selectedKecamatan = trim($_GET['kecamatan'] ?? '');
+$selectedKelurahan = trim($_GET['kelurahan'] ?? '');
 
 // Build WHERE clause for Outlet Registration Date, Wilayah, & Ownership
 $whereOutletConds = ["o.id_investor = {$investorId}"];
@@ -434,6 +435,10 @@ if (!empty($selectedKabupaten)) {
 if (!empty($selectedKecamatan)) {
     $safeKec = $db->real_escape_string($selectedKecamatan);
     $whereOutletConds[] = "mw.kecamatan = '{$safeKec}'";
+}
+if (!empty($selectedKelurahan)) {
+    $safeKel = $db->real_escape_string($selectedKelurahan);
+    $whereOutletConds[] = "mw.kelurahan = '{$safeKel}'";
 }
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
@@ -527,13 +532,14 @@ if ($resOutlets) {
 $resTotalAll = $db->query("SELECT COUNT(*) as cnt FROM outlet WHERE id_investor = {$investorId}");
 $totalOutlet = $resTotalAll ? (int)$resTotalAll->fetch_assoc()['cnt'] : 0;
 
-function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi = '', $selectedKabupaten = '', $selectedKecamatan = '') {
+function buildOutletPageUrl($pageNum, $selectedTglMulai, $selectedTglSelesai, $selectedProvinsi = '', $selectedKabupaten = '', $selectedKecamatan = '', $selectedKelurahan = '') {
     $params = ['page' => $pageNum];
     if (!empty($selectedTglMulai)) $params['tgl_mulai'] = $selectedTglMulai;
     if (!empty($selectedTglSelesai)) $params['tgl_selesai'] = $selectedTglSelesai;
     if (!empty($selectedProvinsi)) $params['provinsi'] = $selectedProvinsi;
     if (!empty($selectedKabupaten)) $params['kabupaten'] = $selectedKabupaten;
     if (!empty($selectedKecamatan)) $params['kecamatan'] = $selectedKecamatan;
+    if (!empty($selectedKelurahan)) $params['kelurahan'] = $selectedKelurahan;
     return SystemInfo::app('CLIENT_URL') . '/outlet?' . http_build_query($params);
 }
 ?>
@@ -745,10 +751,10 @@ html body .form-check-input:checked {
                                     <?= !empty($selectedTglMulai) ? date('d/m/Y', strtotime($selectedTglMulai)) : 'Awal'; ?> s/d <?= !empty($selectedTglSelesai) ? date('d/m/Y', strtotime($selectedTglSelesai)) : 'Akhir'; ?>
                                 </span>
                             <?php endif; ?>
-                            <?php if (!empty($selectedProvinsi) || !empty($selectedKabupaten) || !empty($selectedKecamatan)) : ?>
+                            <?php if (!empty($selectedProvinsi) || !empty($selectedKabupaten) || !empty($selectedKecamatan) || !empty($selectedKelurahan)) : ?>
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" style="font-size: 10px;">
                                     <i class="fa-solid fa-map-location-dot me-1"></i>
-                                    <?= htmlspecialchars(implode(', ', array_filter([$selectedKecamatan, $selectedKabupaten, $selectedProvinsi]))); ?>
+                                    <?= htmlspecialchars(implode(', ', array_filter([$selectedKelurahan, $selectedKecamatan, $selectedKabupaten, $selectedProvinsi]))); ?>
                                 </span>
                             <?php endif; ?>
                         </h5>
@@ -774,7 +780,7 @@ html body .form-check-input:checked {
                         </button>
 
                         <!-- Tombol Cetak PDF Data Neraca Sederhana -->
-                        <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>&provinsi=<?= urlencode($selectedProvinsi); ?>&kabupaten=<?= urlencode($selectedKabupaten); ?>&kecamatan=<?= urlencode($selectedKecamatan); ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
+                        <a href="<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/export_pdf.php?tgl_mulai=<?= urlencode($selectedTglMulai); ?>&tgl_selesai=<?= urlencode($selectedTglSelesai); ?>&bulan=<?= $selectedBulan; ?>&tahun=<?= $selectedTahun; ?>&provinsi=<?= urlencode($selectedProvinsi); ?>&kabupaten=<?= urlencode($selectedKabupaten); ?>&kecamatan=<?= urlencode($selectedKecamatan); ?>&kelurahan=<?= urlencode($selectedKelurahan); ?>" target="_blank" class="btn btn-danger btn-sm rounded-pill px-3 py-1.5 shadow-sm fw-bold d-inline-flex align-items-center gap-1 text-nowrap">
                             <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
                         </a>
                     </div>
@@ -1866,7 +1872,7 @@ html body .form-check-input:checked {
                     <h6 class="modal-title fw-extrabold text-body-emphasis mb-0 fs-6" id="modalFilterWilayahLabel">
                         <i class="fa-solid fa-map-location-dot me-2 text-danger"></i>Filter Wilayah Outlet Toko
                     </h6>
-                    <small class="text-body-secondary" style="font-size: 11px;">Pilih lokasi provinsi, kabupaten, dan kecamatan outlet</small>
+                    <small class="text-body-secondary" style="font-size: 11px;">Pilih lokasi provinsi, kabupaten, kecamatan, dan kelurahan outlet</small>
                 </div>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1903,6 +1909,12 @@ html body .form-check-input:checked {
                                 <option value="">Semua Kecamatan</option>
                             </select>
                         </div>
+                        <div class="col-12">
+                            <label class="text-body-secondary small d-block mb-1 fw-semibold">Filter Kelurahan / Desa</label>
+                            <select id="modalFilterKelurahan" name="kelurahan" class="form-select form-select-sm rounded-3" disabled>
+                                <option value="">Semua Kelurahan / Desa</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-text text-body-secondary small mt-3">
@@ -1926,7 +1938,7 @@ $(document).ready(function() {
     const CLIENT_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>';
 
     // Helper Wilayah Cascading Dropdown Loader
-    function initWilayahCascade(provId, kabId, kecId, kelId, defaultProv = '', defaultKab = '', defaultKec = '', defaultIdWilayah = '') {
+    function initWilayahCascade(provId, kabId, kecId, kelId, defaultProv = '', defaultKab = '', defaultKec = '', defaultKel = '', defaultIdWilayah = '') {
         // 1. Load Provinsi
         $.post(CLIENT_URL + '/ajax/post/wilayah/get_provinsi', function(res) {
             let options = '<option value="">' + ($(provId).data('placeholder') || 'Pilih / Semua Provinsi') + '</option>';
@@ -1946,9 +1958,11 @@ $(document).ready(function() {
         // 2. On Provinsi Change -> Load Kabupaten
         $(provId).off('change.wilayah').on('change.wilayah', function() {
             let prov = $(this).val();
+            let isFilterMode = ($(kelId).attr('name') === 'kelurahan');
+            let kelPlaceholder = isFilterMode ? 'Semua Kelurahan / Desa' : 'Pilih Kelurahan';
             $(kabId).html('<option value="">Pilih / Semua Kabupaten</option>').prop('disabled', true);
             if (kecId) $(kecId).html('<option value="">Pilih / Semua Kecamatan</option>').prop('disabled', true);
-            if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+            if (kelId) $(kelId).html('<option value="">' + kelPlaceholder + '</option>').prop('disabled', true);
 
             if (prov) {
                 $.post(CLIENT_URL + '/ajax/post/wilayah/get_kabupaten', { provinsi: prov }, function(res) {
@@ -1974,8 +1988,10 @@ $(document).ready(function() {
             $(kabId).off('change.wilayah').on('change.wilayah', function() {
                 let prov = $(provId).val();
                 let kab = $(this).val();
+                let isFilterMode = ($(kelId).attr('name') === 'kelurahan');
+                let kelPlaceholder = isFilterMode ? 'Semua Kelurahan / Desa' : 'Pilih Kelurahan';
                 $(kecId).html('<option value="">Pilih / Semua Kecamatan</option>').prop('disabled', true);
-                if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+                if (kelId) $(kelId).html('<option value="">' + kelPlaceholder + '</option>').prop('disabled', true);
 
                 if (prov && kab) {
                     $.post(CLIENT_URL + '/ajax/post/wilayah/get_kecamatan', { provinsi: prov, kabupaten: kab }, function(res) {
@@ -2003,19 +2019,28 @@ $(document).ready(function() {
                 let prov = $(provId).val();
                 let kab = $(kabId).val();
                 let kec = $(this).val();
-                $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
+                let isFilterMode = ($(kelId).attr('name') === 'kelurahan');
+                let kelPlaceholder = isFilterMode ? 'Semua Kelurahan / Desa' : 'Pilih Kelurahan';
+                $(kelId).html('<option value="">' + kelPlaceholder + '</option>').prop('disabled', true);
 
                 if (prov && kab && kec) {
                     $.post(CLIENT_URL + '/ajax/post/wilayah/get_kelurahan', { provinsi: prov, kabupaten: kab, kecamatan: kec }, function(res) {
-                        let options = '<option value="">Pilih Kelurahan</option>';
+                        let options = '<option value="">' + kelPlaceholder + '</option>';
                         if (res && res.results) {
                             res.results.forEach(item => {
-                                let sel = (defaultIdWilayah && item.id == defaultIdWilayah) ? 'selected' : '';
-                                options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                                let optVal = isFilterMode ? (item.kelurahan || item.id) : item.id;
+                                let sel = false;
+                                if (isFilterMode && defaultKel) {
+                                    sel = ((defaultKel || '').toUpperCase() === (item.kelurahan || '').toUpperCase());
+                                } else if (defaultIdWilayah) {
+                                    sel = (item.id == defaultIdWilayah);
+                                }
+                                options += `<option value="${optVal}" ${sel ? 'selected' : ''}>${item.text}</option>`;
                             });
                         }
                         $(kelId).html(options).prop('disabled', false);
                         defaultKec = '';
+                        defaultKel = '';
                         defaultIdWilayah = '';
                     });
                 }
@@ -2027,8 +2052,9 @@ $(document).ready(function() {
     const curProv = '<?= addslashes($selectedProvinsi); ?>';
     const curKab  = '<?= addslashes($selectedKabupaten); ?>';
     const curKec  = '<?= addslashes($selectedKecamatan); ?>';
+    const curKel  = '<?= addslashes($selectedKelurahan); ?>';
 
-    initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', null, curProv, curKab, curKec);
+    initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', '#modalFilterKelurahan', curProv, curKab, curKec, curKel);
 
     // Inisialisasi Wilayah untuk Wizard Tambah Outlet saat modal dibuka
     $('#modalTambahOutlet').on('show.bs.modal', function() {
@@ -2046,6 +2072,7 @@ $(document).ready(function() {
         $('#modalFilterProvinsi').val('');
         $('#modalFilterKabupaten').html('<option value="">Semua Kabupaten</option>').prop('disabled', true);
         $('#modalFilterKecamatan').html('<option value="">Semua Kecamatan</option>').prop('disabled', true);
+        $('#modalFilterKelurahan').html('<option value="">Semua Kelurahan / Desa</option>').prop('disabled', true);
     });
 
     // 0. Live Search Real-Time Filter for Outlet Table

@@ -55,6 +55,11 @@ $selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']
 $selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
 $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
+$selectedProvinsi  = trim($_GET['provinsi'] ?? '');
+$selectedKabupaten = trim($_GET['kabupaten'] ?? '');
+$selectedKecamatan = trim($_GET['kecamatan'] ?? '');
+$selectedKelurahan = trim($_GET['kelurahan'] ?? '');
+
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
 
@@ -67,6 +72,23 @@ $totHakOutlet = 0;
 
 $whereConditions = ($role === 'investor') ? ["o.id_investor = {$investorId}"] : ["o.id_outlet = {$targetOutletId}"];
 $selectedOutletNama = '';
+
+if (!empty($selectedProvinsi)) {
+    $safeProv = $db->real_escape_string($selectedProvinsi);
+    $whereConditions[] = "mw.provinsi = '{$safeProv}'";
+}
+if (!empty($selectedKabupaten)) {
+    $safeKab = $db->real_escape_string($selectedKabupaten);
+    $whereConditions[] = "mw.kabupaten = '{$safeKab}'";
+}
+if (!empty($selectedKecamatan)) {
+    $safeKec = $db->real_escape_string($selectedKecamatan);
+    $whereConditions[] = "mw.kecamatan = '{$safeKec}'";
+}
+if (!empty($selectedKelurahan)) {
+    $safeKel = $db->real_escape_string($selectedKelurahan);
+    $whereConditions[] = "mw.kelurahan = '{$safeKel}'";
+}
 
 if ($selectedOutletId > 0 && $role === 'investor') {
     $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
