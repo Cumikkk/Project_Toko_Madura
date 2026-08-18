@@ -69,7 +69,7 @@ $bulanIndo = [
                                 <i class="fa-solid fa-shield-check me-1"></i> Master Access
                             </span>
                             <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Komisi Master</h2>
-                            <p class="text-white-50 small mb-0">Rekapitulasi komisi & apresiasi dari Admin atas kontribusi kemitraan investor Anda.</p>
+                            <p class="text-white-50 small mb-0">Rekapan komisi & apresiasi dari Admin atas kontribusi kemitraan investor Anda.</p>
                         </div>
                     </div>
                 </div>

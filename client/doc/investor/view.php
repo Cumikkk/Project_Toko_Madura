@@ -116,8 +116,8 @@ $bulanIndo = [
                             <span class="badge bg-white text-danger fw-bold px-3 py-2 rounded-pill mb-2 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
                                 <i class="fa-solid fa-shield-check me-1"></i> Master Access
                             </span>
-                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor & Kemitraan</h2>
-                            <p class="text-white-50 small mb-0">Pantau seluruh investor di bawah jaringan Anda beserta persebaran toko aktif yang dikelola.</p>
+                            <h2 class="fw-bold mb-2 text-white fs-3 fs-md-2">Data Investor</h2>
+                            <p class="text-white-50 small mb-0">Pantau seluruh investor di bawah naungan Anda beserta persebaran toko aktif yang dikelola.</p>
                         </div>
                     </div>
                 </div>
@@ -168,9 +168,9 @@ $bulanIndo = [
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div>
                             <h5 class="fw-bold text-body-emphasis mb-1 fs-6">
-                                <i class="fa-solid fa-list-check me-2 text-danger"></i>Daftar Investor Kemitraan
+                                <i class="fa-solid fa-list-check me-2 text-danger"></i>Daftar Investor
                             </h5>
-                            <p class="text-body-secondary small mb-0">Informasi profil investor, wilayah kemitraan, dan jumlah outlet aktif</p>
+                            <p class="text-body-secondary small mb-0">Informasi investor, wilayah, dan jumlah outlet aktif</p>
                         </div>
                         <div>
                             <button type="button" id="btnResetFilterInvestor" class="btn btn-outline-danger btn-sm d-none align-items-center gap-1.5 rounded-pill px-3 shadow-xs" title="Reset Semua Filter">
