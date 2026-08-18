@@ -11,6 +11,12 @@ $nama = Helper::form_input($_POST['nama_lengkap'] ?? '');
 $username = Helper::form_input($_POST['username'] ?? '');
 $noHp = Helper::form_input($_POST['no_hp'] ?? '');
 $idWilayah = !empty($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : null;
+if (is_null($idWilayah) && $userId > 0) {
+    $resCurrWil = $db->query("SELECT id_wilayah FROM users WHERE id_users = {$userId} LIMIT 1");
+    if ($resCurrWil && $rowCurrWil = $resCurrWil->fetch_assoc()) {
+        $idWilayah = !empty($rowCurrWil['id_wilayah']) ? (int)$rowCurrWil['id_wilayah'] : null;
+    }
+}
 $alamat = Helper::form_input($_POST['alamat_lengkap'] ?? '');
 $password = Helper::form_input($_POST['password'] ?? '');
 

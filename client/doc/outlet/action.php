@@ -102,7 +102,10 @@ try {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $escapedHash = $db->real_escape_string($hashedPassword);
 
-        $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', '{$escapedHash}', 'outlet')";
+        $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
+        $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
+
+        $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', {$wilayahVal}, '{$alamatOutlet}', '{$escapedHash}', 'outlet')";
         if (!$db->query($sqlUser)) {
             JsonResponse(['success' => false, 'message' => 'Gagal membuat akun user outlet: ' . $db->error]);
         }
@@ -110,8 +113,6 @@ try {
 
         // Insert Outlet Record with status 'pending'
         $escapedBukti = $db->real_escape_string($buktiPath);
-        // Simpan kecamatan & alamat outlet ke tabel users
-        $db->query("UPDATE users SET kecamatan = '{$kecamatan}', alamat_lengkap = '{$alamatOutlet}' WHERE id_users = {$newUserId}");
         $sqlOutlet = "INSERT INTO outlet (id_users, id_investor, persentase_potongan, persentase_hak_investor, nama_outlet, status, nominal_transfer, bukti_pembayaran, tgl_request) VALUES ({$newUserId}, {$investorId}, {$persentasePotongan}, {$persenBagianInvestor}, '{$namaOutlet}', 'pending', {$nominalBiaya}, '{$escapedBukti}', NOW())";
         if (!$db->query($sqlOutlet)) {
             JsonResponse(['success' => false, 'message' => 'Gagal menyimpan data outlet: ' . $db->error]);
@@ -296,12 +297,15 @@ try {
         // Tambahkan ke riwayat langganan
         $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request) VALUES ({$idOutlet}, 'baru', {$nominalBiaya}, '{$escapedBukti}', 'pending', NOW())");
 
-        // Update User Account (kecamatan, alamat, nama_lengkap, no_hp, username, password)
+        $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
+        $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
+
+        // Update User Account (id_wilayah, alamat, nama_lengkap, no_hp, username, password)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
-                kecamatan = '{$safeKecamatan}',
+                id_wilayah = {$wilayahVal},
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -310,7 +314,7 @@ try {
                 WHERE id_users = {$associatedUserId}");
         } else {
             $db->query("UPDATE users SET 
-                kecamatan = '{$safeKecamatan}',
+                id_wilayah = {$wilayahVal},
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -436,12 +440,15 @@ try {
             }
         }
 
-        // Update User Account (kecamatan & alamat stored in users table)
+        $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
+        $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
+
+        // Update User Account (id_wilayah & alamat stored in users table)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $escapedHash = $db->real_escape_string($hashedPassword);
             $db->query("UPDATE users SET 
-                kecamatan = '{$safeKecamatan}',
+                id_wilayah = {$wilayahVal},
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
@@ -450,7 +457,7 @@ try {
                 WHERE id_users = {$associatedUserId}");
         } else {
             $db->query("UPDATE users SET 
-                kecamatan = '{$safeKecamatan}',
+                id_wilayah = {$wilayahVal},
                 alamat_lengkap = '{$safeAlamatOutlet}',
                 nama_lengkap = '{$safeNamaPengelola}', 
                 no_hp = '{$safeNoHp}', 
