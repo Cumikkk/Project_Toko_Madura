@@ -605,12 +605,22 @@ ob_start();
                             $subOut   += $nOut;
                             
                             $tglFmt = date('d/m/Y', strtotime($item['tanggal_omzet']));
+                            $pctPot = (float)$item['persentase_potongan'];
+                            $pctInv = (float)($item['persentase_hak_investor'] ?? 50.00);
+                            $pctOut = 100.00 - $pctInv;
+                            $fmtInv = (floor($pctInv) == $pctInv) ? number_format($pctInv, 0) . '%' : number_format($pctInv, 2) . '%';
+                            $fmtOut = (floor($pctOut) == $pctOut) ? number_format($pctOut, 0) . '%' : number_format($pctOut, 2) . '%';
                         ?>
                             <tr>
                                 <td class="text-center fw-bold"><?= $noD++; ?></td>
                                 <td class="text-center fw-bold"><?= $tglFmt; ?></td>
                                 <td class="text-end fw-bold">Rp <?= number_format($nOmzet, 0, ',', '.'); ?></td>
-                                <td class="text-center fw-bold text-secondary"><?= number_format($item['persentase_potongan'], 2); ?>%</td>
+                                <td class="text-center fw-bold text-secondary" style="font-size: 8px; line-height: 1.15; padding: 4px 2px;">
+                                    <?= number_format($pctPot, 2); ?>%
+                                    <div style="font-size: 6.5px; color: #475569; font-weight: normal; margin-top: 1.5px;">
+                                        (Inv <?= $fmtInv; ?> : Out <?= $fmtOut; ?>)
+                                    </div>
+                                </td>
                                 <td class="text-end text-danger fw-bold">Rp <?= number_format($nPot, 0, ',', '.'); ?></td>
                                 <td class="text-end text-success fw-bold">Rp <?= number_format($nInv, 0, ',', '.'); ?></td>
                                 <td class="text-end text-warning fw-bold">Rp <?= number_format($nOut, 0, ',', '.'); ?></td>
