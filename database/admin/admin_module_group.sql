@@ -39,7 +39,7 @@ CREATE TABLE `admin_module_group` (
 
 LOCK TABLES `admin_module_group` WRITE;
 /*!40000 ALTER TABLE `admin_module_group` DISABLE KEYS */;
-INSERT INTO `admin_module_group` VALUES (1,1,'Dashboard','single','ti-home sidemenu-icon menu-icon',1),(2,3,'Investor','single','fa fa-handshake-o sidemenu-icon menu-icon',1),(3,8,'Admin','single','fa fa-user-secret sidemenu-icon menu-icon',1),(4,9,'Developer','dropdown','ti-panel sidemenu-icon menu-icon',1),(5,4,'Outlet','dropdown','fa fa-building sidemenu-icon menu-icon',1),(12,2,'Master','dropdown','fa fa-user-circle sidemenu-icon menu-icon',1),(19,6,'Pengaturan','dropdown','fa fa-cog sidemenu-icon menu-icon',1),(20,99,'Password','single','fa fa-lock sidemenu-icon menu-icon',1);
+INSERT INTO `admin_module_group` VALUES (1,1,'Dashboard','single','fe fe-home',1),(2,2,'Investor','single','fe fe-users',1),(3,3,'Admin','single','fe fe-user-check',1),(4,4,'Developer','dropdown','fe fe-code',1),(5,5,'Outlet','dropdown','fe fe-shopping-bag',1),(12,6,'Master','dropdown','fe fe-briefcase',1),(19,7,'Pengaturan','dropdown','fe fe-settings',1),(20,8,'Password','single','fe fe-lock',1);
 /*!40000 ALTER TABLE `admin_module_group` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-18 10:25:38
+-- Dump completed on 2026-08-18 10:29:24
