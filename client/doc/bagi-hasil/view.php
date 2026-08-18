@@ -85,6 +85,7 @@ $totHakOutlet = 0;
 $hasAnyLastDayDone = false;
 
 // Fetch distinct years available in database
+$availableYears = [];
 $whereYearSql = ($role === 'investor') ? "o.id_investor = {$investorId}" : "o.id_outlet = {$targetOutletId}";
 $resYears = $db->query("SELECT DISTINCT YEAR(l.tanggal_omzet) as y_periode FROM laporan_omzet l JOIN outlet o ON l.id_outlet = o.id_outlet WHERE {$whereYearSql} ORDER BY y_periode DESC");
 if ($resYears) {
@@ -115,7 +116,6 @@ if ($selectedOutletId > 0 && $role === 'investor') {
 $periodeParts = [];
 
 if (!empty($selectedTglMulai) && !empty($selectedTglSelesai)) {
-    $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeMulai = $db->real_escape_string($selectedTglMulai);
     $safeSelesai = $db->real_escape_string($selectedTglSelesai);
     $whereConditions[] = "l.tanggal_omzet BETWEEN '{$safeMulai}' AND '{$safeSelesai}'";
