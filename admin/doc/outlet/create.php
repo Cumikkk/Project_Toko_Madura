@@ -76,7 +76,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
                                         <?php while ($inv = $investorList->fetch_assoc()) : ?>
                                             <option value="<?= $inv['id_investor']; ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($inv['nama_lengkap']); ?>
+                                                <?= htmlspecialchars($inv['nama_lengkap']); ?> (@<?= htmlspecialchars($inv['username']); ?>)
                                             </option>
                                         <?php endwhile; ?>
                                     <?php endif; ?>
@@ -283,7 +283,12 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
 
     $(document).ready(function() {
         if ($.fn.select2) {
-            $('#id_investor').select2({ width: '100%' });
+            $('#id_investor').select2({ 
+                width: '100%',
+                placeholder: '-- Pilih Investor --',
+                allowClear: false,
+                language: { noResults: function() { return 'Tidak ada investor ditemukan'; } }
+            });
         }
 
         const adminUrl = "<?= SystemInfo::app('ADMIN_URL') ?>";
@@ -314,7 +319,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
             }, 120);
         }
 
-        $('.wilayah-select').on('select2:close', function() {
+        $('.wilayah-select, #id_investor').on('select2:close', function() {
             let $container = $(this).next('.select2-container');
             $container.find('.select2-selection').blur();
         });
@@ -333,6 +338,15 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         initWilayahSelect2('#kabupaten');
         initWilayahSelect2('#kecamatan');
         initWilayahSelect2('#id_wilayah');
+
+        // Auto focus awal saat form dimuat
+        setTimeout(() => {
+            if (!isEdit) {
+                openNextSelect2('#id_investor');
+            } else {
+                $('#nama_outlet').focus();
+            }
+        }, 150);
 
         // Load Provinsi
         function loadProvinsi() {
