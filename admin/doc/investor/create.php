@@ -151,6 +151,7 @@ $masterList = Master::getAllMasterOptions();
                                     </select>
                                 </div>
                             </div>
+                            <small id="note_wilayah_master" class="text-muted d-block mt-1" style="font-size: 11.5px;"></small>
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="form-group">

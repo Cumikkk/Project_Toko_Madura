@@ -18,7 +18,7 @@ if (!$adminPermissionCore->hasPermission($authorizedPermission, $requiredPerm) &
     exit;
 }
 
-$result = Outlet::saveOutlet($data, $user['ADM_ID'] ?? 1);
+$result = Outlet::saveOutlet($data, $user['ADM_ID'] ?? 1, $_FILES ?? []);
 if ($result['success']) {
     $result['data'] = ['redirect' => \Config\Core\SystemInfo::app('ADMIN_URL') . "/outlet/view"];
 }

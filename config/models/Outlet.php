@@ -123,10 +123,14 @@ class Outlet {
         $db = Database::connect();
         $id = intval($idOutlet);
         $sql = "
-            SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_outlet, u.id_wilayah
+            SELECT o.*, u.nama_lengkap as kasir_nama, u.username as kasir_username, u.no_hp as kasir_no_hp, 
+                   mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_outlet, u.id_wilayah,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor
             FROM outlet o
             JOIN users u ON (u.id_users = o.id_users)
             LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
+            LEFT JOIN investor inv ON (inv.id_investor = o.id_investor)
+            LEFT JOIN users u_inv ON (u_inv.id_users = inv.id_users)
             WHERE o.id_outlet = {$id}
             LIMIT 1
         ";
@@ -137,7 +141,7 @@ class Outlet {
     // ==============================================
     // WRITE (SAVE / DELETE / UPDATE) METHODS
     // ==============================================
-    public static function saveOutlet($data, $currentUserId = 1) {
+    public static function saveOutlet($data, $currentUserId = 1, $files = []) {
         $db = Database::connect();
         $idOutlet = intval($data['id_outlet'] ?? 0);
         $isEdit   = ($idOutlet > 0);
@@ -189,6 +193,33 @@ class Outlet {
             }
         }
 
+        // Proses unggah berkas bukti pembayaran / kuitansi (opsional)
+        $buktiPath = null;
+        if (isset($files['bukti_pembayaran']) && $files['bukti_pembayaran']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath   = $files['bukti_pembayaran']['tmp_name'];
+            $fileName      = $files['bukti_pembayaran']['name'];
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            if (in_array($fileExtension, $allowedExtensions)) {
+                $targetDir = defined('CRM_ROOT') ? CRM_ROOT . '/uploads/bukti_pembayaran/' : dirname(dirname(__DIR__)) . '/admin/uploads/bukti_pembayaran/';
+                if (!is_dir($targetDir)) {
+                    @mkdir($targetDir, 0777, true);
+                }
+
+                $newFileName = 'bukti_manual_admin_' . time() . '_' . rand(1000, 9999) . '.' . $fileExtension;
+                $destPath = $targetDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $destPath)) {
+                    $buktiPath = 'uploads/bukti_pembayaran/' . $newFileName;
+                }
+            }
+        }
+
+        // Ambil nominal biaya langganan investor untuk catatan transfer
+        $resInv = $db->query("SELECT biaya_langganan_outlet FROM investor WHERE id_investor = {$id_investor} LIMIT 1");
+        $nominalLangganan = ($resInv && $rowInv = $resInv->fetch_assoc()) ? (int)($rowInv['biaya_langganan_outlet'] ?? 100000) : 100000;
+
         $namaSafe      = $db->real_escape_string($nama_outlet);
         $wilayahVal    = $id_wilayah ? $id_wilayah : "NULL";
         $alamatSafe    = $db->real_escape_string($alamat_outlet);
@@ -199,7 +230,7 @@ class Outlet {
         $db->begin_transaction();
         try {
             if ($isEdit) {
-                $resOut = $db->query("SELECT id_outlet, id_users FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
+                $resOut = $db->query("SELECT id_outlet, id_users, bukti_pembayaran FROM outlet WHERE id_outlet = {$idOutlet} LIMIT 1");
                 if (!$resOut || $resOut->num_rows == 0) {
                     throw new Exception("Data cabang toko tidak ditemukan");
                 }
@@ -226,7 +257,24 @@ class Outlet {
                     $tglClause = ", tgl_jatuh_tempo = '{$tglSafe}' {$statusUpdate}";
                 }
 
-                $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, persentase_potongan = {$persentase_potongan}, persentase_hak_investor = {$persentase_hak_investor} {$tglClause} WHERE id_outlet = {$idOutlet}");
+                $buktiClause = "";
+                if (!empty($buktiPath)) {
+                    // Hapus berkas lama jika ada berkas baru diunggah
+                    $oldFile = trim($outletRow['bukti_pembayaran'] ?? '');
+                    if (!empty($oldFile) && $oldFile !== $buktiPath) {
+                        $pathAdmin = (defined('CRM_ROOT') ? CRM_ROOT : dirname(dirname(__DIR__)) . '/admin') . '/' . $oldFile;
+                        $pathClient = (defined('WEB_ROOT') ? WEB_ROOT : dirname(dirname(__DIR__)) . '/client') . '/' . $oldFile;
+                        if (file_exists($pathAdmin)) @unlink($pathAdmin);
+                        if (file_exists($pathClient)) @unlink($pathClient);
+                    }
+                    $buktiSafe = $db->real_escape_string($buktiPath);
+                    $buktiClause = ", bukti_pembayaran = '{$buktiSafe}'";
+
+                    // Update bukti pada riwayat terakhir
+                    $db->query("UPDATE riwayat_langganan SET bukti_pembayaran = '{$buktiSafe}' WHERE id_outlet = {$idOutlet} ORDER BY id_riwayat DESC LIMIT 1");
+                }
+
+                $db->query("UPDATE outlet SET nama_outlet = '{$namaSafe}', id_investor = {$id_investor}, persentase_potongan = {$persentase_potongan}, persentase_hak_investor = {$persentase_hak_investor} {$tglClause} {$buktiClause} WHERE id_outlet = {$idOutlet}");
 
                 $db->commit();
                 return ['success' => true, 'message' => "Berhasil memperbarui data outlet dan akun kasir: {$nama_outlet}"];
@@ -245,7 +293,9 @@ class Outlet {
                 $newKasirId = $db->insert_id;
 
                 $tglJatuhTempoVal = !empty($tgl_jatuh_tempo) ? "'{$db->real_escape_string($tgl_jatuh_tempo)}'" : "DATE_ADD(NOW(), INTERVAL 1 MONTH)";
-                $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, persentase_potongan, persentase_hak_investor, status, tgl_request, tgl_disetujui, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', {$persentase_potongan}, {$persentase_hak_investor}, 'active', NOW(), NOW(), {$tglJatuhTempoVal})");
+                $buktiDbVal = !empty($buktiPath) ? "'{$db->real_escape_string($buktiPath)}'" : "NULL";
+                
+                $db->query("INSERT INTO outlet (id_users, id_investor, nama_outlet, persentase_potongan, persentase_hak_investor, nominal_transfer, bukti_pembayaran, status, tgl_request, tgl_disetujui, tgl_jatuh_tempo) VALUES ({$newKasirId}, {$id_investor}, '{$namaSafe}', {$persentase_potongan}, {$persentase_hak_investor}, {$nominalLangganan}, {$buktiDbVal}, 'active', NOW(), NOW(), {$tglJatuhTempoVal})");
 
                 if ($db->affected_rows < 1) {
                     throw new Exception("Gagal mendaftarkan cabang outlet baru: " . $db->error);
@@ -253,7 +303,8 @@ class Outlet {
                 $newOutletId = $db->insert_id;
 
                 // Catat riwayat pendaftaran awal
-                $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request, tgl_disetujui) VALUES ({$newOutletId}, 'baru', 100000, '', 'active', NOW(), NOW())");
+                $escapedBukti = !empty($buktiPath) ? $db->real_escape_string($buktiPath) : '';
+                $db->query("INSERT INTO riwayat_langganan (id_outlet, tipe_request, nominal_transfer, bukti_pembayaran, status, tgl_request, tgl_disetujui) VALUES ({$newOutletId}, 'baru', {$nominalLangganan}, '{$escapedBukti}', 'active', NOW(), NOW())");
 
                 $db->commit();
                 return ['success' => true, 'message' => "Berhasil mendaftarkan toko cabang baru beserta akun kasir: {$nama_outlet}"];

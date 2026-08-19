@@ -57,10 +57,10 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         <input type="hidden" name="id_users_kasir" value="<?= $outletData['id_users']; ?>">
     <?php endif; ?>
 
-    <div class="row">
-        <!-- KIRI: INFORMASI OUTLET & FINANSIAL -->
+    <div class="row align-items-start">
+        <!-- KIRI: INFORMASI OUTLET & KEUANGAN -->
         <div class="col-lg-6 mb-3">
-            <div class="card custom-card h-100 mb-0">
+            <div class="card custom-card mb-0">
                 <div class="card-header">
                     <div class="d-flex justify-content-between mb-2">
                         <h5 class="card-title">Informasi Outlet</h5>
@@ -68,7 +68,8 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                 </div>
                 <div class="card-body">
                     <div class="row">
-<div class="col-md-12 mb-3">
+                        <!-- 1. Investor -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="id_investor" class="form-label fw-bold">Investor <span class="text-danger">*</span></label>
                                 <select class="form-control" id="id_investor" name="id_investor" required>
@@ -87,7 +88,9 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 <small class="text-muted">Pilih investor yang menaungi outlet ini.</small>
                             </div>
                         </div>
-<div class="col-md-12 mb-3">
+
+                        <!-- 2. Nama Outlet -->
+                        <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="nama_outlet" class="form-label fw-bold">Nama Outlet <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nama_outlet" name="nama_outlet"
@@ -95,7 +98,9 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     value="<?= htmlspecialchars($outletData['nama_outlet'] ?? ''); ?>" required>
                             </div>
                         </div>
-<div class="col-md-12 mb-3">
+
+                        <!-- 3. Wilayah / Desa -->
+                        <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold">Wilayah / Desa <span class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-3 mb-2">
@@ -126,7 +131,8 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                             </div>
                             <small id="note_wilayah_investor" class="text-muted d-block mt-1" style="font-size: 11.5px;"></small>
                         </div>
-<!-- 6. ALAMAT LENGKAP -->
+
+                        <!-- 4. Alamat Lengkap -->
                         <div class="col-md-12 mb-3">
                             <div class="form-group">
                                 <label for="alamat_outlet" class="form-label fw-bold">Alamat Lengkap Outlet <span class="text-danger">*</span></label>
@@ -134,7 +140,8 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     placeholder="Contoh: Jl. Raya Waru No. 123, RT 02 / RW 05, Sidoarjo"><?= htmlspecialchars($outletData['alamat_outlet'] ?? ''); ?></textarea>
                             </div>
                         </div>
-<?php if ($isExpiredOrInactive) : ?>
+
+                        <?php if ($isExpiredOrInactive) : ?>
                             <!-- 5. TANGGAL JATUH TEMPO (PERPANJANGAN MASA LANGGANAN) -->
                             <div class="col-md-12 mb-3">
                                 <div class="form-group">
@@ -145,7 +152,9 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 </div>
                             </div>
                         <?php endif; ?>
-<?php
+
+                        <!-- 6. SKEMA BAGI HASIL -->
+                        <?php
                         $defaultInvestor = (float)($outletData['persentase_hak_investor'] ?? 50.00);
                         $defaultOutlet = 100.00 - $defaultInvestor;
                         ?>
@@ -215,14 +224,39 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 <small class="text-muted" style="font-size: 11px;">Hak outlet.</small>
                             </div>
                         </div>
+
+                        <!-- 7. BUKTI PEMBAYARAN -->
+                        <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                                <label for="bukti_pembayaran" class="form-label fw-bold">Bukti Pembayaran / Kuitansi (Opsional)</label>
+                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran" accept="image/*,.pdf">
+                                <small class="text-muted">Upload foto struk/kuitansi pembayaran manual atau transfer (Format: JPG, PNG, WEBP, PDF, Maks 5MB).</small>
+                                <?php if (!empty($outletData['bukti_pembayaran'])) : ?>
+                                    <?php $fileExt = strtolower(pathinfo($outletData['bukti_pembayaran'], PATHINFO_EXTENSION)); ?>
+                                    <div class="mt-2" id="existing-bukti-box">
+                                        <span class="text-muted fs-13">Bukti saat ini: </span>
+                                        <?php if ($fileExt === 'pdf') : ?>
+                                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/image-proxy.php?file=<?= urlencode($outletData['bukti_pembayaran']) ?>" target="_blank" class="btn btn-xs btn-outline-primary ms-1">
+                                                <i class="fas fa-file-pdf me-1"></i> Lihat PDF
+                                            </a>
+                                        <?php else : ?>
+                                            <button type="button" class="btn btn-xs btn-outline-primary ms-1" 
+                                                    onclick="previewBuktiOutlet('<?= htmlspecialchars($outletData['bukti_pembayaran'], ENT_QUOTES) ?>', '<?= htmlspecialchars($outletData['nama_outlet'] ?? 'Outlet', ENT_QUOTES) ?>', '<?= htmlspecialchars($outletData['nama_investor'] ?? 'Investor', ENT_QUOTES) ?>')">
+                                                <i class="fas fa-image me-1"></i> Lihat Bukti
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- KANAN: AKUN AKSES PENGELOLA OUTLET -->
+        <!-- KANAN: AKUN PENGELOLA OUTLET (PENDEK & MEMUAT TOMBOL AKSI) -->
         <div class="col-lg-6 mb-3">
-            <div class="card custom-card h-100 mb-0">
+            <div class="card custom-card mb-0">
                 <div class="card-header">
                     <div class="d-flex justify-content-between mb-2">
                         <h5 class="card-title">Akun Pengelola Outlet</h5>
@@ -263,17 +297,17 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                 <small class="text-muted d-block mt-1">Password minimal 8 karakter, kombinasi huruf besar (A-Z), huruf kecil (a-z), dan angka (0-9).</small>
                             </div>
                         </div>
+
+                        <!-- TOMBOL AKSI MENYATU DI KARTU KANAN -->
+                        <div class="col-12 mt-2 pt-3 border-top d-flex justify-content-end gap-2">
+                            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary px-4">Batal</a>
+                            <button type="submit" class="btn btn-primary px-4" data-original-text="Submit">
+                                <i class="fas fa-save me-1"></i> <?= $isEdit ? "Simpan Perubahan" : "Simpan Outlet"; ?>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- TOMBOL AKSI -->
-        <div class="col-12 mt-3 d-flex justify-content-end gap-2 mb-4">
-            <a href="<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view" class="btn btn-secondary px-4">Batal</a>
-            <button type="submit" class="btn btn-primary px-4" data-original-text="Submit">
-                <i class="fas fa-save me-1"></i> <?= $isEdit ? "Simpan Perubahan" : "Simpan Outlet"; ?>
-            </button>
         </div>
     </div>
 </form>
@@ -538,9 +572,22 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#alamat_outlet').on('keydown', function(e) {
             if (e.which === 13 && !e.shiftKey) {
                 e.preventDefault();
-                $('#persentase_potongan').focus();
+                if ($('#tgl_jatuh_tempo').length) {
+                    $('#tgl_jatuh_tempo').focus();
+                } else {
+                    $('#persentase_potongan').focus();
+                }
             }
         });
+
+        if ($('#tgl_jatuh_tempo').length) {
+            $('#tgl_jatuh_tempo').on('keydown', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#persentase_potongan').focus();
+                }
+            });
+        }
 
         $('#persentase_potongan').on('keydown', function(e) {
             if (e.which === 13) {
@@ -559,22 +606,16 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#persen_bagian_outlet').on('keydown', function(e) {
             if (e.which === 13) {
                 e.preventDefault();
-                if ($('#tgl_jatuh_tempo').length) {
-                    $('#tgl_jatuh_tempo').focus();
-                } else {
-                    $('#kasir_nama').focus();
-                }
+                $('#bukti_pembayaran').focus();
             }
         });
 
-        if ($('#tgl_jatuh_tempo').length) {
-            $('#tgl_jatuh_tempo').on('keydown', function(e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-                    $('#kasir_nama').focus();
-                }
-            });
-        }
+        $('#bukti_pembayaran').on('keydown', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $('#kasir_nama').focus();
+            }
+        });
 
         $('#kasir_nama').on('keydown', function(e) {
             if (e.which === 13) {
@@ -643,45 +684,138 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
             window.balanceAdminOutletSplit('outlet');
         };
 
+        // Toast Notification saat file bukti transfer dipilih
+        $('#bukti_pembayaran').on('change', function() {
+            let file = this.files && this.files[0] ? this.files[0] : null;
+            if (file) {
+                Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                }).fire({
+                    icon: 'success',
+                    title: 'File Berkas Dipilih',
+                    text: file.name
+                });
+            }
+        });
+
         $('#form-create-outlet').on('submit', function(el) {
             el.preventDefault();
-            let button = $(this).find('button[type="submit"]'),
-                data   = $(this).serialize();
+            let button   = $(this).find('button[type="submit"]'),
+                formData = new FormData(this);
 
             button.addClass('loading').prop('disabled', true);
-            $.post("<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/create", data, (resp) => {
-                button.removeClass('loading').prop('disabled', false);
-                if (resp.success) {
-                    let isEdit = $('input[name="id_outlet"]').val() ? true : false;
-                    let defaultSuccessMsg = isEdit ? 'Data outlet berhasil diperbarui.' : 'Data outlet berhasil ditambahkan.';
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: resp.message || defaultSuccessMsg,
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.href = resp.data?.redirect || "<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view";
-                    });
-                } else {
+            $.ajax({
+                url: "<?= SystemInfo::app('ADMIN_URL') ?>/ajax/post/outlet/create",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: (resp) => {
+                    button.removeClass('loading').prop('disabled', false);
+                    if (resp.success) {
+                        let isEdit = $('input[name="id_outlet"]').val() ? true : false;
+                        let defaultSuccessMsg = isEdit ? 'Data outlet berhasil diperbarui.' : 'Data outlet berhasil ditambahkan.';
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: resp.message || defaultSuccessMsg,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.href = resp.data?.redirect || "<?= SystemInfo::app('ADMIN_URL') ?>/outlet/view";
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Perhatian!',
+                            text: resp.message || 'Gagal menyimpan data outlet.'
+                        });
+                    }
+                },
+                error: (xhr) => {
+                    button.removeClass('loading').prop('disabled', false);
+                    let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
+                    if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
                     Swal.fire({
                         icon: 'error',
                         title: 'Perhatian!',
-                        text: resp.message || 'Gagal menyimpan data outlet.'
+                        text: errorMsg
                     });
                 }
-            }, 'json').fail(function(xhr) {
-                button.removeClass('loading').prop('disabled', false);
-                let errorMsg = 'Terjadi kendala pada server (atau sesi Anda habis). Silakan coba lagi.';
-                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Perhatian!',
-                    text: errorMsg
-                });
             });
         });
     });
+</script>
+<style>
+/* Custom Symmetrical Styling for File Input */
+#bukti_pembayaran.form-control {
+    padding: 0.375rem 0.75rem !important;
+    height: 38px !important;
+    line-height: 1.5 !important;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+}
+#bukti_pembayaran.form-control::file-selector-button {
+    height: 38px;
+    margin: -0.375rem 0.75rem -0.375rem -0.75rem;
+    border: none;
+    border-right: 1px solid var(--bs-border-color, #ced4da);
+    background-color: #e9ecef;
+    padding: 0 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+</style>
+
+<script type="text/javascript">
+function previewBuktiOutlet(filePath, namaOutlet, namaInvestor) {
+    if (!filePath) {
+        Swal.fire('Informasi', 'Bukti pembayaran belum diunggah.', 'info');
+        return;
+    }
+    var adminUrl = '<?= SystemInfo::app("ADMIN_URL") ?>';
+    var proxyUrl = adminUrl + '/image-proxy.php?file=' + encodeURIComponent(filePath);
+    var ext = filePath.split('.').pop().toLowerCase();
+    if (ext === 'pdf') {
+        window.open(proxyUrl, '_blank');
+        return;
+    }
+
+    var infoHtml = '<div class="text-start bg-light p-3 rounded mb-3" style="font-size:13.5px; border:1px solid #e9ecef;">'
+        + '<div class="d-flex align-items-center mb-2">'
+        + '  <i class="fa fa-building text-primary me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nama Outlet:</span>'
+        + '  <span class="text-dark fw-semibold">' + namaOutlet + '</span>'
+        + '</div>'
+        + '<div class="d-flex align-items-center">'
+        + '  <i class="fa fa-handshake-o text-success me-2" style="width:20px; text-align:center;"></i>'
+        + '  <span style="min-width:140px;" class="fw-bold">Nama Investor:</span>'
+        + '  <span class="text-dark">' + (namaInvestor || '-') + '</span>'
+        + '</div>'
+        + '</div>';
+
+    Swal.fire({
+        title: '<i class="fa fa-file-text-o me-2 text-info"></i>Bukti Pembayaran Pendaftaran Outlet',
+        html: infoHtml
+            + '<img src="' + proxyUrl + '" '
+            + 'style="max-width:100%;max-height:60vh;border-radius:8px;border:1px solid #dee2e6;object-fit:contain;" '
+            + 'onerror="this.outerHTML=\'<p class=\\\'text-danger mt-2\\\'><i class=\\\'fa fa-exclamation-triangle me-1\\\'></i> Gambar gagal dimuat</p>\'">',
+        showCloseButton: true,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+        heightAuto: false,
+        width: 640
+    });
+}
 </script>
