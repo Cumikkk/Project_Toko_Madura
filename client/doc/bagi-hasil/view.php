@@ -278,6 +278,11 @@ $countOutlet = count($rows);
     border-color: rgba(255, 193, 7, 0.3);
 }
 
+.box-stat-kulakan {
+    background: rgba(13, 110, 253, 0.08);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
 .card-stat-title-full {
     font-size: 12px;
     line-height: 1.35;
@@ -398,13 +403,13 @@ $countOutlet = count($rows);
         </div>
     </div>
 
-    <!-- 4 Summary Metric Cards (Mobile Readable - No Truncate) -->
-    <div class="row g-2 g-md-3 mb-4">
+    <!-- 5 Summary Metric Cards (Mobile Readable - No Truncate) -->
+    <div class="row g-2 g-md-3 mb-4 row-cols-2 row-cols-md-3 row-cols-xl-5">
         <!-- 1. Total Omzet Reported -->
-        <div class="col-6 col-xl-3">
+        <div class="col">
             <div class="box-stat-bagi-hasil box-stat-omzet h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-primary text-uppercase card-stat-title-full">Total Omzet Toko (100%)</span>
+                    <span class="text-primary text-uppercase card-stat-title-full">Total Omzet (100%)</span>
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-coins"></i>
                     </div>
@@ -417,10 +422,10 @@ $countOutlet = count($rows);
         </div>
 
         <!-- 2. Potongan Dynamic -->
-        <div class="col-6 col-xl-3">
+        <div class="col">
             <div class="box-stat-bagi-hasil box-stat-potongan h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                    <span class="text-danger text-uppercase card-stat-title-full">Potongan Outlet</span>
+                    <span class="text-danger text-uppercase card-stat-title-full">Potongan Skema</span>
                     <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
                         <i class="fa-solid fa-percent"></i>
                     </div>
@@ -441,7 +446,7 @@ $countOutlet = count($rows);
         </div>
 
         <!-- 3. Hak Investor -->
-        <div class="col-6 col-xl-3">
+        <div class="col">
             <div class="box-stat-bagi-hasil box-stat-investor h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <span class="text-success text-uppercase card-stat-title-full">Hak Investor</span>
@@ -465,7 +470,7 @@ $countOutlet = count($rows);
         </div>
 
         <!-- 4. Hak Outlet -->
-        <div class="col-6 col-xl-3">
+        <div class="col">
             <div class="box-stat-bagi-hasil box-stat-outlet h-100 d-flex flex-column justify-content-between">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <span class="text-body-emphasis text-uppercase card-stat-title-full">Hak Outlet</span>
@@ -487,6 +492,30 @@ $countOutlet = count($rows);
                 </div>
             </div>
         </div>
+
+        <!-- 5. Modal Kulakan Sisa Omzet -->
+        <div class="col">
+            <div class="box-stat-bagi-hasil box-stat-kulakan h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                    <span class="text-primary text-uppercase card-stat-title-full">Modal Kulakan</span>
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0 stat-icon-circle-sm">
+                        <i class="fa-solid fa-cart-flatbed-boxes"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="fs-6 fs-md-4 fw-extrabold text-primary mb-1">
+                        <?php if ($hasAnyLastDayDone || $selectedBulan === 0) : ?>
+                            Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?>
+                        <?php else : ?>
+                            -
+                        <?php endif; ?>
+                    </div>
+                    <small class="text-body-secondary micro-text d-block">
+                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Sisa omzet belanja stok' : 'Dihitung tgl akhir bulan'; ?>
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Breakdown Table Per Outlet (Sleek Theme-Adaptive Card Container) -->
@@ -496,7 +525,7 @@ $countOutlet = count($rows);
                 <h5 class="fw-bold text-body-emphasis mb-0 fs-6">
                     <i class="fa-solid fa-list-check me-2 text-danger"></i>Rincian Pembagian Hak Per Outlet (<?= htmlspecialchars($periodeLabelStr); ?>)
                 </h5>
-                <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan investor, serta hak investor &amp; outlet</p>
+                <p class="text-body-secondary small mb-0">Rincian omzet, nominal potongan investor, modal kulakan, serta hak investor &amp; outlet</p>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <!-- Tombol Filter Utama -->
@@ -520,6 +549,7 @@ $countOutlet = count($rows);
                             <th class="py-3 px-3 text-center fw-bold text-danger" style="text-align: center !important;">Potongan Outlet</th>
                             <th class="py-3 px-3 text-center fw-bold text-success" style="text-align: center !important;">Hak Investor</th>
                             <th class="py-3 px-3 text-center fw-bold text-warning" style="text-align: center !important;">Hak Outlet</th>
+                            <th class="py-3 px-3 text-center fw-bold text-primary" style="text-align: center !important;">Modal Kulakan</th>
                             <th class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Bersih Outlet Total</th>
                             <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px; text-align: center !important;">Aksi Detail</th>
                         </tr>
@@ -557,6 +587,13 @@ $countOutlet = count($rows);
                                             <span class="badge bg-secondary-subtle text-secondary fw-semibold">Rp 0 (Belum Aktif)</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="py-3 px-3 text-center fw-bold text-primary" style="text-align: center !important;">
+                                        <?php if ($r['is_last_day_done']) : ?>
+                                            <span>Rp <?= number_format($r['total_omzet'] - $r['potongan_10'], 0, ',', '.'); ?></span>
+                                        <?php else : ?>
+                                            <span>Rp <?= number_format($r['total_omzet'], 0, ',', '.'); ?></span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
                                     <td class="py-3 px-3 text-center pe-3" style="text-align: center !important;">
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold btn-detail-harian-outlet" data-id="<?= $r['id_outlet']; ?>" data-nama="<?= htmlspecialchars($r['nama_outlet']); ?>">
@@ -567,7 +604,7 @@ $countOutlet = count($rows);
                             <?php endforeach; ?>
                         <?php else : ?>
                             <tr>
-                                <td colspan="8" class="text-center text-body-secondary py-5">
+                                <td colspan="9" class="text-center text-body-secondary py-5">
                                     <div class="py-3">
                                         <i class="fa-light fa-vault text-body-secondary mb-3" style="font-size: 50px; opacity: 0.5;"></i>
                                         <h5 class="fw-bold text-body-secondary mb-1">Belum Ada Data Outlet / Omzet</h5>
@@ -593,6 +630,9 @@ $countOutlet = count($rows);
                                 </td>
                                 <td class="py-3 px-3 text-center text-warning fs-5" style="text-align: center !important;">
                                     <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totHakOutlet, 0, ',', '.') : '-'; ?>
+                                </td>
+                                <td class="py-3 px-3 text-center text-primary fs-6" style="text-align: center !important;">
+                                    <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Rp ' . number_format($totOmzet - $totPotongan10, 0, ',', '.') : 'Rp ' . number_format($totOmzet, 0, ',', '.'); ?>
                                 </td>
                                 <td class="py-3 px-3 text-center text-body-emphasis fs-6" style="text-align: center !important;">Rp <?= number_format($totOmzet - $totHakInvestor, 0, ',', '.'); ?></td>
                                 <td class="py-3 px-3 text-center text-body-secondary pe-3" style="text-align: center !important;">-</td>
@@ -735,7 +775,7 @@ $countOutlet = count($rows);
 </style>
 
 <div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 680px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 820px;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel" style="font-size: 14px;">
@@ -755,6 +795,8 @@ $countOutlet = count($rows);
                                 <th class="py-2 text-center text-danger" id="lblModalHeaderPotongan">POTONGAN</th>
                                 <th class="py-2 text-center text-success" id="lblModalHeaderHakInv">HAK INVESTOR</th>
                                 <th class="py-2 text-center text-warning" id="lblModalHeaderHakOut">HAK OUTLET</th>
+                                <th class="py-2 text-center text-primary">MODAL KULAKAN</th>
+                                <th class="py-2 text-center text-body-emphasis">TOTAL DITERIMA</th>
                             </tr>
                         </thead>
                         <tbody class="border-0">
@@ -767,6 +809,8 @@ $countOutlet = count($rows);
                                 <td class="py-2 text-center text-danger fw-extrabold" id="tfootTotPotongan">Rp 0</td>
                                 <td class="py-2 text-center text-success fw-extrabold" id="tfootTotHakInv">Rp 0</td>
                                 <td class="py-2 text-center text-warning fw-extrabold" id="tfootTotHakOut">Rp 0</td>
+                                <td class="py-2 text-center text-primary fw-extrabold" id="tfootTotKulakan">Rp 0</td>
+                                <td class="py-2 text-center text-body-emphasis fw-extrabold" id="tfootTotDiterima">Rp 0</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -816,7 +860,7 @@ $(document).ready(function() {
         $('#tfootModalDetailHarian').addClass('d-none');
         $('#tableModalDetailHarian tbody').html(`
             <tr>
-                <td colspan="6" class="text-center py-4 text-body-secondary">
+                <td colspan="8" class="text-center py-4 text-body-secondary">
                     <i class="fa-solid fa-spinner fa-spin me-2 text-danger fs-5"></i>Memuat rincian omzet harian...
                 </td>
             </tr>
@@ -849,6 +893,8 @@ $(document).ready(function() {
                         $('#lblModalHeaderHakOut').html(res.persen_out === 'Variatif' ? 'Hak Outlet (Variatif)' : `Hak Outlet (${res.persen_out})`);
 
                         res.items.forEach((item, idx) => {
+                            const kulakan = item.omzet - item.potongan_10;
+                            const totalDiterima = kulakan + item.hak_outlet;
                             tbody.append(`
                                 <tr>
                                     <td class="text-center py-1.5 px-2 fw-bold text-body-secondary">${idx + 1}</td>
@@ -868,21 +914,27 @@ $(document).ready(function() {
                                         Rp ${fmt.format(item.hak_outlet)}
                                         <span class="badge bg-warning-subtle text-warning fw-bold ms-1" style="font-size: 10px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.2);">${item.persen_outlet}%</span>
                                     </td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-primary">Rp ${fmt.format(kulakan)}</td>
+                                    <td class="text-center py-1.5 px-2 fw-bold text-body-emphasis">Rp ${fmt.format(totalDiterima)}</td>
                                 </tr>
                             `);
                         });
 
                         // Set Foot Values
+                        const totKulakan = res.summary.total_omzet - res.summary.total_potongan;
+                        const totDiterima = totKulakan + res.summary.total_hak_outlet;
                         $('#tfootTotOmzet').text('Rp ' + fmt.format(res.summary.total_omzet));
                         $('#tfootTotPotongan').text('Rp ' + fmt.format(res.summary.total_potongan));
                         $('#tfootTotHakInv').text('Rp ' + fmt.format(res.summary.total_hak_investor));
                         $('#tfootTotHakOut').text('Rp ' + fmt.format(res.summary.total_hak_outlet));
+                        $('#tfootTotKulakan').text('Rp ' + fmt.format(totKulakan));
+                        $('#tfootTotDiterima').text('Rp ' + fmt.format(totDiterima));
                         $('#tfootModalDetailHarian').removeClass('d-none');
                     } else {
                         $('#tfootModalDetailHarian').addClass('d-none');
                         tbody.html(`
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-body-secondary">
+                                <td colspan="8" class="text-center py-4 text-body-secondary">
                                     Belum ada catatan omzet harian pada periode ini.
                                 </td>
                             </tr>
@@ -892,8 +944,8 @@ $(document).ready(function() {
                     $('#tfootModalDetailHarian').addClass('d-none');
                     $('#tableModalDetailHarian tbody').html(`
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-danger fw-semibold">
-                                ${res.message}
+                            <td colspan="8" class="text-center py-4 text-danger fw-semibold">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i>${res.message || 'Gagal memuat rincian.'}
                             </td>
                         </tr>
                     `);
@@ -903,8 +955,8 @@ $(document).ready(function() {
                 $('#tfootModalDetailHarian').addClass('d-none');
                 $('#tableModalDetailHarian tbody').html(`
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-danger fw-semibold">
-                            Terjadi kesalahan saat memuat data rincian harian.
+                        <td colspan="8" class="text-center py-4 text-danger fw-semibold">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Terjadi kendala jaringan saat memuat data.
                         </td>
                     </tr>
                 `);

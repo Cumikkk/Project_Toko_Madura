@@ -455,7 +455,7 @@ ob_start();
             <td style="width: 49%; vertical-align: top; padding: 0;">
                 <div class="balance-box">
                     <div class="balance-box-header aktiva">
-                        A. SISI AKTIVA (ARUS OMZET &amp; MODAL KULAKAN)
+                        A. SISI AKTIVA (ARUS OMZET &amp; MODAL BELANJA)
                     </div>
                     <table class="balance-row-table">
                         <tr>
@@ -467,7 +467,7 @@ ob_start();
                             <td style="text-align: right; font-weight: bold; color: #dc2626;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f8fafc; font-weight: bold;">
-                            <td style="color: #0f172a;">MODAL KULAKAN TOKO (SISA OMZET)</td>
+                            <td style="color: #0f172a;">MODAL BELANJA</td>
                             <td style="text-align: right; color: #0d6efd; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
@@ -512,7 +512,7 @@ ob_start();
                 <th class="text-end" style="width: 12%;">POTONGAN OMZET</th>
                 <th class="text-end" style="width: 12%;">HAK INVESTOR</th>
                 <th class="text-end" style="width: 12%;">HAK OUTLET</th>
-                <th class="text-end" style="width: 14.5%;">MODAL KULAKAN (SISA OMZET)</th>
+                <th class="text-end" style="width: 14.5%;">MODAL BELANJA</th>
                 <th class="text-end" style="width: 14.5%;">TOTAL DITERIMA TOKO</th>
             </tr>
         </thead>
