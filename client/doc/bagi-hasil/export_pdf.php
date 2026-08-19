@@ -238,11 +238,14 @@ ob_start();
     <meta charset="UTF-8">
     <title>Laporan Keuangan <?= date('d-m-Y'); ?></title>
     <style>
+        @page {
+            margin: 7mm 10mm;
+        }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 9.5px;
+            font-size: 9px;
             color: #1e293b;
-            line-height: 1.35;
+            line-height: 1.3;
             margin: 0;
             padding: 0;
         }
@@ -255,27 +258,27 @@ ob_start();
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             border-bottom: 2px solid #7D0A0A;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         .header-title {
             color: #7D0A0A;
-            font-size: 19px;
+            font-size: 17px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
         }
         .header-subtitle {
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: bold;
             color: #334155;
             text-transform: uppercase;
             margin-top: 2px;
         }
         .header-tagline {
-            font-size: 8.5px;
+            font-size: 8px;
             color: #64748b;
             margin-top: 1px;
         }
@@ -283,32 +286,32 @@ ob_start();
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 5px 8px;
+            padding: 4px 6px;
             vertical-align: top;
-            font-size: 9.5px;
+            font-size: 8.5px;
             word-wrap: break-word;
         }
         .section-title {
-            font-size: 10.5px;
+            font-size: 9.5px;
             font-weight: bold;
             color: #7D0A0A;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 10px;
-            margin-bottom: 6px;
+            margin-top: 6px;
+            margin-bottom: 4px;
             padding-bottom: 2px;
             border-bottom: 1.5px solid #7D0A0A;
         }
         .balance-summary-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
         }
         .balance-box {
             border: 1px solid #cbd5e1;
@@ -317,9 +320,9 @@ ob_start();
             background-color: #ffffff;
         }
         .balance-box-header {
-            padding: 5px 8px;
+            padding: 4px 6px;
             font-weight: bold;
-            font-size: 9.5px;
+            font-size: 8.5px;
             text-transform: uppercase;
             color: #ffffff;
         }
@@ -334,8 +337,8 @@ ob_start();
             border-collapse: collapse;
         }
         .balance-row-table td {
-            padding: 6px 8px;
-            font-size: 9.5px;
+            padding: 4px 6px;
+            font-size: 8.5px;
             border-bottom: 1px solid #f1f5f9;
         }
         
@@ -343,7 +346,7 @@ ob_start();
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
             table-layout: fixed;
         }
         .data-table th {
@@ -351,8 +354,8 @@ ob_start();
             color: #ffffff;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 8.5px;
-            padding: 7px 8px;
+            font-size: 8px;
+            padding: 5px 6px;
             border: 1px solid #7D0A0A;
             vertical-align: middle;
         }
@@ -369,10 +372,10 @@ ob_start();
             text-align: left !important;
         }
         .data-table td {
-            padding: 6px 8px;
+            padding: 4px 6px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
-            font-size: 9px;
+            font-size: 8.5px;
         }
         .data-table tr {
             page-break-inside: avoid;
@@ -678,7 +681,7 @@ ob_start();
     <?php endif; ?>
 
     <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Laporan (Page Break Avoid) -->
-    <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 8px;">
         <tr>
             <td style="width: 60%; vertical-align: top; padding-right: 15px;">
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
