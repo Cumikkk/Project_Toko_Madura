@@ -239,13 +239,13 @@ ob_start();
     <title>Laporan Keuangan <?= date('d-m-Y'); ?></title>
     <style>
         @page {
-            margin: 7mm 10mm;
+            margin: 7mm 9mm;
         }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 9px;
+            font-size: 9.5px;
             color: #1e293b;
-            line-height: 1.3;
+            line-height: 1.35;
             margin: 0;
             padding: 0;
         }
@@ -264,21 +264,21 @@ ob_start();
         }
         .header-title {
             color: #7D0A0A;
-            font-size: 17px;
+            font-size: 19px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
         }
         .header-subtitle {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             color: #334155;
             text-transform: uppercase;
             margin-top: 2px;
         }
         .header-tagline {
-            font-size: 8px;
+            font-size: 8.5px;
             color: #64748b;
             margin-top: 1px;
         }
@@ -288,22 +288,22 @@ ob_start();
             border-collapse: collapse;
             margin-bottom: 8px;
             background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 4px 6px;
+            padding: 4px 8px;
             vertical-align: top;
-            font-size: 8.5px;
+            font-size: 9.5px;
             word-wrap: break-word;
         }
         .section-title {
-            font-size: 9.5px;
+            font-size: 10.5px;
             font-weight: bold;
             color: #7D0A0A;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 6px;
+            margin-top: 7px;
             margin-bottom: 4px;
             padding-bottom: 2px;
             border-bottom: 1.5px solid #7D0A0A;
@@ -320,9 +320,9 @@ ob_start();
             background-color: #ffffff;
         }
         .balance-box-header {
-            padding: 4px 6px;
+            padding: 5px 8px;
             font-weight: bold;
-            font-size: 8.5px;
+            font-size: 9.5px;
             text-transform: uppercase;
             color: #ffffff;
         }
@@ -337,8 +337,8 @@ ob_start();
             border-collapse: collapse;
         }
         .balance-row-table td {
-            padding: 4px 6px;
-            font-size: 8.5px;
+            padding: 5px 8px;
+            font-size: 9.5px;
             border-bottom: 1px solid #f1f5f9;
         }
         
@@ -354,8 +354,8 @@ ob_start();
             color: #ffffff;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 8px;
-            padding: 5px 6px;
+            font-size: 9px;
+            padding: 6px 7px;
             border: 1px solid #7D0A0A;
             vertical-align: middle;
         }
@@ -372,10 +372,10 @@ ob_start();
             text-align: left !important;
         }
         .data-table td {
-            padding: 4px 6px;
+            padding: 5px 7px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
-            font-size: 8.5px;
+            font-size: 9.5px;
         }
         .data-table tr {
             page-break-inside: avoid;
@@ -401,7 +401,7 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN KEUANGAN &amp; RINCIAN HARIAN</div>
+                <div class="header-subtitle">LAPORAN KEUANGAN</div>
                 <div class="header-tagline">Ringkasan Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
