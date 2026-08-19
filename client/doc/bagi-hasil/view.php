@@ -759,6 +759,14 @@ $countOutlet = count($rows);
 <!-- MODAL: DETAIL RINCIAN OMZET HARIAN TOKO (Tgl 1 s.d. Tgl 31) -->
 <!-- ========================================================================= -->
 <style>
+body.modal-open,
+html:has(body.modal-open) {
+    overflow: hidden !important;
+}
+#modalDetailOmzetHarian {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+}
 #tableModalDetailHarian thead th {
     position: sticky;
     top: 0;
@@ -782,8 +790,8 @@ $countOutlet = count($rows);
 }
 </style>
 
-<div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 820px;">
+<div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 1200px; width: 96%;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
                 <h6 class="modal-title fw-bold text-body-emphasis" id="modalDetailOmzetHarianLabel" style="font-size: 14px;">
@@ -793,39 +801,39 @@ $countOutlet = count($rows);
             </div>
             <div class="modal-body p-3">
                 <!-- Table of Daily Omzet -->
-                <div class="table-responsive rounded-3 border" style="max-height: 380px;">
-                    <table class="table table-sm table-hover align-middle mb-0 w-100" id="tableModalDetailHarian" style="font-size: 11px;">
-                        <thead class="table-group-divider bg-body-secondary text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.3px;">
+                <div class="table-responsive rounded-3 border">
+                    <table class="table table-sm table-hover align-middle mb-0 w-100 text-nowrap" id="tableModalDetailHarian" style="font-size: 11.5px;">
+                        <thead class="table-group-divider bg-body-secondary text-uppercase fw-bold" style="font-size: 10.5px; letter-spacing: 0.3px;">
                             <tr>
-                                <th class="py-2 text-center" style="width: 35px;">NO</th>
-                                <th class="py-2 text-center">TANGGAL LAPORAN</th>
-                                <th class="py-2 text-center">OMZET HARIAN</th>
-                                <th class="py-2 text-center text-danger" id="lblModalHeaderPotongan">POTONGAN</th>
-                                <th class="py-2 text-center text-success" id="lblModalHeaderHakInv">HAK INVESTOR</th>
-                                <th class="py-2 text-center text-warning" id="lblModalHeaderHakOut">HAK OUTLET</th>
-                                <th class="py-2 text-center text-brown">MODAL BELANJA</th>
-                                <th class="py-2 text-center text-body-emphasis">TOTAL DITERIMA</th>
+                                <th class="py-2.5 text-center" style="width: 40px;">NO</th>
+                                <th class="py-2.5 text-center">TANGGAL LAPORAN</th>
+                                <th class="py-2.5 text-center">OMZET HARIAN</th>
+                                <th class="py-2.5 text-center text-danger" id="lblModalHeaderPotongan">POTONGAN</th>
+                                <th class="py-2.5 text-center text-success" id="lblModalHeaderHakInv">HAK INVESTOR</th>
+                                <th class="py-2.5 text-center text-warning" id="lblModalHeaderHakOut">HAK OUTLET</th>
+                                <th class="py-2.5 text-center text-brown">MODAL BELANJA</th>
+                                <th class="py-2.5 text-center text-body-emphasis">TOTAL DITERIMA</th>
                             </tr>
                         </thead>
                         <tbody class="border-0">
                             <!-- Loaded dynamically via JS -->
                         </tbody>
-                        <tfoot class="table-group-divider bg-body-secondary fw-bold d-none" id="tfootModalDetailHarian" style="font-size: 11px;">
+                        <tfoot class="table-group-divider bg-body-secondary fw-bold d-none" id="tfootModalDetailHarian" style="font-size: 11.5px;">
                             <tr>
-                                <td colspan="2" class="py-2 text-center text-body-emphasis text-uppercase fw-bold">TOTAL KESELURUHAN:</td>
-                                <td class="py-2 text-center text-body-emphasis fw-extrabold" id="tfootTotOmzet">Rp 0</td>
-                                <td class="py-2 text-center text-danger fw-extrabold" id="tfootTotPotongan">Rp 0</td>
-                                <td class="py-2 text-center text-success fw-extrabold" id="tfootTotHakInv">Rp 0</td>
-                                <td class="py-2 text-center text-warning fw-extrabold" id="tfootTotHakOut">Rp 0</td>
-                                <td class="py-2 text-center text-brown fw-extrabold" id="tfootTotKulakan">Rp 0</td>
-                                <td class="py-2 text-center text-body-emphasis fw-extrabold" id="tfootTotDiterima">Rp 0</td>
+                                <td colspan="2" class="py-2.5 text-center text-body-emphasis text-uppercase fw-bold">TOTAL KESELURUHAN:</td>
+                                <td class="py-2.5 text-center text-body-emphasis fw-extrabold" id="tfootTotOmzet">Rp 0</td>
+                                <td class="py-2.5 text-center text-danger fw-extrabold" id="tfootTotPotongan">Rp 0</td>
+                                <td class="py-2.5 text-center text-success fw-extrabold" id="tfootTotHakInv">Rp 0</td>
+                                <td class="py-2.5 text-center text-warning fw-extrabold" id="tfootTotHakOut">Rp 0</td>
+                                <td class="py-2.5 text-center text-brown fw-extrabold" id="tfootTotKulakan">Rp 0</td>
+                                <td class="py-2.5 text-center text-body-emphasis fw-extrabold" id="tfootTotDiterima">Rp 0</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0 pb-3 px-3 justify-content-start">
-                <button type="button" class="btn btn-light rounded-pill px-3 py-1 btn-sm" data-bs-dismiss="modal" style="font-size: 12px;">Tutup</button>
+                <button type="button" class="btn btn-light rounded-pill px-4 py-1.5 btn-sm fw-bold" data-bs-dismiss="modal" style="font-size: 12px;">Tutup</button>
             </div>
         </div>
     </div>
