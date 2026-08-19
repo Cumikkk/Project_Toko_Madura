@@ -499,11 +499,7 @@ ob_start();
                         </tr>
                         <tr style="background-color: #f0fdf4; font-weight: bold;">
                             <td style="color: #166534;">TOTAL HAK TERDISTRIBUSI KESELURUHAN</td>
-                            <td style="text-align: right; color: #166534; font-size: 10px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
-                        </tr>
-                        <tr style="background-color: #f0fdf4; font-weight: bold;">
-                            <td style="color: #166534;">TOTAL BERSIH HAK INVESTOR</td>
-                            <td style="text-align: right; color: #166534; font-size: 10.5px;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
+                            <td style="text-align: right; color: #166534; font-size: 10.5px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
