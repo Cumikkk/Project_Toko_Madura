@@ -418,11 +418,13 @@ ob_start();
                         <td style="width: 4%; color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($investorNama); ?></td>
                     </tr>
-                    <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
-                        <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet Toko</td>
-                    </tr>
+                    <?php if ($selectedOutletId <= 0 && $role === 'investor') : ?>
+                        <tr>
+                            <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
+                            <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
+                            <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet Toko</td>
+                        </tr>
+                    <?php endif; ?>
                 </table>
             </td>
             <td style="width: 50%; vertical-align: top; padding: 6px 10px;">
@@ -433,7 +435,7 @@ ob_start();
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($periodeTitleStr); ?></td>
                     </tr>
                     <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Cakupan Toko</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Toko</td>
                         <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($displayNamaToko); ?></td>
                     </tr>
