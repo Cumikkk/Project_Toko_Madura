@@ -236,7 +236,7 @@ ob_start();
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Keuangan Sederhana Investor - <?= htmlspecialchars($periodeTitleStr); ?></title>
+    <title>Laporan Keuangan <?= date('d-m-Y'); ?></title>
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -715,5 +715,6 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 
-$dompdf->stream("Laporan_Keuangan_Sederhana_Investor_{$checkBulan}_{$checkTahun}.pdf", ["Attachment" => 0]);
+$pdfFilename = "Laporan Keuangan " . date('d-m-Y') . ".pdf";
+$dompdf->stream($pdfFilename, ["Attachment" => 0]);
 exit;
