@@ -236,8 +236,11 @@ ob_start();
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Keuangan Sederhana Investor - <?= htmlspecialchars($periodeTitleStr); ?></title>
+    <title>Laporan Keuangan <?= date('d-m-Y'); ?></title>
     <style>
+        @page {
+            margin: 7mm 9mm;
+        }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 9.5px;
@@ -255,9 +258,9 @@ ob_start();
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             border-bottom: 2px solid #7D0A0A;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         .header-title {
             color: #7D0A0A;
@@ -268,7 +271,7 @@ ob_start();
             margin: 0;
         }
         .header-subtitle {
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: bold;
             color: #334155;
             text-transform: uppercase;
@@ -283,13 +286,13 @@ ob_start();
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
             background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
         }
         .meta-box td {
-            padding: 5px 8px;
+            padding: 4px 8px;
             vertical-align: top;
             font-size: 9.5px;
             word-wrap: break-word;
@@ -300,15 +303,15 @@ ob_start();
             color: #7D0A0A;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 10px;
-            margin-bottom: 6px;
+            margin-top: 7px;
+            margin-bottom: 4px;
             padding-bottom: 2px;
             border-bottom: 1.5px solid #7D0A0A;
         }
         .balance-summary-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
         }
         .balance-box {
             border: 1px solid #cbd5e1;
@@ -334,7 +337,7 @@ ob_start();
             border-collapse: collapse;
         }
         .balance-row-table td {
-            padding: 6px 8px;
+            padding: 5px 8px;
             font-size: 9.5px;
             border-bottom: 1px solid #f1f5f9;
         }
@@ -343,7 +346,7 @@ ob_start();
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
             table-layout: fixed;
         }
         .data-table th {
@@ -351,8 +354,8 @@ ob_start();
             color: #ffffff;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 8.5px;
-            padding: 7px 8px;
+            font-size: 9px;
+            padding: 6px 7px;
             border: 1px solid #7D0A0A;
             vertical-align: middle;
         }
@@ -369,10 +372,10 @@ ob_start();
             text-align: left !important;
         }
         .data-table td {
-            padding: 6px 8px;
+            padding: 5px 7px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
-            font-size: 9px;
+            font-size: 9.5px;
         }
         .data-table tr {
             page-break-inside: avoid;
@@ -398,7 +401,7 @@ ob_start();
         <tr>
             <td style="width: 65%;">
                 <h1 class="header-title">TOKO MADURA</h1>
-                <div class="header-subtitle">LAPORAN KEUANGAN &amp; RINCIAN HARIAN</div>
+                <div class="header-subtitle">LAPORAN KEUANGAN</div>
                 <div class="header-tagline">Ringkasan Posisi Aktiva Omzet, Potongan Skema, Distribusi Bagi Hasil &amp; Rincian Harian</div>
             </td>
             <td style="width: 35%; text-align: right; vertical-align: bottom;">
@@ -678,7 +681,7 @@ ob_start();
     <?php endif; ?>
 
     <!-- Bagian IV: Catatan Keuangan & Pengesahan Lembar Laporan (Page Break Avoid) -->
-    <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <table class="page-break-inside-avoid" style="width: 100%; border-collapse: collapse; margin-top: 8px;">
         <tr>
             <td style="width: 60%; vertical-align: top; padding-right: 15px;">
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
@@ -715,5 +718,6 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 
-$dompdf->stream("Laporan_Keuangan_Sederhana_Investor_{$checkBulan}_{$checkTahun}.pdf", ["Attachment" => 0]);
+$pdfFilename = "Laporan Keuangan " . date('d-m-Y') . ".pdf";
+$dompdf->stream($pdfFilename, ["Attachment" => 0]);
 exit;
