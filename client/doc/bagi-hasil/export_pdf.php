@@ -391,6 +391,7 @@ ob_start();
         .text-success { color: #16a34a; }
         .text-warning { color: #d97706; }
         .text-primary { color: #0d6efd; }
+        .text-brown { color: #7D0A0A; }
         .text-secondary { color: #64748b; }
     </style>
 </head>
@@ -421,11 +422,16 @@ ob_start();
                         <td style="width: 4%; color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($investorNama); ?></td>
                     </tr>
+                    <tr>
+                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">ID Investor</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
+                        <td style="color: #0f172a; font-weight: bold; padding: 2px 0;">#INV-<?= str_pad($investorId, 4, '0', STR_PAD_LEFT); ?></td>
+                    </tr>
                     <?php if ($selectedOutletId <= 0 && $role === 'investor') : ?>
                         <tr>
                             <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
                             <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
-                            <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet Toko</td>
+                            <td style="color: #7D0A0A; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet</td>
                         </tr>
                     <?php endif; ?>
                 </table>
@@ -467,8 +473,8 @@ ob_start();
                             <td style="text-align: right; font-weight: bold; color: #dc2626;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f8fafc; font-weight: bold;">
-                            <td style="color: #0f172a;">MODAL BELANJA</td>
-                            <td style="text-align: right; color: #0d6efd; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
+                            <td style="color: #0f172a;">MODAL BELANJA TOKO (SISA OMZET)</td>
+                            <td style="text-align: right; color: #7D0A0A; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
@@ -512,14 +518,14 @@ ob_start();
                 <th class="text-end" style="width: 12%;">POTONGAN OMZET</th>
                 <th class="text-end" style="width: 12%;">HAK INVESTOR</th>
                 <th class="text-end" style="width: 12%;">HAK OUTLET</th>
-                <th class="text-end" style="width: 14.5%;">MODAL BELANJA</th>
+                <th class="text-end" style="width: 14.5%;">MODAL BELANJA (SISA OMZET)</th>
                 <th class="text-end" style="width: 14.5%;">TOTAL DITERIMA TOKO</th>
             </tr>
         </thead>
         <tbody>
             <?php if (!empty($rowsSummary)) : ?>
                 <?php $no = 1; foreach ($rowsSummary as $r) : 
-                    $modalKulakan = $r['total_omzet'] - $r['potongan_10'];
+                    $modalBelanja = $r['total_omzet'] - $r['potongan_10'];
                 ?>
                     <tr>
                         <td class="text-center fw-bold"><?= $no++; ?></td>
@@ -530,7 +536,7 @@ ob_start();
                         <td class="text-end text-danger fw-bold">Rp <?= number_format($r['potongan_10'], 0, ',', '.'); ?></td>
                         <td class="text-end text-success fw-bold">Rp <?= number_format($r['hak_investor'], 0, ',', '.'); ?></td>
                         <td class="text-end text-warning fw-bold">Rp <?= number_format($r['hak_outlet'], 0, ',', '.'); ?></td>
-                        <td class="text-end text-primary fw-bold">Rp <?= number_format($modalKulakan, 0, ',', '.'); ?></td>
+                        <td class="text-end text-brown fw-bold">Rp <?= number_format($modalBelanja, 0, ',', '.'); ?></td>
                         <td class="text-end fw-bold">Rp <?= number_format($r['total_bersih_outlet'], 0, ',', '.'); ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -550,7 +556,7 @@ ob_start();
                     <td class="text-end text-danger" style="padding: 6px;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
                     <td class="text-end text-success" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
                     <td class="text-end text-warning" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($totHakOutlet, 0, ',', '.'); ?></td>
-                    <td class="text-end text-primary" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
+                    <td class="text-end text-brown" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
                     <td class="text-end text-body-emphasis" style="padding: 6px; font-size: 9.5px;">Rp <?= number_format($totOmzet - $totPotongan10 + $totHakOutlet, 0, ',', '.'); ?></td>
                 </tr>
             </tfoot>
@@ -603,8 +609,8 @@ ob_start();
                         <div style="font-size: 9.5px; font-weight: bold; color: #d97706; margin-top: 2px;">Rp <?= number_format($rOut['hak_outlet'], 0, ',', '.'); ?></div>
                     </td>
                     <td style="width: 17%; padding: 5px 8px; border-right: 1px solid #e2e8f0;">
-                        <div style="font-size: 7.5px; color: #0d6efd; font-weight: bold; text-transform: uppercase;">Modal Kulakan</div>
-                        <div style="font-size: 9.5px; font-weight: bold; color: #0d6efd; margin-top: 2px;">Rp <?= number_format($rOut['total_omzet'] - $rOut['potongan_10'], 0, ',', '.'); ?></div>
+                        <div style="font-size: 7.5px; color: #7D0A0A; font-weight: bold; text-transform: uppercase;">Modal Belanja</div>
+                        <div style="font-size: 9.5px; font-weight: bold; color: #7D0A0A; margin-top: 2px;">Rp <?= number_format($rOut['total_omzet'] - $rOut['potongan_10'], 0, ',', '.'); ?></div>
                     </td>
                     <td style="width: 17%; padding: 5px 8px;">
                         <div style="font-size: 7.5px; color: #334155; font-weight: bold; text-transform: uppercase;">Total Diterima Toko</div>
@@ -613,7 +619,7 @@ ob_start();
                 </tr>
             </table>
 
-            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini (11 Kolom Rapi Termasuk Modal Kulakan) -->
+            <!-- Tabel Rincian Transaksi Harian Omzet Toko Ini (11 Kolom Rapi Termasuk Modal Belanja) -->
             <table class="data-table">
                 <thead>
                     <tr>
@@ -626,7 +632,7 @@ ob_start();
                         <th class="text-end" style="width: 10%;">HAK INVESTOR</th>
                         <th class="text-center" style="width: 5%;">OUT. (%)</th>
                         <th class="text-end" style="width: 10%;">HAK OUTLET</th>
-                        <th class="text-end" style="width: 11%;">MODAL KULAKAN</th>
+                        <th class="text-end" style="width: 11%;">MODAL BELANJA</th>
                         <th class="text-end" style="width: 11%;">TOTAL DITERIMA</th>
                     </tr>
                 </thead>
@@ -640,8 +646,8 @@ ob_start();
                             $nPot   = (float)$item['nominal_potongan'];
                             $nInv   = (float)$item['nominal_hak_investor'];
                             $nOut   = (float)$item['nominal_hak_outlet'];
-                            $nKulakan = $nOmzet - $nPot;
-                            $nBersih = $nKulakan + $nOut;
+                            $nBelanja = $nOmzet - $nPot;
+                            $nBersih = $nBelanja + $nOut;
 
                             $subOmzet += $nOmzet;
                             $subPot   += $nPot;
@@ -665,7 +671,7 @@ ob_start();
                                 <td class="text-end text-success fw-bold">Rp <?= number_format($nInv, 0, ',', '.'); ?></td>
                                 <td class="text-center fw-bold text-warning" style="font-size: 8px;"><?= $fmtOut; ?></td>
                                 <td class="text-end text-warning fw-bold">Rp <?= number_format($nOut, 0, ',', '.'); ?></td>
-                                <td class="text-end text-primary fw-bold">Rp <?= number_format($nKulakan, 0, ',', '.'); ?></td>
+                                <td class="text-end text-brown fw-bold">Rp <?= number_format($nBelanja, 0, ',', '.'); ?></td>
                                 <td class="text-end fw-bold">Rp <?= number_format($nBersih, 0, ',', '.'); ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -688,7 +694,7 @@ ob_start();
                             <td class="text-end text-success" style="padding: 6px; font-size: 9px;">Rp <?= number_format($subInv, 0, ',', '.'); ?></td>
                             <td class="text-center" style="padding: 6px;">-</td>
                             <td class="text-end text-warning" style="padding: 6px; font-size: 9px;">Rp <?= number_format($subOut, 0, ',', '.'); ?></td>
-                            <td class="text-end text-primary" style="padding: 6px; font-size: 9px;">Rp <?= number_format($subOmzet - $subPot, 0, ',', '.'); ?></td>
+                            <td class="text-end text-brown" style="padding: 6px; font-size: 9px;">Rp <?= number_format($subOmzet - $subPot, 0, ',', '.'); ?></td>
                             <td class="text-end" style="padding: 6px; font-size: 9px;">Rp <?= number_format($subOmzet - $subPot + $subOut, 0, ',', '.'); ?></td>
                         </tr>
                     </tfoot>
@@ -704,8 +710,8 @@ ob_start();
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
                     <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT HARIAN:</div>
                     <ul style="margin: 0; padding-left: 12px; font-size: 8px; color: #64748b; line-height: 1.35;">
-                        <li><strong>Modal Kulakan (Sisa Omzet):</strong> Dana pokok operasional toko dari omzet kotor setelah dipotong skema, dialokasikan untuk kulakan dan pembelian bahan/stok dagangan kembali.</li>
-                        <li><strong>Total Diterima Toko:</strong> Total penerimaan dana yang dipegang pihak toko, akumulasi dari Modal Kulakan ditambah Hak Bagi Hasil milik outlet.</li>
+                        <li><strong>Modal Belanja (Sisa Omzet):</strong> Dana pokok operasional toko dari omzet kotor setelah dipotong skema, dialokasikan untuk belanja dan pembelian bahan/stok dagangan kembali.</li>
+                        <li><strong>Total Diterima Toko:</strong> Total penerimaan dana yang dipegang pihak toko, akumulasi dari Modal Belanja ditambah Hak Bagi Hasil milik outlet.</li>
                         <li><strong>Hak Investor:</strong> Bagian hasil bersih milik investor sesuai kesepakatan persentase bagi hasil.</li>
                     </ul>
                 </div>
