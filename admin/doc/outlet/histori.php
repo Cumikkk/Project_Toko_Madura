@@ -1,7 +1,7 @@
 <?php
-use Config\Core\Database;
 use Config\Core\SystemInfo;
 use App\Models\Helper;
+use App\Models\Outlet;
 
 $queryParam = Helper::getSafeInput($_GET);
 $idOutlet = intval($queryParam['id'] ?? 0);
@@ -11,34 +11,20 @@ if ($idOutlet <= 0) {
     return;
 }
 
-$db = Database::connect();
-
-// Fetch outlet info
-$resOutlet = $db->query("
-    SELECT o.id_outlet, o.nama_outlet, o.tgl_jatuh_tempo, o.status,
-           u_kasir.nama_lengkap as pengelola_toko, u_kasir.no_hp as no_hp_toko,
-           inv.id_investor, inv.biaya_langganan_outlet,
-           u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor, u_inv.no_hp as no_hp_investor
-    FROM outlet o
-    LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
-    LEFT JOIN investor inv ON inv.id_investor = o.id_investor
-    LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
-    WHERE o.id_outlet = {$idOutlet}
-    LIMIT 1
-");
-$outlet = ($resOutlet && $resOutlet->num_rows > 0) ? $resOutlet->fetch_assoc() : null;
+// Fetch outlet info via Model Outlet
+$outlet = Outlet::getOutletHistoriHeader($idOutlet);
 
 if (!$outlet) {
     echo '<div class="alert alert-danger"><i class="fe fe-alert-circle me-2"></i>Outlet tidak ditemukan.</div>';
     return;
 }
 
-// Fetch riwayat langganan
+// Fetch riwayat langganan via Model Outlet
 $riwayat = [];
 $totalDanaMasuk = 0;
 $totalTrxActive = 0;
 
-$resRiwayat = $db->query("SELECT * FROM riwayat_langganan WHERE id_outlet = {$idOutlet} ORDER BY id_riwayat DESC");
+$resRiwayat = Outlet::getRiwayatLanggananByOutlet($idOutlet);
 if ($resRiwayat) {
     while ($r = $resRiwayat->fetch_assoc()) {
         $riwayat[] = $r;

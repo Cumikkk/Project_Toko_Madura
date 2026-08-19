@@ -35,6 +35,19 @@ class Investor {
         ";
         return $db->query($sql);
     }
+
+    public static function getAllInvestorOptions() {
+        $db = Database::connect();
+        $sql = "
+            SELECT inv.id_investor, u.nama_lengkap, u.username, mw.provinsi, mw.kabupaten 
+            FROM investor inv 
+            JOIN users u ON u.id_users = inv.id_users 
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah 
+            ORDER BY u.nama_lengkap ASC
+        ";
+        return $db->query($sql);
+    }
+
     public static function getInvestorById($idInvestor) {
         $db = Database::connect();
         $id = intval($idInvestor);
@@ -42,8 +55,8 @@ class Investor {
         $sql = "
             SELECT i.*, u.nama_lengkap, u.username, u.no_hp, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u.alamat_lengkap as alamat_investor, u.id_wilayah
             FROM investor i
-            JOIN users u ON u.id_users = i.id_users
-            LEFT JOIN master_wilayah mw ON u.id_wilayah = mw.id_wilayah
+            JOIN users u ON (u.id_users = i.id_users)
+            LEFT JOIN master_wilayah mw ON (u.id_wilayah = mw.id_wilayah)
             WHERE i.id_investor = {$id}
             LIMIT 1
         ";
@@ -88,12 +101,32 @@ class Investor {
             return ['success' => false, 'message' => "Username tidak valid, hanya boleh huruf dan angka (tanpa spasi)"];
         }
 
+        $idMaster = intval($data['id_master'] ?? $currentUserId);
+
+        // Validasi pembatasan wilayah: wilayah Investor harus di provinsi yang sama dengan Master Owner
+        if ($idMaster > 0 && $id_wilayah > 0) {
+            $checkMasterWilayah = $db->query("
+                SELECT mw_m.provinsi as prov_master, mw_i.provinsi as prov_investor
+                FROM users u_m
+                LEFT JOIN master_wilayah mw_m ON mw_m.id_wilayah = u_m.id_wilayah
+                CROSS JOIN master_wilayah mw_i ON mw_i.id_wilayah = {$id_wilayah}
+                WHERE u_m.id_users = {$idMaster}
+                LIMIT 1
+            ");
+            if ($checkMasterWilayah && $rowMW = $checkMasterWilayah->fetch_assoc()) {
+                if (!empty($rowMW['prov_master']) && !empty($rowMW['prov_investor'])) {
+                    if (strcasecmp(trim($rowMW['prov_master']), trim($rowMW['prov_investor'])) !== 0) {
+                        return ['success' => false, 'message' => "Wilayah investor harus berada di provinsi yang sama dengan Master Owner (" . $rowMW['prov_master'] . ")"];
+                    }
+                }
+            }
+        }
+
         $nameSafe     = $db->real_escape_string($nama_lengkap);
         $usernameSafe = $db->real_escape_string($username);
         $hpVal        = $no_hp ? "'" . $db->real_escape_string($no_hp) . "'" : "NULL";
         $wilayahVal   = $id_wilayah ? $id_wilayah : "NULL";
         $alamatVal    = $alamat ? "'" . $db->real_escape_string($alamat) . "'" : "NULL";
-        $idMaster     = intval($data['id_master'] ?? $currentUserId);
 
         $db->begin_transaction();
         try {
@@ -199,4 +232,38 @@ class Investor {
             return ['success' => false, 'message' => "Gagal menghapus data investor: " . $e->getMessage()];
         }
     }
+
+    public static function getActiveOutletsByInvestorId(int $idInvestor) {
+        $db = Database::connect();
+        $id = intval($idInvestor);
+        $sql = "
+            SELECT 
+                o.id_outlet,
+                o.nama_outlet,
+                u.alamat_lengkap as alamat_outlet,
+                mw.provinsi,
+                mw.kabupaten,
+                mw.kecamatan,
+                mw.kelurahan,
+                o.status,
+                DATE_FORMAT(o.tgl_request, '%d/%m/%Y %H:%i') as tanggal_bergabung,
+                DATE_FORMAT(o.tgl_disetujui, '%d/%m/%Y %H:%i') as tgl_disetujui
+            FROM outlet o
+            JOIN users u ON o.id_users = u.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
+            WHERE o.id_investor = {$id}
+              AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan'))
+              AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= CURRENT_DATE())
+            ORDER BY o.id_outlet DESC
+        ";
+        $res = $db->query($sql);
+        $data = [];
+        if ($res && $res->num_rows > 0) {
+            while ($row = $res->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
+    }
 }
+

@@ -1,5 +1,4 @@
 <?php
-use Config\Core\Database;
 use Config\Core\SystemInfo;
 use App\Models\Helper;
 use App\Models\Outlet;
@@ -22,8 +21,6 @@ if (!$outlet) {
     echo '<div class="alert alert-danger"><i class="fe fe-alert-circle me-2"></i>Outlet tidak ditemukan.</div>';
     return;
 }
-
-$db = Database::connect();
 
 // Ekstrak daftar tahun unik secara dinamis dari data transaksi
 $daftarTahun = [];
@@ -53,30 +50,13 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
 ?>
 
 <style>
-/* Rapatkan & Gabungkan Baris Total Footer agar Menyatu Rapat dengan Tabel */
-#table-rincian-omzet_wrapper .dataTables_scrollBody table {
-    margin-bottom: 0 !important;
-    border-bottom: none !important;
+/* Baris Total Footer Bersih & Menyatu Rapat Presisi */
+#table-rincian-omzet tfoot tr {
+    background-color: #f1f5f9 !important;
 }
-#table-rincian-omzet_wrapper .dataTables_scrollFoot {
+#table-rincian-omzet tfoot td {
     background-color: #f1f5f9 !important;
     border-top: 2px solid #cbd5e1 !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-#table-rincian-omzet_wrapper .dataTables_scrollFoot table {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    border-top: none !important;
-    background-color: #f1f5f9 !important;
-}
-#table-rincian-omzet_wrapper .dataTables_scrollFoot tfoot tr {
-    background-color: #f1f5f9 !important;
-}
-#table-rincian-omzet_wrapper .dataTables_scrollFoot tfoot td {
-    padding: 10px 8px !important;
-    background-color: #f1f5f9 !important;
-    border-top: none !important;
     border-bottom: 1px solid #cbd5e1 !important;
     vertical-align: middle !important;
     font-size: 13.5px;
@@ -358,7 +338,7 @@ $(document).ready(function() {
         tableRincian = $('#table-rincian-omzet').DataTable({
             processing: true,
             deferRender: true,
-            scrollX: true,
+            autoWidth: false,
             lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
             pageLength: 5,
             language: {

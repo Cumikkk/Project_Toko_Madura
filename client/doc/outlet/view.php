@@ -379,11 +379,23 @@ $bulanIndo = [
     7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 
-// Get Investor ID for logged-in user
-$resInv = $db->query("SELECT id_investor FROM investor WHERE id_users = {$userId} LIMIT 1");
+// Get Investor ID & Wilayah for logged-in user
+$resInv = $db->query("
+    SELECT i.id_investor, mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan 
+    FROM investor i 
+    JOIN users u ON u.id_users = i.id_users 
+    LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah 
+    WHERE i.id_users = {$userId} 
+    LIMIT 1
+");
 $investorId = 0;
+$investorProvinsi = '';
+$investorKabupaten = '';
 if ($resInv && $resInv->num_rows > 0) {
-    $investorId = (int)$resInv->fetch_assoc()['id_investor'];
+    $rowInv = $resInv->fetch_assoc();
+    $investorId = (int)$rowInv['id_investor'];
+    $investorProvinsi = $rowInv['provinsi'] ?? '';
+    $investorKabupaten = $rowInv['kabupaten'] ?? '';
 } else {
     $db->query("INSERT INTO investor (id_users, id_master) VALUES ({$userId}, 1)");
     $investorId = $db->insert_id;
@@ -1057,6 +1069,11 @@ html body .form-check-input:checked {
                                         </select>
                                     </div>
                                 </div>
+                                <?php if (!empty($investorProvinsi)) : ?>
+                                    <div class="form-text text-primary mt-1" style="font-size: 11px;">
+                                        <i class="fa-solid fa-circle-info me-1"></i>Wilayah outlet dibatasi sesuai domisili Investor: <strong><?= htmlspecialchars($investorProvinsi); ?></strong>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Alamat Lengkap Toko -->
@@ -1262,6 +1279,11 @@ html body .form-check-input:checked {
                                     </select>
                                 </div>
                             </div>
+                            <?php if (!empty($investorProvinsi)) : ?>
+                                <div class="form-text text-primary mt-1" style="font-size: 11px;">
+                                    <i class="fa-solid fa-circle-info me-1"></i>Wilayah outlet dibatasi sesuai domisili Investor: <strong><?= htmlspecialchars($investorProvinsi); ?></strong>
+                                </div>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-6 col-12">
                             <label class="form-label fw-semibold text-body-emphasis fs-14 required">No. HP / WhatsApp</label>
@@ -1924,24 +1946,49 @@ html body .form-check-input:checked {
 $(document).ready(function() {
     const ACTION_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>/doc/outlet/action.php';
     const CLIENT_URL = '<?= SystemInfo::app('CLIENT_URL'); ?>';
+    const INVESTOR_PROVINSI = '<?= addslashes($investorProvinsi); ?>';
 
     // Helper Wilayah Cascading Dropdown Loader
-    function initWilayahCascade(provId, kabId, kecId, kelId, defaultProv = '', defaultKab = '', defaultKec = '', defaultIdWilayah = '') {
-        // 1. Load Provinsi
-        $.post(CLIENT_URL + '/ajax/post/wilayah/get_provinsi', function(res) {
-            let options = '<option value="">' + ($(provId).data('placeholder') || 'Pilih / Semua Provinsi') + '</option>';
-            if (res && res.results) {
-                res.results.forEach(item => {
-                    let sel = ((defaultProv || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
-                    options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
-                });
-            }
-            $(provId).html(options).prop('disabled', false);
+    function initWilayahCascade(provId, kabId, kecId, kelId, defaultProv = '', defaultKab = '', defaultKec = '', defaultIdWilayah = '', isRestricted = false) {
+        if (isRestricted && INVESTOR_PROVINSI) {
+            // Langsung set provinsi investor dan kunci dropdown
+            $(provId).html(`<option value="${INVESTOR_PROVINSI}" selected>${INVESTOR_PROVINSI}</option>`).prop('disabled', true);
+            
+            $(kabId).html('<option value="">Pilih Kabupaten</option>').prop('disabled', true);
+            if (kecId) $(kecId).html('<option value="">Pilih Kecamatan</option>').prop('disabled', true);
+            if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
 
-            if (defaultProv) {
-                $(provId).trigger('change');
-            }
-        });
+            $.post(CLIENT_URL + '/ajax/post/wilayah/get_kabupaten', { provinsi: INVESTOR_PROVINSI }, function(res) {
+                let options = '<option value="">Pilih Kabupaten</option>';
+                if (res && res.results) {
+                    res.results.forEach(item => {
+                        let sel = ((defaultKab || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
+                        options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                    });
+                }
+                $(kabId).html(options).prop('disabled', false);
+
+                if (defaultKab) {
+                    $(kabId).trigger('change.wilayah');
+                }
+            });
+        } else {
+            // 1. Load All Provinsi
+            $.post(CLIENT_URL + '/ajax/post/wilayah/get_provinsi', function(res) {
+                let options = '<option value="">' + ($(provId).data('placeholder') || 'Pilih / Semua Provinsi') + '</option>';
+                if (res && res.results) {
+                    res.results.forEach(item => {
+                        let sel = ((defaultProv || '').toUpperCase() === item.id.toUpperCase()) ? 'selected' : '';
+                        options += `<option value="${item.id}" ${sel}>${item.text}</option>`;
+                    });
+                }
+                $(provId).html(options).prop('disabled', false);
+
+                if (defaultProv) {
+                    $(provId).trigger('change.wilayah');
+                }
+            });
+        }
 
         // 2. On Provinsi Change -> Load Kabupaten
         $(provId).off('change.wilayah').on('change.wilayah', function() {
@@ -1962,7 +2009,7 @@ $(document).ready(function() {
                     $(kabId).html(options).prop('disabled', false);
 
                     if (defaultKab) {
-                        $(kabId).trigger('change');
+                        $(kabId).trigger('change.wilayah');
                         defaultProv = ''; // reset after cascade trigger
                     }
                 });
@@ -1972,7 +2019,7 @@ $(document).ready(function() {
         // 3. On Kabupaten Change -> Load Kecamatan
         if (kecId) {
             $(kabId).off('change.wilayah').on('change.wilayah', function() {
-                let prov = $(provId).val();
+                let prov = $(provId).val() || (isRestricted ? INVESTOR_PROVINSI : '');
                 let kab = $(this).val();
                 $(kecId).html('<option value="">Pilih / Semua Kecamatan</option>').prop('disabled', true);
                 if (kelId) $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
@@ -1989,7 +2036,7 @@ $(document).ready(function() {
                         $(kecId).html(options).prop('disabled', false);
 
                         if (defaultKec) {
-                            $(kecId).trigger('change');
+                            $(kecId).trigger('change.wilayah');
                             defaultKab = ''; // reset after cascade trigger
                         }
                     });
@@ -2000,7 +2047,7 @@ $(document).ready(function() {
         // 4. On Kecamatan Change -> Load Kelurahan
         if (kelId) {
             $(kecId).off('change.wilayah').on('change.wilayah', function() {
-                let prov = $(provId).val();
+                let prov = $(provId).val() || (isRestricted ? INVESTOR_PROVINSI : '');
                 let kab = $(kabId).val();
                 let kec = $(this).val();
                 $(kelId).html('<option value="">Pilih Kelurahan</option>').prop('disabled', true);
@@ -2028,11 +2075,11 @@ $(document).ready(function() {
     const curKab  = '<?= addslashes($selectedKabupaten); ?>';
     const curKec  = '<?= addslashes($selectedKecamatan); ?>';
 
-    initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', null, curProv, curKab, curKec);
+    initWilayahCascade('#modalFilterProvinsi', '#modalFilterKabupaten', '#modalFilterKecamatan', null, curProv, curKab, curKec, '', false);
 
     // Inisialisasi Wilayah untuk Wizard Tambah Outlet saat modal dibuka
     $('#modalTambahOutlet').on('show.bs.modal', function() {
-        initWilayahCascade('#wizard_provinsi', '#wizard_kabupaten', '#wizard_kecamatan_select', '#wizard_id_wilayah');
+        initWilayahCascade('#wizard_provinsi', '#wizard_kabupaten', '#wizard_kecamatan_select', '#wizard_id_wilayah', '', '', '', '', true);
     });
 
     // Reset Tanggal Filter Event
@@ -2371,7 +2418,8 @@ $(document).ready(function() {
                         res.data.provinsi,
                         res.data.kabupaten,
                         res.data.kecamatan,
-                        res.data.id_wilayah
+                        res.data.id_wilayah,
+                        true
                     );
 
                     $('#edit_persentase_potongan').val(parseFloat(res.data.persentase_potongan).toFixed(2));

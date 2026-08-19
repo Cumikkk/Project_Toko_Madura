@@ -2,8 +2,7 @@
 use Config\Core\Database;
 use Config\Core\SystemInfo;
 use App\Models\Outlet;
-
-$db = Database::connect();
+use App\Models\Investor;
 
 // Parameter filter bulan & tahun (default: 0 = Semua Bulan & Semua Tahun)
 $selectedBulan = 0;
@@ -17,36 +16,11 @@ try {
 }
 $outlets = $omzetData['outlets'] ?? [];
 
-// Ambil daftar tahun dinamis dari data laporan omzet
-$listTahunOmzet = [];
-try {
-    $resTahunOmzet = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE tanggal_omzet IS NOT NULL AND tanggal_omzet > '1970-01-01' ORDER BY tahun DESC");
-    if ($resTahunOmzet && $resTahunOmzet->num_rows > 0) {
-        while ($rowT = $resTahunOmzet->fetch_assoc()) {
-            if (!empty($rowT['tahun'])) {
-                $listTahunOmzet[] = intval($rowT['tahun']);
-            }
-        }
-    }
-} catch (\Throwable $e) {
-    // Fallback: hanya tampilkan tahun sekarang
-}
-if (empty($listTahunOmzet)) {
-    $listTahunOmzet[] = intval(date('Y'));
-}
+// Ambil daftar tahun dinamis dari data laporan omzet via Model Outlet
+$listTahunOmzet = Outlet::getAvailableTahunOmzet();
 
-// Ambil opsi filter investor
-$investorOptions = null;
-try {
-    $investorOptions = $db->query("
-    SELECT inv.id_investor, u.nama_lengkap, u.username 
-    FROM investor inv 
-    JOIN users u ON u.id_users = inv.id_users 
-    ORDER BY u.nama_lengkap ASC
-");
-} catch (\Throwable $e) {
-    // Fallback: tidak ada opsi investor
-}
+// Ambil opsi filter investor via Model Investor
+$investorOptions = Investor::getAllInvestorOptions();
 
 // Daftar nama bulan dalam bahasa Indonesia
 $namaBulan = [

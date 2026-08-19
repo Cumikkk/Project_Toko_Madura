@@ -1,55 +1,20 @@
 <?php
-use Config\Core\Database;
 use App\Models\User;
+use App\Models\Master;
 use Config\Core\SystemInfo;
 
 $user = User::user();
-$db = Database::connect();
 $masterId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 $namaMaster = $user['nama_lengkap'] ?? $user['username'] ?? 'Master Owner';
 
-// Fetch All Komisi List for Master (Instant Client-Side Filtering)
-$sqlList = "
-    SELECT * 
-    FROM komisi_master 
-    WHERE id_master = {$masterId}
-    ORDER BY tgl_transfer DESC, id_komisi DESC
-";
-$resKomisi = $db->query($sqlList);
-$komisiList = [];
-$totalOverallKomisi = 0;
-$totalKomisiBulanIni = 0;
+// Fetch All Komisi List for Master via Master Model
+$dataKomisi = Master::getKomisiListForMaster($masterId);
+$komisiList = $dataKomisi['komisiList'];
+$totalOverallKomisi = $dataKomisi['totalOverallKomisi'];
+$totalKomisiBulanIni = $dataKomisi['totalKomisiBulanIni'];
 
-$currentMonth = (int)date('n');
-$currentYear  = (int)date('Y');
-
-if ($resKomisi && $resKomisi->num_rows > 0) {
-    while ($row = $resKomisi->fetch_assoc()) {
-        $komisiList[] = $row;
-        $nom = (float)($row['nominal_transfer_komisi'] ?? 0);
-        $totalOverallKomisi += $nom;
-        
-        $m = !empty($row['tgl_transfer']) ? (int)date('n', strtotime($row['tgl_transfer'])) : 0;
-        $y = !empty($row['tgl_transfer']) ? (int)date('Y', strtotime($row['tgl_transfer'])) : 0;
-        if ($m === $currentMonth && $y === $currentYear) {
-            $totalKomisiBulanIni += $nom;
-        }
-    }
-}
-
-// Fetch distinct years of komisi transfers
-$availableYears = [];
-$resYears = $db->query("SELECT DISTINCT YEAR(tgl_transfer) as y_periode FROM komisi_master WHERE id_master = {$masterId} ORDER BY y_periode DESC");
-if ($resYears) {
-    while ($yRow = $resYears->fetch_assoc()) {
-        if (!empty($yRow['y_periode'])) {
-            $availableYears[] = (int)$yRow['y_periode'];
-        }
-    }
-}
-if (!in_array((int)date('Y'), $availableYears)) {
-    array_unshift($availableYears, (int)date('Y'));
-}
+// Fetch distinct years of komisi transfers via Master Model
+$availableYears = Master::getAvailableTahunKomisiByMaster($masterId);
 
 $bulanIndo = [
     1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',

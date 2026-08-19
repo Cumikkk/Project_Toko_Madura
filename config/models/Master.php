@@ -39,7 +39,13 @@ class Master {
     }
     public static function getAllMasterOptions() {
         $db = Database::connect();
-        return $db->query("SELECT id_users, nama_lengkap, username FROM users WHERE role = 'master' ORDER BY nama_lengkap ASC");
+        return $db->query("
+            SELECT u.id_users, u.nama_lengkap, u.username, mw.provinsi, mw.kabupaten 
+            FROM users u 
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah 
+            WHERE u.role = 'master' 
+            ORDER BY u.nama_lengkap ASC
+        ");
     }
     public static function getAllKomisi($id_master = null) {
         $db = Database::connect();
@@ -278,4 +284,173 @@ class Master {
         $db->query("DELETE FROM komisi_master WHERE id_komisi = {$idKomisi}");
         return ['success' => true, 'message' => 'Data komisi master berhasil dihapus.'];
     }
+
+    // ==============================================
+    // CLIENT PORTAL (ROLE MASTER) METHODS
+    // ==============================================
+    public static function getInvestorKabupatenOptions(int $masterId) {
+        $db = Database::connect();
+        $id = intval($masterId);
+        $resKab = $db->query("
+            SELECT DISTINCT mw.kabupaten 
+            FROM investor i 
+            JOIN users u ON u.id_users = i.id_users 
+            JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah 
+            WHERE (i.id_master = {$id} OR i.id_master IS NULL) 
+              AND mw.kabupaten IS NOT NULL AND mw.kabupaten != ''
+            ORDER BY mw.kabupaten ASC
+        ");
+        $list = [];
+        if ($resKab) {
+            while ($kRow = $resKab->fetch_assoc()) {
+                $list[] = $kRow['kabupaten'];
+            }
+        }
+        return $list;
+    }
+
+    public static function getInvestorJoinYears(int $masterId) {
+        $db = Database::connect();
+        $id = intval($masterId);
+        $resYears = $db->query("
+            SELECT DISTINCT YEAR(u.created_at) as y_periode 
+            FROM investor i 
+            JOIN users u ON u.id_users = i.id_users 
+            WHERE (i.id_master = {$id} OR i.id_master IS NULL) 
+            ORDER BY y_periode DESC
+        ");
+        $list = [];
+        if ($resYears) {
+            while ($yRow = $resYears->fetch_assoc()) {
+                if (!empty($yRow['y_periode'])) {
+                    $list[] = (int)$yRow['y_periode'];
+                }
+            }
+        }
+        if (!in_array((int)date('Y'), $list)) {
+            array_unshift($list, (int)date('Y'));
+        }
+        return $list;
+    }
+
+    public static function getInvestorListForMaster(int $masterId) {
+        $db = Database::connect();
+        $id = intval($masterId);
+        $sqlInv = "
+            SELECT 
+                i.id_investor,
+                u.nama_lengkap,
+                u.username,
+                u.no_hp,
+                mw.provinsi,
+                mw.kabupaten,
+                mw.kecamatan,
+                mw.kelurahan,
+                u.alamat_lengkap as alamat_investor,
+                u.created_at as tanggal_bergabung,
+                COUNT(o.id_outlet) as total_outlet,
+                SUM(CASE WHEN (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
+            FROM investor i
+            JOIN users u ON u.id_users = i.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
+            LEFT JOIN outlet o ON o.id_investor = i.id_investor
+            WHERE (i.id_master = {$id} OR i.id_master IS NULL)
+            GROUP BY i.id_investor
+            ORDER BY i.id_investor DESC
+        ";
+
+        $resInvestors = $db->query($sqlInv);
+        $investorList = [];
+        $totalOverallInvestors = 0;
+        $totalOverallActiveOutlets = 0;
+
+        if ($resInvestors && $resInvestors->num_rows > 0) {
+            while ($row = $resInvestors->fetch_assoc()) {
+                $invId = (int)$row['id_investor'];
+                $outlets = [];
+                $sqlOut = "SELECT o.nama_outlet, mw_out.provinsi, mw_out.kabupaten, mw_out.kecamatan, mw_out.kelurahan, u.alamat_lengkap as alamat_outlet, 
+                                  o.tgl_disetujui as tanggal_bergabung 
+                           FROM outlet o 
+                           JOIN users u ON u.id_users = o.id_users 
+                           LEFT JOIN master_wilayah mw_out ON mw_out.id_wilayah = u.id_wilayah
+                           WHERE o.id_investor = {$invId} 
+                             AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) 
+                             AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
+                           ORDER BY o.id_outlet DESC";
+                $resOut = $db->query($sqlOut);
+                if ($resOut) {
+                    while ($out = $resOut->fetch_assoc()) {
+                        $outlets[] = $out;
+                    }
+                }
+                $row['outlets_data'] = $outlets;
+                $investorList[] = $row;
+                $totalOverallInvestors++;
+                $totalOverallActiveOutlets += (int)$row['total_aktif'];
+            }
+        }
+
+        return [
+            'investors'                  => $investorList,
+            'totalOverallInvestors'      => $totalOverallInvestors,
+            'totalOverallActiveOutlets'  => $totalOverallActiveOutlets
+        ];
+    }
+
+    public static function getKomisiListForMaster(int $masterId) {
+        $db = Database::connect();
+        $id = intval($masterId);
+        $sqlList = "
+            SELECT * 
+            FROM komisi_master 
+            WHERE id_master = {$id}
+            ORDER BY tgl_transfer DESC, id_komisi DESC
+        ";
+        $resKomisi = $db->query($sqlList);
+        $komisiList = [];
+        $totalOverallKomisi = 0;
+        $totalKomisiBulanIni = 0;
+
+        $currentMonth = (int)date('n');
+        $currentYear  = (int)date('Y');
+
+        if ($resKomisi && $resKomisi->num_rows > 0) {
+            while ($row = $resKomisi->fetch_assoc()) {
+                $komisiList[] = $row;
+                $nom = (float)($row['nominal_transfer_komisi'] ?? 0);
+                $totalOverallKomisi += $nom;
+                
+                $m = !empty($row['tgl_transfer']) ? (int)date('n', strtotime($row['tgl_transfer'])) : 0;
+                $y = !empty($row['tgl_transfer']) ? (int)date('Y', strtotime($row['tgl_transfer'])) : 0;
+                if ($m === $currentMonth && $y === $currentYear) {
+                    $totalKomisiBulanIni += $nom;
+                }
+            }
+        }
+
+        return [
+            'komisiList'          => $komisiList,
+            'totalOverallKomisi'  => $totalOverallKomisi,
+            'totalKomisiBulanIni' => $totalKomisiBulanIni
+        ];
+    }
+
+    public static function getAvailableTahunKomisiByMaster(int $masterId) {
+        $db = Database::connect();
+        $id = intval($masterId);
+        $availableYears = [];
+        $resYears = $db->query("SELECT DISTINCT YEAR(tgl_transfer) as y_periode FROM komisi_master WHERE id_master = {$id} ORDER BY y_periode DESC");
+        if ($resYears) {
+            while ($yRow = $resYears->fetch_assoc()) {
+                if (!empty($yRow['y_periode'])) {
+                    $availableYears[] = (int)$yRow['y_periode'];
+                }
+            }
+        }
+        if (!in_array((int)date('Y'), $availableYears)) {
+            array_unshift($availableYears, (int)date('Y'));
+        }
+        return $availableYears;
+    }
 }
+

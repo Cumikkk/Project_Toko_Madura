@@ -75,8 +75,11 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     <option value="" disabled <?= empty($outletData['id_investor']) ? 'selected' : ''; ?>>-- Pilih Investor --</option>
                                     <?php if ($investorList && $investorList->num_rows > 0) : ?>
                                         <?php while ($inv = $investorList->fetch_assoc()) : ?>
-                                            <option value="<?= $inv['id_investor']; ?>" <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($inv['nama_lengkap']); ?> (@<?= htmlspecialchars($inv['username']); ?>)
+                                            <option value="<?= $inv['id_investor']; ?>" 
+                                                data-provinsi="<?= htmlspecialchars($inv['provinsi'] ?? ''); ?>"
+                                                data-kabupaten="<?= htmlspecialchars($inv['kabupaten'] ?? ''); ?>"
+                                                <?= (($outletData['id_investor'] ?? 0) == $inv['id_investor']) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($inv['nama_lengkap']); ?> (@<?= htmlspecialchars($inv['username']); ?>)<?= !empty($inv['provinsi']) ? ' - ' . htmlspecialchars($inv['provinsi']) : ''; ?>
                                             </option>
                                         <?php endwhile; ?>
                                     <?php endif; ?>
@@ -121,6 +124,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                                     </select>
                                 </div>
                             </div>
+                            <small id="note_wilayah_investor" class="text-muted d-block mt-1" style="font-size: 11.5px;"></small>
                         </div>
 <!-- 6. ALAMAT LENGKAP -->
                         <div class="col-md-12 mb-3">
@@ -342,7 +346,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         // Auto focus awal saat form dimuat
         setTimeout(() => {
             if (!isEdit) {
-                openNextSelect2('#id_investor');
+                $('#id_investor').next('.select2-container').find('.select2-selection').focus();
             } else {
                 $('#nama_outlet').focus();
             }
@@ -390,8 +394,6 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                     if (isEdit && edit_kabupaten) {
                         $('#kabupaten').trigger('change');
                         edit_provinsi = "";
-                    } else if (!isEdit || !edit_kabupaten) {
-                        openNextSelect2('#kabupaten');
                     }
                 });
             }
@@ -420,8 +422,6 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                     if (isEdit && edit_kecamatan) {
                         $('#kecamatan').trigger('change');
                         edit_kabupaten = "";
-                    } else if (!isEdit || !edit_kecamatan) {
-                        openNextSelect2('#kecamatan');
                     }
                 });
             }
@@ -449,17 +449,56 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                     if (isEdit && edit_id_wilayah) {
                         edit_kecamatan = "";
                         edit_id_wilayah = "";
-                    } else if (!isEdit || !edit_id_wilayah) {
-                        openNextSelect2('#id_wilayah');
                     }
                 });
             }
         });
 
-        // Initialize form
-        loadProvinsi();
+        $('#provinsi').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
+                    openNextSelect2('#kabupaten');
+                }
+            }, 150);
+        });
 
-        // Auto populate Bagi Hasil Investor when selecting an investor & move focus
+        $('#kabupaten').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
+                    openNextSelect2('#kecamatan');
+                }
+            }, 150);
+        });
+
+        $('#kecamatan').on('select2:select', function() {
+            setTimeout(() => {
+                if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
+                    openNextSelect2('#id_wilayah');
+                }
+            }, 150);
+        });
+
+        function applyInvestorProvinsiConstraint(invProv) {
+            if (invProv) {
+                $('#note_wilayah_investor').html('<i class="fe fe-info me-1 text-primary"></i>Wilayah dibatasi sesuai domisili Investor: <strong class="text-primary">' + invProv + '</strong>');
+                $('#provinsi').html(`<option value="${invProv}" selected>${invProv}</option>`).prop('disabled', true);
+                initWilayahSelect2('#provinsi');
+                $('#provinsi').trigger('change');
+            } else {
+                $('#note_wilayah_investor').text('');
+                loadProvinsi();
+            }
+        }
+
+        // Initialize form
+        let initialInvProv = $('#id_investor option:selected').data('provinsi') || '';
+        if (initialInvProv) {
+            applyInvestorProvinsiConstraint(initialInvProv);
+        } else {
+            loadProvinsi();
+        }
+
+        // Auto populate Bagi Hasil Investor & Kunci Wilayah when selecting an investor & move focus
         $('#id_investor').on('change select2:select', function(e) {
             let selectedOption = $(this).find('option:selected');
             let persen = selectedOption.data('persen');
@@ -467,6 +506,9 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
                 $('#persentase_hak_investor').val(persen);
                 window.balanceAdminOutletSplit('investor');
             }
+            let invProv = selectedOption.data('provinsi') || '';
+            applyInvestorProvinsiConstraint(invProv);
+
             if (e.type === 'select2:select') {
                 setTimeout(function() {
                     $('#nama_outlet').focus();
@@ -477,7 +519,13 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#nama_outlet').on('keydown', function(e) {
             if (e.which === 13) {
                 e.preventDefault();
-                $('#provinsi').select2('open');
+                if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
+                    openNextSelect2('#kabupaten');
+                } else if (!$('#provinsi').prop('disabled')) {
+                    openNextSelect2('#provinsi');
+                } else {
+                    openNextSelect2('#kabupaten');
+                }
             }
         });
 

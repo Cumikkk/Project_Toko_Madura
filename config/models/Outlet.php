@@ -169,6 +169,26 @@ class Outlet {
             }
         }
 
+        // Validasi pembatasan wilayah: wilayah Outlet harus di provinsi yang sama dengan Investor
+        if ($id_investor > 0 && $id_wilayah > 0) {
+            $checkInvWilayah = $db->query("
+                SELECT mw_inv.provinsi as prov_investor, mw_out.provinsi as prov_outlet
+                FROM investor inv
+                JOIN users u_inv ON u_inv.id_users = inv.id_users
+                LEFT JOIN master_wilayah mw_inv ON mw_inv.id_wilayah = u_inv.id_wilayah
+                CROSS JOIN master_wilayah mw_out ON mw_out.id_wilayah = {$id_wilayah}
+                WHERE inv.id_investor = {$id_investor}
+                LIMIT 1
+            ");
+            if ($checkInvWilayah && $rowIW = $checkInvWilayah->fetch_assoc()) {
+                if (!empty($rowIW['prov_investor']) && !empty($rowIW['prov_outlet'])) {
+                    if (strcasecmp(trim($rowIW['prov_investor']), trim($rowIW['prov_outlet'])) !== 0) {
+                        return ['success' => false, 'message' => "Wilayah outlet harus berada di provinsi yang sama dengan Investor (" . $rowIW['prov_investor'] . ")"];
+                    }
+                }
+            }
+        }
+
         $namaSafe      = $db->real_escape_string($nama_outlet);
         $wilayahVal    = $id_wilayah ? $id_wilayah : "NULL";
         $alamatSafe    = $db->real_escape_string($alamat_outlet);
@@ -531,4 +551,54 @@ class Outlet {
         }
         return ['success' => false, 'message' => 'Gagal memperbarui biaya langganan: ' . $db->error];
     }
+
+    public static function getAvailableTahunOmzet() {
+        $db = Database::connect();
+        $listTahun = [];
+        try {
+            $res = $db->query("SELECT DISTINCT YEAR(tanggal_omzet) as tahun FROM laporan_omzet WHERE tanggal_omzet IS NOT NULL AND tanggal_omzet > '1970-01-01' ORDER BY tahun DESC");
+            if ($res && $res->num_rows > 0) {
+                while ($row = $res->fetch_assoc()) {
+                    if (!empty($row['tahun'])) {
+                        $listTahun[] = intval($row['tahun']);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fallback
+        }
+        if (empty($listTahun)) {
+            $listTahun[] = intval(date('Y'));
+        }
+        return $listTahun;
+    }
+
+    public static function getOutletHistoriHeader(int $idOutlet) {
+        $db = Database::connect();
+        $id = intval($idOutlet);
+        $sql = "
+            SELECT o.id_outlet, o.nama_outlet, o.tgl_jatuh_tempo, o.status,
+                   u_kasir.nama_lengkap as nama_kasir, u_kasir.username as username_kasir, u_kasir.no_hp as no_hp_kasir,
+                   inv.id_investor, inv.biaya_langganan_outlet,
+                   u_inv.nama_lengkap as nama_investor, u_inv.username as username_investor,
+                   mw.provinsi, mw.kabupaten, mw.kecamatan, mw.kelurahan, u_kasir.alamat_lengkap as alamat_outlet
+            FROM outlet o
+            LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
+            LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
+            LEFT JOIN investor inv ON inv.id_investor = o.id_investor
+            LEFT JOIN users u_inv ON u_inv.id_users = inv.id_users
+            WHERE o.id_outlet = {$id}
+            LIMIT 1
+        ";
+        $res = $db->query($sql);
+        return ($res && $res->num_rows > 0) ? $res->fetch_assoc() : null;
+    }
+
+    public static function getRiwayatLanggananByOutlet(int $idOutlet) {
+        $db = Database::connect();
+        $id = intval($idOutlet);
+        $sql = "SELECT * FROM riwayat_langganan WHERE id_outlet = {$id} ORDER BY id_riwayat DESC";
+        return $db->query($sql);
+    }
 }
+

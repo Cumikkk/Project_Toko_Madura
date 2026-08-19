@@ -88,8 +88,11 @@ $masterList = Master::getAllMasterOptions();
                                     <option value="" disabled <?= empty($investorData['id_master']) ? 'selected' : ''; ?>>-- Pilih Master Owner --</option>
                                     <?php if ($masterList && $masterList->num_rows > 0) : ?>
                                         <?php while ($m = $masterList->fetch_assoc()) : ?>
-                                            <option value="<?= $m['id_users']; ?>" <?= (($investorData['id_master'] ?? 0) == $m['id_users']) ? 'selected' : ''; ?>>
-                                                <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)
+                                            <option value="<?= $m['id_users']; ?>" 
+                                                data-provinsi="<?= htmlspecialchars($m['provinsi'] ?? ''); ?>"
+                                                data-kabupaten="<?= htmlspecialchars($m['kabupaten'] ?? ''); ?>"
+                                                <?= (($investorData['id_master'] ?? 0) == $m['id_users']) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($m['nama_lengkap']); ?> (@<?= htmlspecialchars($m['username']); ?>)<?= !empty($m['provinsi']) ? ' - ' . htmlspecialchars($m['provinsi']) : ''; ?>
                                             </option>
                                         <?php endwhile; ?>
                                     <?php endif; ?>
@@ -275,20 +278,35 @@ $masterList = Master::getAllMasterOptions();
             }
         });
 
-        $('#id_master').on('select2:select', function() {
+        $('#id_master').select2({
+            placeholder: '-- Pilih Master Owner --',
+            allowClear: false,
+            width: '100%'
+        }).on('select2:close', function() {
+            let searchField = document.querySelector('.select2-search__field');
+            if (searchField) searchField.blur();
+        }).on('select2:select', function() {
             setTimeout(() => {
                 $('#biaya_langganan_outlet').focus();
-            }, 120);
+            }, 150);
         });
 
         $('#biaya_langganan_outlet').on('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                openNextSelect2('#provinsi');
+                if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
+                    openNextSelect2('#kabupaten');
+                } else {
+                    openNextSelect2('#provinsi');
+                }
             }
         });
 
-        // Navigasi saat data TETAP dipilih (tidak berubah)
+        // Initialize Select2 on wilayah selects
+        $('.wilayah-select').each(function() {
+            initWilayahSelect2(this);
+        });
+
         $('#provinsi').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
@@ -319,7 +337,26 @@ $masterList = Master::getAllMasterOptions();
             }, 150);
         });
 
-        // Load Provinsi
+        // Handler perubahan Master Owner: otomatis kunci provinsi sesuai domisili Master Owner
+        $('#id_master').on('change', function() {
+            let selectedOpt = $(this).find('option:selected');
+            let masterProv = selectedOpt.data('provinsi') || '';
+            applyMasterProvinsiConstraint(masterProv);
+        });
+
+        function applyMasterProvinsiConstraint(masterProv) {
+            if (masterProv) {
+                $('#note_wilayah_master').html('<i class="fe fe-info me-1 text-primary"></i>Wilayah dibatasi sesuai domisili Master Owner: <strong class="text-primary">' + masterProv + '</strong>');
+                $('#provinsi').html(`<option value="${masterProv}" selected>${masterProv}</option>`).prop('disabled', true);
+                initWilayahSelect2('#provinsi');
+                $('#provinsi').trigger('change');
+            } else {
+                $('#note_wilayah_master').text('');
+                loadProvinsi();
+            }
+        }
+
+        // Load Provinsi (fallback jika Master tidak punya provinsi spesifik)
         function loadProvinsi() {
             $.post(adminUrl + "/ajax/post/wilayah/get_provinsi", function(res) {
                 let options = '<option value=""></option>';
@@ -331,7 +368,7 @@ $masterList = Master::getAllMasterOptions();
                 }
                 $('#provinsi').html(options).prop('disabled', false);
                 initWilayahSelect2('#provinsi');
-                if (isEdit && edit_provinsi) {
+                if (isInitialEditCascade && edit_provinsi) {
                     $('#provinsi').trigger('change');
                 }
             });
@@ -361,13 +398,11 @@ $masterList = Master::getAllMasterOptions();
                     if (isInitialEditCascade && edit_kabupaten) {
                         $('#kabupaten').trigger('change');
                         edit_provinsi = "";
-                    } else {
-                        openNextSelect2('#kabupaten');
                     }
                 });
             }
         });
-
+            
         // Load Kecamatan
         $('#kabupaten').on('change', function() {
             let prov = $('#provinsi').val();
@@ -391,8 +426,6 @@ $masterList = Master::getAllMasterOptions();
                     if (isInitialEditCascade && edit_kecamatan) {
                         $('#kecamatan').trigger('change');
                         edit_kabupaten = "";
-                    } else {
-                        openNextSelect2('#kecamatan');
                     }
                 });
             }
@@ -421,15 +454,18 @@ $masterList = Master::getAllMasterOptions();
                         edit_kecamatan = "";
                         edit_id_wilayah = "";
                         isInitialEditCascade = false;
-                    } else {
-                        openNextSelect2('#id_wilayah');
                     }
                 });
             }
         });
 
         // Initialize form
-        loadProvinsi();
+        let initialMasterProv = $('#id_master option:selected').data('provinsi') || '';
+        if (initialMasterProv) {
+            applyMasterProvinsiConstraint(initialMasterProv);
+        } else {
+            loadProvinsi();
+        }
 
         $('#form-create-investor').on('submit', function(el) {
             el.preventDefault();

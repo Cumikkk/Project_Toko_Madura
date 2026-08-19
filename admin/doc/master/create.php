@@ -1,11 +1,8 @@
 <?php
 use App\Models\Master;
-use Config\Core\Database;
 use Config\Core\SystemInfo;
 
-$db = Database::connect();
-
-$idMaster = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['c']) ? intval($_GET['c']) : 0);
+$idMaster = intval($_GET['id'] ?? ($_GET['c'] ?? 0));
 $isEdit   = ($idMaster > 0);
 $masterData = null;
 
@@ -265,8 +262,6 @@ if ($isEdit) {
                     if (isInitialEditCascade && edit_kabupaten) {
                         $('#kabupaten').trigger('change');
                         edit_provinsi = "";
-                    } else {
-                        openNextSelect2('#kabupaten');
                     }
                 });
             }
@@ -295,8 +290,6 @@ if ($isEdit) {
                     if (isInitialEditCascade && edit_kecamatan) {
                         $('#kecamatan').trigger('change');
                         edit_kabupaten = "";
-                    } else {
-                        openNextSelect2('#kecamatan');
                     }
                 });
             }
@@ -328,8 +321,6 @@ if ($isEdit) {
                         setTimeout(() => {
                             $('#nama_lengkap').focus();
                         }, 100);
-                    } else {
-                        openNextSelect2('#id_wilayah');
                     }
                 });
             }

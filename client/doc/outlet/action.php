@@ -105,6 +105,26 @@ try {
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
 
+        // Validasi pembatasan wilayah: wilayah Outlet harus di provinsi yang sama dengan Investor
+        if ($idWilayah > 0 && $investorId > 0) {
+            $chkInvWilayah = $db->query("
+                SELECT mw_inv.provinsi as prov_investor, mw_out.provinsi as prov_outlet
+                FROM investor inv
+                JOIN users u_inv ON u_inv.id_users = inv.id_users
+                LEFT JOIN master_wilayah mw_inv ON mw_inv.id_wilayah = u_inv.id_wilayah
+                CROSS JOIN master_wilayah mw_out ON mw_out.id_wilayah = {$idWilayah}
+                WHERE inv.id_investor = {$investorId}
+                LIMIT 1
+            ");
+            if ($chkInvWilayah && $rowIW = $chkInvWilayah->fetch_assoc()) {
+                if (!empty($rowIW['prov_investor']) && !empty($rowIW['prov_outlet'])) {
+                    if (strcasecmp(trim($rowIW['prov_investor']), trim($rowIW['prov_outlet'])) !== 0) {
+                        JsonResponse(['success' => false, 'message' => "Wilayah outlet harus berada di provinsi yang sama dengan Investor (" . $rowIW['prov_investor'] . ")."]);
+                    }
+                }
+            }
+        }
+
         $sqlUser = "INSERT INTO users (nama_lengkap, username, no_hp, id_wilayah, alamat_lengkap, password, role) VALUES ('{$namaPengelola}', '{$username}', '{$noHp}', {$wilayahVal}, '{$alamatOutlet}', '{$escapedHash}', 'outlet')";
         if (!$db->query($sqlUser)) {
             JsonResponse(['success' => false, 'message' => 'Gagal membuat akun user outlet: ' . $db->error]);
@@ -300,6 +320,26 @@ try {
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
 
+        // Validasi pembatasan wilayah: wilayah Outlet harus di provinsi yang sama dengan Investor
+        if ($idWilayah > 0 && $investorId > 0) {
+            $chkInvWilayah = $db->query("
+                SELECT mw_inv.provinsi as prov_investor, mw_out.provinsi as prov_outlet
+                FROM investor inv
+                JOIN users u_inv ON u_inv.id_users = inv.id_users
+                LEFT JOIN master_wilayah mw_inv ON mw_inv.id_wilayah = u_inv.id_wilayah
+                CROSS JOIN master_wilayah mw_out ON mw_out.id_wilayah = {$idWilayah}
+                WHERE inv.id_investor = {$investorId}
+                LIMIT 1
+            ");
+            if ($chkInvWilayah && $rowIW = $chkInvWilayah->fetch_assoc()) {
+                if (!empty($rowIW['prov_investor']) && !empty($rowIW['prov_outlet'])) {
+                    if (strcasecmp(trim($rowIW['prov_investor']), trim($rowIW['prov_outlet'])) !== 0) {
+                        JsonResponse(['success' => false, 'message' => "Wilayah outlet harus berada di provinsi yang sama dengan Investor (" . $rowIW['prov_investor'] . ")."]);
+                    }
+                }
+            }
+        }
+
         // Update User Account (id_wilayah, alamat, nama_lengkap, no_hp, username, password)
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -442,6 +482,26 @@ try {
 
         $idWilayah = isset($_POST['id_wilayah']) ? (int)$_POST['id_wilayah'] : 0;
         $wilayahVal = ($idWilayah > 0) ? $idWilayah : "NULL";
+
+        // Validasi pembatasan wilayah: wilayah Outlet harus di provinsi yang sama dengan Investor
+        if ($idWilayah > 0 && $investorId > 0) {
+            $chkInvWilayah = $db->query("
+                SELECT mw_inv.provinsi as prov_investor, mw_out.provinsi as prov_outlet
+                FROM investor inv
+                JOIN users u_inv ON u_inv.id_users = inv.id_users
+                LEFT JOIN master_wilayah mw_inv ON mw_inv.id_wilayah = u_inv.id_wilayah
+                CROSS JOIN master_wilayah mw_out ON mw_out.id_wilayah = {$idWilayah}
+                WHERE inv.id_investor = {$investorId}
+                LIMIT 1
+            ");
+            if ($chkInvWilayah && $rowIW = $chkInvWilayah->fetch_assoc()) {
+                if (!empty($rowIW['prov_investor']) && !empty($rowIW['prov_outlet'])) {
+                    if (strcasecmp(trim($rowIW['prov_investor']), trim($rowIW['prov_outlet'])) !== 0) {
+                        JsonResponse(['success' => false, 'message' => "Wilayah outlet harus berada di provinsi yang sama dengan Investor (" . $rowIW['prov_investor'] . ")."]);
+                    }
+                }
+            }
+        }
 
         // Update User Account (id_wilayah & alamat stored in users table)
         if (!empty($password)) {

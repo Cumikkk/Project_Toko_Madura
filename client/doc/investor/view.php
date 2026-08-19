@@ -1,103 +1,22 @@
 <?php
-use Config\Core\Database;
 use App\Models\User;
+use App\Models\Master;
 use Config\Core\SystemInfo;
 
 $user = User::user();
-$db = Database::connect();
 $userId = (int)($user['MBR_ID'] ?? $user['id_users'] ?? 0);
 
-// Fetch distinct kabupaten of investors for filter dropdown
-$availableKabupaten = [];
-$resKab = $db->query("
-    SELECT DISTINCT mw.kabupaten 
-    FROM investor i 
-    JOIN users u ON u.id_users = i.id_users 
-    JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah 
-    WHERE (i.id_master = {$userId} OR i.id_master IS NULL) 
-      AND mw.kabupaten IS NOT NULL AND mw.kabupaten != ''
-    ORDER BY mw.kabupaten ASC
-");
-if ($resKab) {
-    while ($kRow = $resKab->fetch_assoc()) {
-        $availableKabupaten[] = $kRow['kabupaten'];
-    }
-}
+// Fetch distinct kabupaten of investors for filter dropdown via Master Model
+$availableKabupaten = Master::getInvestorKabupatenOptions($userId);
 
-// Fetch distinct years of investor registration
-$availableYears = [];
-$resYears = $db->query("
-    SELECT DISTINCT YEAR(u.created_at) as y_periode 
-    FROM investor i 
-    JOIN users u ON u.id_users = i.id_users 
-    WHERE (i.id_master = {$userId} OR i.id_master IS NULL) 
-    ORDER BY y_periode DESC
-");
-if ($resYears) {
-    while ($yRow = $resYears->fetch_assoc()) {
-        if (!empty($yRow['y_periode'])) {
-            $availableYears[] = (int)$yRow['y_periode'];
-        }
-    }
-}
-if (!in_array((int)date('Y'), $availableYears)) {
-    array_unshift($availableYears, (int)date('Y'));
-}
+// Fetch distinct years of investor registration via Master Model
+$availableYears = Master::getInvestorJoinYears($userId);
 
-// Fetch All Investors List for Master (Instant Client-Side Filtering)
-$sqlInv = "
-    SELECT 
-        i.id_investor,
-        u.nama_lengkap,
-        u.username,
-        u.no_hp,
-        mw.provinsi,
-        mw.kabupaten,
-        mw.kecamatan,
-        mw.kelurahan,
-        u.alamat_lengkap as alamat_investor,
-        u.created_at as tanggal_bergabung,
-        COUNT(o.id_outlet) as total_outlet,
-        SUM(CASE WHEN (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW()) THEN 1 ELSE 0 END) as total_aktif
-    FROM investor i
-    JOIN users u ON u.id_users = i.id_users
-    LEFT JOIN master_wilayah mw ON mw.id_wilayah = u.id_wilayah
-    LEFT JOIN outlet o ON o.id_investor = i.id_investor
-    WHERE (i.id_master = {$userId} OR i.id_master IS NULL)
-    GROUP BY i.id_investor
-    ORDER BY i.id_investor DESC
-";
-
-$resInvestors = $db->query($sqlInv);
-$investorList = [];
-$totalOverallInvestors = 0;
-$totalOverallActiveOutlets = 0;
-
-if ($resInvestors && $resInvestors->num_rows > 0) {
-    while ($row = $resInvestors->fetch_assoc()) {
-        $invId = (int)$row['id_investor'];
-        $outlets = [];
-        $sqlOut = "SELECT o.nama_outlet, mw_out.provinsi, mw_out.kabupaten, mw_out.kecamatan, mw_out.kelurahan, u.alamat_lengkap as alamat_outlet, 
-                          o.tgl_disetujui as tanggal_bergabung 
-                   FROM outlet o 
-                   JOIN users u ON u.id_users = o.id_users 
-                   LEFT JOIN master_wilayah mw_out ON mw_out.id_wilayah = u.id_wilayah
-                   WHERE o.id_investor = {$invId} 
-                     AND (o.status = 'active' OR (o.status IN ('pending', 'reject') AND o.tipe_request = 'perpanjangan')) 
-                     AND (o.tgl_jatuh_tempo IS NULL OR o.tgl_jatuh_tempo >= NOW())
-                   ORDER BY o.id_outlet DESC";
-        $resOut = $db->query($sqlOut);
-        if ($resOut) {
-            while ($out = $resOut->fetch_assoc()) {
-                $outlets[] = $out;
-            }
-        }
-        $row['outlets_data'] = $outlets;
-        $investorList[] = $row;
-        $totalOverallInvestors++;
-        $totalOverallActiveOutlets += (int)$row['total_aktif'];
-    }
-}
+// Fetch All Investors List for Master via Master Model
+$dataMaster = Master::getInvestorListForMaster($userId);
+$investorList = $dataMaster['investors'];
+$totalOverallInvestors = $dataMaster['totalOverallInvestors'];
+$totalOverallActiveOutlets = $dataMaster['totalOverallActiveOutlets'];
 
 $bulanIndo = [
     1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',

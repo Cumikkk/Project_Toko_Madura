@@ -2,8 +2,7 @@
 use Config\Core\Database;
 use Config\Core\SystemInfo;
 use App\Models\Outlet;
-
-$db = Database::connect();
+use App\Models\Investor;
 
 $stats = Outlet::getOutletStats();
 $activeCount = $stats['activeCount'];
@@ -24,7 +23,7 @@ $pendingOutlets = Outlet::getPendingOutlets();
 $rejectedOutlets = Outlet::getRejectedOutlets();
 
 // Fetch list of Investors for filter dropdown
-$investorFilterOptions = $db->query("SELECT inv.id_investor, u.nama_lengkap, u.username FROM investor inv JOIN users u ON u.id_users = inv.id_users ORDER BY u.nama_lengkap ASC");
+$investorFilterOptions = Investor::getAllInvestorOptions();
 
 // Helper: safely encode alamat for JS variable
 function safeJsonAlamat($str) {
