@@ -469,11 +469,11 @@ ob_start();
                             <td style="text-align: right; font-weight: bold; color: #dc2626;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f8fafc; font-weight: bold;">
-                            <td style="color: #7D0A0A;">MODAL BELANJA TOKO (SISA OMZET)</td>
+                            <td style="color: #7D0A0A;">MODAL BELANJA TOKO</td>
                             <td style="text-align: right; color: #7D0A0A; font-size: 10px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f1f5f9; font-weight: bold;">
-                            <td style="color: #0f172a;">TOTAL DITERIMA TOKO (MODAL + HAK OUTLET)</td>
+                            <td style="color: #0f172a;">TOTAL DITERIMA TOKO</td>
                             <td style="text-align: right; color: #0f172a; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10 + $totHakOutlet, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
@@ -710,7 +710,7 @@ ob_start();
                 <div style="border: 1px solid #cbd5e1; background-color: #f8fafc; border-radius: 6px; padding: 8px 10px;">
                     <div style="font-weight: bold; font-size: 8.5px; color: #334155; margin-bottom: 3px; text-transform: uppercase;">CATATAN KEUANGAN &amp; AUDIT HARIAN:</div>
                     <ul style="margin: 0; padding-left: 12px; font-size: 8px; color: #64748b; line-height: 1.35;">
-                        <li><strong>Modal Belanja (Sisa Omzet):</strong> Dana pokok operasional toko dari omzet kotor setelah dipotong skema, dialokasikan untuk belanja dan pembelian bahan/stok dagangan kembali.</li>
+                        <li><strong>Modal Belanja:</strong> Dana pokok operasional toko dari omzet kotor setelah dipotong skema, dialokasikan untuk belanja dan pembelian bahan/stok dagangan kembali.</li>
                         <li><strong>Total Diterima Toko:</strong> Total penerimaan dana yang dipegang pihak toko, akumulasi dari Modal Belanja ditambah Hak Bagi Hasil milik outlet.</li>
                         <li><strong>Hak Investor:</strong> Bagian hasil bersih milik investor sesuai kesepakatan persentase bagi hasil.</li>
                     </ul>
