@@ -422,11 +422,7 @@ ob_start();
                         <td style="width: 4%; color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($investorNama); ?></td>
                     </tr>
-                    <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">ID Investor</td>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
-                        <td style="color: #0f172a; font-weight: bold; padding: 2px 0;">#INV-<?= str_pad($investorId, 4, '0', STR_PAD_LEFT); ?></td>
-                    </tr>
+                   
                     <?php if ($selectedOutletId <= 0 && $role === 'investor') : ?>
                         <tr>
                             <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
@@ -461,7 +457,7 @@ ob_start();
             <td style="width: 49%; vertical-align: top; padding: 0;">
                 <div class="balance-box">
                     <div class="balance-box-header aktiva">
-                        A. SISI AKTIVA (ARUS OMZET &amp; MODAL BELANJA)
+                        A. SISI AKTIVA (OMZET &amp; PENERIMAAN TOKO)
                     </div>
                     <table class="balance-row-table">
                         <tr>
@@ -473,8 +469,12 @@ ob_start();
                             <td style="text-align: right; font-weight: bold; color: #dc2626;">Rp <?= number_format($totPotongan10, 0, ',', '.'); ?></td>
                         </tr>
                         <tr style="background-color: #f8fafc; font-weight: bold;">
-                            <td style="color: #0f172a;">MODAL BELANJA TOKO (SISA OMZET)</td>
-                            <td style="text-align: right; color: #7D0A0A; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
+                            <td style="color: #7D0A0A;">MODAL BELANJA TOKO (SISA OMZET)</td>
+                            <td style="text-align: right; color: #7D0A0A; font-size: 10px;">Rp <?= number_format($totOmzet - $totPotongan10, 0, ',', '.'); ?></td>
+                        </tr>
+                        <tr style="background-color: #f1f5f9; font-weight: bold;">
+                            <td style="color: #0f172a;">TOTAL DITERIMA TOKO (MODAL + HAK OUTLET)</td>
+                            <td style="text-align: right; color: #0f172a; font-size: 10.5px;">Rp <?= number_format($totOmzet - $totPotongan10 + $totHakOutlet, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
@@ -499,7 +499,11 @@ ob_start();
                         </tr>
                         <tr style="background-color: #f0fdf4; font-weight: bold;">
                             <td style="color: #166534;">TOTAL HAK TERDISTRIBUSI KESELURUHAN</td>
-                            <td style="text-align: right; color: #166534; font-size: 10.5px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
+                            <td style="text-align: right; color: #166534; font-size: 10px;">Rp <?= number_format($totHakInvestor + $totHakOutlet, 0, ',', '.'); ?></td>
+                        </tr>
+                        <tr style="background-color: #f0fdf4; font-weight: bold;">
+                            <td style="color: #166534;">TOTAL BERSIH HAK INVESTOR</td>
+                            <td style="text-align: right; color: #166534; font-size: 10.5px;">Rp <?= number_format($totHakInvestor, 0, ',', '.'); ?></td>
                         </tr>
                     </table>
                 </div>
@@ -518,7 +522,7 @@ ob_start();
                 <th class="text-end" style="width: 12%;">POTONGAN OMZET</th>
                 <th class="text-end" style="width: 12%;">HAK INVESTOR</th>
                 <th class="text-end" style="width: 12%;">HAK OUTLET</th>
-                <th class="text-end" style="width: 14.5%;">MODAL BELANJA (SISA OMZET)</th>
+                <th class="text-end" style="width: 14.5%;">MODAL BELANJA</th>
                 <th class="text-end" style="width: 14.5%;">TOTAL DITERIMA TOKO</th>
             </tr>
         </thead>
