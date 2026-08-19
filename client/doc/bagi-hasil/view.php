@@ -558,7 +558,7 @@ $countOutlet = count($rows);
                             <th class="py-3 px-3 text-center fw-bold text-success" style="text-align: center !important;">Hak Investor</th>
                             <th class="py-3 px-3 text-center fw-bold text-warning" style="text-align: center !important;">Hak Outlet</th>
                             <th class="py-3 px-3 text-center fw-bold text-brown" style="text-align: center !important;">Modal Belanja</th>
-                            <th class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Bersih Outlet Total</th>
+                            <th class="py-3 px-3 text-center fw-bold text-body-emphasis" style="text-align: center !important;">Total Diterima Toko</th>
                             <th class="py-3 px-3 text-center fw-bold pe-3" style="width: 140px; text-align: center !important;">Aksi Detail</th>
                         </tr>
                     </thead>

@@ -201,8 +201,8 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                 <th class="text-center">PERSENTASE POTONGAN</th>
                                 <th class="text-center">HAK INVESTOR</th>
                                 <th class="text-center">HAK OUTLET</th>
-                                <th class="text-center" style="color: #7D0A0A;">MODAL BELANJA</th>
-                                <th class="text-center">BERSIH OUTLET TOTAL</th>
+                                <th class="text-center">MODAL BELANJA</th>
+                                <th class="text-center">TOTAL DITERIMA TOKO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -246,7 +246,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                             Rp <?= number_format($nomHakOutlet, 0, ',', '.') ?>
                                             <small class="text-muted">(<?= number_format($pctOutlet, 0) ?>%)</small>
                                         </td>
-                                        <td class="text-end fw-bold" style="color: #7D0A0A;">
+                                        <td class="text-end fw-bold" style="color: #6f42c1;">
                                             Rp <?= number_format($nomModalBelanja, 0, ',', '.') ?>
                                         </td>
                                         <td class="text-end fw-bold text-dark">
@@ -268,7 +268,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                 <td class="text-end text-danger fw-bold py-2" id="footTotalPotongan">Rp 0</td>
                                 <td class="text-end text-primary fw-bold py-2" id="footTotalInvestor">Rp 0</td>
                                 <td class="text-end text-warning fw-bold py-2" id="footTotalOutlet">Rp 0</td>
-                                <td class="text-end fw-bold py-2" style="color: #7D0A0A;" id="footTotalModalBelanja">Rp 0</td>
+                                <td class="text-end fw-bold py-2" style="color: #6f42c1;" id="footTotalModalBelanja">Rp 0</td>
                                 <td class="text-end text-dark fw-bold py-2" id="footTotalBersih">Rp 0</td>
                             </tr>
                         </tfoot>
