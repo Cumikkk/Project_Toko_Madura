@@ -2025,10 +2025,10 @@ $(document).ready(function() {
                             res.results.forEach(item => {
                                 let optVal = isFilterMode ? (item.kelurahan || item.id) : item.id;
                                 let sel = false;
-                                if (isFilterMode && defaultKel) {
-                                    sel = ((defaultKel || '').toUpperCase() === (item.kelurahan || '').toUpperCase());
-                                } else if (defaultIdWilayah) {
-                                    sel = (item.id == defaultIdWilayah);
+                                if (defaultIdWilayah && item.id == defaultIdWilayah) {
+                                    sel = true;
+                                } else if (defaultKel && (item.kelurahan || '').toUpperCase() === (defaultKel || '').toUpperCase()) {
+                                    sel = true;
                                 }
                                 options += `<option value="${optVal}" ${sel ? 'selected' : ''}>${item.text}</option>`;
                             });
@@ -2393,6 +2393,7 @@ $(document).ready(function() {
                         res.data.provinsi,
                         res.data.kabupaten,
                         res.data.kecamatan,
+                        res.data.kelurahan,
                         res.data.id_wilayah
                     );
 
