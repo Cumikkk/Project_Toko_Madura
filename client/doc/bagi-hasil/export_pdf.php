@@ -55,6 +55,11 @@ $selectedTglSelesai = isset($_GET['tgl_selesai']) && !empty($_GET['tgl_selesai']
 $selectedBulan      = isset($_GET['bulan']) ? (int)$_GET['bulan'] : 0;
 $selectedTahun      = isset($_GET['tahun']) ? (int)$_GET['tahun'] : 0;
 
+$selectedProvinsi  = trim($_GET['provinsi'] ?? '');
+$selectedKabupaten = trim($_GET['kabupaten'] ?? '');
+$selectedKecamatan = trim($_GET['kecamatan'] ?? '');
+$selectedKelurahan = trim($_GET['kelurahan'] ?? '');
+
 $checkBulan = ($selectedBulan > 0) ? $selectedBulan : (int)date('n');
 $checkTahun = ($selectedTahun > 0) ? $selectedTahun : (int)date('Y');
 
@@ -67,6 +72,23 @@ $totHakOutlet = 0;
 
 $whereConditions = ($role === 'investor') ? ["o.id_investor = {$investorId}"] : ["o.id_outlet = {$targetOutletId}"];
 $selectedOutletNama = '';
+
+if (!empty($selectedProvinsi)) {
+    $safeProv = $db->real_escape_string($selectedProvinsi);
+    $whereConditions[] = "mw.provinsi = '{$safeProv}'";
+}
+if (!empty($selectedKabupaten)) {
+    $safeKab = $db->real_escape_string($selectedKabupaten);
+    $whereConditions[] = "mw.kabupaten = '{$safeKab}'";
+}
+if (!empty($selectedKecamatan)) {
+    $safeKec = $db->real_escape_string($selectedKecamatan);
+    $whereConditions[] = "mw.kecamatan = '{$safeKec}'";
+}
+if (!empty($selectedKelurahan)) {
+    $safeKel = $db->real_escape_string($selectedKelurahan);
+    $whereConditions[] = "mw.kelurahan = '{$safeKel}'";
+}
 
 if ($selectedOutletId > 0 && $role === 'investor') {
     $whereConditions[0] = "o.id_outlet = {$selectedOutletId}";
@@ -396,11 +418,13 @@ ob_start();
                         <td style="width: 4%; color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($investorNama); ?></td>
                     </tr>
-                    <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
-                        <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet Toko</td>
-                    </tr>
+                    <?php if ($selectedOutletId <= 0 && $role === 'investor') : ?>
+                        <tr>
+                            <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Total Outlet Terdaftar</td>
+                            <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
+                            <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= $countOutlet; ?> Outlet Toko</td>
+                        </tr>
+                    <?php endif; ?>
                 </table>
             </td>
             <td style="width: 50%; vertical-align: top; padding: 6px 10px;">
@@ -411,7 +435,7 @@ ob_start();
                         <td style="width: 58%; color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($periodeTitleStr); ?></td>
                     </tr>
                     <tr>
-                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Cakupan Toko</td>
+                        <td style="color: #64748b; font-weight: bold; padding: 2px 0;">Toko</td>
                         <td style="color: #64748b; font-weight: bold; padding: 2px 0;">:</td>
                         <td style="color: #0f172a; font-weight: bold; padding: 2px 0;"><?= htmlspecialchars($displayNamaToko); ?></td>
                     </tr>
@@ -525,9 +549,9 @@ ob_start();
         <?php endif; ?>
     </table>
 
-    <!-- HALAMAN BARU UNTUK KELOMPOK OUTLET TRANSAKSI HARIAN -->
+    <!-- HALAMAN BARU UNTUK KELOMPOK OUTLET TRANSAKSI HARIAN (HANYA DITAMPILKAN SAAT FILTER TOKO SPESIFIK DIPILIH) -->
     <!-- Bagian III: Tabel Rincian Transaksi Harian Per Outlet Toko (Menampilkan Kolom Skema Pot. %) -->
-    <?php if (!empty($rowsSummary)) : ?>
+    <?php if (!empty($rowsSummary) && ($selectedOutletId > 0 || $role === 'outlet')) : ?>
         <?php 
         $outletNum = 0;
         foreach ($rowsSummary as $rOut) : 
