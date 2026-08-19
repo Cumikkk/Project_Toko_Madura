@@ -156,7 +156,8 @@ $bulanIndo = [
                 </div>
 
                 <div class="card-body p-2 p-md-4">
-                    <div class="table-responsive">
+                    <!-- DESKTOP / TABLET TABLE VIEW (Visible on >= 768px) -->
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-hover align-middle mb-0 w-100" id="tableDataKomisi">
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
@@ -242,6 +243,84 @@ $bulanIndo = [
                         </table>
                     </div>
 
+                    <!-- MOBILE CARD LIST VIEW (Visible only on < 768px HP) -->
+                    <div class="d-md-none" id="mobileKomisiList">
+                        <?php if (!empty($komisiList)) : ?>
+                            <?php foreach ($komisiList as $index => $km) : 
+                                $tglStr = !empty($km['tgl_transfer']) ? date('Y-m-d', strtotime($km['tgl_transfer'])) : '';
+                                $mNum = !empty($km['tgl_transfer']) ? (int)date('n', strtotime($km['tgl_transfer'])) : 0;
+                                $yNum = !empty($km['tgl_transfer']) ? (int)date('Y', strtotime($km['tgl_transfer'])) : 0;
+                                $nomVal = (float)($km['nominal_transfer_komisi'] ?? 0);
+                                $buktiFoto = !empty($km['bukti_pembayaran']) ? trim($km['bukti_pembayaran']) : '';
+                                $proxyUrl = !empty($buktiFoto) ? SystemInfo::app('CLIENT_URL') . '/image-proxy.php?file=' . urlencode($buktiFoto) : '';
+                                $fileExt = !empty($buktiFoto) ? strtolower(pathinfo($buktiFoto, PATHINFO_EXTENSION)) : '';
+                            ?>
+                                <div class="card border border-body-subtle shadow-xs mb-3 komisi-card-item rounded-3 overflow-hidden bg-body"
+                                     data-date="<?= $tglStr; ?>"
+                                     data-month="<?= $mNum; ?>"
+                                     data-year="<?= $yNum; ?>"
+                                     data-nominal="<?= $nomVal; ?>"
+                                     data-id="<?= (int)$km['id_komisi']; ?>">
+                                    <div class="card-body p-3">
+                                        <!-- Top: Index, Catatan & Nominal -->
+                                        <div class="d-flex align-items-start justify-content-between gap-2 mb-2 pb-2 border-bottom border-body-subtle">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-danger-subtle text-danger fw-bold rounded-circle d-flex align-items-center justify-content-center card-index-num" style="width: 28px; height: 28px; font-size: 11px;">
+                                                    <?= $index + 1; ?>
+                                                </span>
+                                                <div>
+                                                    <h6 class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($km['catatan'] ?: 'Komisi Master'); ?></h6>
+                                                    <span class="text-body-secondary small font-monospace" style="font-size: 11.5px;">
+                                                        <i class="fa-regular fa-clock me-1 text-primary"></i><?= !empty($km['tgl_transfer']) ? date("d/m/Y H:i", strtotime($km['tgl_transfer'])) . ' WIB' : '-'; ?>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold fs-12 flex-shrink-0">
+                                                + Rp <?= number_format($nomVal, 0, ',', '.'); ?>
+                                            </span>
+                                        </div>
+
+                                        <!-- Action Button for Bukti -->
+                                        <div class="mt-2">
+                                            <?php if (!empty($buktiFoto)) : ?>
+                                                <?php if ($fileExt === 'pdf') : ?>
+                                                    <a href="<?= $proxyUrl; ?>" target="_blank" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-1.5 fw-semibold shadow-xs">
+                                                        <i class="fa-solid fa-file-pdf me-1"></i> Lihat PDF Bukti Transfer
+                                                    </a>
+                                                <?php else : ?>
+                                                    <button type="button" 
+                                                            class="btn btn-outline-danger btn-sm w-100 rounded-pill py-1.5 fw-semibold btn-client-view-bukti-komisi shadow-xs" 
+                                                            data-img="<?= $proxyUrl; ?>"
+                                                            data-master="<?= htmlspecialchars($namaMaster, ENT_QUOTES, 'UTF-8'); ?>"
+                                                            data-periode="<?= htmlspecialchars($km['catatan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>"
+                                                            data-nominal="Rp <?= number_format($nomVal, 0, ',', '.'); ?>"
+                                                            title="Lihat Bukti Transfer">
+                                                        <i class="fa-solid fa-image me-1"></i> Lihat Bukti Transfer
+                                                    </button>
+                                                <?php endif; ?>
+                                            <?php else : ?>
+                                                <div class="text-center text-body-secondary small py-1">
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1 font-monospace small">
+                                                        <i class="fa-solid fa-info-circle me-1"></i> Tidak Ada Lampiran
+                                                    </span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <div class="text-center py-5 text-body-secondary card border border-body-subtle rounded-3">
+                                <i class="fa-solid fa-receipt fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                                Belum ada riwayat penyerahan komisi.
+                            </div>
+                        <?php endif; ?>
+                        <div id="noMatchingFilterMobileKomisi" class="text-center py-5 text-body-secondary card border border-body-subtle rounded-3" style="display: none;">
+                            <i class="fa-solid fa-filter-circle-xmark fs-1 text-danger opacity-50 mb-2 d-block"></i>
+                            Tidak ada riwayat komisi yang sesuai dengan kriteria filter saat ini.
+                        </div>
+                    </div>
+
                     <!-- Record Summary Footer -->
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
                         <div class="small text-body-secondary fw-semibold ms-1">
@@ -274,11 +353,13 @@ $(document).ready(function() {
             $('#btnResetFilterKomisi').removeClass('d-inline-flex').addClass('d-none');
         }
 
-        // Sorting Rows in DOM
+        // Sorting Rows in DOM (Desktop Table & Mobile Cards)
         let $tbody = $('#tbodyKomisi');
+        let $mobileList = $('#mobileKomisiList');
         let rows = $('.komisi-data-row').get();
+        let cards = $('.komisi-card-item').get();
 
-        rows.sort(function(a, b) {
+        let sortFn = function(a, b) {
             let dateA = $(a).attr('data-date');
             let dateB = $(b).attr('data-date');
             let nomA = parseFloat($(a).attr('data-nominal')) || 0;
@@ -293,10 +374,16 @@ $(document).ready(function() {
             } else { // newest
                 return (dateB.localeCompare(dateA)) || (idB - idA);
             }
-        });
+        };
+
+        rows.sort(sortFn);
+        cards.sort(sortFn);
 
         $.each(rows, function(idx, row) {
             $tbody.append(row);
+        });
+        $.each(cards, function(idx, card) {
+            $mobileList.append(card);
         });
 
         // Filter Rows & Calculate Metrics
@@ -307,6 +394,7 @@ $(document).ready(function() {
         let nowMonth = now.getMonth() + 1;
         let nowYear  = now.getFullYear();
 
+        // Filter desktop table rows
         $('.komisi-data-row').each(function() {
             let $row = $(this);
             let rowDate = $row.attr('data-date');
@@ -335,14 +423,42 @@ $(document).ready(function() {
             }
         });
 
+        // Filter mobile cards
+        let mobileVisibleCount = 0;
+        $('.komisi-card-item').each(function() {
+            let $card = $(this);
+            let rowDate = $card.attr('data-date');
+            let rowMonth = parseInt($card.attr('data-month')) || 0;
+            let rowYear = parseInt($card.attr('data-year')) || 0;
+            let rowNominal = parseFloat($card.attr('data-nominal')) || 0;
+            let rowText = $card.text().toLowerCase();
+
+            let matchMonth = (bulan === 0 || rowMonth === bulan);
+            let matchYear = (tahun === 0 || rowYear === tahun);
+            let matchDateRange = true;
+            if (tglMulai && rowDate < tglMulai) matchDateRange = false;
+            if (tglSelesai && rowDate > tglSelesai) matchDateRange = false;
+            let matchSearch = (!search || rowText.indexOf(search) > -1);
+
+            if (matchMonth && matchYear && matchDateRange && matchSearch) {
+                $card.show();
+                mobileVisibleCount++;
+                $card.find('.card-index-num').text(mobileVisibleCount);
+            } else {
+                $card.hide();
+            }
+        });
+
         $('#metricTotalKomisi').text('Rp ' + totalSum.toLocaleString('id-ID'));
         $('#metricKomisiBulanIni').text('Rp ' + thisMonthSum.toLocaleString('id-ID'));
         $('#footerCountVisibleKomisi').text(visibleCount);
 
         if (visibleCount === 0) {
             $('#noMatchingFilterRowKomisi').show();
+            $('#noMatchingFilterMobileKomisi').show();
         } else {
             $('#noMatchingFilterRowKomisi').hide();
+            $('#noMatchingFilterMobileKomisi').hide();
         }
     }
 

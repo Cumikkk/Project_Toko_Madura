@@ -269,15 +269,12 @@ function initFilterSelect2(selector) {
     });
 }
 
-function openNextFilterSelect2(selector) {
+function focusNextFilterSelect2(selector) {
     setTimeout(() => {
         let $el = $(selector);
-        $el.select2('open');
-        let searchField = document.querySelector('.select2-container--open .select2-search__field');
-        if (searchField) {
-            searchField.focus();
-        }
-    }, 120);
+        let $container = $el.next('.select2-container');
+        $container.find('.select2-selection').focus();
+    }, 100);
 }
 
 $(document).ready(function() {
@@ -303,11 +300,11 @@ $(document).ready(function() {
 
     // Navigasi Otomatis Berurutan saat Filter Dipilih
     $('#filterMaster').on('select2:select', function() {
-        openNextFilterSelect2('#filterBulan');
+        focusNextFilterSelect2('#filterBulan');
     });
 
     $('#filterBulan').on('select2:select', function() {
-        openNextFilterSelect2('#filterTahun');
+        focusNextFilterSelect2('#filterTahun');
     });
 
     // Inisialisasi DataTable Komisi

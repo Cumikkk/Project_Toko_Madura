@@ -159,7 +159,8 @@ $bulanIndo = [
                 </div>
 
                 <div class="card-body p-2 p-md-4">
-                    <div class="table-responsive">
+                    <!-- DESKTOP / TABLET TABLE VIEW (Visible on >= 768px) -->
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-hover align-middle mb-0 w-100" id="tableDataInvestor">
                             <thead class="table-group-divider bg-body-secondary">
                                 <tr class="text-uppercase small text-body-secondary">
@@ -238,6 +239,92 @@ $bulanIndo = [
                         </table>
                     </div>
 
+                    <!-- MOBILE CARD LIST VIEW (Visible only on < 768px HP) -->
+                    <div class="d-md-none" id="mobileInvestorList">
+                        <?php if (!empty($investorList)) : ?>
+                            <?php foreach ($investorList as $index => $inv) : 
+                                $invMonth = !empty($inv['tanggal_bergabung']) ? (int)date('n', strtotime($inv['tanggal_bergabung'])) : 0;
+                                $invYear  = !empty($inv['tanggal_bergabung']) ? (int)date('Y', strtotime($inv['tanggal_bergabung'])) : 0;
+                                $statusOutletRow = ((int)$inv['total_aktif'] > 0) ? 'active' : 'empty';
+                                $kabUpper = !empty($inv['kabupaten']) ? strtoupper(trim($inv['kabupaten'])) : '';
+                            ?>
+                                <div class="card border border-body-subtle shadow-xs mb-3 investor-card-item rounded-3 overflow-hidden bg-body"
+                                     data-status="<?= $statusOutletRow; ?>"
+                                     data-kabupaten="<?= htmlspecialchars($kabUpper); ?>"
+                                     data-bulan="<?= $invMonth; ?>"
+                                     data-tahun="<?= $invYear; ?>"
+                                     data-outlets-count="<?= (int)$inv['total_aktif']; ?>">
+                                    <div class="card-body p-3">
+                                        <!-- Top Row: Avatar Badge, Nama & No. HP + Outlet Pill -->
+                                        <div class="d-flex align-items-start justify-content-between gap-2 mb-2 pb-2 border-bottom border-body-subtle">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-danger-subtle text-danger fw-bold rounded-circle d-flex align-items-center justify-content-center card-index-num" style="width: 28px; height: 28px; font-size: 11px;">
+                                                    <?= $index + 1; ?>
+                                                </span>
+                                                <div>
+                                                    <h6 class="fw-bold text-body-emphasis mb-0 fs-6"><?= htmlspecialchars($inv['nama_lengkap']); ?></h6>
+                                                    <span class="text-success small fw-semibold">
+                                                        <i class="fa-solid fa-phone me-1"></i><?= htmlspecialchars($inv['no_hp'] ?? '-'); ?>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold fs-11 flex-shrink-0">
+                                                <i class="fa-solid fa-store me-1"></i><?= number_format($inv['total_aktif']); ?> Outlet
+                                            </span>
+                                        </div>
+
+                                        <!-- Middle Info Grid -->
+                                        <div class="p-2.5 bg-body-tertiary rounded-3 mb-3 small">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5 pb-1 border-bottom border-body-subtle">
+                                                <span class="text-body-secondary"><i class="fa-solid fa-location-dot me-1 text-danger"></i>Wilayah:</span>
+                                                <span class="fw-bold text-body-emphasis text-end" style="font-size: 12.5px;">
+                                                    <?= !empty($inv['kecamatan']) && $inv['kecamatan'] !== '-' ? htmlspecialchars(ucwords(strtolower($inv['kelurahan'] ?? ''))) . ', Kec. ' . htmlspecialchars(ucwords(strtolower($inv['kecamatan'] ?? ''))) : '-'; ?>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <span class="text-body-secondary"><i class="fa-regular fa-clock me-1 text-primary"></i>Bergabung:</span>
+                                                <span class="fw-semibold font-monospace text-body-emphasis" style="font-size: 12px;">
+                                                    <?= !empty($inv['tanggal_bergabung']) ? date("d/m/Y H:i", strtotime($inv['tanggal_bergabung'])) . ' WIB' : '-'; ?>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Bottom Action Buttons -->
+                                        <div class="d-flex gap-2">
+                                            <?php if (!empty($inv['kecamatan']) && $inv['kecamatan'] !== '-') : ?>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary flex-fill rounded-pill py-1.5 btn-detail-alamat-investor fw-semibold shadow-xs"
+                                                        data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                        data-provinsi="<?= htmlspecialchars($inv['provinsi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                        data-kabupaten="<?= htmlspecialchars($inv['kabupaten'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                        data-kecamatan="<?= htmlspecialchars($inv['kecamatan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                        data-kelurahan="<?= htmlspecialchars($inv['kelurahan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                        data-alamat="<?= htmlspecialchars($inv['alamat_investor'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                        title="Detail Alamat">
+                                                    <i class="fa-solid fa-map-location-dot me-1 text-danger"></i>Detail Lokasi
+                                                </button>
+                                            <?php endif; ?>
+                                            <button type="button" class="btn btn-sm btn-outline-danger flex-fill rounded-pill py-1.5 btn-lihat-outlet fw-bold shadow-xs"
+                                                    data-nama="<?= htmlspecialchars($inv['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?>" 
+                                                    data-outlets="<?= htmlspecialchars(json_encode($inv['outlets_data'] ?? []), ENT_QUOTES, 'UTF-8'); ?>"
+                                                    title="Lihat Outlet">
+                                                <i class="fa-solid fa-store me-1"></i>Lihat Outlet
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else : ?>
+                            <div class="text-center py-5 text-body-secondary card border border-body-subtle rounded-3">
+                                <i class="fa-solid fa-users-slash fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                                Belum ada data investor terdaftar.
+                            </div>
+                        <?php endif; ?>
+                        <div id="noMatchingFilterMobileInvestor" class="text-center py-5 text-body-secondary card border border-body-subtle rounded-3" style="display: none;">
+                            <i class="fa-solid fa-filter-circle-xmark fs-1 text-danger opacity-50 mb-2 d-block"></i>
+                            Tidak ada data investor yang sesuai dengan kriteria filter saat ini.
+                        </div>
+                    </div>
+
                     <!-- Record Summary Footer -->
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top border-body-subtle mt-2">
                         <div class="small text-body-secondary fw-semibold ms-1">
@@ -277,6 +364,7 @@ $(document).ready(function() {
         let visibleCount = 0;
         let totalVisibleOutlets = 0;
 
+        // Filter desktop table rows
         $('.investor-data-row').each(function() {
             let $row = $(this);
             let rowStatus = $row.attr('data-status');
@@ -302,14 +390,41 @@ $(document).ready(function() {
             }
         });
 
+        // Filter mobile card items
+        let mobileVisibleCount = 0;
+        $('.investor-card-item').each(function() {
+            let $card = $(this);
+            let rowStatus = $card.attr('data-status');
+            let rowKab = ($card.attr('data-kabupaten') || '').toUpperCase().trim();
+            let rowBulan = parseInt($card.attr('data-bulan')) || 0;
+            let rowTahun = parseInt($card.attr('data-tahun')) || 0;
+            let rowText = $card.text().toLowerCase();
+
+            let matchStatus = (filterStatus === 'all' || rowStatus === filterStatus);
+            let matchKab = (!filterKab || rowKab === filterKab);
+            let matchBulan = (filterBulan === 0 || rowBulan === filterBulan);
+            let matchTahun = (filterTahun === 0 || rowTahun === filterTahun);
+            let matchSearch = (!search || rowText.indexOf(search) > -1);
+
+            if (matchStatus && matchKab && matchBulan && matchTahun && matchSearch) {
+                $card.show();
+                mobileVisibleCount++;
+                $card.find('.card-index-num').text(mobileVisibleCount);
+            } else {
+                $card.hide();
+            }
+        });
+
         $('#metricTotalInvestor').text(visibleCount.toLocaleString('id-ID'));
         $('#metricTotalOutlet').text(totalVisibleOutlets.toLocaleString('id-ID'));
         $('#footerCountVisible').text(visibleCount);
 
         if (visibleCount === 0) {
             $('#noMatchingFilterRow').show();
+            $('#noMatchingFilterMobileInvestor').show();
         } else {
             $('#noMatchingFilterRow').hide();
+            $('#noMatchingFilterMobileInvestor').hide();
         }
     }
 
@@ -400,11 +515,14 @@ $(document).ready(function() {
         let namaInv = $(this).data('nama');
         let outlets = $(this).data('outlets');
 
-        let html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0 w-100 text-start" style="font-size: 13.5px;">';
-        html += '<thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary"><tr><th class="ps-3 text-center" style="width: 50px;">No</th><th>Nama Outlet</th><th class="text-center">Wilayah</th><th class="text-center">Tanggal Bergabung</th></tr></thead>';
-        html += '<tbody class="border-0">';
+        let html = '';
 
         if (outlets && outlets.length > 0) {
+            // 1. DESKTOP MODAL TABLE (>= 768px)
+            html += '<div class="table-responsive d-none d-md-block"><table class="table table-hover align-middle mb-0 w-100 text-start" style="font-size: 13.5px;">';
+            html += '<thead class="table-group-divider bg-body-secondary text-uppercase small text-body-secondary"><tr><th class="ps-3 text-center" style="width: 50px;">No</th><th>Nama Outlet</th><th class="text-center">Wilayah</th><th class="text-center">Tanggal Bergabung</th></tr></thead>';
+            html += '<tbody class="border-0">';
+
             $.each(outlets, function(idx, item) {
                 let safeNama = String(item.nama_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                 let safeKel = item.kelurahan ? item.kelurahan : '';
@@ -457,11 +575,52 @@ $(document).ready(function() {
                     `;
                 }
             });
-        } else {
-            html += '<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-1"></i> Investor ini belum memiliki outlet yang aktif.</td></tr>';
-        }
+            html += '</tbody></table></div>';
 
-        html += '</tbody></table></div>';
+            // 2. MOBILE MODAL CARDS (< 768px)
+            html += '<div class="d-md-none text-start">';
+            $.each(outlets, function(idx, item) {
+                let safeNama = String(item.nama_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                let safeKel = item.kelurahan ? item.kelurahan : '';
+                let safeKec = item.kecamatan ? item.kecamatan : '';
+                let safeKab = item.kabupaten ? item.kabupaten : '';
+                let safeProv = item.provinsi ? item.provinsi : '';
+                let safeAlamat = String(item.alamat_outlet || '-').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+                let fullWilayahOutlet = formatWilayahText(safeKel, safeKec, safeKab, safeProv);
+                let mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(safeAlamat !== '-' ? safeAlamat : '');
+                let tglJoin = item.tanggal_bergabung ? item.tanggal_bergabung : (item.tgl_disetujui ? item.tgl_disetujui : '-');
+
+                html += `
+                    <div class="card border border-secondary-subtle rounded-3 mb-2 shadow-xs bg-white overflow-hidden">
+                        <div class="card-body p-2.5">
+                            <div class="d-flex align-items-center justify-content-between mb-1.5 pb-1 border-bottom border-light-subtle">
+                                <span class="badge bg-danger-subtle text-danger fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 11px;">
+                                    ${idx + 1}
+                                </span>
+                                <strong class="text-dark fs-6 flex-grow-1 ms-2 text-truncate">${safeNama}</strong>
+                                <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">${tglJoin}</span>
+                            </div>
+                            <div class="small text-secondary mb-1">
+                                <i class="fa-solid fa-location-dot me-1 text-danger"></i>${fullWilayahOutlet || '-'}
+                            </div>
+                            ${safeAlamat && safeAlamat !== '-' ? `
+                                <div class="p-2 bg-light rounded-2 mt-1.5 border border-light-subtle" style="font-size: 11.5px;">
+                                    <span class="text-muted d-block fw-bold mb-0.5">Alamat Lengkap:</span>
+                                    <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-underline fw-bold d-block text-break">
+                                        ${safeAlamat} <i class="fa-solid fa-arrow-up-right-from-square ms-1 text-primary" style="font-size: 9px;"></i>
+                                    </a>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+        } else {
+            html += '<div class="text-center py-4 text-muted"><i class="fa-solid fa-store-slash me-1 fs-3 d-block mb-2"></i> Investor ini belum memiliki outlet yang aktif.</div>';
+        }
 
         Swal.fire({
             title: `<div class="fw-bold text-danger fs-5"><i class="fa-solid fa-store me-2"></i>Daftar Outlet Milik ${namaInv || 'Investor'}</div>`,

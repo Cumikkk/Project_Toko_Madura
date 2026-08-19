@@ -214,15 +214,13 @@ $masterList = Master::getAllMasterOptions();
             });
         }
 
-        function openNextSelect2(selector) {
+        function focusNextSelect2(selector) {
             setTimeout(() => {
                 let $el = $(selector);
-                $el.select2('open');
-                let searchField = document.querySelector('.select2-container--open .select2-search__field');
-                if (searchField) {
-                    searchField.focus();
+                if ($el.length && !$el.prop('disabled')) {
+                    $el.next('.select2-container').find('.select2-selection').focus();
                 }
-            }, 120);
+            }, 100);
         }
 
         $('.wilayah-select, #id_master').on('select2:close', function() {
@@ -275,7 +273,7 @@ $masterList = Master::getAllMasterOptions();
         $('#password').on('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                openNextSelect2('#id_master');
+                focusNextSelect2('#id_master');
             }
         });
 
@@ -296,9 +294,9 @@ $masterList = Master::getAllMasterOptions();
             if (e.key === 'Enter') {
                 e.preventDefault();
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 } else {
-                    openNextSelect2('#provinsi');
+                    focusNextSelect2('#provinsi');
                 }
             }
         });
@@ -311,7 +309,7 @@ $masterList = Master::getAllMasterOptions();
         $('#provinsi').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 }
             }, 150);
         });
@@ -319,7 +317,7 @@ $masterList = Master::getAllMasterOptions();
         $('#kabupaten').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
-                    openNextSelect2('#kecamatan');
+                    focusNextSelect2('#kecamatan');
                 }
             }, 150);
         });
@@ -327,7 +325,7 @@ $masterList = Master::getAllMasterOptions();
         $('#kecamatan').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
-                    openNextSelect2('#id_wilayah');
+                    focusNextSelect2('#id_wilayah');
                 }
             }, 150);
         });

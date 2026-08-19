@@ -479,12 +479,15 @@ class Outlet {
                 $pctInv = (float)($row['persentase_hak_investor'] ?? 0);
                 
                 $nomPotongan = (float)($row['nominal_potongan'] ?? (($omzet * $pctPot) / 100));
-                $omzetBersih = max(0, $omzet - $nomPotongan);
-                $nomHakInvestor = ($omzetBersih * $pctInv) / 100;
-                $nomHakOutlet = $omzetBersih - $nomHakInvestor;
+                $nomHakInvestor = ($nomPotongan * $pctInv) / 100;
+                $nomHakOutlet = $nomPotongan - $nomHakInvestor;
+                $nomModalBelanja = max(0, $omzet - $nomPotongan);
+                $nomBersihTotal = $nomModalBelanja + $nomHakOutlet;
 
                 $row['nominal_hak_investor'] = $nomHakInvestor;
                 $row['nominal_hak_outlet'] = $nomHakOutlet;
+                $row['nominal_modal_belanja'] = $nomModalBelanja;
+                $row['nominal_bersih_outlet'] = $nomBersihTotal;
 
                 $transaksi[] = $row;
                 $totalOmzet += $omzet;
@@ -532,7 +535,9 @@ class Outlet {
                    COALESCE(omz.total_transaksi, 0) as transaksi_periode,
                    COALESCE(omz.total_potongan, 0) as potongan_periode,
                    COALESCE(omz.total_hak_investor, 0) as hak_investor_periode,
-                   COALESCE(omz.total_hak_outlet, 0) as hak_outlet_periode
+                   COALESCE(omz.total_hak_outlet, 0) as hak_outlet_periode,
+                   COALESCE(omz.total_modal_belanja, 0) as modal_belanja_periode,
+                   COALESCE(omz.total_bersih_outlet, 0) as bersih_outlet_periode
             FROM outlet o
             LEFT JOIN users u_kasir ON u_kasir.id_users = o.id_users
             LEFT JOIN master_wilayah mw ON mw.id_wilayah = u_kasir.id_wilayah
@@ -543,8 +548,10 @@ class Outlet {
                        SUM(nominal_omzet) as total_omzet,
                        COUNT(*) as total_transaksi,
                        SUM(nominal_potongan) as total_potongan,
-                       SUM((nominal_omzet - nominal_potongan) * (persentase_hak_investor / 100)) as total_hak_investor,
-                       SUM((nominal_omzet - nominal_potongan) * (1 - (persentase_hak_investor / 100))) as total_hak_outlet
+                       SUM(nominal_potongan * (persentase_hak_investor / 100)) as total_hak_investor,
+                       SUM(nominal_potongan * (1 - (persentase_hak_investor / 100))) as total_hak_outlet,
+                       SUM(nominal_omzet - nominal_potongan) as total_modal_belanja,
+                       SUM(nominal_omzet - (nominal_potongan * (persentase_hak_investor / 100))) as total_bersih_outlet
                 FROM laporan_omzet
                 WHERE {$whereOmzet}
                 GROUP BY id_outlet

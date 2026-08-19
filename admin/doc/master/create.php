@@ -156,13 +156,13 @@ if ($isEdit) {
 
         let isInitialEditCascade = isEdit;
 
-        function openNextSelect2(selector) {
+        function focusNextSelect2(selector) {
             setTimeout(() => {
                 let $el = $(selector);
                 if ($el.length && !$el.prop('disabled')) {
-                    $el.select2('open');
+                    $el.next('.select2-container').find('.select2-selection').focus();
                 }
-            }, 120);
+            }, 100);
         }
 
         $('.wilayah-select').on('select2:close', function() {
@@ -211,7 +211,7 @@ if ($isEdit) {
         $('#provinsi').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 }
             }, 150);
         });
@@ -219,7 +219,7 @@ if ($isEdit) {
         $('#kabupaten').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
-                    openNextSelect2('#kecamatan');
+                    focusNextSelect2('#kecamatan');
                 }
             }, 150);
         });
@@ -227,7 +227,7 @@ if ($isEdit) {
         $('#kecamatan').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
-                    openNextSelect2('#id_wilayah');
+                    focusNextSelect2('#id_wilayah');
                 }
             }, 150);
         });
@@ -337,7 +337,7 @@ if ($isEdit) {
         $('#no_hp').on('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                openNextSelect2('#provinsi');
+                focusNextSelect2('#provinsi');
             }
         });
 

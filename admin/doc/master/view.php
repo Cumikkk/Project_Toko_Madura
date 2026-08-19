@@ -193,15 +193,12 @@ $(document).ready(function() {
         });
     }
 
-    function openNextFilterSelect2(selector) {
+    function focusNextFilterSelect2(selector) {
         setTimeout(() => {
             let $el = $(selector);
-            $el.select2('open');
-            let searchField = document.querySelector('.select2-container--open .select2-search__field');
-            if (searchField) {
-                searchField.focus();
-            }
-        }, 120);
+            let $container = $el.next('.select2-container');
+            $container.find('.select2-selection').focus();
+        }, 100);
     }
 
     $('.filter-select').on('select2:close', function() {
@@ -312,7 +309,7 @@ $(document).ready(function() {
                 }
                 $('#filterKabupaten').html(options).prop('disabled', false);
                 initFilterSelect2('#filterKabupaten');
-                openNextFilterSelect2('#filterKabupaten');
+                focusNextFilterSelect2('#filterKabupaten');
             });
         }
         if (tableMaster) {

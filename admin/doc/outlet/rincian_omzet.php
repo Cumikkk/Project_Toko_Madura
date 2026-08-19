@@ -201,6 +201,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                 <th class="text-center">PERSENTASE POTONGAN</th>
                                 <th class="text-center">HAK INVESTOR</th>
                                 <th class="text-center">HAK OUTLET</th>
+                                <th class="text-center" style="color: #7D0A0A;">MODAL BELANJA</th>
                                 <th class="text-center">BERSIH OUTLET TOTAL</th>
                             </tr>
                         </thead>
@@ -217,7 +218,8 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                     $nomPotongan = (float)($t['nominal_potongan'] ?? 0);
                                     $nomHakInvestor = (float)($t['nominal_hak_investor'] ?? 0);
                                     $nomHakOutlet = (float)($t['nominal_hak_outlet'] ?? 0);
-                                    $nomBersih = max(0, $nomOmzet - $nomHakInvestor);
+                                    $nomModalBelanja = (float)($t['nominal_modal_belanja'] ?? max(0, $nomOmzet - $nomPotongan));
+                                    $nomBersih = (float)($t['nominal_bersih_outlet'] ?? ($nomModalBelanja + $nomHakOutlet));
                                 ?>
                                     <tr data-bulan="<?= $blnVal ?>" 
                                         data-tahun="<?= $thnVal ?>"
@@ -225,6 +227,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                         data-potongan="<?= $nomPotongan ?>"
                                         data-investor="<?= $nomHakInvestor ?>"
                                         data-outlet="<?= $nomHakOutlet ?>"
+                                        data-modal-belanja="<?= $nomModalBelanja ?>"
                                         data-bersih="<?= $nomBersih ?>">
                                         <td class="text-center"><?= $no++ ?></td>
                                         <td class="text-center"><?= $tglFormatted ?></td>
@@ -243,6 +246,9 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                             Rp <?= number_format($nomHakOutlet, 0, ',', '.') ?>
                                             <small class="text-muted">(<?= number_format($pctOutlet, 0) ?>%)</small>
                                         </td>
+                                        <td class="text-end fw-bold" style="color: #7D0A0A;">
+                                            Rp <?= number_format($nomModalBelanja, 0, ',', '.') ?>
+                                        </td>
                                         <td class="text-end fw-bold text-dark">
                                             Rp <?= number_format($nomBersih, 0, ',', '.') ?>
                                         </td>
@@ -250,7 +256,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                 <?php endforeach; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Belum ada transaksi omzet tercatat untuk outlet ini.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">Belum ada transaksi omzet tercatat untuk outlet ini.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -262,6 +268,7 @@ $totalOmzetAll = (float)($summary['total_omzet'] ?? 0);
                                 <td class="text-end text-danger fw-bold py-2" id="footTotalPotongan">Rp 0</td>
                                 <td class="text-end text-primary fw-bold py-2" id="footTotalInvestor">Rp 0</td>
                                 <td class="text-end text-warning fw-bold py-2" id="footTotalOutlet">Rp 0</td>
+                                <td class="text-end fw-bold py-2" style="color: #7D0A0A;" id="footTotalModalBelanja">Rp 0</td>
                                 <td class="text-end text-dark fw-bold py-2" id="footTotalBersih">Rp 0</td>
                             </tr>
                         </tfoot>
@@ -297,15 +304,12 @@ function initFilterSelect2(selector) {
     });
 }
 
-function openNextFilterSelect2(selector) {
+function focusNextFilterSelect2(selector) {
     setTimeout(() => {
         let $el = $(selector);
-        $el.select2('open');
-        let searchField = document.querySelector('.select2-container--open .select2-search__field');
-        if (searchField) {
-            searchField.focus();
-        }
-    }, 120);
+        let $container = $el.next('.select2-container');
+        $container.find('.select2-selection').focus();
+    }, 100);
 }
 
 $(document).ready(function() {
@@ -330,7 +334,7 @@ $(document).ready(function() {
 
     // Navigasi Otomatis Berurutan saat Filter Dipilih
     $('#filterBulan').on('select2:select', function() {
-        openNextFilterSelect2('#filterTahun');
+        focusNextFilterSelect2('#filterTahun');
     });
 
     // Inisialisasi DataTable Rincian Omzet dengan footerCallback dinamis
@@ -370,6 +374,7 @@ $(document).ready(function() {
                 var totalPotongan = 0;
                 var totalInvestor = 0;
                 var totalOutlet = 0;
+                var totalModalBelanja = 0;
                 var totalBersih = 0;
 
                 // Hitung total hanya untuk baris yang lolos filter / pencarian
@@ -379,6 +384,7 @@ $(document).ready(function() {
                     totalPotongan += parseFloat($row.attr('data-potongan')) || 0;
                     totalInvestor += parseFloat($row.attr('data-investor')) || 0;
                     totalOutlet += parseFloat($row.attr('data-outlet')) || 0;
+                    totalModalBelanja += parseFloat($row.attr('data-modal-belanja')) || 0;
                     totalBersih += parseFloat($row.attr('data-bersih')) || 0;
                 });
 
@@ -386,6 +392,7 @@ $(document).ready(function() {
                 $('#footTotalPotongan').html(formatRupiah(totalPotongan));
                 $('#footTotalInvestor').html(formatRupiah(totalInvestor));
                 $('#footTotalOutlet').html(formatRupiah(totalOutlet));
+                $('#footTotalModalBelanja').html(formatRupiah(totalModalBelanja));
                 $('#footTotalBersih').html(formatRupiah(totalBersih));
             }
         });

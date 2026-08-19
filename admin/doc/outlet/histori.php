@@ -368,15 +368,12 @@ $(document).ready(function() {
         });
     }
 
-    function openNextFilterSelect2(selector) {
+    function focusNextFilterSelect2(selector) {
         setTimeout(() => {
             let $el = $(selector);
-            $el.select2('open');
-            let searchField = document.querySelector('.select2-container--open .select2-search__field');
-            if (searchField) {
-                searchField.focus();
-            }
-        }, 120);
+            let $container = $el.next('.select2-container');
+            $container.find('.select2-selection').focus();
+        }, 100);
     }
 
     $('.filter-select').on('select2:close', function() {
@@ -483,24 +480,24 @@ $(document).ready(function() {
         }
     }
 
-    // Event filter: alur otomatis membuka dropdown berikutnya persis seperti halaman Master
+    // Event filter: alur otomatis memindahkan fokus ke filter berikutnya
     $('#filterTipe').on('change select2:select', function(e) {
         if (e.type === 'select2:select' && $(this).val()) {
-            openNextFilterSelect2('#filterStatus');
+            focusNextFilterSelect2('#filterStatus');
         }
         if (table) table.draw();
     });
 
     $('#filterStatus').on('change select2:select', function(e) {
         if (e.type === 'select2:select' && $(this).val()) {
-            openNextFilterSelect2('#filterBulan');
+            focusNextFilterSelect2('#filterBulan');
         }
         if (table) table.draw();
     });
 
     $('#filterBulan').on('change select2:select', function(e) {
         if (e.type === 'select2:select' && $(this).val()) {
-            openNextFilterSelect2('#filterTahun');
+            focusNextFilterSelect2('#filterTahun');
         }
         if (table) table.draw();
     });

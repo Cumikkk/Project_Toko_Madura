@@ -346,15 +346,13 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
             });
         }
 
-        function openNextSelect2(selector) {
+        function focusNextSelect2(selector) {
             setTimeout(() => {
                 let $el = $(selector);
-                $el.select2('open');
-                let searchField = document.querySelector('.select2-container--open .select2-search__field');
-                if (searchField) {
-                    searchField.focus();
+                if ($el.length && !$el.prop('disabled')) {
+                    $el.next('.select2-container').find('.select2-selection').focus();
                 }
-            }, 120);
+            }, 100);
         }
 
         $('.wilayah-select, #id_investor').on('select2:close', function() {
@@ -491,7 +489,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#provinsi').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 }
             }, 150);
         });
@@ -499,7 +497,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#kabupaten').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#kecamatan option').length > 1 && !$('#kecamatan').prop('disabled')) {
-                    openNextSelect2('#kecamatan');
+                    focusNextSelect2('#kecamatan');
                 }
             }, 150);
         });
@@ -507,7 +505,7 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
         $('#kecamatan').on('select2:select', function() {
             setTimeout(() => {
                 if ($('#id_wilayah option').length > 1 && !$('#id_wilayah').prop('disabled')) {
-                    openNextSelect2('#id_wilayah');
+                    focusNextSelect2('#id_wilayah');
                 }
             }, 150);
         });
@@ -554,11 +552,11 @@ $investorList = Investor::getAllInvestors($loggedInLevel, $loggedInId);
             if (e.which === 13) {
                 e.preventDefault();
                 if ($('#kabupaten option').length > 1 && !$('#kabupaten').prop('disabled')) {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 } else if (!$('#provinsi').prop('disabled')) {
-                    openNextSelect2('#provinsi');
+                    focusNextSelect2('#provinsi');
                 } else {
-                    openNextSelect2('#kabupaten');
+                    focusNextSelect2('#kabupaten');
                 }
             }
         });
