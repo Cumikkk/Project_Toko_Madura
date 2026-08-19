@@ -547,9 +547,9 @@ ob_start();
         <?php endif; ?>
     </table>
 
-    <!-- HALAMAN BARU UNTUK KELOMPOK OUTLET TRANSAKSI HARIAN -->
+    <!-- HALAMAN BARU UNTUK KELOMPOK OUTLET TRANSAKSI HARIAN (HANYA DITAMPILKAN SAAT FILTER TOKO SPESIFIK DIPILIH) -->
     <!-- Bagian III: Tabel Rincian Transaksi Harian Per Outlet Toko (Menampilkan Kolom Skema Pot. %) -->
-    <?php if (!empty($rowsSummary)) : ?>
+    <?php if (!empty($rowsSummary) && ($selectedOutletId > 0 || $role === 'outlet')) : ?>
         <?php 
         $outletNum = 0;
         foreach ($rowsSummary as $rOut) : 
