@@ -759,6 +759,14 @@ $countOutlet = count($rows);
 <!-- MODAL: DETAIL RINCIAN OMZET HARIAN TOKO (Tgl 1 s.d. Tgl 31) -->
 <!-- ========================================================================= -->
 <style>
+body.modal-open,
+html:has(body.modal-open) {
+    overflow: hidden !important;
+}
+#modalDetailOmzetHarian {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+}
 #tableModalDetailHarian thead th {
     position: sticky;
     top: 0;
@@ -782,7 +790,7 @@ $countOutlet = count($rows);
 }
 </style>
 
-<div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true">
+<div class="modal fade" id="modalDetailOmzetHarian" tabindex="-1" aria-labelledby="modalDetailOmzetHarianLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 1200px; width: 96%;">
         <div class="modal-content border-0 shadow bg-body" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0 pt-3 px-3">
@@ -793,7 +801,7 @@ $countOutlet = count($rows);
             </div>
             <div class="modal-body p-3">
                 <!-- Table of Daily Omzet -->
-                <div class="table-responsive rounded-3 border" style="max-height: 65vh; overflow-y: auto;">
+                <div class="table-responsive rounded-3 border">
                     <table class="table table-sm table-hover align-middle mb-0 w-100 text-nowrap" id="tableModalDetailHarian" style="font-size: 11.5px;">
                         <thead class="table-group-divider bg-body-secondary text-uppercase fw-bold" style="font-size: 10.5px; letter-spacing: 0.3px;">
                             <tr>
