@@ -519,7 +519,7 @@ $countOutlet = count($rows);
                         <?php endif; ?>
                     </div>
                     <small class="text-body-secondary micro-text d-block">
-                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Sisa omzet belanja stok' : 'Dihitung tgl akhir bulan'; ?>
+                        <?= ($hasAnyLastDayDone || $selectedBulan === 0) ? 'Uang Belanja' : 'Dihitung tgl akhir bulan'; ?>
                     </small>
                 </div>
             </div>
